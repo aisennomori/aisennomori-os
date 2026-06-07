@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ブロック診断ツール（90問）</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;-webkit-text-size-adjust:100%;background:#f8f7f4;font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif}
+#app{max-width:480px;margin:0 auto;padding:16px 16px 32px;min-height:100vh}
+.header{text-align:center;margin-bottom:1.25rem;padding-top:8px}
+.header h1{font-size:20px;font-weight:600;color:#1a1a1a;margin-bottom:10px}
+.intro-note{font-size:13px;color:#666;background:#eeecea;border-radius:12px;padding:10px 14px;line-height:1.75;text-align:left}
+.progress-wrap{margin-bottom:1.25rem}
+.progress-label{display:flex;justify-content:space-between;font-size:13px;color:#888;margin-bottom:6px}
+.progress-bar{height:6px;background:#e8e6e0;border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:#7F77DD;border-radius:99px;transition:width 0.3s ease}
+.q-card{background:#fff;border:1px solid #e8e6e0;border-radius:16px;padding:20px}
+.q-type{font-size:12px;font-weight:600;color:#7F77DD;margin-bottom:8px;letter-spacing:0.06em}
+.q-text{font-size:16px;color:#1a1a1a;line-height:1.8;margin-bottom:20px;min-height:60px}
+.btn-row{display:flex;gap:10px}
+.btn-yn{flex:1;padding:16px 12px;border-radius:12px;font-size:16px;font-weight:500;cursor:pointer;border:1.5px solid #ddd;background:#fff;color:#1a1a1a;transition:background 0.1s,border-color 0.1s;min-height:54px}
+.btn-yes.sel{background:#EEEDFE;border-color:#7F77DD;color:#3C3489}
+.btn-no.sel{background:#f1efe8;border-color:#888780;color:#444441}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:12px;min-height:44px}
+.btn-nav{padding:12px 18px;border-radius:10px;font-size:14px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#444;min-height:44px}
+.btn-nav:disabled{opacity:0.3;cursor:default}
+.btn-result{padding:12px 22px;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;background:#7F77DD;color:#fff;border:none;min-height:44px}
+/* 結果画面 */
+.result-wrap{display:none}
+.result-header{text-align:center;margin-bottom:1.5rem}
+.badge{display:inline-block;padding:5px 14px;border-radius:99px;font-size:13px;font-weight:600;background:#EEEDFE;color:#3C3489;margin-bottom:10px}
+.result-title{font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.result-sub{font-size:13px;color:#888}
+.score-chart{display:grid;gap:10px;margin:1.25rem 0}
+.score-row{display:grid;grid-template-columns:58px 1fr 26px;align-items:center;gap:8px;font-size:13px}
+.score-row .label{color:#888;text-align:right}
+.score-bar-bg{height:10px;background:#e8e6e0;border-radius:99px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:99px}
+.score-row .val{color:#1a1a1a;font-weight:600;text-align:left}
+.result-card{background:#fff;border:1px solid #e8e6e0;border-radius:16px;padding:20px;margin-top:1.25rem}
+.rc-label{font-size:12px;font-weight:600;color:#7F77DD;margin-bottom:10px;letter-spacing:0.06em}
+.rc-body{font-size:14px;color:#555;line-height:1.85;margin-bottom:14px}
+.rc-advice{background:#f8f7f4;border-radius:10px;padding:14px;font-size:14px;color:#555;line-height:1.8}
+.rc-advice strong{color:#1a1a1a;font-weight:600}
+/* 回答一覧 */
+.answers-section{margin-top:1.25rem}
+.answers-toggle{width:100%;padding:13px 16px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid #ddd;background:#fff;color:#444;text-align:left;display:flex;justify-content:space-between;align-items:center}
+.answers-toggle .arrow{transition:transform 0.2s;font-size:12px;color:#999}
+.answers-toggle.open .arrow{transform:rotate(180deg)}
+.answers-list{display:none;margin-top:8px;background:#fff;border:1px solid #e8e6e0;border-radius:16px;overflow:hidden}
+.answers-list.open{display:block}
+.ans-group-title{font-size:11px;font-weight:700;color:#fff;padding:6px 14px;letter-spacing:0.06em}
+.ans-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;padding:10px 14px;border-bottom:1px solid #f0ede8;font-size:13px;line-height:1.6}
+.ans-item:last-child{border-bottom:none}
+.ans-q{color:#444}
+.ans-yn{font-weight:700;font-size:12px;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.ans-yes{background:#EEEDFE;color:#3C3489}
+.ans-no{background:#f1efe8;color:#666}
+/* アクションボタン */
+.action-btns{display:flex;gap:10px;margin-top:1.25rem}
+.btn-action{flex:1;padding:13px 10px;border-radius:12px;font-size:14px;font-weight:500;cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:6px;border:none}
+.btn-copy{background:#EEEDFE;color:#3C3489;border:1px solid #7F77DD !important;border-style:solid}
+.btn-pdf{background:#7F77DD;color:#fff}
+.btn-pdf:disabled{opacity:0.6;cursor:default}
+.btn-retry{margin-top:10px;width:100%;padding:14px;border-radius:12px;font-size:14px;cursor:pointer;border:1px solid #ddd;background:#fff;color:#444;min-height:48px}
+.multi-wrap{display:none}
+.multi-results{display:flex;flex-direction:column;gap:1.25rem}
+/* コピーモーダル */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-box{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:480px;max-height:80vh;display:flex;flex-direction:column;gap:12px}
+.modal-title{font-size:16px;font-weight:600;color:#1a1a1a}
+.modal-sub{font-size:13px;color:#888}
+.modal-textarea{flex:1;min-height:200px;max-height:40vh;border:1px solid #ddd;border-radius:10px;padding:12px;font-size:12px;line-height:1.7;color:#333;resize:none;font-family:monospace;overflow-y:auto}
+.modal-btns{display:flex;gap:10px}
+.modal-btn{flex:1;padding:13px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;min-height:46px;border:none}
+.modal-btn-select{background:#EEEDFE;color:#3C3489}
+.modal-btn-close{background:#f1efe8;color:#555}
+/* スピナー */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 印刷用スタイル */
+@media print {
+  #quiz-view,.action-btns,.btn-retry,.answers-toggle,.nav-row{display:none!important}
+  #result-view{display:block!important}
+  .answers-list{display:block!important;border:none!important}
+  .ans-group-title{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .score-bar-fill{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{background:#fff!important}
+  #app{max-width:100%!important;padding:0!important}
+  .result-card{break-inside:avoid}
+  .ans-item{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="quiz-view">
+    <div class="header">
+      <h1>ブロック診断ツール</h1>
+      <div class="intro-note">
+        全部で90問あります。YES / NO でお答えください。<br>
+        チェックが多くついた項目が、あなたの"無意識の防衛傾向"を表しています。
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span id="q-counter">1 / 90</span>
+        <span id="q-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+    </div>
+    <div class="q-card">
+      <div class="q-type" id="q-type-label"></div>
+      <div class="q-text" id="q-text"></div>
+      <div class="btn-row">
+        <button class="btn-yn btn-yes" onclick="answer(true)">はい</button>
+        <button class="btn-yn btn-no"  onclick="answer(false)">いいえ</button>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-nav" id="btn-back" onclick="back()" disabled>← 前へ</button>
+      <button class="btn-result" id="btn-result" onclick="showResult()" style="display:none">結果を見る →</button>
+      <span id="spacer"></span>
+    </div>
+  </div>
+
+  <div id="result-view" class="result-wrap">
+    <div class="result-header">
+      <div class="badge">診断結果</div>
+      <div class="result-title" id="res-title"></div>
+      <div class="result-sub" id="res-sub"></div>
+    </div>
+    <div class="score-chart" id="score-chart"></div>
+    <div class="multi-wrap" id="multi-wrap">
+      <div class="multi-results" id="multi-results"></div>
+    </div>
+    <div id="main-card" class="result-card">
+      <div class="rc-label" id="rc-label"></div>
+      <div class="rc-body" id="rc-body"></div>
+      <div class="rc-advice"><strong>アドバイス：</strong><span id="rc-advice"></span></div>
+    </div>
+    <div class="answers-section">
+      <button class="answers-toggle" id="answers-toggle" onclick="toggleAnswers()">
+        <span>全90問の回答一覧を見る</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="answers-list" id="answers-list"></div>
+    </div>
+    <div class="action-btns">
+      <button class="btn-action btn-copy" style="border:1px solid #7F77DD" onclick="openCopyModal()">📋 テキストコピー</button>
+      <button class="btn-action btn-pdf" id="btn-pdf" onclick="printResult()">📄 PDF保存 / 印刷</button>
+    </div>
+    <button class="btn-retry" onclick="retry()">もう一度診断する</button>
+  </div>
+</div>
+
+<!-- コピーモーダル -->
+<div class="modal-overlay" id="copy-modal" onclick="closeCopyModalOutside(event)">
+  <div class="modal-box">
+    <div class="modal-title">📋 テキストをコピー</div>
+    <div class="modal-sub">下のテキストを全選択して、コピーしてください。</div>
+    <textarea class="modal-textarea" id="copy-textarea" readonly></textarea>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-select" onclick="selectAll()">全選択する</button>
+      <button class="modal-btn modal-btn-close" onclick="closeCopyModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TYPES=[
+  {id:'domination',label:'支配型',color:'#D85A30'},
+  {id:'submission',label:'服従型',color:'#7F77DD'},
+  {id:'dependence',label:'依存型',color:'#1D9E75'},
+  {id:'independence',label:'自立型',color:'#378ADD'},
+  {id:'order',label:'秩序型',color:'#BA7517'},
+  {id:'escape',label:'逃避型',color:'#D4537E'},
+];
+const QUESTIONS=[
+  {type:'domination',text:'相手が自分の思うように動かないとイライラすることがある'},
+  {type:'domination',text:'自分が負けたり劣っていることに我慢ならない'},
+  {type:'domination',text:'予定通りにいかないと強い不安を感じる'},
+  {type:'domination',text:'他人の行動をつい指摘・修正したくなる'},
+  {type:'domination',text:'感情で相手を操作してしまうことがある'},
+  {type:'domination',text:'責任感が強く、自分が一番であろうとする'},
+  {type:'domination',text:'人のミスを許せないことがある'},
+  {type:'domination',text:'周囲を管理・コントロールしようとする傾向がある'},
+  {type:'domination',text:'他人が無責任に見えるとストレスを感じる'},
+  {type:'domination',text:'自分がやった方が早いと感じることが多い'},
+  {type:'domination',text:'他人に任せるより、自分でやりたいと思う'},
+  {type:'domination',text:'ルールや自分のやり方に従わせようとする癖がある'},
+  {type:'domination',text:'つい「正しさ」で相手を論破しようとする'},
+  {type:'domination',text:'責めたり叱ったりしてしまった後、自己嫌悪になる'},
+  {type:'domination',text:'自分のやり方が一番だと感じてしまう'},
+  {type:'submission',text:'嫌われるのが怖くて、本音をなかなか言えない'},
+  {type:'submission',text:'その場の空気を壊さないように我慢する'},
+  {type:'submission',text:'「NO」と言えず、後から疲れてしまうことがある'},
+  {type:'submission',text:'自分の気持ちよりも、相手を優先してしまう'},
+  {type:'submission',text:'「わたしなんて…」と自己評価が低くなりがち'},
+  {type:'submission',text:'「怒らせたらどうしよう」と思ってしまう'},
+  {type:'submission',text:'他人に合わせるのが習慣になっている'},
+  {type:'submission',text:'自分の意見を持つことに、罪悪感がある'},
+  {type:'submission',text:'相手に従っていた方が安全だと感じる'},
+  {type:'submission',text:'衝突を避けるために、自分を引っ込める'},
+  {type:'submission',text:'本音と建前を使い分けてしまう'},
+  {type:'submission',text:'自分が我慢すればいいと思ってしまう'},
+  {type:'submission',text:'他人の気分に左右されてしまう'},
+  {type:'submission',text:'拒否されたくない気持ちが強い'},
+  {type:'submission',text:'「いい人」でいようとして疲れてしまう'},
+  {type:'dependence',text:'一人になるのが怖いと感じることがある'},
+  {type:'dependence',text:'誰かに必要とされていないと不安になる'},
+  {type:'dependence',text:'相手の反応ばかり気にしてしまう'},
+  {type:'dependence',text:'「愛されていないのでは」と不安になることがある'},
+  {type:'dependence',text:'感情が不安定になりやすい'},
+  {type:'dependence',text:'相手から離れることに対して罪悪感を抱く'},
+  {type:'dependence',text:'相手の感情に過剰に反応してしまう'},
+  {type:'dependence',text:'認めてもらうために無理をしてしまう'},
+  {type:'dependence',text:'自分に自信が持てず、人に依存しがち'},
+  {type:'dependence',text:'相手に合わせて自分を変えてしまう'},
+  {type:'dependence',text:'嫌われたくなくて遠慮してしまう'},
+  {type:'dependence',text:'つながっていないと安心できない'},
+  {type:'dependence',text:'常に「大丈夫かな？」と確認したくなる'},
+  {type:'dependence',text:'連絡が来ないだけで心がざわついてしまう'},
+  {type:'dependence',text:'誰かにそっけなくされると「嫌われたのかな」と感じてしまう'},
+  {type:'independence',text:'人に弱みを見せるのがとても苦手'},
+  {type:'independence',text:'「助けて」が言えないまま、自分だけで頑張ってしまう'},
+  {type:'independence',text:'人を助けたり手伝ったりすることが自分の役割だと感じる'},
+  {type:'independence',text:'本当はつらくても「平気なふり」をしてしまう'},
+  {type:'independence',text:'「自分でなんとかしなきゃ」と思ってしまう'},
+  {type:'independence',text:'人に心配されるのが嫌だ'},
+  {type:'independence',text:'甘えたり頼ったりすると、罪悪感がある'},
+  {type:'independence',text:'責任感が強く、全部自分で背負いがち'},
+  {type:'independence',text:'弱さを見せることが「恥」だと思っている'},
+  {type:'independence',text:'頼るくらいなら、我慢する方を選んでしまう'},
+  {type:'independence',text:'「私は大丈夫」と無理に言ってしまう癖がある'},
+  {type:'independence',text:'誰にも期待しない方が楽だと思う'},
+  {type:'independence',text:'「自分さえ我慢すれば」と思うことが多い'},
+  {type:'independence',text:'人に期待して裏切られた経験がある'},
+  {type:'independence',text:'弱音を吐いた後、後悔してしまう'},
+  {type:'order',text:'間違えることが怖い'},
+  {type:'order',text:'準備不足だと不安になり、行動できない'},
+  {type:'order',text:'物事が整っていないと落ち着かない'},
+  {type:'order',text:'「間違ってはいけない」というプレッシャーが強い'},
+  {type:'order',text:'ルールや常識に従って生きる傾向がある'},
+  {type:'order',text:'先のことを考えすぎて動けなくなる'},
+  {type:'order',text:'スケジュールを変更されるとイライラする'},
+  {type:'order',text:'細かい部分にこだわりすぎてしまう'},
+  {type:'order',text:'計画通りに進まないと焦る'},
+  {type:'order',text:'変化が苦手で、予測できることに安心する'},
+  {type:'order',text:'「きちんとしていない」と感じると不安になる'},
+  {type:'order',text:'つい自分に厳しくなってしまう'},
+  {type:'order',text:'判断基準が「正しさ」や「完璧さ」に偏ってしまう'},
+  {type:'order',text:'決められた手順が崩れると混乱する'},
+  {type:'order',text:'感情に振り回されたくない'},
+  {type:'escape',text:'空想の世界にいることで、気持ちが楽になることが多い'},
+  {type:'escape',text:'現実の人間関係やトラブルに向き合うのが怖い'},
+  {type:'escape',text:'感情を感じたくないとき、すぐに頭の中で別のことを考える'},
+  {type:'escape',text:'心を守るために、相手と距離を取る癖がある'},
+  {type:'escape',text:'気づくと、現実から離れた妄想をしていることがある'},
+  {type:'escape',text:'話しかけられても、内側の世界に意識が向いていることがある'},
+  {type:'escape',text:'「どうでもいい」と無気力になる瞬間がある'},
+  {type:'escape',text:'深く考えすぎて行動できなくなることがある'},
+  {type:'escape',text:'感じるよりも、考えてしまう傾向が強い'},
+  {type:'escape',text:'不快な気持ちになると、ぼーっとしてしまう'},
+  {type:'escape',text:'一人の時間や空間がないと、心が疲れてしまう'},
+  {type:'escape',text:'感情が湧いたとき、それを感じないようにしている'},
+  {type:'escape',text:'深く人と関わることに、無意識の怖さがある'},
+  {type:'escape',text:'自分の殻に閉じこもりがちだと感じる'},
+  {type:'escape',text:'心を閉ざしてしまう癖がある'},
+];
+const PROFILES={
+  domination:{title:'支配型',sub:'コントロール・正しさにこだわる傾向',feature:'あなたはとても責任感が強く、正しさや結果を出すことを大切にして生きてこられた方かもしれません。物事を整え、導く力がある一方で、「こうあるべき」「正しくあってほしい」という思いが強くなりすぎると、無意識のうちに人や状況をコントロールしたくなることがあります。相手の行動が思い通りにいかないと、心がざわついたり、イライラしてしまうこともあるでしょう。でもその奥には、敗北や相手の思い通りにされることを恐れる、深い「不安」があるのです。',advice:'まずは、その「正しさ」を手放そうとするのではなく、「守ろうとしてきた不安」に寄り添ってあげてください。相手に委ねる、手放す、信じてみる——それは最初、怖いことかもしれません。でも、手放した先にこそ、あなたが本当に望んでいた"深い安心"が待っています。世界は、あなたが思っている以上に、優しく、柔らかいものかもしれません。'},
+  submission:{title:'服従型',sub:'他人に合わせ、自分を抑える傾向',feature:'あなたはとても思いやり深く、相手の気持ちに敏感な方です。場の空気を壊さないように振る舞い、たとえ自分の本音が違っていても「相手を傷つけたくない」「波風を立てたくない」という想いから、つい我慢してしまう。それは、あなたが「愛されたい」「認められたい」という純粋な願いを、深いところに持っているからです。でも、いつも"いい人"を演じ続けると、だんだんと本当の自分が見えなくなってしまいます。',advice:'あなたの中には、ちゃんと声を上げていい"本当の気持ち"があります。相手のことを思いやるように、自分の心にも耳を傾けてみてください。「嫌だ」と思っていい、「NO」と言っても大丈夫——そう自分に許可してあげましょう。自分を大切にすればするほど、まわりの人ともより深く、本当の意味でつながれるようになります。'},
+  dependence:{title:'依存型',sub:'見捨てられ不安・承認欲求が強い傾向',feature:'あなたは、とても感受性が豊かで、人とのつながりを大切にする方です。その一方で、心のどこかで「一人になるのが怖い」「見捨てられるのでは」という不安を抱えていることはありませんか？連絡が来ないだけで心がざわついたり、誰かにそっけなくされると「嫌われたのかな」と感じてしまう。それは、あなたが「つながり」を何よりも大切にしてきたからです。でもその"つながり"が、いつの間にか「自分を犠牲にする関係性」になってしまうこともあります。',advice:'あなたが本当に求めているのは、"安心感のある愛"ではないでしょうか。その安心感は、他人からもらうものではなく、あなたの内側から生まれるものです。まずは、自分自身を深く信頼し、心のよりどころを「外」から「内」に戻していくこと。あなたがあなたを大切にし、自立して生きる時、本当に安心できる関係も育っていくのです。'},
+  independence:{title:'自立型',sub:'誰にも頼らず、一人で抱え込む傾向',feature:'あなたは、とても頑張り屋で、人に頼らずにここまで生きてきた方かもしれません。誰かに迷惑をかけてはいけない、甘えてはいけない——そんな思いが心の奥に根づいていて、本当はつらくても「大丈夫」と言ってしまうのではないでしょうか。人に助けを求めたくても、それは「弱さ」だと感じてしまい、無意識に一人で抱え込んでしまう。「誰にも頼らない生き方」が、いつの間にか「自分を守る方法」になっていたのかもしれません。',advice:'誰かにそっと手を差し伸べられたとき、心がじんわりと温かくなった経験はありませんか？人に頼ることは、けっして「甘え」ではありません。むしろ、誰かを信じ、委ねることができる人こそ、本当の意味で「強い人」なのです。「頼る」「助けを求める」その一歩は、あなたの内側にある力を、もっと自由に解き放つきっかけになります。'},
+  order:{title:'秩序型',sub:'完璧・正しさ・ルールにこだわる傾向',feature:'あなたは、とても几帳面で誠実な方です。決められたルールや正しさに価値を置き、自分にも他人にもきちんとしていたいという気持ちが強いのではないでしょうか。少しでも予定が狂ったり思い通りにいかないと、不安になったりイライラしてしまうことはありませんか？「ちゃんとしていたい」という思いの奥には、「ちゃんとしていない自分には価値がない」という思い込みが隠れていることもあります。',advice:'あなたが大切にしてきた秩序や規律は、確かにあなたを守ってきたのです。でも、すこしだけ肩の力を抜いてみてください。完璧じゃなくても、ちゃんとしていなくても、あなたには十分すぎるほどの価値があります。「ゆるむこと」「遊び心」を自分に許すことで、人生はもっと自由に、そして楽に進み始めるのです。'},
+  escape:{title:'逃避型',sub:'現実から離れ、内面世界に逃げる傾向',feature:'あなたはとても繊細で、感じる力が豊かであるがゆえに、現実の刺激や人間関係に対して、無意識に距離を取ってしまうことがあります。傷つくことや混乱することが怖くて、自分の内側にこもってしまう。誰にも邪魔されない自分だけの世界にいるとき、ようやく安心できるのかもしれません。外の世界で何かを感じそうになると、自然と意識が別のことへと飛んでいく——それはあなたが「感じること」に対してとても敏感だからなのです。',advice:'まずは、そんな自分を責めないでください。あなたが「逃げてしまった」ように見えるその瞬間も、本当は自分を守ろうとしてきたのです。ほんの少しだけ、「感じること」「つながること」を自分に許してあげてください。誰かに心を開いたり、ひとつの感情をしっかり感じたりすることは、最初は怖く感じるかもしれません。でも、大丈夫。あなたのペースで、少しずつでいいのです。'},
+};
+
+const TOTAL=QUESTIONS.length;
+let answers=new Array(TOTAL).fill(null);
+let current=0;
+let lastSorted=[];
+let lastIsClose=false;
+
+function render(){
+  const q=QUESTIONS[current];
+  const t=TYPES.find(t=>t.id===q.type);
+  document.getElementById('q-type-label').textContent=t.label;
+  document.getElementById('q-text').textContent=q.text;
+  document.getElementById('q-counter').textContent=(current+1)+' / '+TOTAL;
+  const pct=Math.round(current/TOTAL*100);
+  document.getElementById('q-pct').textContent=pct+'%';
+  document.getElementById('pbar').style.width=pct+'%';
+  document.getElementById('btn-back').disabled=current===0;
+  const ans=answers[current];
+  document.querySelectorAll('.btn-yn').forEach(b=>b.classList.remove('sel'));
+  if(ans===true)document.querySelector('.btn-yes').classList.add('sel');
+  if(ans===false)document.querySelector('.btn-no').classList.add('sel');
+  const allDone=answers.every(a=>a!==null);
+  document.getElementById('btn-result').style.display=allDone?'inline-block':'none';
+  document.getElementById('spacer').style.display=allDone?'none':'inline-block';
+}
+function answer(val){
+  answers[current]=val;
+  if(current<TOTAL-1){current++;render();}
+  else{render();}
+}
+function back(){if(current>0){current--;render();}}
+
+function calcScores(){
+  const scores={};
+  TYPES.forEach(t=>{scores[t.id]=0;});
+  QUESTIONS.forEach((q,i)=>{if(answers[i]===true)scores[q.type]++;});
+  return scores;
+}
+
+function buildAnswersList(){
+  const list=document.getElementById('answers-list');
+  let html='';
+  TYPES.forEach(t=>{
+    const typeQs=QUESTIONS.map((q,i)=>({...q,idx:i})).filter(q=>q.type===t.id);
+    const yesCount=typeQs.filter(q=>answers[q.idx]===true).length;
+    html+=`<div class="ans-group-title" style="background:${t.color}">${t.label}（${yesCount}/${typeQs.length}）</div>`;
+    typeQs.forEach(q=>{
+      const isYes=answers[q.idx]===true;
+      html+=`<div class="ans-item"><div class="ans-q">Q${q.idx+1}. ${q.text}</div><div class="ans-yn ${isYes?'ans-yes':'ans-no'}">${isYes?'はい':'いいえ'}</div></div>`;
+    });
+  });
+  list.innerHTML=html;
+}
+
+function toggleAnswers(){
+  const list=document.getElementById('answers-list');
+  const btn=document.getElementById('answers-toggle');
+  const isOpen=list.classList.contains('open');
+  list.classList.toggle('open');
+  btn.classList.toggle('open');
+  btn.querySelector('span:first-child').textContent=isOpen?'全90問の回答一覧を見る':'回答一覧を閉じる';
+}
+
+function buildCopyText(){
+  const now=new Date();
+  const dateStr=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+  const top=lastSorted[0],second=lastSorted[1];
+  const topProfile=PROFILES[top.id];
+  let txt='■ ブロック診断ツール 結果レポート\n';
+  txt+=`診断日：${dateStr}\n\n`;
+  txt+='【診断結果】\n';
+  if(lastIsClose){
+    txt+=`複合型（${top.label} × ${second.label}）\n\n`;
+    [top,second].forEach(t=>{
+      const p=PROFILES[t.id];
+      txt+=`▶ ${p.title}（${p.sub}）\n${p.feature}\nアドバイス：${p.advice}\n\n`;
+    });
+  } else {
+    txt+=`${topProfile.title}（${topProfile.sub}）\n\n【あなたの特徴】\n${topProfile.feature}\n\n【アドバイス】\n${topProfile.advice}\n\n`;
+  }
+  txt+='【スコア一覧】\n';
+  lastSorted.forEach(t=>{
+    const pct=Math.round(t.score/t.max*100);
+    const bar='█'.repeat(Math.round(pct/10))+'░'.repeat(10-Math.round(pct/10));
+    txt+=`${t.label}  ${bar}  ${t.score}/${t.max}点\n`;
+  });
+  txt+='\n【全90問 回答一覧】\n';
+  TYPES.forEach(t=>{
+    const typeQs=QUESTIONS.map((q,i)=>({...q,idx:i})).filter(q=>q.type===t.id);
+    const yesCount=typeQs.filter(q=>answers[q.idx]===true).length;
+    txt+=`\n▼ ${t.label}（${yesCount}/${typeQs.length}）\n`;
+    typeQs.forEach(q=>{
+      const yn=answers[q.idx]===true?'はい  ':'いいえ';
+      txt+=`  [${yn}] Q${q.idx+1}. ${q.text}\n`;
+    });
+  });
+  return txt;
+}
+
+function openCopyModal(){
+  document.getElementById('copy-textarea').value=buildCopyText();
+  document.getElementById('copy-modal').classList.add('open');
+  setTimeout(()=>{const ta=document.getElementById('copy-textarea');ta.focus();ta.select();},100);
+}
+function closeCopyModal(){document.getElementById('copy-modal').classList.remove('open');}
+function closeCopyModalOutside(e){if(e.target===document.getElementById('copy-modal'))closeCopyModal();}
+function selectAll(){const ta=document.getElementById('copy-textarea');ta.focus();ta.select();}
+
+function printResult(){
+  // 回答一覧を展開してから印刷
+  const list=document.getElementById('answers-list');
+  const btn=document.getElementById('answers-toggle');
+  if(!list.classList.contains('open')){
+    list.classList.add('open');
+    btn.classList.add('open');
+    btn.querySelector('span:first-child').textContent='回答一覧を閉じる';
+  }
+  setTimeout(()=>window.print(), 150);
+}
+
+
+function showResult(){
+  const scores=calcScores();
+  const sorted=TYPES.map(t=>({...t,score:scores[t.id],max:QUESTIONS.filter(q=>q.type===t.id).length})).sort((a,b)=>b.score-a.score);
+  lastSorted=sorted;
+  const top=sorted[0],second=sorted[1];
+  const topProfile=PROFILES[top.id];
+  const topPct=Math.round(top.score/top.max*100);
+  const secondPct=Math.round(second.score/second.max*100);
+  const isClose=secondPct>=topPct-15&&second.score>=5;
+  lastIsClose=isClose;
+
+  document.getElementById('quiz-view').style.display='none';
+  document.getElementById('result-view').style.display='block';
+  document.getElementById('res-title').textContent=isClose?`複合型（${top.label} × ${second.label}）`:topProfile.title;
+  document.getElementById('res-sub').textContent=isClose?'2つの傾向が近い複合型です':topProfile.sub;
+
+  document.getElementById('score-chart').innerHTML=sorted.map(t=>{
+    const pct=Math.round(t.score/t.max*100);
+    return`<div class="score-row"><div class="label">${t.label}</div><div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%;background:${t.color}"></div></div><div class="val">${t.score}</div></div>`;
+  }).join('');
+
+  if(isClose){
+    document.getElementById('multi-wrap').style.display='block';
+    document.getElementById('multi-results').innerHTML=[top,second].map(t=>{
+      const p=PROFILES[t.id];
+      return`<div class="result-card"><div class="rc-label">${p.title} — ${p.sub}</div><div class="rc-body">${p.feature}</div><div class="rc-advice"><strong>アドバイス：</strong>${p.advice}</div></div>`;
+    }).join('');
+    document.getElementById('main-card').style.display='none';
+  } else {
+    document.getElementById('rc-label').textContent=`${topProfile.title} — ${topProfile.sub}`;
+    document.getElementById('rc-body').textContent=topProfile.feature;
+    document.getElementById('rc-advice').textContent=topProfile.advice;
+  }
+  buildAnswersList();
+  window.scrollTo(0,0);
+}
+
+function retry(){
+  answers=new Array(TOTAL).fill(null);
+  current=0;lastSorted=[];lastIsClose=false;
+  document.getElementById('result-view').style.display='none';
+  document.getElementById('multi-wrap').style.display='none';
+  document.getElementById('multi-results').innerHTML='';
+  document.getElementById('main-card').style.display='block';
+  document.getElementById('answers-list').classList.remove('open');
+  document.getElementById('answers-toggle').classList.remove('open');
+  document.getElementById('answers-toggle').querySelector('span:first-child').textContent='全90問の回答一覧を見る';
+  document.getElementById('quiz-view').style.display='block';
+  window.scrollTo(0,0);
+  render();
+}
+render();
+</script>
+</body>
+</html>
