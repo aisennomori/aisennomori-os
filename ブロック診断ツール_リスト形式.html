@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ブロック診断ツール（リスト形式）</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f8f7f4;
+  --white: #ffffff;
+  --border: #e8e4dc;
+  --text: #1a1a1a;
+  --text2: #666;
+  --purple: #7F77DD;
+  --purple-light: #EEEDFE;
+  --purple-dark: #3C3489;
+  --accent1: #D85A30;
+  --accent2: #1D9E75;
+  --accent3: #378ADD;
+  --accent4: #BA7517;
+  --accent5: #D4537E;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: 'Noto Sans JP', sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+}
+
+#app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+/* ===== HEADER ===== */
+.page-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-top: 8px;
+}
+.page-header h1 {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.intro-note {
+  font-size: 13px;
+  color: var(--text2);
+  background: #eeecea;
+  border-radius: 12px;
+  padding: 12px 16px;
+  line-height: 1.8;
+  text-align: left;
+}
+
+/* ===== PROGRESS ===== */
+.progress-wrap {
+  margin-bottom: 1.5rem;
+}
+.progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.progress-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--purple);
+}
+.progress-pct {
+  font-size: 13px;
+  color: var(--text2);
+}
+.progress-bar {
+  height: 8px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), #a89ff0);
+  border-radius: 99px;
+  transition: width 0.4s cubic-bezier(.22,.68,0,1.2);
+}
+
+/* ===== PAGE BADGE ===== */
+.page-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+.badge-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+.badge-info { flex: 1; }
+.badge-type {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+.badge-range {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 1px;
+}
+
+/* ===== QUESTION LIST ===== */
+.q-list {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+
+.q-item {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.q-item:last-child { border-bottom: none; }
+.q-item.answered { background: #fafaf8; }
+
+.q-num-text {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.q-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--purple);
+  background: var(--purple-light);
+  border-radius: 6px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.q-text {
+  font-size: 14.5px;
+  color: var(--text);
+  line-height: 1.75;
+}
+
+.yn-row {
+  display: flex;
+  gap: 8px;
+}
+.yn-btn {
+  flex: 1;
+  padding: 11px 8px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text2);
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 46px;
+  font-family: 'Noto Sans JP', sans-serif;
+}
+.yn-btn:active { transform: scale(0.97); }
+.yn-btn.yes-sel {
+  background: var(--purple-light);
+  border-color: var(--purple);
+  color: var(--purple-dark);
+  font-weight: 700;
+}
+.yn-btn.no-sel {
+  background: #f1efe8;
+  border-color: #888780;
+  color: #444441;
+  font-weight: 700;
+}
+
+/* ===== VALIDATION ===== */
+.validation-msg {
+  display: none;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #cf1322;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.validation-msg.show { display: block; }
+
+/* ===== NAV ===== */
+.nav-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.btn-prev {
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 14px;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 50px;
+  transition: all 0.2s;
+}
+.btn-prev:disabled { opacity: 0.3; cursor: default; }
+.btn-prev:not(:disabled):hover { border-color: var(--purple); color: var(--purple); }
+
+.btn-next {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, var(--purple) 0%, #6059cc 100%);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 50px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 16px rgba(127,119,221,0.35);
+  letter-spacing: 0.05em;
+}
+.btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(127,119,221,0.45); }
+.btn-next:active { transform: scale(0.98); }
+
+/* ===== PAGE DOTS ===== */
+.page-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin: 1.2rem 0 0;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s;
+}
+.dot.done { background: var(--purple); opacity: 0.4; }
+.dot.active { background: var(--purple); width: 20px; border-radius: 4px; opacity: 1; }
+
+/* ===== RESULT ===== */
+#result-view { display: none; }
+
+.result-hero {
+  text-align: center;
+  padding: 2rem 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--white), #f0eefd);
+  border: 1px solid #dddaff;
+  border-radius: 20px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 20px rgba(127,119,221,0.12);
+}
+.result-badge {
+  display: inline-block;
+  background: var(--purple-light);
+  color: var(--purple-dark);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 99px;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.1em;
+}
+.result-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.result-sub { font-size: 13px; color: var(--text2); }
+
+/* Score chart */
+.score-chart {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 1.2rem;
+}
+.chart-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+.score-row {
+  display: grid;
+  grid-template-columns: 56px 1fr 36px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+.score-row:last-child { margin-bottom: 0; }
+.score-label { color: var(--text2); text-align: right; }
+.score-bar-bg {
+  height: 10px;
+  background: #eeebe4;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.8s cubic-bezier(.22,.68,0,1.2);
+}
+.score-val { font-weight: 700; color: var(--text); }
+
+/* Profile card */
+.profile-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.profile-card-header {
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  letter-spacing: 0.08em;
+}
+.profile-card-body {
+  padding: 16px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.9;
+  margin-bottom: 12px;
+}
+.profile-advice {
+  margin: 0 16px 16px;
+  background: var(--bg);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 14px;
+  color: #555;
+  line-height: 1.85;
+}
+.profile-advice strong { color: var(--text); font-weight: 700; }
+
+/* Multi cards */
+.multi-cards { display: flex; flex-direction: column; gap: 1.2rem; }
+
+/* Action buttons */
+.action-btns {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.btn-action {
+  flex: 1;
+  padding: 14px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: all 0.2s;
+}
+.btn-copy {
+  background: var(--purple-light);
+  color: var(--purple-dark);
+  border: 1.5px solid var(--purple);
+}
+.btn-pdf {
+  background: linear-gradient(135deg, var(--purple), #6059cc);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 16px rgba(127,119,221,0.35);
+}
+.btn-retry {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text2);
+  font-family: 'Noto Sans JP', sans-serif;
+  min-height: 50px;
+  margin-top: 10px;
+  transition: all 0.2s;
+}
+.btn-retry:hover { border-color: var(--purple); color: var(--purple); }
+
+/* Answers toggle */
+.answers-section { margin-bottom: 1.2rem; }
+.answers-toggle {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text2);
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Noto Sans JP', sans-serif;
+  transition: all 0.2s;
+}
+.answers-toggle:hover { border-color: var(--purple); color: var(--purple); }
+.arrow { transition: transform 0.2s; font-size: 12px; }
+.answers-toggle.open .arrow { transform: rotate(180deg); }
+.answers-list { display: none; margin-top: 8px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.answers-list.open { display: block; }
+.ans-group-title { font-size: 11px; font-weight: 700; color: white; padding: 6px 14px; letter-spacing: 0.06em; }
+.ans-item { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: start; padding: 10px 14px; border-bottom: 1px solid #f0ede8; font-size: 13px; line-height: 1.6; }
+.ans-item:last-child { border-bottom: none; }
+.ans-q { color: #444; }
+.ans-yn { font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+.ans-yes { background: var(--purple-light); color: var(--purple-dark); }
+.ans-no { background: #f1efe8; color: #666; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--white); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 560px; max-height: 80vh; display: flex; flex-direction: column; gap: 12px; }
+.modal-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.modal-sub { font-size: 13px; color: var(--text2); }
+.modal-textarea { flex: 1; min-height: 200px; max-height: 40vh; border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 12px; line-height: 1.7; color: #333; resize: none; font-family: monospace; overflow-y: auto; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn { flex: 1; padding: 13px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; min-height: 46px; border: none; font-family: 'Noto Sans JP', sans-serif; }
+.modal-btn-select { background: var(--purple-light); color: var(--purple-dark); }
+.modal-btn-close { background: #f1efe8; color: #555; }
+
+/* Slide animation */
+.quiz-page { animation: slideIn 0.3s cubic-bezier(.22,.68,0,1.2); }
+@keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+@media print {
+  #quiz-view,.action-btns,.btn-retry,.answers-toggle,.nav-row,.page-dots { display:none!important }
+  #result-view { display:block!important }
+  .answers-list { display:block!important; border:none!important }
+  .ans-group-title { -webkit-print-color-adjust:exact; print-color-adjust:exact }
+  .score-bar-fill { -webkit-print-color-adjust:exact; print-color-adjust:exact }
+  body { background:#fff!important }
+  #app { max-width:100%!important; padding:0!important }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- QUIZ VIEW -->
+  <div id="quiz-view">
+    <div class="page-header">
+      <h1>ブロック診断ツール</h1>
+      <div class="intro-note">
+        全90問を10問ずつ、9ページに分けてお答えください。<br>
+        YES / NO を選択し、10問すべて入力したら次へ進めます。
+      </div>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-top">
+        <span class="progress-label" id="progress-label">ページ 1 / 9</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="page-badge" id="page-badge"></div>
+
+    <div class="validation-msg" id="val-msg">
+      ⚠️ すべての質問に YES / NO を選択してから次へ進んでください
+    </div>
+
+    <div class="q-list" id="q-list"></div>
+
+    <div class="nav-row">
+      <button class="btn-prev" id="btn-prev" onclick="prevPage()">← 前へ</button>
+      <button class="btn-next" id="btn-next" onclick="nextPage()">次へ →</button>
+    </div>
+
+    <div class="page-dots" id="page-dots"></div>
+  </div>
+
+  <!-- RESULT VIEW -->
+  <div id="result-view">
+    <div class="result-hero">
+      <div class="result-badge">診断結果</div>
+      <div class="result-title" id="res-title"></div>
+      <div class="result-sub" id="res-sub"></div>
+    </div>
+
+    <div class="score-chart">
+      <div class="chart-title">スコア一覧</div>
+      <div id="score-chart-rows"></div>
+    </div>
+
+    <div id="main-result"></div>
+
+    <div class="answers-section">
+      <button class="answers-toggle" id="answers-toggle" onclick="toggleAnswers()">
+        <span id="ans-toggle-text">全90問の回答一覧を見る</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="answers-list" id="answers-list"></div>
+    </div>
+
+    <div class="action-btns">
+      <button class="btn-action btn-copy" onclick="openCopyModal()">📋 テキストコピー</button>
+      <button class="btn-action btn-pdf" onclick="printResult()">📄 PDF保存</button>
+    </div>
+    <button class="btn-retry" onclick="retry()">もう一度診断する</button>
+  </div>
+
+</div>
+
+<!-- Copy Modal -->
+<div class="modal-overlay" id="copy-modal" onclick="closeCopyModalOutside(event)">
+  <div class="modal-box">
+    <div class="modal-title">📋 テキストをコピー</div>
+    <div class="modal-sub">下のテキストを全選択してコピーしてください</div>
+    <textarea class="modal-textarea" id="copy-textarea" readonly></textarea>
+    <div class="modal-btns">
+      <button class="modal-btn modal-btn-select" onclick="selectAll()">全選択する</button>
+      <button class="modal-btn modal-btn-close" onclick="closeCopyModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TYPES = [
+  { id:'domination',  label:'支配型',  color:'#D85A30' },
+  { id:'submission',  label:'服従型',  color:'#7F77DD' },
+  { id:'dependence',  label:'依存型',  color:'#1D9E75' },
+  { id:'independence',label:'自立型',  color:'#378ADD' },
+  { id:'order',       label:'秩序型',  color:'#BA7517' },
+  { id:'escape',      label:'逃避型',  color:'#D4537E' },
+];
+
+const QUESTIONS = [
+  {type:'domination',text:'相手が自分の思うように動かないとイライラすることがある'},
+  {type:'domination',text:'自分が負けたり劣っていることに我慢ならない'},
+  {type:'domination',text:'予定通りにいかないと強い不安を感じる'},
+  {type:'domination',text:'他人の行動をつい指摘・修正したくなる'},
+  {type:'domination',text:'感情で相手を操作してしまうことがある'},
+  {type:'domination',text:'責任感が強く、自分が一番であろうとする'},
+  {type:'domination',text:'人のミスを許せないことがある'},
+  {type:'domination',text:'周囲を管理・コントロールしようとする傾向がある'},
+  {type:'domination',text:'他人が無責任に見えるとストレスを感じる'},
+  {type:'domination',text:'自分がやった方が早いと感じることが多い'},
+  {type:'domination',text:'他人に任せるより、自分でやりたいと思う'},
+  {type:'domination',text:'ルールや自分のやり方に従わせようとする癖がある'},
+  {type:'domination',text:'つい「正しさ」で相手を論破しようとする'},
+  {type:'domination',text:'責めたり叱ったりしてしまった後、自己嫌悪になる'},
+  {type:'domination',text:'自分のやり方が一番だと感じてしまう'},
+  {type:'submission',text:'嫌われるのが怖くて、本音をなかなか言えない'},
+  {type:'submission',text:'その場の空気を壊さないように我慢する'},
+  {type:'submission',text:'「NO」と言えず、後から疲れてしまうことがある'},
+  {type:'submission',text:'自分の気持ちよりも、相手を優先してしまう'},
+  {type:'submission',text:'「わたしなんて…」と自己評価が低くなりがち'},
+  {type:'submission',text:'「怒らせたらどうしよう」と思ってしまう'},
+  {type:'submission',text:'他人に合わせるのが習慣になっている'},
+  {type:'submission',text:'自分の意見を持つことに、罪悪感がある'},
+  {type:'submission',text:'相手に従っていた方が安全だと感じる'},
+  {type:'submission',text:'衝突を避けるために、自分を引っ込める'},
+  {type:'submission',text:'本音と建前を使い分けてしまう'},
+  {type:'submission',text:'自分が我慢すればいいと思ってしまう'},
+  {type:'submission',text:'他人の気分に左右されてしまう'},
+  {type:'submission',text:'拒否されたくない気持ちが強い'},
+  {type:'submission',text:'「いい人」でいようとして疲れてしまう'},
+  {type:'dependence',text:'一人になるのが怖いと感じることがある'},
+  {type:'dependence',text:'誰かに必要とされていないと不安になる'},
+  {type:'dependence',text:'相手の反応ばかり気にしてしまう'},
+  {type:'dependence',text:'「愛されていないのでは」と不安になることがある'},
+  {type:'dependence',text:'感情が不安定になりやすい'},
+  {type:'dependence',text:'相手から離れることに対して罪悪感を抱く'},
+  {type:'dependence',text:'相手の感情に過剰に反応してしまう'},
+  {type:'dependence',text:'認めてもらうために無理をしてしまう'},
+  {type:'dependence',text:'自分に自信が持てず、人に依存しがち'},
+  {type:'dependence',text:'相手に合わせて自分を変えてしまう'},
+  {type:'dependence',text:'嫌われたくなくて遠慮してしまう'},
+  {type:'dependence',text:'つながっていないと安心できない'},
+  {type:'dependence',text:'常に「大丈夫かな？」と確認したくなる'},
+  {type:'dependence',text:'連絡が来ないだけで心がざわついてしまう'},
+  {type:'dependence',text:'誰かにそっけなくされると「嫌われたのかな」と感じてしまう'},
+  {type:'independence',text:'人に弱みを見せるのがとても苦手'},
+  {type:'independence',text:'「助けて」が言えないまま、自分だけで頑張ってしまう'},
+  {type:'independence',text:'人を助けたり手伝ったりすることが自分の役割だと感じる'},
+  {type:'independence',text:'本当はつらくても「平気なふり」をしてしまう'},
+  {type:'independence',text:'「自分でなんとかしなきゃ」と思ってしまう'},
+  {type:'independence',text:'人に心配されるのが嫌だ'},
+  {type:'independence',text:'甘えたり頼ったりすると、罪悪感がある'},
+  {type:'independence',text:'責任感が強く、全部自分で背負いがち'},
+  {type:'independence',text:'弱さを見せることが「恥」だと思っている'},
+  {type:'independence',text:'頼るくらいなら、我慢する方を選んでしまう'},
+  {type:'independence',text:'「私は大丈夫」と無理に言ってしまう癖がある'},
+  {type:'independence',text:'誰にも期待しない方が楽だと思う'},
+  {type:'independence',text:'「自分さえ我慢すれば」と思うことが多い'},
+  {type:'independence',text:'人に期待して裏切られた経験がある'},
+  {type:'independence',text:'弱音を吐いた後、後悔してしまう'},
+  {type:'order',text:'間違えることが怖い'},
+  {type:'order',text:'準備不足だと不安になり、行動できない'},
+  {type:'order',text:'物事が整っていないと落ち着かない'},
+  {type:'order',text:'「間違ってはいけない」というプレッシャーが強い'},
+  {type:'order',text:'ルールや常識に従って生きる傾向がある'},
+  {type:'order',text:'先のことを考えすぎて動けなくなる'},
+  {type:'order',text:'スケジュールを変更されるとイライラする'},
+  {type:'order',text:'細かい部分にこだわりすぎてしまう'},
+  {type:'order',text:'計画通りに進まないと焦る'},
+  {type:'order',text:'変化が苦手で、予測できることに安心する'},
+  {type:'order',text:'「きちんとしていない」と感じると不安になる'},
+  {type:'order',text:'つい自分に厳しくなってしまう'},
+  {type:'order',text:'判断基準が「正しさ」や「完璧さ」に偏ってしまう'},
+  {type:'order',text:'決められた手順が崩れると混乱する'},
+  {type:'order',text:'感情に振り回されたくない'},
+  {type:'escape',text:'空想の世界にいることで、気持ちが楽になることが多い'},
+  {type:'escape',text:'現実の人間関係やトラブルに向き合うのが怖い'},
+  {type:'escape',text:'感情を感じたくないとき、すぐに頭の中で別のことを考える'},
+  {type:'escape',text:'心を守るために、相手と距離を取る癖がある'},
+  {type:'escape',text:'気づくと、現実から離れた妄想をしていることがある'},
+  {type:'escape',text:'話しかけられても、内側の世界に意識が向いていることがある'},
+  {type:'escape',text:'「どうでもいい」と無気力になる瞬間がある'},
+  {type:'escape',text:'深く考えすぎて行動できなくなることがある'},
+  {type:'escape',text:'感じるよりも、考えてしまう傾向が強い'},
+  {type:'escape',text:'不快な気持ちになると、ぼーっとしてしまう'},
+  {type:'escape',text:'一人の時間や空間がないと、心が疲れてしまう'},
+  {type:'escape',text:'感情が湧いたとき、それを感じないようにしている'},
+  {type:'escape',text:'深く人と関わることに、無意識の怖さがある'},
+  {type:'escape',text:'自分の殻に閉じこもりがちだと感じる'},
+  {type:'escape',text:'心を閉ざしてしまう癖がある'},
+];
+
+const PROFILES = {
+  domination:{title:'支配型',sub:'コントロール・正しさにこだわる傾向',feature:'あなたはとても責任感が強く、正しさや結果を出すことを大切にして生きてこられた方かもしれません。物事を整え、導く力がある一方で、「こうあるべき」「正しくあってほしい」という思いが強くなりすぎると、無意識のうちに人や状況をコントロールしたくなることがあります。相手の行動が思い通りにいかないと、心がざわついたり、イライラしてしまうこともあるでしょう。でもその奥には、敗北や相手の思い通りにされることを恐れる、深い「不安」があるのです。',advice:'まずは、その「正しさ」を手放そうとするのではなく、「守ろうとしてきた不安」に寄り添ってあげてください。相手に委ねる、手放す、信じてみる——それは最初、怖いことかもしれません。でも、手放した先にこそ、あなたが本当に望んでいた"深い安心"が待っています。'},
+  submission:{title:'服従型',sub:'他人に合わせ、自分を抑える傾向',feature:'あなたはとても思いやり深く、相手の気持ちに敏感な方です。場の空気を壊さないように振る舞い、たとえ自分の本音が違っていても「相手を傷つけたくない」「波風を立てたくない」という想いから、つい我慢してしまう。それは、あなたが「愛されたい」「認められたい」という純粋な願いを、深いところに持っているからです。',advice:'あなたの中には、ちゃんと声を上げていい"本当の気持ち"があります。相手のことを思いやるように、自分の心にも耳を傾けてみてください。「嫌だ」と思っていい、「NO」と言っても大丈夫——そう自分に許可してあげましょう。'},
+  dependence:{title:'依存型',sub:'見捨てられ不安・承認欲求が強い傾向',feature:'あなたは、とても感受性が豊かで、人とのつながりを大切にする方です。その一方で、心のどこかで「一人になるのが怖い」「見捨てられるのでは」という不安を抱えていることはありませんか？連絡が来ないだけで心がざわついたり、誰かにそっけなくされると「嫌われたのかな」と感じてしまう。',advice:'あなたが本当に求めているのは、"安心感のある愛"ではないでしょうか。その安心感は、他人からもらうものではなく、あなたの内側から生まれるものです。まずは、自分自身を深く信頼し、心のよりどころを「外」から「内」に戻していきましょう。'},
+  independence:{title:'自立型',sub:'誰にも頼らず、一人で抱え込む傾向',feature:'あなたは、とても頑張り屋で、人に頼らずにここまで生きてきた方かもしれません。誰かに迷惑をかけてはいけない、甘えてはいけない——そんな思いが心の奥に根づいていて、本当はつらくても「大丈夫」と言ってしまうのではないでしょうか。',advice:'誰かにそっと手を差し伸べられたとき、心がじんわりと温かくなった経験はありませんか？人に頼ることは、けっして「甘え」ではありません。「頼る」「助けを求める」その一歩は、あなたの内側にある力を、もっと自由に解き放つきっかけになります。'},
+  order:{title:'秩序型',sub:'完璧・正しさ・ルールにこだわる傾向',feature:'あなたは、とても几帳面で誠実な方です。決められたルールや正しさに価値を置き、自分にも他人にもきちんとしていたいという気持ちが強いのではないでしょうか。「ちゃんとしていたい」という思いの奥には、「ちゃんとしていない自分には価値がない」という思い込みが隠れていることもあります。',advice:'あなたが大切にしてきた秩序や規律は、確かにあなたを守ってきたのです。でも、すこしだけ肩の力を抜いてみてください。完璧じゃなくても、あなたには十分すぎるほどの価値があります。'},
+  escape:{title:'逃避型',sub:'現実から離れ、内面世界に逃げる傾向',feature:'あなたはとても繊細で、感じる力が豊かであるがゆえに、現実の刺激や人間関係に対して、無意識に距離を取ってしまうことがあります。傷つくことや混乱することが怖くて、自分の内側にこもってしまう。誰にも邪魔されない自分だけの世界にいるとき、ようやく安心できるのかもしれません。',advice:'まずは、そんな自分を責めないでください。ほんの少しだけ、「感じること」「つながること」を自分に許してあげてください。あなたのペースで、少しずつでいいのです。'},
+};
+
+const TOTAL = 90;
+const PER_PAGE = 10;
+const TOTAL_PAGES = 9;
+
+let answers = new Array(TOTAL).fill(null);
+let currentPage = 0; // 0-indexed
+
+function getPageQuestions(page) {
+  const start = page * PER_PAGE;
+  return QUESTIONS.slice(start, start + PER_PAGE).map((q, i) => ({ ...q, globalIdx: start + i }));
+}
+
+function getPageType(page) {
+  const qs = getPageQuestions(page);
+  const typeId = qs[0].type;
+  return TYPES.find(t => t.id === typeId);
+}
+
+function renderPage() {
+  const page = currentPage;
+  const qs = getPageQuestions(page);
+  const type = getPageType(page);
+
+  // Badge
+  document.getElementById('page-badge').innerHTML = `
+    <div class="badge-circle" style="background:${type.color}">${page + 1}</div>
+    <div class="badge-info">
+      <div class="badge-type">${type.label}</div>
+      <div class="badge-range">Q${page * PER_PAGE + 1} 〜 Q${page * PER_PAGE + 10}</div>
+    </div>
+  `;
+
+  // Progress
+  const pct = Math.round(page / TOTAL_PAGES * 100);
+  document.getElementById('progress-label').textContent = `ページ ${page + 1} / ${TOTAL_PAGES}`;
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  // Questions
+  const qList = document.getElementById('q-list');
+  qList.innerHTML = qs.map((q, i) => {
+    const idx = q.globalIdx;
+    const ans = answers[idx];
+    return `
+      <div class="q-item ${ans !== null ? 'answered' : ''}" id="qitem-${idx}">
+        <div class="q-num-text">
+          <span class="q-num">Q${idx + 1}</span>
+          <span class="q-text">${q.text}</span>
+        </div>
+        <div class="yn-row">
+          <button class="yn-btn ${ans === true ? 'yes-sel' : ''}" onclick="setAnswer(${idx}, true)">✅ はい</button>
+          <button class="yn-btn ${ans === false ? 'no-sel' : ''}" onclick="setAnswer(${idx}, false)">❌ いいえ</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Nav buttons
+  document.getElementById('btn-prev').disabled = page === 0;
+  const isLast = page === TOTAL_PAGES - 1;
+  document.getElementById('btn-next').textContent = isLast ? '結果を見る 🎯' : '次へ →';
+
+  // Dots
+  const dots = document.getElementById('page-dots');
+  dots.innerHTML = Array.from({ length: TOTAL_PAGES }, (_, i) => {
+    const cls = i < page ? 'dot done' : i === page ? 'dot active' : 'dot';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  // Hide validation msg
+  document.getElementById('val-msg').classList.remove('show');
+
+  // Animate
+  qList.classList.remove('quiz-page');
+  void qList.offsetWidth;
+  qList.classList.add('quiz-page');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function setAnswer(idx, val) {
+  answers[idx] = val;
+  // Update UI for this item
+  const item = document.getElementById(`qitem-${idx}`);
+  item.classList.add('answered');
+  item.querySelectorAll('.yn-btn').forEach(b => b.classList.remove('yes-sel', 'no-sel'));
+  item.querySelectorAll('.yn-btn')[0].classList.toggle('yes-sel', val === true);
+  item.querySelectorAll('.yn-btn')[1].classList.toggle('no-sel', val === false);
+  // Hide validation if all answered
+  const pageQs = getPageQuestions(currentPage);
+  const allDone = pageQs.every(q => answers[q.globalIdx] !== null);
+  if (allDone) document.getElementById('val-msg').classList.remove('show');
+}
+
+function prevPage() {
+  if (currentPage > 0) {
+    currentPage--;
+    renderPage();
+  }
+}
+
+function nextPage() {
+  // Validate all answered
+  const pageQs = getPageQuestions(currentPage);
+  const allDone = pageQs.every(q => answers[q.globalIdx] !== null);
+  if (!allDone) {
+    document.getElementById('val-msg').classList.add('show');
+    // Scroll to first unanswered
+    const firstUnanswered = pageQs.find(q => answers[q.globalIdx] === null);
+    if (firstUnanswered) {
+      document.getElementById(`qitem-${firstUnanswered.globalIdx}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return;
+  }
+
+  if (currentPage < TOTAL_PAGES - 1) {
+    currentPage++;
+    renderPage();
+  } else {
+    showResult();
+  }
+}
+
+function calcScores() {
+  const scores = {};
+  TYPES.forEach(t => { scores[t.id] = 0; });
+  QUESTIONS.forEach((q, i) => { if (answers[i] === true) scores[q.type]++; });
+  return scores;
+}
+
+function showResult() {
+  const scores = calcScores();
+  const sorted = TYPES.map(t => ({
+    ...t,
+    score: scores[t.id],
+    max: QUESTIONS.filter(q => q.type === t.id).length
+  })).sort((a, b) => b.score - a.score);
+
+  const top = sorted[0], second = sorted[1];
+  const topPct = Math.round(top.score / top.max * 100);
+  const secondPct = Math.round(second.score / second.max * 100);
+  const isClose = secondPct >= topPct - 15 && second.score >= 5;
+
+  document.getElementById('quiz-view').style.display = 'none';
+  document.getElementById('result-view').style.display = 'block';
+
+  // Hero
+  const topProfile = PROFILES[top.id];
+  document.getElementById('res-title').textContent = isClose
+    ? `複合型（${top.label} × ${second.label}）`
+    : topProfile.title;
+  document.getElementById('res-sub').textContent = isClose
+    ? '2つの傾向が近い複合型です'
+    : topProfile.sub;
+
+  // Score chart
+  document.getElementById('score-chart-rows').innerHTML = sorted.map(t => {
+    const pct = Math.round(t.score / t.max * 100);
+    return `
+      <div class="score-row">
+        <div class="score-label">${t.label}</div>
+        <div class="score-bar-bg">
+          <div class="score-bar-fill" style="width:0%;background:${t.color}" data-pct="${pct}"></div>
+        </div>
+        <div class="score-val">${t.score}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }, 100);
+
+  // Profile
+  const mainResult = document.getElementById('main-result');
+  if (isClose) {
+    mainResult.innerHTML = `<div class="multi-cards">${[top, second].map(t => {
+      const p = PROFILES[t.id];
+      return `
+        <div class="profile-card">
+          <div class="profile-card-header" style="background:${t.color}">${p.title} — ${p.sub}</div>
+          <div class="profile-card-body">${p.feature}</div>
+          <div class="profile-advice"><strong>アドバイス：</strong>${p.advice}</div>
+        </div>
+      `;
+    }).join('')}</div>`;
+  } else {
+    mainResult.innerHTML = `
+      <div class="profile-card">
+        <div class="profile-card-header" style="background:${top.color}">${topProfile.title} — ${topProfile.sub}</div>
+        <div class="profile-card-body">${topProfile.feature}</div>
+        <div class="profile-advice"><strong>アドバイス：</strong>${topProfile.advice}</div>
+      </div>
+    `;
+  }
+
+  // Answers list
+  buildAnswersList();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function buildAnswersList() {
+  let html = '';
+  TYPES.forEach(t => {
+    const typeQs = QUESTIONS.map((q, i) => ({ ...q, idx: i })).filter(q => q.type === t.id);
+    const yesCount = typeQs.filter(q => answers[q.idx] === true).length;
+    html += `<div class="ans-group-title" style="background:${t.color}">${t.label}（${yesCount}/${typeQs.length}）</div>`;
+    typeQs.forEach(q => {
+      const isYes = answers[q.idx] === true;
+      html += `<div class="ans-item"><div class="ans-q">Q${q.idx + 1}. ${q.text}</div><div class="ans-yn ${isYes ? 'ans-yes' : 'ans-no'}">${isYes ? 'はい' : 'いいえ'}</div></div>`;
+    });
+  });
+  document.getElementById('answers-list').innerHTML = html;
+}
+
+function toggleAnswers() {
+  const list = document.getElementById('answers-list');
+  const btn = document.getElementById('answers-toggle');
+  const isOpen = list.classList.contains('open');
+  list.classList.toggle('open');
+  btn.classList.toggle('open');
+  document.getElementById('ans-toggle-text').textContent = isOpen ? '全90問の回答一覧を見る' : '回答一覧を閉じる';
+}
+
+function buildCopyText() {
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+  const scores = calcScores();
+  const sorted = TYPES.map(t => ({ ...t, score: scores[t.id], max: QUESTIONS.filter(q => q.type === t.id).length })).sort((a, b) => b.score - a.score);
+  const top = sorted[0], second = sorted[1];
+  const topPct = Math.round(top.score / top.max * 100);
+  const secondPct = Math.round(second.score / second.max * 100);
+  const isClose = secondPct >= topPct - 15 && second.score >= 5;
+
+  let txt = '■ ブロック診断ツール 結果レポート\n';
+  txt += `診断日：${dateStr}\n\n【診断結果】\n`;
+  if (isClose) {
+    txt += `複合型（${top.label} × ${second.label}）\n\n`;
+    [top, second].forEach(t => {
+      const p = PROFILES[t.id];
+      txt += `▶ ${p.title}（${p.sub}）\n${p.feature}\nアドバイス：${p.advice}\n\n`;
+    });
+  } else {
+    const p = PROFILES[top.id];
+    txt += `${p.title}（${p.sub}）\n\n【あなたの特徴】\n${p.feature}\n\n【アドバイス】\n${p.advice}\n\n`;
+  }
+  txt += '【スコア一覧】\n';
+  sorted.forEach(t => {
+    const pct = Math.round(t.score / t.max * 100);
+    const bar = '█'.repeat(Math.round(pct / 10)) + '░'.repeat(10 - Math.round(pct / 10));
+    txt += `${t.label}  ${bar}  ${t.score}/${t.max}点\n`;
+  });
+  return txt;
+}
+
+function openCopyModal() {
+  document.getElementById('copy-textarea').value = buildCopyText();
+  document.getElementById('copy-modal').classList.add('open');
+  setTimeout(() => { const ta = document.getElementById('copy-textarea'); ta.focus(); ta.select(); }, 100);
+}
+function closeCopyModal() { document.getElementById('copy-modal').classList.remove('open'); }
+function closeCopyModalOutside(e) { if (e.target === document.getElementById('copy-modal')) closeCopyModal(); }
+function selectAll() { const ta = document.getElementById('copy-textarea'); ta.focus(); ta.select(); }
+
+function printResult() {
+  const list = document.getElementById('answers-list');
+  const btn = document.getElementById('answers-toggle');
+  if (!list.classList.contains('open')) {
+    list.classList.add('open');
+    btn.classList.add('open');
+    document.getElementById('ans-toggle-text').textContent = '回答一覧を閉じる';
+  }
+  setTimeout(() => window.print(), 150);
+}
+
+function retry() {
+  answers = new Array(TOTAL).fill(null);
+  currentPage = 0;
+  document.getElementById('result-view').style.display = 'none';
+  document.getElementById('quiz-view').style.display = 'block';
+  document.getElementById('answers-list').classList.remove('open');
+  document.getElementById('answers-toggle').classList.remove('open');
+  document.getElementById('ans-toggle-text').textContent = '全90問の回答一覧を見る';
+  renderPage();
+}
+
+// Init
+renderPage();
+</script>
+</body>
+</html>
