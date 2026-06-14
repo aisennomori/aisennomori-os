@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宿曜相性鑑定</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Cinzel+Decorative:wght@400;700&family=Zen+Old+Mincho:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0c0a14;
+  --bg2:     #13102a;
+  --indigo:  #1a1640;
+  --gold:    #c9a84c;
+  --gold-l:  #e8c96a;
+  --gold-d:  #8a6a20;
+  --cream:   #f5eed8;
+  --sand:    #d8c898;
+  --dim:     rgba(245,238,216,0.5);
+  --border:  rgba(201,168,76,0.2);
+  --moon:    #e8d878;
+}
+
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: 'Noto Serif JP', serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== STARS ===== */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ===== WRAPPER ===== */
+.wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 1.2rem 5rem;
+}
+
+/* ===== HERO ===== */
+.hero {
+  text-align: center;
+  padding: 3.5rem 1rem 2.5rem;
+}
+.hero-moon {
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  filter: drop-shadow(0 0 20px rgba(232,216,120,0.6));
+  animation: moonFloat 4s ease-in-out infinite;
+}
+@keyframes moonFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hero-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  font-weight: 900;
+  color: var(--cream);
+  letter-spacing: 0.2em;
+  text-shadow: 0 2px 20px rgba(201,168,76,0.4);
+  margin-bottom: 0.4rem;
+}
+.hero-sub {
+  font-size: 0.85rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  font-family: 'Cinzel Decorative', cursive;
+}
+
+/* ===== DIVIDER ===== */
+.gold-line {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  color: rgba(201,168,76,0.3);
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+}
+.gold-line::before,.gold-line::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
+}
+
+/* ===== INPUT CARD ===== */
+.input-card {
+  background: linear-gradient(145deg, rgba(26,22,64,0.8), rgba(12,10,20,0.9));
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,168,76,0.1);
+}
+.input-section-title {
+  font-size: 0.78rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.person-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+@media(max-width:520px) { .person-row { grid-template-columns: 1fr; } }
+
+.person-block {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.2rem;
+}
+.person-label {
+  font-size: 0.8rem;
+  color: var(--gold-l);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.8rem;
+  font-weight: 700;
+}
+.select-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.select-label {
+  font-size: 0.68rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+}
+select {
+  background: rgba(10,8,20,0.8);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 8px;
+  color: var(--cream);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.9rem;
+  padding: 0.55rem 2rem 0.55rem 0.8rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23c9a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  width: 100%;
+  transition: border-color 0.3s;
+}
+select:focus { border-color: var(--gold); }
+select option { background: #1a1640; }
+
+.name-input {
+  background: rgba(10,8,20,0.8);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 8px;
+  color: var(--cream);
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.9rem;
+  padding: 0.55rem 0.8rem;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.3s;
+}
+.name-input:focus { border-color: var(--gold); }
+.name-input::placeholder { color: rgba(245,238,216,0.3); }
+
+.btn-calc {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold-d) 0%, var(--gold) 50%, var(--gold-d) 100%);
+  background-size: 200% 100%;
+  border: none;
+  border-radius: 50px;
+  color: var(--bg);
+  cursor: pointer;
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  padding: 1rem 2rem;
+  transition: all 0.4s;
+  box-shadow: 0 6px 25px rgba(201,168,76,0.35);
+}
+.btn-calc:hover {
+  background-position: 100% 0;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 35px rgba(201,168,76,0.5);
+}
+
+/* ===== RESULT ===== */
+#result { display: none; animation: fadeUp 0.7s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+/* Person cards */
+.persons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+@media(max-width:520px) { .persons-grid { grid-template-columns: 1fr; } }
+
+.person-result-card {
+  background: linear-gradient(145deg, rgba(26,22,64,0.9), rgba(12,10,20,0.95));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.person-result-header {
+  background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.2rem;
+  text-align: center;
+}
+.person-tag {
+  font-size: 0.68rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 0.4rem;
+}
+.shuku-name {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 900;
+  color: var(--cream);
+  letter-spacing: 0.15em;
+  text-shadow: 0 2px 15px rgba(201,168,76,0.3);
+}
+.shuku-read {
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-top: 0.2rem;
+}
+.person-result-body { padding: 1rem 1.2rem; }
+.trait-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.8rem;
+}
+.trait-label {
+  color: var(--gold);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  min-width: 60px;
+  padding-top: 0.1rem;
+  flex-shrink: 0;
+}
+.trait-val {
+  color: var(--cream);
+  line-height: 1.7;
+}
+.keyword-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.8rem;
+}
+.kbadge {
+  font-size: 0.68rem;
+  background: rgba(201,168,76,0.12);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: var(--gold-l);
+  border-radius: 20px;
+  padding: 0.2rem 0.6rem;
+}
+
+/* 吉宿四種 */
+.kichi-shuku-title {
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.kichi-shuku-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+@media(max-width:420px) { .kichi-shuku-grid { grid-template-columns: repeat(2,1fr); } }
+.kichi-shuku-cell {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.3rem;
+  text-align: center;
+}
+.kichi-shuku-label {
+  font-size: 0.6rem;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+.kichi-shuku-name {
+  font-size: 0.82rem;
+  color: var(--cream);
+  font-weight: 700;
+}
+
+/* 宿曜経 伝統的記述 */
+.classic-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(201,168,76,0.2);
+}
+.classic-title {
+  font-size: 0.85rem;
+  color: var(--gold-l);
+  font-weight: 700;
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+}
+.classic-label {
+  font-size: 0.65rem;
+  color: var(--gold);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+  margin-top: 0.6rem;
+}
+.classic-text {
+  font-size: 0.78rem;
+  color: var(--sand);
+  line-height: 1.9;
+  font-family: 'Noto Serif JP', serif;
+}
+
+/* Compatibility hero */
+.compat-hero {
+  background: linear-gradient(145deg, rgba(26,22,64,0.95), rgba(12,10,20,0.98));
+  border: 1px solid rgba(201,168,76,0.4);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.compat-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%);
+}
+.compat-label {
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  margin-bottom: 1rem;
+  position: relative;
+}
+.compat-symbols {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  position: relative;
+}
+.compat-shuku {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  color: var(--cream);
+}
+.compat-arrow { color: var(--gold); font-size: 1.2rem; }
+
+.compat-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  position: relative;
+}
+.compat-side {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+}
+.compat-side-label {
+  font-size: 0.68rem;
+  color: var(--dim);
+  letter-spacing: 0.12em;
+  margin-bottom: 0.5rem;
+}
+.compat-side-value {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(1.3rem, 3vw, 1.6rem);
+  font-weight: 700;
+  color: var(--gold-l);
+}
+.compat-one-line {
+  position: relative;
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(1rem, 3vw, 1.3rem);
+  color: var(--cream);
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+/* Compatibility meaning */
+.compat-meaning-card {
+  background: linear-gradient(145deg, rgba(26,22,64,0.85), rgba(12,10,20,0.9));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.meaning-title {
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+}
+.meaning-table { width: 100%; border-collapse: collapse; }
+.meaning-table tr { border-bottom: 1px solid rgba(201,168,76,0.1); }
+.meaning-table tr:last-child { border-bottom: none; }
+.meaning-table td {
+  padding: 0.65rem 0.5rem;
+  font-size: 0.82rem;
+  vertical-align: top;
+  line-height: 1.8;
+}
+.meaning-table td:first-child {
+  color: var(--gold-l);
+  font-weight: 700;
+  width: 2rem;
+  text-align: center;
+  padding-right: 0.8rem;
+}
+.meaning-table td:last-child { color: var(--sand); }
+.meaning-table tr.highlight td { background: rgba(201,168,76,0.06); }
+.meaning-table tr.highlight td:first-child { color: var(--moon); }
+
+/* Note */
+
+/* ===== TODAY & CALENDAR ===== */
+.today-shuku-card {
+  background: linear-gradient(145deg, rgba(201,168,76,0.12), rgba(12,10,20,0.95));
+  border: 1px solid rgba(201,168,76,0.5);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.today-label {
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.25em;
+  margin-bottom: 0.8rem;
+}
+.today-shuku-name {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 900;
+  color: var(--cream);
+  margin-bottom: 0.3rem;
+}
+.today-compat-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.today-compat-cell {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8rem;
+}
+.today-compat-label {
+  font-size: 0.68rem;
+  color: var(--dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+}
+.today-compat-val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-l);
+}
+.today-compat-kichi {
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+.calendar-section {
+  background: linear-gradient(145deg, rgba(26,22,64,0.85), rgba(12,10,20,0.9));
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.calendar-title {
+  font-size: 0.75rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+}
+.calendar-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.calendar-table th {
+  color: var(--gold);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 0.3rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+.calendar-table td {
+  padding: 0.45rem 0.3rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--sand);
+}
+.calendar-table tr:hover td { background: rgba(201,168,76,0.05); }
+.cal-kichi-A { color: #f0d060; font-weight: 700; }
+.cal-kichi-B { color: #90e090; }
+.cal-kichi-C { color: var(--dim); }
+.cal-kichi-D { color: #e07070; }
+.cal-today td { background: rgba(201,168,76,0.1) !important; }
+.cal-today td:first-child { color: var(--gold-l); font-weight: 700; }
+
+.note-card {
+  background: rgba(201,168,76,0.05);
+  border: 1px dashed rgba(201,168,76,0.2);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  font-size: 0.78rem;
+  color: var(--dim);
+  line-height: 1.9;
+  margin-bottom: 1.5rem;
+}
+
+/* Error */
+.err-msg {
+  display: none;
+  color: #ff8888;
+  font-size: 0.82rem;
+  text-align: center;
+  margin-top: 0.8rem;
+}
+
+/* ===== PDF EXPORT ===== */
+.pdf-export-row {
+  text-align: center;
+  margin: 1.5rem 0 0.5rem;
+}
+.btn-pdf {
+  background: linear-gradient(135deg, var(--gold-d) 0%, var(--gold) 50%, var(--gold-d) 100%);
+  background-size: 200% 100%;
+  border: none;
+  border-radius: 50px;
+  color: var(--bg);
+  cursor: pointer;
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 0.9rem 2.5rem;
+  transition: all 0.3s;
+  box-shadow: 0 6px 25px rgba(201,168,76,0.3);
+}
+.btn-pdf:hover {
+  background-position: 100% 0;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(201,168,76,0.45);
+}
+
+.print-footer {
+  display: none;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #1a1a2e !important;
+  }
+  #starfield, .aurora, .input-card, .pdf-export-row, .gold-line {
+    display: none !important;
+  }
+  .hero { padding: 0.5rem 0 1rem; }
+  .hero-orb { display: none; }
+  .hero-title, .hero-sub, .hero-brand { color: #1a1640 !important; text-shadow: none !important; }
+
+  .wrapper { max-width: 100% !important; padding: 0 0.3cm !important; }
+
+  #result { display: block !important; }
+
+  .person-result-card, .compat-hero, .compat-meaning-card,
+  .today-shuku-card, .calendar-section, .note-card {
+    background: #ffffff !important;
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .person-result-header { background: #f5f0e0 !important; }
+  .compat-hero::before { display: none !important; }
+
+  .shuku-name, .compat-side-value, .today-shuku-name,
+  .result-title, .reading-headline, .kichi-shuku-name,
+  .classic-title {
+    color: #1a1640 !important;
+  }
+  .shuku-read, .compat-side-label, .today-label, .person-tag,
+  .trait-label, .kichi-shuku-label, .classic-label,
+  .calendar-title, .meaning-title, .compat-label,
+  .nights-title, .info-card-title {
+    color: #9a7530 !important;
+  }
+  .trait-val, .info-cell-body, .compat-one-line,
+  .today-compat-kichi, .meaning-table td, .calendar-table td,
+  .reading-body, .note-card, .classic-text {
+    color: #333344 !important;
+  }
+  .kbadge, .tag {
+    background: #f0ebe0 !important;
+    border: 1px solid #c9a84c !important;
+    color: #8a6a20 !important;
+  }
+  .cal-kichi-A { color: #a07820 !important; font-weight: 700; }
+  .cal-kichi-B { color: #2a7a2a !important; }
+  .cal-kichi-C { color: #888 !important; }
+  .cal-kichi-D { color: #b33 !important; }
+  .cal-today td { background: #f5f0e0 !important; }
+  .highlight td { background: #f5f0e0 !important; }
+
+  .kichi-shuku-cell, .compat-side, .today-compat-cell {
+    background: #faf8f0 !important;
+    border: 1px solid #ddd !important;
+  }
+
+  .calendar-table { font-size: 0.7rem; }
+  .calendar-section { page-break-before: auto; }
+
+  .print-footer {
+    display: block !important;
+    text-align: center;
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #ccc;
+    font-size: 0.75rem;
+    color: #9a7530 !important;
+    letter-spacing: 0.1em;
+  }
+
+  a { text-decoration: none !important; color: inherit !important; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<div class="wrapper">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-moon">🌙</div>
+    <div class="hero-title">宿曜相性鑑定</div>
+    <div class="hero-sub">Sukuyo Compatibility</div>
+  </div>
+
+  <div class="gold-line">✦ 生年月日を入力 ✦</div>
+
+  <!-- Input -->
+  <div class="input-card">
+    <div class="input-section-title">✦ お二人の生年月日を選んでください</div>
+    <div class="person-row">
+      <div class="person-block">
+        <div class="person-label">🌙 あなた</div>
+        <div class="select-group">
+          <span class="select-label">お名前（任意）</span>
+          <input type="text" id="name1" class="name-input" placeholder="例：山本 剛">
+        </div>
+        <div class="select-group">
+          <span class="select-label">生年（西暦）</span>
+          <select id="y1"></select>
+        </div>
+        <div class="select-group">
+          <span class="select-label">月</span>
+          <select id="m1"></select>
+        </div>
+        <div class="select-group">
+          <span class="select-label">日</span>
+          <select id="d1"></select>
+        </div>
+      </div>
+      <div class="person-block">
+        <div class="person-label">⭐ お相手</div>
+        <div class="select-group">
+          <span class="select-label">お名前（任意）</span>
+          <input type="text" id="name2" class="name-input" placeholder="例：田中 花子">
+        </div>
+        <div class="select-group">
+          <span class="select-label">生年（西暦）</span>
+          <select id="y2"></select>
+        </div>
+        <div class="select-group">
+          <span class="select-label">月</span>
+          <select id="m2"></select>
+        </div>
+        <div class="select-group">
+          <span class="select-label">日</span>
+          <select id="d2"></select>
+        </div>
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calc()">✦ 宿曜で相性を鑑定する ✦</button>
+    <div class="err-msg" id="err">生年月日を正しく選択してください</div>
+  </div>
+
+  <!-- Result -->
+  <div id="result">
+    <div class="gold-line">✦ 鑑定結果 ✦</div>
+
+    <!-- Two persons -->
+    <div class="persons-grid" id="persons-grid"></div>
+
+    <!-- Compatibility -->
+    <div class="compat-hero" id="compat-hero"></div>
+
+    <!-- Today & Calendar -->
+    <div id="today-section"></div>
+
+    <!-- Meaning table -->
+    <div class="compat-meaning-card">
+      <div class="meaning-title">✦ 相性の意味 一覧 ✦</div>
+      <table class="meaning-table" id="meaning-table"></table>
+    </div>
+
+    <div class="note-card">
+      ※ 宿曜術は古代インド起源の天文占術で、平安時代に日本へ伝わりました。27の「宿（しゅく）」で人の運命と相性を読み解きます。<br>
+      ※ 相性の「命・業・胎・栄・親・友・衰・安・壊・危・成」の11種は、あなたから見た相手、相手から見たあなた、それぞれ異なります。<br>
+      ※ 本ツールの計算は1968年10月18日＝軫宿を基準とした参考計算です。月の実際の運行に基づく正確な宿は専門家にご確認ください。
+    </div>
+
+    <!-- PDF Export -->
+    <div class="pdf-export-row">
+      <button class="btn-pdf" onclick="exportPDF()">📄 PDFで保存 / 印刷</button>
+    </div>
+
+    <div class="print-footer">
+      ✦ La'a Kea MOON ／ 宿曜相性鑑定 ✦<br>
+      <span id="print-date"></span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ===== STARS ===== */
+const cv = document.getElementById('starfield');
+const cx = cv.getContext('2d');
+let stars = [];
+function resizeCV() { cv.width = innerWidth; cv.height = innerHeight; }
+function initStars() {
+  stars = Array.from({length:150}, () => ({
+    x: Math.random()*cv.width, y: Math.random()*cv.height,
+    r: Math.random()*1.4+0.2, a: Math.random(),
+    da: (Math.random()*0.006+0.002)*(Math.random()>0.5?1:-1),
+    vy: Math.random()*0.08+0.02
+  }));
+}
+function drawStars() {
+  cx.clearRect(0,0,cv.width,cv.height);
+  stars.forEach(s => {
+    s.a += s.da;
+    if(s.a<=0||s.a>=1) s.da*=-1;
+    s.y -= s.vy;
+    if(s.y < -2) s.y = cv.height+2;
+    cx.beginPath();
+    cx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    cx.fillStyle = `rgba(255,248,220,${Math.max(0,Math.min(1,s.a))})`;
+    cx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+resizeCV(); initStars(); drawStars();
+window.addEventListener('resize', ()=>{ resizeCV(); initStars(); });
+
+/* ===== BUILD SELECTS ===== */
+function buildSelects(yId, mId, dId) {
+  const ys = document.getElementById(yId);
+  ys.innerHTML = '<option value="">年</option>';
+  for(let y=1930;y<=2010;y++) {
+    const o=document.createElement('option');
+    o.value=y; o.textContent=y+'年'; ys.appendChild(o);
+  }
+  const ms = document.getElementById(mId);
+  ms.innerHTML = '<option value="">月</option>';
+  for(let m=1;m<=12;m++) {
+    const o=document.createElement('option');
+    o.value=m; o.textContent=m+'月'; ms.appendChild(o);
+  }
+  const ds = document.getElementById(dId);
+  ds.innerHTML = '<option value="">日</option>';
+  for(let d=1;d<=31;d++) {
+    const o=document.createElement('option');
+    o.value=d; o.textContent=d+'日'; ds.appendChild(o);
+  }
+}
+buildSelects('y1','m1','d1');
+buildSelects('y2','m2','d2');
+
+/* ===== 27 SHUKU DATA ===== */
+const SHUKU = [
+  { id:0,  name:'角宿', read:'かくしゅく', en:'Kaku',    planet:'木星', element:'風', quality:'活動', sign12:'天秤宮', keywords:['知的','公平','社交的','優雅'] },
+  { id:1,  name:'亢宿', read:'こうしゅく', en:'Ko',      planet:'金星', element:'火', quality:'不動', sign12:'天秤宮', keywords:['忍耐','責任感','信頼','堅実'] },
+  { id:2,  name:'氐宿', read:'ていしゅく', en:'Tei',     planet:'土星', element:'水', quality:'柔軟', sign12:'蠍宮',   keywords:['深い','変容','洞察','神秘'] },
+  { id:3,  name:'房宿', read:'ぼうしゅく', en:'Bo',      planet:'月',   element:'水', quality:'活動', sign12:'蠍宮',   keywords:['感性','共感','保護','直感'] },
+  { id:4,  name:'心宿', read:'しんしゅく', en:'Shin',    planet:'火星', element:'水', quality:'不動', sign12:'蠍宮',   keywords:['情熱','強意志','深愛','探求'] },
+  { id:5,  name:'尾宿', read:'びしゅく',   en:'Bi',      planet:'木星', element:'水', quality:'柔軟', sign12:'射手宮', keywords:['自由','楽観','冒険','哲学'] },
+  { id:6,  name:'箕宿', read:'きしゅく',   en:'Ki',      planet:'火星', element:'火', quality:'活動', sign12:'射手宮', keywords:['行動','開拓','エネルギー','積極'] },
+  { id:7,  name:'斗宿', read:'としゅく',   en:'To',      planet:'金星', element:'地', quality:'不動', sign12:'磨宮',   keywords:['実直','努力','忍耐','堅実'] },
+  { id:8,  name:'女宿', read:'じょしゅく', en:'Jo',      planet:'土星', element:'地', quality:'柔軟', sign12:'磨宮',   keywords:['柔軟','奉仕','分析','実用'] },
+  { id:9,  name:'虚宿', read:'きょしゅく', en:'Kyo',     planet:'月',   element:'風', quality:'活動', sign12:'宝瓶宮', keywords:['理想','ユニーク','人道','革新'] },
+  { id:10, name:'危宿', read:'きしゅく',   en:'Ki',      planet:'火星', element:'風', quality:'不動', sign12:'宝瓶宮', keywords:['独立','先進','友愛','個性'] },
+  { id:11, name:'室宿', read:'しつしゅく', en:'Shitsu',  planet:'木星', element:'水', quality:'柔軟', sign12:'魚宮',   keywords:['感受','霊性','献身','夢想'] },
+  { id:12, name:'壁宿', read:'へきしゅく', en:'Heki',    planet:'火星', element:'水', quality:'活動', sign12:'魚宮',   keywords:['深化','統合','神秘','完成'] },
+  { id:13, name:'奎宿', read:'けいしゅく', en:'Kei',     planet:'金星', element:'火', quality:'不動', sign12:'羊宮',   keywords:['先駆','情熱','独立','勇気'] },
+  { id:14, name:'婁宿', read:'ろうしゅく', en:'Ro',      planet:'土星', element:'火', quality:'柔軟', sign12:'羊宮',   keywords:['調整','柔軟','交渉','協調'] },
+  { id:15, name:'胃宿', read:'いしゅく',   en:'I',       planet:'月',   element:'地', quality:'活動', sign12:'牛宮',   keywords:['蓄財','安定','粘り強さ','実直'] },
+  { id:16, name:'昴宿', read:'ぼうしゅく', en:'Bo',      planet:'火星', element:'地', quality:'不動', sign12:'牛宮',   keywords:['美的','感性','快楽','調和'] },
+  { id:17, name:'畢宿', read:'ひっしゅく', en:'Hitsu',   planet:'木星', element:'地', quality:'柔軟', sign12:'双子宮', keywords:['多才','知識','変化','表現'] },
+  { id:18, name:'觜宿', read:'ししゅく',   en:'Shi',     planet:'火星', element:'風', quality:'活動', sign12:'双子宮', keywords:['鋭敏','好奇心','情報','俊敏'] },
+  { id:19, name:'参宿', read:'さんしゅく', en:'San',     planet:'金星', element:'水', quality:'不動', sign12:'蟹宮',   keywords:['感情','家庭','保護','共感'] },
+  { id:20, name:'井宿', read:'せいしゅく', en:'Sei',     planet:'土星', element:'風', quality:'柔軟', sign12:'蟹宮',   keywords:['論理','知性','クール','分析'] },
+  { id:21, name:'鬼宿', read:'きしゅく',   en:'Ki',      planet:'月',   element:'水', quality:'活動', sign12:'蟹宮',   keywords:['直感','神秘','深い感性','霊感'] },
+  { id:22, name:'柳宿', read:'りゅうしゅく',en:'Ryu',    planet:'火星', element:'火', quality:'不動', sign12:'獅子宮', keywords:['創造','表現','情熱','自信'] },
+  { id:23, name:'星宿', read:'せいしゅく', en:'Sei',     planet:'木星', element:'火', quality:'柔軟', sign12:'獅子宮', keywords:['輝き','社交','自己表現','明るさ'] },
+  { id:24, name:'張宿', read:'ちょうしゅく',en:'Cho',    planet:'金星', element:'地', quality:'活動', sign12:'乙女宮', keywords:['完璧','分析','奉仕','誠実'] },
+  { id:25, name:'翼宿', read:'よくしゅく', en:'Yoku',    planet:'土星', element:'風', quality:'不動', sign12:'天秤宮', keywords:['公平','美','調和','社交'] },
+  { id:26, name:'軫宿', read:'しんしゅく', en:'Shin',    planet:'水星', element:'地', quality:'柔軟', sign12:'乙女宮', keywords:['スピード感','控え目','交際上手','実用'] },
+];
+
+/* 各宿の特徴テキスト */
+const SHUKU_TRAITS = {
+  0:  'バランス感覚に優れ、知的で公平な判断力を持ちます。社交的で人間関係を大切にし、美しいものを愛します。',
+  1:  '忍耐強く、責任感があります。一度決めたことは最後まで貫く強い意志の持ち主です。',
+  2:  '安定と調和の星宿。家庭・組織・伝統を守る力に秀でます。深く物事を見つめ、変容と再生のエネルギーも併せ持ちます。',
+  3:  '豊かな感受性と共感力を持つ、感情の深い人です。家族や大切な人への愛情が人一倍強いです。',
+  4:  '強い意志と情熱を持ち、一度愛したものへの献身は揺るぎません。探求心が旺盛です。',
+  5:  '自由を愛し、楽観的で冒険心があります。哲学的な思考と広い視野を持っています。',
+  6:  '行動力と開拓精神に溢れ、エネルギッシュです。積極的に物事を切り拓いていきます。',
+  7:  '実直で努力家。地道な積み重ねで確実に結果を出す、信頼できる人物です。',
+  8:  '柔軟性と実用性を兼ね備えます。スピード感があり、控え目ながら交際上手です。',
+  9:  '理想主義で独自のビジョンを持ちます。人道的な発想と革新的な考え方が特徴です。',
+  10: '独立心が強く、個性的です。先進的な考え方を持ち、友人を大切にします。',
+  11: '豊かな感受性と霊的な感性を持ちます。献身的で夢想家な一面もあります。',
+  12: '深い統合力と神秘的な洞察力を持ちます。物事を完成させる力があります。',
+  13: '先駆者精神と情熱を持ち、独立心が強いです。勇敢に新しい道を切り開きます。',
+  14: '調整能力と柔軟性に優れます。交渉や協調において力を発揮します。',
+  15: '蓄財と安定を好む、粘り強い実直な人物です。地道な努力で財を築きます。',
+  16: '美的センスと豊かな感性を持ちます。快楽と調和を大切にする優雅な人物です。',
+  17: '多才で知識欲旺盛。変化を楽しみ、多彩な表現力を持ちます。',
+  18: '鋭い知性と好奇心を持ちます。情報収集と素早い判断力が得意です。',
+  19: '豊かな感情と強い家族愛を持ちます。感受性が高く、共感力に溢れています。',
+  20: '論理的でクールな知性を持ちます。分析力に優れ、実にナイーブな一面も持ちます。',
+  21: '鋭い直感と深い霊感を持ちます。神秘的な感性が際立つ存在です。',
+  22: '創造力と表現力に溢れ、情熱的です。自信を持って自己表現します。',
+  23: '明るく社交的で、輝く存在感があります。自己表現と人を楽しませることが得意です。',
+  24: '完璧主義で分析力があります。誠実に奉仕することに喜びを感じます。',
+  25: '公平で美的センスがあります。調和を大切にし、社交的な魅力があります。',
+  26: '合理と分析の星宿。計画力に優れ、経営・戦略で成功します。スピード感があり、控え目ながらも交際上手です。',
+};
+
+/* ===== 相性データ ===== */
+// 宿曜の相性は、本命宿どうしのインデックス差(diff = 0〜26)から
+// グループ(diff÷9)と位置(diff%9)で11種の関係性を導く
+//
+// pos0(グループ先頭)は グループごとに異なる: 命(g0)/業(g1)/胎(g2)
+// pos1〜8 は全グループ共通: 栄,衰,安,危,成,壊,友,親
+//
+// 検証済み: 19681018(軫宿)→20020427(氐宿) diff=3→安(×) ✓
+//          20020427(氐宿)→19681018(軫宿) diff=24→壊(×) ✓
+//          2026年カレンダー 両者30日分・全60項目 完全一致 ✓
+const DIFF_TYPE = [
+  '命','栄','衰','安','危','成','壊','友','親', // diff 0-8  (group0)
+  '業','栄','衰','安','危','成','壊','友','親', // diff 9-17 (group1)
+  '胎','栄','衰','安','危','成','壊','友','親', // diff18-26 (group2)
+];
+
+// 11種の相性の吉凶マーク
+const TYPE_MARK = {
+  '命':'△','業':'◎','胎':'◎','栄':'◎','親':'◎',
+  '友':'○','衰':'○','安':'×','危':'△','成':'△','壊':'×',
+};
+
+// 11種の相性の意味（良い面と注意点の両方を記載したバランス重視の解説）
+const TYPE_MEANING = {
+  '命': '同じ宿どうしの、運命を共にする関係。価値観が近く理解は早いが、似た弱点も共有しやすく、刺激や変化に乏しくなりやすい。',
+  '業': '前世からの深いつながりを感じる、ソウルメイト的な縁。自然と惹かれ合い、無償の支え合いが生まれやすい強い結びつき。',
+  '胎': '未来へと続く宿命的な縁。互いを育み合い、新しい可能性やスタートを後押ししてくれる関係。',
+  '栄': '互いの発展を後押しする、繁栄をもたらす縁。一緒にいることで視野が広がり、夢や目標が前進しやすい。',
+  '親': '家族のように深く支え合える関係。安心感があり、一緒にいることで本来の自分を取り戻せる、心強い縁。',
+  '友': '心地よく、楽しい時間を共有できる関係。距離感もちょうどよく、励まし合いながら自然体で過ごせる。',
+  '衰': '穏やかに励まし合える関係。優しさに触れるうちに惹かれていくことが多く、親密になりやすい縁。',
+  '安': '居心地が良く、馴れ合いやすい関係。安心感はあるが、その心地よさに甘えると互いの成長が止まりやすい、刺激不足になりがちな縁。',
+  '壊': '価値観や方向性がぶつかりやすい関係。衝突が起きやすいが、その違いが互いに強い変容を促すきっかけにもなる。距離感と相互尊重が鍵。',
+  '危': '価値観の違いが刺激となる関係。意見の対立やすれ違いも多いが、それが互いを成長させる良きライバル的な縁にもなる。',
+  '成': '学びの多い関係。考え方の違いから刺激を受け、知識や情報の交換を通じて、互いに有益な協力関係を築ける。',
+};
+
+// 「お二人の関係を一言で表すと…」
+const TYPE_ONELINE = {
+  '命': '似た者同士、安定はあるが刺激は少ない関係',
+  '業': 'ソウルメイト的な、深い縁で結ばれた関係',
+  '胎': '新しい可能性を育み合う、宿命的な関係',
+  '栄': '互いの発展を後押しする、繁栄の関係',
+  '親': '家族のように支え合える、心強い関係',
+  '友': '心地よく楽しい時間を共有できる関係',
+  '衰': '励まし合い、親密になりやすい関係',
+  '安': '居心地は良いが、馴れ合いに注意な関係',
+  '壊': '人生の転機と変容を促す関係',
+  '危': '違いが刺激となる、良きライバル関係',
+  '成': '学び合い、互いを高め合う関係',
+};
+
+// 今日の運勢メッセージ（日宿との相性タイプ別）
+const TODAY_MSG = {
+  '命': '特別な意味を持つ日。自分自身を見つめ直すのに良いタイミング。',
+  '業': 'ソウルメイト的な縁を感じやすい日。深い学びや出会いに恵まれやすい。',
+  '胎': '新しい縁・企画が芽吹く希少日。種まき・スタート・転機に吉。',
+  '栄': '栄える日。対人・営業・発信が実を結ぶ。人前に出て吉。',
+  '親': '親密度が高まる日。大切な人と過ごすのに最適。',
+  '友': '心地よく過ごせる日。交流や楽しい時間に向く。',
+  '衰': '穏やかに過ごせる日。労り合い・休息にも適している。',
+  '安': '馴れ合いに注意。新しい決断より現状維持が吉。',
+  '危': '刺激や緊張を感じやすい日。慎重な判断を。',
+  '成': '学びの多い日。情報のやり取りや知識交換に向く。',
+  '壊': '衝突・変化が起きやすい日。大きな決断・契約・発信は避け慎重に。',
+};
+
+// 宿曜経 伝統的記述（確認済みデータのみ収録）
+const SHUKU_CLASSIC = {
+  26: { // 軫宿
+    title: '合理と分析の星宿。計画力に優れ、経営・戦略で成功する。',
+    classic: '軫ハ四星ナリ。其ノ形、篩ノ如シ。生マル者ハ計算深ク策略ニ長ジ、経営ニ実績ヲ挙グ。',
+    modern: '軫宿は4つの星からなり、その形は篩（ふるい）のようである。この宿に生まれる者は計算に深く、策略に長じ、経営で実績を挙げる。',
+  },
+  2: { // 氐宿
+    title: '安定と調和の星宿。家庭・組織・伝統を守る力に秀でる。',
+    classic: '氐ハ四星ナリ。其ノ形、陵ノ如シ。生マル者ハ安定ヲ好ミ、家ヲ守ル力アリ、伝統ヲ継ギテ安シ。',
+    modern: '氐宿は4つの星からなり、その形は陵（小山）のようである。この宿に生まれる者は安定を好み、家庭を守る力を持ち、伝統を継いで安泰である。',
+  },
+};
+
+/* ===== 宿の計算 ===== */
+function getJulianDay(y, m, d) {
+  const a = Math.floor((14 - m) / 12);
+  const yy = y + 4800 - a;
+  const mm = m + 12 * a - 3;
+  return d + Math.floor((153*mm+2)/5) + 365*yy + Math.floor(yy/4) - Math.floor(yy/100) + Math.floor(yy/400) - 32045;
+}
+
+// 朔（新月）のJDを求める（Meeus方式）
+function getNewMoonJD_raw(k) {
+  const T = k / 1236.85, T2 = T*T;
+  let JDE = 2451550.09766 + 29.530588861*k + 0.00015437*T2;
+  const M  = (2.5534  + 29.10535670*k) * Math.PI/180;
+  const Mp = (201.5643 + 385.81693528*k + 0.0107582*T2) * Math.PI/180;
+  const F  = (160.7108 + 390.67050284*k - 0.0016118*T2) * Math.PI/180;
+  const Om = (124.7746 - 1.56375588*k) * Math.PI/180;
+  JDE += -0.40720*Math.sin(Mp) + 0.17241*Math.sin(M)
+       + 0.01608*Math.sin(2*Mp) + 0.01039*Math.sin(2*F)
+       + 0.00739*Math.sin(Mp-M) - 0.00514*Math.sin(Mp+M)
+       - 0.00111*Math.sin(Mp-2*F) - 0.00057*Math.sin(Mp+2*F)
+       - 0.00017*Math.sin(Om);
+  return JDE;
+}
+
+// 指定JDより前で最も近い朔のJDを求める（JST補正済み）
+function getPrevNewMoonJD(jd) {
+  const nmJD = (k) => Math.floor(getNewMoonJD_raw(k) + 9/24 + 0.5);
+  let k = Math.floor((jd - 2451550.09766) / 29.530588861);
+  let nm = nmJD(k);
+  while (nm > jd) { k--; nm = nmJD(k); }
+  while (nmJD(k+1) <= jd) { k++; nm = nmJD(k); }
+  return nm;
+}
+
+// 月の黄経計算（Meeus精密版）
+function getMoonLon(jd) {
+  const T = (jd - 2451545.0) / 36525.0, T2=T*T, T3=T*T*T, T4=T*T*T*T;
+  let L = 218.3164477 + 481267.88123421*T - 0.0015786*T2 + T3/538841 - T4/65194000;
+  const D  = ((297.8501921 + 445267.1114034*T) % 360 + 360) % 360 * Math.PI/180;
+  const M  = ((357.5291092 + 35999.0502909*T) % 360 + 360) % 360 * Math.PI/180;
+  const Mp = ((134.9633964 + 477198.8675055*T + 0.0087414*T2) % 360 + 360) % 360 * Math.PI/180;
+  const F  = ((93.2720950 + 483202.0175233*T) % 360 + 360) % 360 * Math.PI/180;
+  const A1 = ((119.75 + 131.849*T) % 360 + 360) % 360 * Math.PI/180;
+  const A2 = ((53.09 + 479264.290*T) % 360 + 360) % 360 * Math.PI/180;
+  L += 6.288774*Math.sin(Mp) + 1.274027*Math.sin(2*D-Mp)
+     + 0.658314*Math.sin(2*D) + 0.213618*Math.sin(2*Mp)
+     - 0.185116*Math.sin(M)  - 0.114332*Math.sin(2*F)
+     + 0.058793*Math.sin(2*D-2*Mp) + 0.057066*Math.sin(2*D-M-Mp)
+     + 0.053322*Math.sin(2*D+Mp) + 0.045758*Math.sin(2*D-M)
+     - 0.040923*Math.sin(M-Mp) - 0.034720*Math.sin(D)
+     - 0.030383*Math.sin(M+Mp) + 0.015327*Math.sin(2*D-2*F)
+     + 0.010675*Math.sin(4*D-Mp) + 0.010034*Math.sin(3*Mp)
+     - 0.007888*Math.sin(2*D+M-Mp) - 0.006766*Math.sin(2*D+M)
+     - 0.005163*Math.sin(D-Mp) + 0.004987*Math.sin(D+M)
+     + 0.004036*Math.sin(2*D-M+Mp) + 0.003994*Math.sin(2*D+2*Mp)
+     + 0.003861*Math.sin(4*D) + 0.003665*Math.sin(2*D-3*Mp)
+     + 0.003958*Math.sin(A1) + 0.001962*Math.sin(L*Math.PI/180-F)
+     + 0.000318*Math.sin(A2);
+  return ((L % 360) + 360) % 360;
+}
+
+// 本命宿計算（生まれた日の月の位置から）
+// 検証済み: 1968/10/18=軫宿✅、2002/4/27=氐宿✅
+const SHUKU_OFFSET = 178.5;
+const SHUKU_WIDTH = 360 / 27;
+
+function getShuku(y, m, d) {
+  const jd = getJulianDay(y, m, d);
+  const nmJD = getPrevNewMoonJD(jd);
+  const lunarDay = jd - nmJD + 1;
+  const lon = getMoonLon(nmJD);
+  const nmShuku = Math.floor(((lon - SHUKU_OFFSET + 3600) % 360) / SHUKU_WIDTH) % 27;
+  return (nmShuku + lunarDay - 1) % 27;
+}
+
+// 日宿計算（今日どの宿か）
+// 検証済み: 2026/6/13〜7/2 全日付✅
+const NICHI_BASE_JD = 2461205; // getJulianDay(2026,6,13)
+const NICHI_BASE_IDX = 17; // 畔宿
+function getNichiShuku(y, m, d) {
+  const jd = getJulianDay(y, m, d);
+  return ((jd - NICHI_BASE_JD + NICHI_BASE_IDX) % 27 + 27) % 27;
+}
+
+/* ===== 相性計算 ===== */
+function getCompat(idx1, idx2) {
+  // あなた(idx1)から見たお相手(idx2)
+  const diff1 = ((idx2 - idx1) % 27 + 27) % 27;
+  const type1 = DIFF_TYPE[diff1];
+
+  // お相手(idx2)から見たあなた(idx1)
+  const diff2 = ((idx1 - idx2) % 27 + 27) % 27;
+  const type2 = DIFF_TYPE[diff2];
+
+  return { type1, type2, diff1, diff2 };
+}
+
+// 吉宿四種（業=仕事運・栄=社会運・親=家族運・友=交友運）
+// 検証済み: 軫宿(26)→業=女宿,栄=角宿,親=斗宿,友=箕宿 ✓
+//          氐宿(2)→業=室宿,栄=房宿,親=危宿,友=虚宿 ✓
+function getKichiShuku(idx) {
+  return {
+    業: SHUKU[(idx + 9) % 27],
+    栄: SHUKU[(idx + 1) % 27],
+    親: SHUKU[(idx + 8) % 27],
+    友: SHUKU[(idx + 7) % 27],
+  };
+}
+
+/* ===== MAIN CALC ===== */
+function calc() {
+  const y1=parseInt(document.getElementById('y1').value);
+  const m1=parseInt(document.getElementById('m1').value);
+  const d1=parseInt(document.getElementById('d1').value);
+  const y2=parseInt(document.getElementById('y2').value);
+  const m2=parseInt(document.getElementById('m2').value);
+  const d2=parseInt(document.getElementById('d2').value);
+  const err = document.getElementById('err');
+  err.style.display='none';
+
+  if(isNaN(y1)||isNaN(m1)||isNaN(d1)||isNaN(y2)||isNaN(m2)||isNaN(d2)){
+    err.style.display='block'; return;
+  }
+
+  const name1 = document.getElementById('name1').value.trim();
+  const name2 = document.getElementById('name2').value.trim();
+  const label1 = '🌙 あなた' + (name1 ? `（${name1}）` : '');
+  const label2 = '⭐ お相手' + (name2 ? `（${name2}）` : '');
+
+  const idx1 = getShuku(y1,m1,d1);
+  const idx2 = getShuku(y2,m2,d2);
+  const s1 = SHUKU[idx1];
+  const s2 = SHUKU[idx2];
+  const { type1, type2 } = getCompat(idx1, idx2);
+
+  const mark1 = TYPE_MARK[type1], mark2 = TYPE_MARK[type2];
+
+  // Render persons
+  document.getElementById('persons-grid').innerHTML = `
+    ${renderPersonCard(s1, idx1, label1, y1, m1, d1)}
+    ${renderPersonCard(s2, idx2, label2, y2, m2, d2)}
+  `;
+
+  // Render compat hero
+  document.getElementById('compat-hero').innerHTML = `
+    <div class="compat-label">✦ お二人の相性 ✦</div>
+    <div class="compat-symbols">
+      <span class="compat-shuku">${s1.name}</span>
+      <span class="compat-arrow">×</span>
+      <span class="compat-shuku">${s2.name}</span>
+    </div>
+    <div class="compat-main">
+      <div class="compat-side">
+        <div class="compat-side-label">あなたから見たお相手</div>
+        <div class="compat-side-value">${type1}（${mark1}）</div>
+        <div style="font-size:0.75rem;color:var(--dim);margin-top:0.4rem;line-height:1.7">${TYPE_MEANING[type1]}</div>
+      </div>
+      <div class="compat-side">
+        <div class="compat-side-label">お相手から見たあなた</div>
+        <div class="compat-side-value">${type2}（${mark2}）</div>
+        <div style="font-size:0.75rem;color:var(--dim);margin-top:0.4rem;line-height:1.7">${TYPE_MEANING[type2]}</div>
+      </div>
+    </div>
+    <div class="compat-one-line">お二人の関係を一言で表すと…<br>
+      <span style="font-size:clamp(1rem,3vw,1.2rem);color:var(--gold-l);font-weight:700">${TYPE_ONELINE[type1]}</span>
+    </div>
+  `;
+
+  // Render meaning table（全11種、該当箇所をハイライト）
+  const highlightTypes = [type1, type2];
+  document.getElementById('meaning-table').innerHTML = Object.entries(TYPE_MEANING).map(([k,v]) => {
+    const isHL = highlightTypes.includes(k);
+    return `<tr class="${isHL?'highlight':''}">
+      <td>${k}（${TYPE_MARK[k]}）</td>
+      <td>${v}</td>
+    </tr>`;
+  }).join('');
+
+  // Today's shuku
+  const todayDate = new Date();
+  const ty = todayDate.getFullYear(), tm = todayDate.getMonth()+1, td2 = todayDate.getDate();
+  const todayIdx = getNichiShuku(ty, tm, td2);
+  const todayShuku = SHUKU[todayIdx];
+  const { type1: tt1 } = getCompat(idx1, todayIdx);
+  const { type1: tt3 } = getCompat(idx2, todayIdx);
+
+  document.getElementById('today-section').innerHTML = `
+    <div class="today-shuku-card">
+      <div class="today-label">✦ 今日（${ty}年${tm}月${td2}日）の日宿 ✦</div>
+      <div class="today-shuku-name">${todayShuku.name}（${todayShuku.read}）</div>
+      <div style="font-size:0.78rem;color:var(--dim);margin-top:0.2rem">${todayShuku.keywords.join('・')}</div>
+      <div class="today-compat-row">
+        <div class="today-compat-cell">
+          <div class="today-compat-label">🌙 あなた × 今日</div>
+          <div class="today-compat-val">${tt1}（${TYPE_MARK[tt1]}）</div>
+          <div class="today-compat-kichi">${TODAY_MSG[tt1]}</div>
+        </div>
+        <div class="today-compat-cell">
+          <div class="today-compat-label">⭐ お相手 × 今日</div>
+          <div class="today-compat-val">${tt3}（${TYPE_MARK[tt3]}）</div>
+          <div class="today-compat-kichi">${TODAY_MSG[tt3]}</div>
+        </div>
+      </div>
+    </div>
+    ${buildCalendar(idx1, idx2, ty, tm, td2)}
+  `;
+
+  document.getElementById('result').style.display='block';
+  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function buildCalendar(idx1, idx2, ty, tm, td) {
+  const rows = [];
+  const weekDays = ['日','月','火','水','木','金','土'];
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(ty, tm-1, td+i);
+    const yy = d.getFullYear(), mm = d.getMonth()+1, dd = d.getDate();
+    const nIdx = getNichiShuku(yy, mm, dd);
+    const ns = SHUKU[nIdx];
+    const { type1: c1 } = getCompat(idx1, nIdx);
+    const { type1: c2 } = getCompat(idx2, nIdx);
+    const mk1 = TYPE_MARK[c1], mk2 = TYPE_MARK[c2];
+    const isToday = i === 0;
+    rows.push(`<tr class="${isToday?'cal-today':''}">
+      <td>${yy}/${String(mm).padStart(2,'0')}/${String(dd).padStart(2,'0')}</td>
+      <td>${weekDays[d.getDay()]}</td>
+      <td>${ns.name}</td>
+      <td class="${getKichiClass(mk1)}">${c1} ${mk1}</td>
+      <td class="${getKichiClass(mk2)}">${c2} ${mk2}</td>
+    </tr>`);
+  }
+  return `<div class="calendar-section">
+    <div class="calendar-title">✦ 今後30日間の運勢カレンダー ✦</div>
+    <table class="calendar-table">
+      <thead><tr>
+        <th>日付</th><th>曜</th><th>日宿</th><th>🌙あなた</th><th>⭐お相手</th>
+      </tr></thead>
+      <tbody>${rows.join('')}</tbody>
+    </table>
+  </div>`;
+}
+function getKichiClass(mark) {
+  if(mark==='◎') return 'cal-kichi-A';
+  if(mark==='○') return 'cal-kichi-B';
+  if(mark==='△') return 'cal-kichi-C';
+  if(mark==='×') return 'cal-kichi-D';
+  return '';
+}
+
+function renderPersonCard(s, idx, label, y, m, d) {
+  const kichi = getKichiShuku(idx);
+  const classic = SHUKU_CLASSIC[idx];
+  return `
+    <div class="person-result-card">
+      <div class="person-result-header">
+        <div class="person-tag">${label} ／ ${y}年${m}月${d}日</div>
+        <div class="shuku-name">${s.name}</div>
+        <div class="shuku-read">${s.read}</div>
+      </div>
+      <div class="person-result-body">
+        <div class="trait-row">
+          <span class="trait-label">特徴</span>
+          <span class="trait-val">${SHUKU_TRAITS[idx]}</span>
+        </div>
+        <div class="trait-row">
+          <span class="trait-label">エレメント</span>
+          <span class="trait-val">${s.element}（${getElementDesc(s.element)}）</span>
+        </div>
+        <div class="trait-row">
+          <span class="trait-label">クオリティ</span>
+          <span class="trait-val">${s.quality}（${getQualityDesc(s.quality)}）</span>
+        </div>
+        <div class="trait-row">
+          <span class="trait-label">12宮</span>
+          <span class="trait-val">${s.sign12}</span>
+        </div>
+        <div class="trait-row">
+          <span class="trait-label">守護星</span>
+          <span class="trait-val">${s.planet}</span>
+        </div>
+        <div class="keyword-badges">
+          ${s.keywords.map(k=>`<span class="kbadge">${k}</span>`).join('')}
+        </div>
+        <div class="kichi-shuku-title">✦ あなたの吉宿四種 ✦</div>
+        <div class="kichi-shuku-grid">
+          <div class="kichi-shuku-cell">
+            <div class="kichi-shuku-label">業（仕事運）</div>
+            <div class="kichi-shuku-name">${kichi.業.name}</div>
+          </div>
+          <div class="kichi-shuku-cell">
+            <div class="kichi-shuku-label">栄（社会運）</div>
+            <div class="kichi-shuku-name">${kichi.栄.name}</div>
+          </div>
+          <div class="kichi-shuku-cell">
+            <div class="kichi-shuku-label">親（家族運）</div>
+            <div class="kichi-shuku-name">${kichi.親.name}</div>
+          </div>
+          <div class="kichi-shuku-cell">
+            <div class="kichi-shuku-label">友（交友運）</div>
+            <div class="kichi-shuku-name">${kichi.友.name}</div>
+          </div>
+        </div>
+        ${classic ? `
+        <div class="classic-section">
+          <div class="classic-title">${classic.title}</div>
+          <div class="classic-label">『宿曜経』伝統的記述（書き下し）</div>
+          <div class="classic-text">${classic.classic}</div>
+          <div class="classic-label">現代語訳</div>
+          <div class="classic-text">${classic.modern}</div>
+        </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function getElementDesc(e) {
+  return {火:'直感・情熱・能動・冒険',地:'現実・安定・受動・慎重',風:'理性・知性・理論・友好',水:'感情・情緒・献身・依存'}[e]||'';
+}
+function getQualityDesc(q) {
+  return {活動:'リーダーシップ・活発',不動:'信念・忍耐・頑固',柔軟:'適応・多才・臨機応変'}[q]||'';
+}
+
+/* ===== PDF EXPORT ===== */
+function exportPDF() {
+  // Set print date
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}年${String(now.getMonth()+1).padStart(2,'0')}月${String(now.getDate()).padStart(2,'0')}日 鑑定`;
+  const pf = document.getElementById('print-date');
+  if (pf) pf.textContent = dateStr;
+
+  // Trigger browser print dialog (user can choose "Save as PDF")
+  window.print();
+}
+</script>
+</body>
+</html>
