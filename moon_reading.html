@@ -906,28 +906,138 @@ const CYCLE_READING = {
   3: { title:"浄化期 - 手放しと解放の時間", periods:["'Ole-pau","Kāloa-kū-kahi","Kāloa-kū-lua","Kāloa-pau"], actions:["ホ・オポノポノ","断捨離・手放し","感謝解放・波を流す","感去の癒し・赦し","執着を手放す"] },
 };
 
-/* ===== MOON AGE CALCULATION ===== */
-function getMoonAge(year, month, day) {
-  // Julian Day Number calculation
+/* ===== MOON AGE CALCULATION =====
+   moon_cycle.html と同じロジックを採用。
+   固定の朔望月で剰余演算するのではなく、Meeusの天文アルゴリズムで
+   実際の朔（新月）の瞬間を計算し、直前の朔からの経過日数で夜番号を決定する。
+   各サイクルの実際の長さ（29日 or 30日）に応じて、最終日を必ず
+   「ムク（30）」とすることで、ハワイの伝統的な月暦の数え方を再現する。
+*/
+
+// 標準ユリウス日（正午基準）
+function getJulianDay(year, month, day) {
   const a = Math.floor((14 - month) / 12);
   const y = year + 4800 - a;
   const m = month + 12 * a - 3;
-  let jdn = day + Math.floor((153 * m + 2) / 5) + 365 * y
-            + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
-
-  // Reference new moon calibrated so that 1968-10-18 = night 26 (Kāloa-pau)
-  const refNewMoon = 2451551.0;
-  const synodicMonth = 29.53058867;
-
-  const daysSince = jdn - refNewMoon;
-  let age = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
-  return age; // 0-29.53
+  return day + Math.floor((153 * m + 2) / 5) + 365 * y
+       + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
 }
 
-function getNightIndex(age) {
-  let night = Math.floor(age) + 1;
-  if (night > 30) night = 30;
-  return night;
+// k番目の朔（新月）のユリウス日（力学時, JDE）をMeeusの式で計算
+function newMoonJDE(k) {
+  const T = k / 1236.85;
+  const T2 = T*T, T3 = T2*T, T4 = T3*T;
+  let JDE = 2451550.09766 + 29.530588861*k
+    + 0.00015437*T2 - 0.000000150*T3 + 0.00000000073*T4;
+
+  const M  = 2.5534 + 29.10535670*k - 0.0000014*T2 - 0.00000011*T3;
+  const Mp = 201.5643 + 385.81693528*k + 0.0107582*T2 + 0.00001238*T3 - 0.000000058*T4;
+  const F  = 160.7108 + 390.67050284*k - 0.0016118*T2 - 0.00000227*T3 + 0.000000011*T4;
+  const Om = 124.7746 - 1.56375588*k + 0.0020672*T2 + 0.00000215*T3;
+
+  const d2r = Math.PI/180;
+  const Ms = (M  % 360) * d2r;
+  const Mm = (Mp % 360) * d2r;
+  const Fm = (F  % 360) * d2r;
+  const Og = (Om % 360) * d2r;
+  const E  = 1 - 0.002516*T - 0.0000074*T2;
+
+  let corr = 0;
+  corr += -0.40720 * Math.sin(Mm);
+  corr +=  0.17241 * E * Math.sin(Ms);
+  corr +=  0.01608 * Math.sin(2*Mm);
+  corr +=  0.01039 * Math.sin(2*Fm);
+  corr +=  0.00739 * E * Math.sin(Mm - Ms);
+  corr += -0.00514 * E * Math.sin(Mm + Ms);
+  corr +=  0.00208 * E*E * Math.sin(2*Ms);
+  corr += -0.00111 * Math.sin(Mm - 2*Fm);
+  corr += -0.00057 * Math.sin(Mm + 2*Fm);
+  corr +=  0.00056 * E * Math.sin(2*Mm + Ms);
+  corr += -0.00042 * Math.sin(3*Mm);
+  corr +=  0.00042 * E * Math.sin(Ms + 2*Fm);
+  corr +=  0.00038 * E * Math.sin(Ms - 2*Fm);
+  corr += -0.00024 * E * Math.sin(2*Mm - Ms);
+  corr += -0.00017 * Math.sin(Og);
+  corr += -0.00007 * Math.sin(Mm + 2*Ms);
+  corr +=  0.00004 * Math.sin(2*Mm - 2*Fm);
+  corr +=  0.00004 * Math.sin(3*Ms);
+  corr +=  0.00003 * Math.sin(Mm + Ms - 2*Fm);
+  corr +=  0.00003 * Math.sin(2*Mm + 2*Fm);
+  corr += -0.00003 * Math.sin(Mm + Ms + 2*Fm);
+  corr +=  0.00003 * Math.sin(Mm - Ms + 2*Fm);
+  corr += -0.00002 * Math.sin(Mm - Ms - 2*Fm);
+  corr += -0.00002 * Math.sin(3*Mm + Ms);
+  corr +=  0.00002 * Math.sin(4*Mm);
+
+  return JDE + corr;
+}
+
+function jdeToUTCDate(jde) {
+  return new Date((jde - 2440587.5) * 86400000);
+}
+
+function kForYearMonth(year, month) {
+  const yearsFrac = year + (month - 0.5) / 12 - 2000;
+  return Math.floor(yearsFrac * 12.3685);
+}
+
+// 指定年の朔（新月）の日付（日本時間の0時基準, UTCミリ秒）を全て列挙
+function newMoonCalendarDays(year) {
+  const kStart = kForYearMonth(year, 1) - 3;
+  const kEnd   = kForYearMonth(year, 12) + 3;
+  const days = [];
+  for (let k = kStart; k <= kEnd; k++) {
+    const utc = jdeToUTCDate(newMoonJDE(k));
+    const jst = new Date(utc.getTime() + 9*3600*1000);
+    days.push(Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), jst.getUTCDate()));
+  }
+  days.sort((a,b)=>a-b);
+  return days.filter((d,i)=> i===0 || d!==days[i-1]);
+}
+
+const newMoonCache = {};
+function getNewMoonDays(year){
+  if (!newMoonCache[year]) newMoonCache[year] = newMoonCalendarDays(year);
+  return newMoonCache[year];
+}
+
+function newMoonsNear(year){
+  return getNewMoonDays(year-1).concat(getNewMoonDays(year)).concat(getNewMoonDays(year+1));
+}
+
+// 指定日が属するサイクル（直前の朔 nm 〜 次の朔 nextNm）を求める
+function surroundingNewMoons(year, month, day){
+  const target = Date.UTC(year, month-1, day);
+  const candidates = newMoonsNear(year);
+
+  let nmIdx = -1;
+  for (let i=0; i<candidates.length; i++){
+    if (candidates[i] <= target) nmIdx = i;
+    else break;
+  }
+  return { nm: candidates[nmIdx], nextNm: candidates[nmIdx+1] };
+}
+
+// 朔からの経過日数(dayIdx)とそのサイクルの実際の長さ(lunLen)、
+// 夜番号(n: 1〜30, 朔の翌日が1夜=ヒロ, 最終日は必ず30夜=ムク)を返す
+function moonDayInfo(year, month, day){
+  const target = Date.UTC(year, month-1, day);
+  const { nm, nextNm } = surroundingNewMoons(year, month, day);
+  const dayIdx = Math.round((target - nm) / 86400000);
+  const lunLen = Math.round((nextNm - nm) / 86400000);
+  const n = (dayIdx === 0) ? 30 : dayIdx; // 朔の日自体は前サイクルのムク(30)とする
+  return { n, dayIdx, lunLen };
+}
+
+// 既存コードとの互換用：月齢相当の値（0〜lunLen未満の小数日数）を返す
+function getMoonAge(year, month, day) {
+  const { dayIdx, lunLen } = moonDayInfo(year, month, day);
+  return (dayIdx === 0 ? lunLen : dayIdx) - 1 + 0.5; // 表示用の近似値（0〜29.x）
+}
+
+// 夜番号（1〜30）を返す
+function getNightIndex(year, month, day) {
+  return moonDayInfo(year, month, day).n;
 }
 
 /* ===== MAIN FUNCTION ===== */
@@ -950,7 +1060,7 @@ function doReading() {
 
   setTimeout(() => {
     const age = getMoonAge(year, month, day);
-    const nightIdx = getNightIndex(age);
+    const nightIdx = getNightIndex(year, month, day);
     const night = NIGHTS[nightIdx - 1];
     const reading = READINGS[nightIdx];
     const cycleNum = night.cycle;
@@ -1148,7 +1258,7 @@ function doToday() {
   const d = now.getDate();
 
   const age = getMoonAge(y, m, d);
-  const nightIdx = getNightIndex(age);
+  const nightIdx = getNightIndex(y, m, d);
   const night = NIGHTS[nightIdx - 1];
   const reading = READINGS[nightIdx];
   const todayMsg = TODAY_MESSAGES[nightIdx];
