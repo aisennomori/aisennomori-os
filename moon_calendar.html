@@ -380,21 +380,55 @@
 
   let iconUid = 0;
 
-  function moonAge(year, month, day){
-    const t = new Date(year, month-1, day, 12, 0, 0).getTime();
+  // Moon age (fractional days since reference new moon) sampled at a fixed UTC hour,
+  // used only to locate "the most recent new moon" for a given date.
+  function moonAgeAtNoonUTC(year, month, day){
+    const t = Date.UTC(year, month-1, day, 12, 0, 0);
     let age = ((t - newMoonEpoch) / 86400000) % synodicMonth;
     if (age < 0) age += synodicMonth;
     return age;
   }
 
-  function moonIconSVG(age, size){
+  // Returns a UTC Date (at 12:00) representing the calendar day of the new moon
+  // on or immediately before the given date.
+  function newMoonDateOnOrBefore(year, month, day){
+    const age = moonAgeAtNoonUTC(year, month, day);
+    const t = Date.UTC(year, month-1, day, 12, 0, 0) - Math.floor(age) * 86400000;
+    return new Date(t);
+  }
+
+  // Integer day index since the most recent new moon: new moon day itself = 0,
+  // counting up by whole calendar days (+1 per day), per Hawaiian moon-day convention.
+  function dayIndexFor(year, month, day){
+    const nm = newMoonDateOnOrBefore(year, month, day);
+    const target = Date.UTC(year, month-1, day, 12, 0, 0);
+    return Math.round((target - nm.getTime()) / 86400000);
+  }
+
+  // Length (in whole days) of the current lunation, used to determine whether
+  // this cycle includes a day 29 (Mauli) before day 0/Muku, or skips straight to Muku.
+  function lunationLengthFor(year, month, day){
+    const nm = newMoonDateOnOrBefore(year, month, day);
+    const nmTime = nm.getTime();
+    let d = 25;
+    while (true){
+      const t = nmTime + d*86400000;
+      const age = ((t - newMoonEpoch)/86400000) % synodicMonth;
+      const normAge = age < 0 ? age + synodicMonth : age;
+      if (normAge < 1) return d; // this day is the next new moon -> lunation length
+      d++;
+      if (d > 31) return 29; // safety fallback
+    }
+  }
+
+  function moonIconSVG(dayIdx, lunLen, size){
     size = size || 30;
     iconUid++;
     const r = size/2 - 1.5;
     const cx = size/2, cy = size/2;
-    const theta = (age/synodicMonth) * 2 * Math.PI;
+    const theta = (dayIdx/lunLen) * 2 * Math.PI;
     const dx = r * (1 + Math.cos(theta));
-    const dir = age < synodicMonth/2 ? 1 : -1;
+    const dir = dayIdx < lunLen/2 ? 1 : -1;
     const lightCx = cx + dir*dx;
     return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" aria-hidden="true">'
       + '<defs><clipPath id="mclip'+iconUid+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'"/></clipPath></defs>'
@@ -420,13 +454,14 @@
 
   function renderTodayWidget(){
     const now = new Date();
-    const age = moonAge(now.getFullYear(), now.getMonth()+1, now.getDate());
-    const idx = Math.floor(age);
-    const info = moonData[idx];
-    document.getElementById('todayMoon').innerHTML = moonIconSVG(age, 44);
+    const y = now.getFullYear(), m = now.getMonth()+1, d = now.getDate();
+    const dayIdx = dayIndexFor(y, m, d);
+    const lunLen = lunationLengthFor(y, m, d);
+    const n = (dayIdx === 0) ? 30 : dayIdx;
+    const info = moonData[n - 1];
+    document.getElementById('todayMoon').innerHTML = moonIconSVG(dayIdx, lunLen, 44);
     document.getElementById('todayLabel').textContent =
-      '今日 ' + now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日('
-      + dowNames[now.getDay()] + ')';
+      '今日 ' + y + '年' + m + '月' + d + '日(' + dowNames[now.getDay()] + ')';
     document.getElementById('todayName').innerHTML =
       '<span class="num">' + info.n + '.</span> ' + escapeHtml(info.name)
       + '<span class="kana">' + info.kana + '</span>';
@@ -436,7 +471,7 @@
   function populateYearSelect(){
     const sel = document.getElementById('yearInput');
     const current = new Date().getFullYear();
-    for (let y = current - 3; y <= current + 6; y++){
+    for (let y = current + 6; y >= 1930; y--){
       const opt = document.createElement('option');
       opt.value = y;
       opt.textContent = y + '年';
@@ -459,9 +494,11 @@
     const now = new Date();
 
     for (let d = 1; d <= dim; d++){
-      const age = moonAge(year, month, d);
-      const idx = Math.floor(age) % 30;
-      const info = moonData[idx];
+      const dayIdx = dayIndexFor(year, month, d);
+      const lunLen = lunationLengthFor(year, month, d);
+      // Day index 0 = new moon = Muku (n=30). Otherwise n = dayIdx directly.
+      const n = (dayIdx === 0) ? 30 : dayIdx;
+      const info = moonData[n - 1];
       const dateObj = new Date(year, month-1, d);
       const dow = dowNames[dateObj.getDay()];
       const isToday = (now.getFullYear() === year && now.getMonth()+1 === month && now.getDate() === d);
@@ -478,7 +515,7 @@
           + '<div class="date-num">' + d + '</div>'
           + '<div class="date-dow ' + dowClass + '">' + dow + '</div>'
         + '</div>'
-        + '<div class="moon-wrap">' + moonIconSVG(age) + '</div>'
+        + '<div class="moon-wrap">' + moonIconSVG(dayIdx, lunLen) + '</div>'
         + '<div class="info-block">'
           + '<div class="name-line"><span class="num">' + info.n + '.</span> '
             + escapeHtml(info.name) + '<span class="kana">' + info.kana + '</span></div>'
