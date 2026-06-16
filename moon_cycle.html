@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ハワイアン・ムーン・サイクル | 愛泉の杜</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+
+  :root{
+    --bg:#FBF6EC;
+    --card:#FFFFFF;
+    --ink:#3A322A;
+    --ink-soft:#9A8F80;
+    --line:#EAE1D2;
+    --waxing:#4F9D94;
+    --full:#E2A23C;
+    --waning:#8FAE7E;
+    --moon-dark:#2E2A24;
+    --moon-light:#F6CE5B;
+    --font-display:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+    --font-body:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
+  }
+
+  *{ box-sizing:border-box; }
+
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+  }
+
+  .page{
+    max-width:480px;
+    margin:0 auto;
+    padding:0 0 40px;
+    min-height:100vh;
+  }
+
+  header.app-header{
+    background:linear-gradient(180deg,#3E3A33 0%,#4A4339 100%);
+    color:#F7F1E4;
+    padding:22px 20px 26px;
+    border-radius:0 0 22px 22px;
+  }
+  header.app-header h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:1.3rem;
+    letter-spacing:.04em;
+    margin:0 0 2px;
+  }
+  header.app-header .subtitle{
+    font-size:.75rem;
+    color:#CFC4AE;
+    letter-spacing:.08em;
+    margin:0;
+  }
+
+  .controls{
+    margin:18px 16px 4px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .controls .field{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .controls label{
+    font-size:.7rem;
+    color:var(--ink-soft);
+    letter-spacing:.06em;
+  }
+  .controls select{
+    font-family:var(--font-body);
+    font-size:.95rem;
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:7px 10px;
+    background:#FCFAF5;
+  }
+  .controls button.go-btn{
+    margin-left:auto;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:.9rem;
+    color:#FBF6EC;
+    background:var(--ink);
+    border:none;
+    border-radius:10px;
+    padding:10px 18px;
+    cursor:pointer;
+    letter-spacing:.05em;
+  }
+  .controls button.go-btn:active{ opacity:.85; }
+
+  /* Cycle nav (prev / title / next) */
+  .cycle-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin:22px 16px 8px;
+  }
+  .cycle-nav .nav-btn{
+    flex:0 0 auto;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--card);
+    color:var(--ink);
+    font-size:1.1rem;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .cycle-nav .nav-btn:active{ background:var(--line); }
+  .cycle-nav .cal-title{
+    flex:1 1 auto;
+    text-align:center;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:.98rem;
+    color:var(--ink);
+    line-height:1.3;
+  }
+  .cycle-nav .cal-title .range{
+    display:block;
+    font-size:.72rem;
+    font-weight:400;
+    color:var(--ink-soft);
+    margin-top:2px;
+  }
+
+  .calendar-list{
+    margin:0 16px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+  }
+
+  .day-card{
+    position:relative;
+    display:grid;
+    grid-template-columns:62px 38px 1fr;
+    gap:0 12px;
+    align-items:center;
+    padding:9px 14px 9px 18px;
+    border-bottom:1px solid var(--line);
+  }
+  .day-card:last-child{ border-bottom:none; }
+  .day-card::before{
+    content:'';
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width:4px;
+    background:var(--phase-color);
+  }
+  .day-card.today{ background:#FFF7E2; }
+
+  .date-block{ text-align:center; }
+  .date-num{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:1.05rem;
+    line-height:1.15;
+    color:var(--ink);
+  }
+  .date-dow{
+    font-size:.66rem;
+    color:var(--ink-soft);
+    margin-top:1px;
+  }
+  .date-dow.sun{ color:#C25450; }
+  .date-dow.sat{ color:#4A6FA5; }
+  .date-dow-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:3px;
+    margin-top:1px;
+  }
+  .date-dow-row .marker{
+    font-size:.62rem;
+    line-height:1;
+  }
+
+  .moon-wrap{ display:flex; justify-content:center; }
+
+  .info-block{ min-width:0; }
+  .info-block .name-line{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:.95rem;
+    color:var(--ink);
+  }
+  .info-block .name-line .num{
+    color:var(--ink-soft);
+    font-weight:400;
+    margin-right:3px;
+  }
+  .info-block .name-line .kana{
+    font-weight:400;
+    font-size:.76rem;
+    color:var(--ink-soft);
+    margin-left:6px;
+  }
+
+  .legend{
+    display:flex;
+    gap:14px;
+    margin:14px 16px 0;
+    font-size:.7rem;
+    color:var(--ink-soft);
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .legend i{
+    display:inline-block; width:10px; height:10px; border-radius:2px;
+  }
+  .legend .i-wax{ background:var(--waxing); }
+  .legend .i-full{ background:var(--full); }
+  .legend .i-wan{ background:var(--waning); }
+
+  .marker-legend{
+    margin:18px 16px 0;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 16px;
+  }
+  .marker-legend .legend-title{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:.85rem;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  .marker-legend .legend-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:.8rem;
+    color:#5A5048;
+    padding:4px 0;
+  }
+  .marker-legend .legend-row .mk{
+    font-size:.95rem;
+    width:20px;
+    text-align:center;
+  }
+
+  .print-section{
+    margin:22px 16px 0;
+  }
+  .print-section button{
+    width:100%;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:1rem;
+    letter-spacing:.06em;
+    color:#FBF6EC;
+    background:var(--ink);
+    border:none;
+    border-radius:12px;
+    padding:14px;
+    cursor:pointer;
+  }
+  .print-section button:active{ opacity:.85; }
+  .print-hint{
+    text-align:center;
+    font-size:.7rem;
+    color:var(--ink-soft);
+    margin-top:8px;
+  }
+
+  @media print{
+    body{ background:#fff; }
+    header.app-header{
+      background:none; color:var(--ink); border-radius:0; padding:0 0 10px;
+    }
+    .controls{ display:none; }
+    .legend{ display:none; }
+    .print-section{ display:none; }
+    .cycle-nav .nav-btn{ display:none; }
+    .cycle-nav{ margin:10px 0 6px; }
+    .calendar-list{ border:none; border-radius:0; margin:0; }
+    .page{ max-width:100%; padding:0; }
+    .day-card{ padding:5px 4px 5px 10px; break-inside:avoid; }
+    .date-num{ font-size:.95rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="app-header">
+    <h1>ハワイアン・ムーン・サイクル</h1>
+    <p class="subtitle">愛泉の杜 ｰ ムーン手帖(ヒロ〜ムク 1サイクル表示)</p>
+  </header>
+
+  <section class="controls">
+    <div class="field">
+      <label for="yearInput">西暦年</label>
+      <select id="yearInput" required></select>
+    </div>
+    <div class="field">
+      <label for="monthInput">月</label>
+      <select id="monthInput" required>
+        <option value="1">1月</option>
+        <option value="2">2月</option>
+        <option value="3">3月</option>
+        <option value="4">4月</option>
+        <option value="5">5月</option>
+        <option value="6">6月</option>
+        <option value="7">7月</option>
+        <option value="8">8月</option>
+        <option value="9">9月</option>
+        <option value="10">10月</option>
+        <option value="11">11月</option>
+        <option value="12">12月</option>
+      </select>
+    </div>
+    <button class="go-btn" id="generateBtn" type="button">表示する</button>
+  </section>
+
+  <div class="legend">
+    <span><i class="i-wax"></i>Ho'onui(満ちる)</span>
+    <span><i class="i-full"></i>Poepoe(満月期)</span>
+    <span><i class="i-wan"></i>Ho'emi(欠ける)</span>
+  </div>
+
+  <div class="cycle-nav">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="前のサイクル">⬅️</button>
+    <div class="cal-title" id="calTitle"></div>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="次のサイクル">➡️</button>
+  </div>
+
+  <div class="calendar-list" id="calendarList"></div>
+
+  <div class="marker-legend">
+    <div class="legend-title">凡例</div>
+    <div class="legend-row"><span class="mk">🔵</span>新しい事を始める</div>
+    <div class="legend-row"><span class="mk">❤️</span>休息期</div>
+    <div class="legend-row"><span class="mk">🟢</span>食物パワー</div>
+    <div class="legend-row"><span class="mk">🩵</span>浄化期</div>
+  </div>
+
+  <section class="print-section">
+    <button id="printBtn" type="button">PDFとして印刷</button>
+    <p class="print-hint">印刷ダイアログで「PDFに保存」を選ぶとPDF化できます</p>
+  </section>
+
+</div>
+
+<script>
+  const dowNames = ['日','月','火','水','木','金','土'];
+
+  const moonData = [
+    null,
+    {n:1,  name:"Hilo",          kana:"ヒロ"},
+    {n:2,  name:"Hoaka",         kana:"ホアカ"},
+    {n:3,  name:"Kū-kahi",       kana:"クーカヒ"},
+    {n:4,  name:"Kū-lua",        kana:"クールア"},
+    {n:5,  name:"Kū-kolu",       kana:"クーコル"},
+    {n:6,  name:"Kū-pau",        kana:"クーパウ"},
+    {n:7,  name:"ʻOle-kū-kahi",  kana:"オレクーカヒ"},
+    {n:8,  name:"ʻOle-kū-lua",   kana:"オレクールア"},
+    {n:9,  name:"ʻOle-kū-kolu",  kana:"オレクーコル"},
+    {n:10, name:"ʻOle-pau",      kana:"オレパウ"},
+    {n:11, name:"Huna",          kana:"フナ"},
+    {n:12, name:"Mōhalu",        kana:"モーハル"},
+    {n:13, name:"Hua",           kana:"フア"},
+    {n:14, name:"Akua",          kana:"アクア"},
+    {n:15, name:"Hoku",          kana:"ホク"},
+    {n:16, name:"Māhealani",     kana:"マヘアラニ"},
+    {n:17, name:"Kulu",          kana:"クル"},
+    {n:18, name:"Lāʻau-kū-kahi", kana:"ラーアウクーカヒ"},
+    {n:19, name:"Lāʻau-kū-lua",  kana:"ラーアウクールア"},
+    {n:20, name:"Lāʻau-kū-kolu", kana:"ラーアウクーコル"},
+    {n:21, name:"ʻOle-kū-kahi",  kana:"オレクーカヒ"},
+    {n:22, name:"ʻOle-kū-lua",   kana:"オレクールア"},
+    {n:23, name:"ʻOle-pau",      kana:"オレパウ"},
+    {n:24, name:"Kāloa-kū-kahi", kana:"カーロアクーカヒ"},
+    {n:25, name:"Kāloa-kū-lua",  kana:"カーロアクールア"},
+    {n:26, name:"Kāloa-pau",     kana:"カーロアパウ"},
+    {n:27, name:"Kāne",          kana:"カーネ"},
+    {n:28, name:"Lono",          kana:"ロノ"},
+    {n:29, name:"Mauli",         kana:"マウリ"},
+    {n:30, name:"Muku",          kana:"ムク"},
+  ];
+
+  let iconUid = 0;
+  let currentYear, currentMonth; // year/month used to *locate* the displayed cycle
+
+  // ============================================================
+  // Astronomical new-moon calculation (Meeus low-precision series)
+  // ============================================================
+  function newMoonJDE(k) {
+    const T = k / 1236.85;
+    const T2 = T*T, T3 = T2*T, T4 = T3*T;
+    let JDE = 2451550.09766 + 29.530588861*k
+      + 0.00015437*T2 - 0.000000150*T3 + 0.00000000073*T4;
+
+    const M  = 2.5534 + 29.10535670*k - 0.0000014*T2 - 0.00000011*T3;
+    const Mp = 201.5643 + 385.81693528*k + 0.0107582*T2 + 0.00001238*T3 - 0.000000058*T4;
+    const F  = 160.7108 + 390.67050284*k - 0.0016118*T2 - 0.00000227*T3 + 0.000000011*T4;
+    const Om = 124.7746 - 1.56375588*k + 0.0020672*T2 + 0.00000215*T3;
+
+    const d2r = Math.PI/180;
+    const Ms = (M  % 360) * d2r;
+    const Mm = (Mp % 360) * d2r;
+    const Fm = (F  % 360) * d2r;
+    const Og = (Om % 360) * d2r;
+    const E  = 1 - 0.002516*T - 0.0000074*T2;
+
+    let corr = 0;
+    corr += -0.40720 * Math.sin(Mm);
+    corr +=  0.17241 * E * Math.sin(Ms);
+    corr +=  0.01608 * Math.sin(2*Mm);
+    corr +=  0.01039 * Math.sin(2*Fm);
+    corr +=  0.00739 * E * Math.sin(Mm - Ms);
+    corr += -0.00514 * E * Math.sin(Mm + Ms);
+    corr +=  0.00208 * E*E * Math.sin(2*Ms);
+    corr += -0.00111 * Math.sin(Mm - 2*Fm);
+    corr += -0.00057 * Math.sin(Mm + 2*Fm);
+    corr +=  0.00056 * E * Math.sin(2*Mm + Ms);
+    corr += -0.00042 * Math.sin(3*Mm);
+    corr +=  0.00042 * E * Math.sin(Ms + 2*Fm);
+    corr +=  0.00038 * E * Math.sin(Ms - 2*Fm);
+    corr += -0.00024 * E * Math.sin(2*Mm - Ms);
+    corr += -0.00017 * Math.sin(Og);
+    corr += -0.00007 * Math.sin(Mm + 2*Ms);
+    corr +=  0.00004 * Math.sin(2*Mm - 2*Fm);
+    corr +=  0.00004 * Math.sin(3*Ms);
+    corr +=  0.00003 * Math.sin(Mm + Ms - 2*Fm);
+    corr +=  0.00003 * Math.sin(2*Mm + 2*Fm);
+    corr += -0.00003 * Math.sin(Mm + Ms + 2*Fm);
+    corr +=  0.00003 * Math.sin(Mm - Ms + 2*Fm);
+    corr += -0.00002 * Math.sin(Mm - Ms - 2*Fm);
+    corr += -0.00002 * Math.sin(3*Mm + Ms);
+    corr +=  0.00002 * Math.sin(4*Mm);
+
+    return JDE + corr;
+  }
+
+  function jdeToUTCDate(jde) {
+    return new Date((jde - 2440587.5) * 86400000);
+  }
+
+  function kForYearMonth(year, month) {
+    const yearsFrac = year + (month - 0.5) / 12 - 2000;
+    return Math.floor(yearsFrac * 12.3685);
+  }
+
+  function newMoonCalendarDays(year) {
+    const kStart = kForYearMonth(year, 1) - 3;
+    const kEnd   = kForYearMonth(year, 12) + 3;
+    const days = [];
+    for (let k = kStart; k <= kEnd; k++) {
+      const utc = jdeToUTCDate(newMoonJDE(k));
+      const jst = new Date(utc.getTime() + 9*3600*1000);
+      days.push(Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), jst.getUTCDate()));
+    }
+    days.sort((a,b)=>a-b);
+    return days.filter((d,i)=> i===0 || d!==days[i-1]);
+  }
+
+  const newMoonCache = {};
+  function getNewMoonDays(year){
+    if (!newMoonCache[year]) newMoonCache[year] = newMoonCalendarDays(year);
+    return newMoonCache[year];
+  }
+
+  function newMoonsNear(year){
+    return getNewMoonDays(year-1).concat(getNewMoonDays(year)).concat(getNewMoonDays(year+1));
+  }
+
+  // Find the lunar cycle (new moon -> next new moon) whose Hilo (new moon + 1 day)
+  // is the first one falling on or after the 1st of the given calendar month.
+  function findCycleForYearMonth(year, month){
+    const monthStart = Date.UTC(year, month-1, 1);
+    const nmList = newMoonsNear(year);
+    for (let i = 0; i < nmList.length - 1; i++){
+      const hiloDate = nmList[i] + 86400000;
+      if (hiloDate >= monthStart) {
+        return { nm: nmList[i], nextNm: nmList[i+1] };
+      }
+    }
+    return null;
+  }
+
+  // Given a cycle's new-moon boundaries, find the next cycle (forward) or
+  // previous cycle (backward).
+  function adjacentCycle(nm, nextNm, direction){
+    const y = new Date(nm).getUTCFullYear();
+    const nmList = newMoonsNear(y);
+    const idx = nmList.indexOf(nm);
+    if (idx === -1) return null;
+    if (direction > 0) {
+      if (idx+2 >= nmList.length) return null;
+      return { nm: nmList[idx+1], nextNm: nmList[idx+2] };
+    } else {
+      if (idx-1 < 0) return null;
+      return { nm: nmList[idx-1], nextNm: nmList[idx] };
+    }
+  }
+
+  function dateFromUTCms(ms){
+    return new Date(ms);
+  }
+
+  function fmtDate(ms){
+    const d = dateFromUTCms(ms);
+    return (d.getUTCFullYear()) + '年' + (d.getUTCMonth()+1) + '月' + d.getUTCDate() + '日';
+  }
+  function fmtShort(ms){
+    const d = dateFromUTCms(ms);
+    return (d.getUTCMonth()+1) + '/' + d.getUTCDate();
+  }
+
+  // ============================================================
+  // Rendering
+  // ============================================================
+  function moonIconSVG(dayIdx, lunLen, size){
+    size = size || 30;
+    iconUid++;
+    const r = size/2 - 1.5;
+    const cx = size/2, cy = size/2;
+    const theta = (dayIdx/lunLen) * 2 * Math.PI;
+    const dx = r * (1 + Math.cos(theta));
+    const dir = dayIdx < lunLen/2 ? 1 : -1;
+    const lightCx = cx + dir*dx;
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" aria-hidden="true">'
+      + '<defs><clipPath id="mclip'+iconUid+'"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'"/></clipPath></defs>'
+      + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="var(--moon-dark)"/>'
+      + '<circle cx="'+lightCx+'" cy="'+cy+'" r="'+r+'" fill="var(--moon-light)" clip-path="url(#mclip'+iconUid+')"/>'
+      + '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>'
+      + '</svg>';
+  }
+
+  function phaseColor(n){
+    if (n <= 10) return 'var(--waxing)';
+    if (n <= 20) return 'var(--full)';
+    return 'var(--waning)';
+  }
+
+  // Marker emoji for specific moon-day-number ranges, per user's spec.
+  function markerForN(n){
+    if (n >= 1 && n <= 3)   return '🔵';
+    if (n >= 7 && n <= 10)  return '❤️';
+    if (n >= 18 && n <= 20) return '🟢';
+    if (n >= 23 && n <= 26) return '🩵';
+    return '';
+  }
+
+  function escapeHtml(str){
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  let displayedCycle = null; // { nm, nextNm }
+
+  function renderCycle(cycle){
+    displayedCycle = cycle;
+    const { nm, nextNm } = cycle;
+    const lunLen = Math.round((nextNm - nm) / 86400000);
+    const now = new Date();
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+
+    document.getElementById('calTitle').innerHTML =
+      escapeHtml(fmtDate(nm + 86400000)) + ' 〜 ' + escapeHtml(fmtDate(nextNm))
+      + '<span class="range">ヒロ(1) 〜 ムク(30) ・ 全' + lunLen + '日間</span>';
+
+    const list = document.getElementById('calendarList');
+    list.innerHTML = '';
+
+    for (let dayIdx = 1; dayIdx <= lunLen; dayIdx++){
+      const dateMs = nm + dayIdx * 86400000;
+      const n = (dayIdx === lunLen) ? 30 : dayIdx; // last day of cycle = Muku(30)
+      const info = moonData[n];
+      const d = dateFromUTCms(dateMs);
+      const dow = dowNames[d.getUTCDay()];
+      const isToday = (dateMs === todayUTC);
+
+      let dowClass = '';
+      if (dow === '日') dowClass = 'sun';
+      if (dow === '土') dowClass = 'sat';
+
+      const card = document.createElement('div');
+      card.className = 'day-card' + (isToday ? ' today' : '');
+      card.style.setProperty('--phase-color', phaseColor(info.n));
+      const marker = markerForN(info.n);
+      const markerHtml = marker ? '<span class="marker">' + marker + '</span>' : '';
+      card.innerHTML =
+        '<div class="date-block">'
+          + '<div class="date-num">' + escapeHtml(fmtShort(dateMs)) + '</div>'
+          + '<div class="date-dow-row"><span class="date-dow ' + dowClass + '">' + dow + '</span>' + markerHtml + '</div>'
+        + '</div>'
+        + '<div class="moon-wrap">' + moonIconSVG(dayIdx, lunLen) + '</div>'
+        + '<div class="info-block">'
+          + '<div class="name-line"><span class="num">' + info.n + '.</span> '
+            + escapeHtml(info.name) + '<span class="kana">' + info.kana + '</span></div>'
+        + '</div>';
+      list.appendChild(card);
+    }
+  }
+
+  function populateYearSelect(){
+    const sel = document.getElementById('yearInput');
+    const current = new Date().getFullYear();
+    for (let y = current + 6; y >= 1930; y--){
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y + '年';
+      if (y === current) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+
+  function showForYearMonth(year, month){
+    const cycle = findCycleForYearMonth(year, month);
+    if (cycle) renderCycle(cycle);
+  }
+
+  document.getElementById('generateBtn').addEventListener('click', function(){
+    const year = parseInt(document.getElementById('yearInput').value, 10);
+    const month = parseInt(document.getElementById('monthInput').value, 10);
+    if (!year || !month) return;
+    showForYearMonth(year, month);
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', function(){
+    if (!displayedCycle) return;
+    const prev = adjacentCycle(displayedCycle.nm, displayedCycle.nextNm, -1);
+    if (prev) renderCycle(prev);
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', function(){
+    if (!displayedCycle) return;
+    const next = adjacentCycle(displayedCycle.nm, displayedCycle.nextNm, 1);
+    if (next) renderCycle(next);
+  });
+
+  document.getElementById('printBtn').addEventListener('click', function(){ window.print(); });
+
+  populateYearSelect();
+  document.getElementById('monthInput').value = (new Date().getMonth()+1);
+
+  (function initToday(){
+    const now = new Date();
+    showForYearMonth(now.getFullYear(), now.getMonth()+1);
+  })();
+</script>
+</body>
+</html>
