@@ -605,7 +605,7 @@
 
   function populateYearSelect(){
     const sel=document.getElementById('yearInput'),cur=new Date().getFullYear();
-    for(let y=cur-3;y<=cur+6;y++){
+    for(let y=cur+5;y>=cur-80;y--){
       const o=document.createElement('option');
       o.value=y;o.textContent=y+'年';
       if(y===cur)o.selected=true;
