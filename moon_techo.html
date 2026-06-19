@@ -9,344 +9,299 @@
   @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
 
   :root{
-    --bg:#FBF6EC;
+    --bg:#F7F2E8;
     --card:#FFFFFF;
-    --ink:#3A322A;
+    --ink:#2E2820;
     --ink-soft:#9A8F80;
-    --line:#EAE1D2;
+    --line:#E0D8C8;
     --font-display:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
     --font-body:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;
-    --col-hoonui:#3DBFB8;
-    --col-poepoe:#E0784A;
-    --col-hoemi:#5DAF40;
+    --hoonui:#2AADA6;
+    --hoonui-light:#E8F8F7;
+    --poepoe:#D96A38;
+    --poepoe-light:#FDF0E8;
+    --hoemi:#4EA832;
+    --hoemi-light:#EDF7E8;
   }
 
   *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ background:var(--bg); color:var(--ink); font-family:var(--font-body); }
+  .page{ max-width:560px; margin:0 auto; padding:0 0 50px; min-height:100vh; }
 
-  html,body{
-    background:var(--bg);
-    color:var(--ink);
-    font-family:var(--font-body);
-  }
-
-  .page{
-    max-width:540px;
-    margin:0 auto;
-    padding:0 0 40px;
-    min-height:100vh;
-  }
-
+  /* ===== Header ===== */
   header.app-header{
-    background:linear-gradient(180deg,#3E3A33 0%,#4A4339 100%);
-    color:#F7F1E4;
-    padding:22px 20px 26px;
-    border-radius:0 0 22px 22px;
+    background:linear-gradient(160deg,#2E2820 0%,#4A3F32 60%,#5A4F42 100%);
+    color:#F7F1E4; padding:24px 20px 28px;
+    border-radius:0 0 28px 28px;
+    text-align:center; position:relative; overflow:hidden;
+  }
+  header.app-header::before{
+    content:'🌙'; position:absolute;
+    font-size:5rem; opacity:.07; right:-10px; top:-10px;
   }
   header.app-header h1{
-    font-family:var(--font-display);
-    font-weight:700;
-    font-size:1.3rem;
-    letter-spacing:.04em;
-    margin-bottom:2px;
+    font-family:var(--font-display); font-weight:700;
+    font-size:1.4rem; letter-spacing:.08em; margin-bottom:4px;
   }
-  header.app-header .subtitle{
-    font-size:.75rem;
-    color:#CFC4AE;
-    letter-spacing:.08em;
-  }
+  header.app-header .subtitle{ font-size:.72rem; color:#CFC4AE; letter-spacing:.12em; }
 
+  /* ===== Controls ===== */
   .controls{
-    display:flex;
-    gap:10px;
-    align-items:flex-end;
-    padding:18px 16px 10px;
-    flex-wrap:wrap;
+    display:flex; gap:10px; align-items:flex-end;
+    padding:20px 16px 8px; flex-wrap:wrap;
   }
-  .field{
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-    flex:1;
-    min-width:80px;
-  }
-  .field label{
-    font-size:.72rem;
-    color:var(--ink-soft);
-    font-weight:500;
-  }
+  .field{ display:flex; flex-direction:column; gap:4px; flex:1; min-width:80px; }
+  .field label{ font-size:.72rem; color:var(--ink-soft); font-weight:500; }
   .field select{
-    font-size:.88rem;
-    padding:7px 10px;
-    border:1px solid var(--line);
-    border-radius:8px;
-    background:var(--card);
-    color:var(--ink);
-    appearance:none;
+    font-size:.88rem; padding:8px 10px;
+    border:1px solid var(--line); border-radius:10px;
+    background:#fff; color:var(--ink); appearance:none;
     font-family:var(--font-body);
   }
-  .controls button{
-    font-family:var(--font-display);
-    font-weight:700;
-    font-size:.85rem;
-    letter-spacing:.04em;
-    color:#FBF6EC;
-    background:var(--ink);
-    border:none;
-    border-radius:8px;
-    padding:9px 16px;
-    cursor:pointer;
-    white-space:nowrap;
+  .controls .gen-btn{
+    font-family:var(--font-display); font-weight:700;
+    font-size:.85rem; letter-spacing:.04em;
+    color:#fff; background:var(--ink);
+    border:none; border-radius:10px;
+    padding:10px 18px; cursor:pointer; white-space:nowrap;
   }
-  .controls button:active{ opacity:.85; }
+  .controls .gen-btn:active{ opacity:.8; }
 
+  /* ===== View Toggle ===== */
+  .view-toggle{
+    display:flex; gap:6px;
+    margin:10px 16px 0;
+  }
+  .view-btn{
+    flex:1; padding:10px 6px;
+    border-radius:10px; border:2px solid var(--line);
+    background:#fff; color:var(--ink-soft);
+    font-family:var(--font-body); font-size:.82rem;
+    cursor:pointer; font-weight:500;
+    transition:all .18s; text-align:center;
+    position:relative;
+  }
+  .view-btn.active{
+    background:var(--hoonui);
+    color:#fff;
+    border-color:var(--hoonui);
+    font-weight:700;
+    box-shadow:0 3px 10px rgba(42,173,166,0.35);
+  }
+  .view-btn.active::after{
+    content:'✔';
+    position:absolute;
+    top:4px; right:6px;
+    font-size:.65rem;
+    opacity:.85;
+  }
+  .view-btn:not(.active):hover{ border-color:var(--hoonui); color:var(--hoonui); }
+  .view-btn:active{ opacity:.85; }
+
+  /* ===== Cycle nav ===== */
   .cycle-nav{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin:18px 16px 10px;
-    gap:8px;
+    display:flex; align-items:center; justify-content:space-between;
+    margin:14px 16px 12px; gap:8px;
   }
   .nav-btn{
-    flex-shrink:0;
-    width:40px; height:40px;
-    border-radius:50%;
-    border:1px solid var(--line);
-    background:var(--card);
-    font-size:1.1rem;
-    cursor:pointer;
+    flex-shrink:0; width:40px; height:40px; border-radius:50%;
+    border:1px solid var(--line); background:#fff;
+    font-size:1.1rem; cursor:pointer;
     display:flex; align-items:center; justify-content:center;
+    box-shadow:0 1px 4px rgba(0,0,0,0.08);
   }
   .nav-btn:active{ background:#F0EAD9; }
   .nav-btn:disabled{ opacity:.35; cursor:default; }
   .cycle-title{
-    font-family:var(--font-display);
-    font-weight:700;
-    font-size:.92rem;
+    font-family:var(--font-display); font-weight:700;
+    font-size:.88rem; text-align:center;
+    flex:1; line-height:1.5;
+    background:#fff;
     color:var(--ink);
-    text-align:center;
-    flex:1;
-    line-height:1.4;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px 10px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.06);
   }
 
-  /* ===== Sheet (CSS Grid) ===== */
+  /* ===== Sheet wrap ===== */
   .sheet-wrap{
-    margin:0 16px 18px;
-    background:var(--bg);
-    border:1px solid var(--line);
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:0 4px 18px rgba(0,0,0,0.06);
+    margin:0 12px 20px;
     container-type:inline-size;
   }
 
-  .sheet-inner{
-    padding:10px 8px 12px;
-  }
-
   .period-title{
-    font-family:var(--font-display);
-    font-weight:700;
-    font-size:3.2cqw;
-    color:var(--ink);
-    text-align:center;
-    margin-bottom:10px;
-    letter-spacing:0.02em;
+    font-family:var(--font-display); font-weight:700;
+    font-size:3.6cqw; color:var(--ink);
+    text-align:center; margin-bottom:12px; letter-spacing:.03em;
   }
 
-  .group-block{
-    margin-bottom:7px;
-  }
+  /* ======================================
+     案①：グリッド表示
+  ====================================== */
+  .group-block{ margin-bottom:7px; }
 
   .group-header{
     padding:3px 8px 3px 10px;
     border-radius:5px 5px 0 0;
-    font-size:2cqw;
-    font-weight:700;
-    letter-spacing:0.14em;
-    color:#fff;
+    font-size:2cqw; font-weight:700;
+    letter-spacing:.14em; color:#fff;
   }
-  .group-header.hoonui{ background:var(--col-hoonui); }
-  .group-header.poepoe{ background:var(--col-poepoe); }
-  .group-header.hoemi { background:var(--col-hoemi);  }
+  .group-header.hoonui{ background:var(--hoonui); }
+  .group-header.poepoe{ background:var(--poepoe); }
+  .group-header.hoemi { background:var(--hoemi);  }
 
   .day-grid{
-    display:grid;
-    grid-template-columns:repeat(10, 1fr);
-    gap:2px;
-    background:var(--line);
-    border-radius:0 0 5px 5px;
-    padding:2px;
+    display:grid; grid-template-columns:repeat(10,1fr);
+    gap:2px; background:var(--line);
+    border-radius:0 0 5px 5px; padding:2px;
   }
-
   .day-cell{
-    background:#fff;
-    border-radius:3px;
-    padding:3px 1px 4px;
-    text-align:center;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:0;
-    min-width:0;
-    overflow:hidden;
+    background:#fff; border-radius:3px;
+    padding:3px 1px 4px; text-align:center;
+    display:flex; flex-direction:column;
+    align-items:center; gap:0; min-width:0; overflow:hidden;
   }
-
-  .day-cell .moon-icon{
-    font-size:4.2cqw;
-    line-height:1.3;
-  }
+  .day-cell .moon-icon{ font-size:4.2cqw; line-height:1.3; }
   .day-cell .haw-name{
-    font-size:1.55cqw;
-    color:#666;
-    line-height:1.25;
-    width:100%;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
+    font-size:1.55cqw; color:#666; line-height:1.25;
+    width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
   }
   .day-cell .kana{
-    font-size:1.2cqw;
-    color:#999;
-    line-height:1.2;
-    width:100%;
-    overflow:hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
+    font-size:1.2cqw; color:#999; line-height:1.2;
+    width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
   }
   .day-cell .moon-num{
-    font-size:2.4cqw;
-    font-weight:700;
-    color:var(--ink);
-    line-height:1.35;
+    font-size:2.4cqw; font-weight:700; color:var(--ink); line-height:1.35;
   }
   .day-cell .date-info{
-    font-size:1.9cqw;
-    font-weight:700;
-    color:var(--ink);
-    line-height:1.25;
+    font-size:1.9cqw; font-weight:700; color:var(--ink); line-height:1.25;
   }
   .day-cell .dow-info{
-    font-size:1.7cqw;
-    color:var(--ink-soft);
-    line-height:1.2;
+    font-size:1.7cqw; color:var(--ink-soft); line-height:1.2;
   }
-  .day-cell .marker{
-    font-size:2.6cqw;
-    line-height:1.2;
-    margin-top:1px;
-  }
+  .day-cell .marker{ font-size:2.6cqw; line-height:1.2; margin-top:1px; }
   .day-cell.today .date-info,
-  .day-cell.today .dow-info{
-    color:#C0392B;
-  }
+  .day-cell.today .dow-info{ color:#C0392B; }
   .day-cell.no-date .moon-icon,
   .day-cell.no-date .haw-name,
-  .day-cell.no-date .moon-num{
-    opacity:0.35;
-  }
+  .day-cell.no-date .moon-num{ opacity:.35; }
 
+  /* ======================================
+     案②：カード表示
+  ====================================== */
+  .group-section{ margin-bottom:16px; }
+
+  .group-label{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:8px; padding:0 4px;
+  }
+  .group-label-line{ flex:1; height:1px; }
+  .group-label-text{
+    font-size:3cqw; font-weight:700;
+    letter-spacing:.18em; color:#fff;
+    padding:4px 14px; border-radius:20px; white-space:nowrap;
+  }
+  .group-label.hoonui .group-label-text{ background:var(--hoonui); }
+  .group-label.hoonui .group-label-line{ background:var(--hoonui); opacity:.4; }
+  .group-label.poepoe .group-label-text{ background:var(--poepoe); }
+  .group-label.poepoe .group-label-line{ background:var(--poepoe); opacity:.4; }
+  .group-label.hoemi  .group-label-text{ background:var(--hoemi); }
+  .group-label.hoemi  .group-label-line{ background:var(--hoemi); opacity:.4; }
+
+  .card-grid{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+  }
+  .day-card{
+    border-radius:12px; padding:8px 4px 8px;
+    display:flex; flex-direction:column;
+    align-items:center; gap:2px; text-align:center;
+    border:1px solid transparent; overflow:hidden;
+  }
+  .group-section.hoonui .day-card{ background:var(--hoonui-light); border-color:#C8EDEC; }
+  .group-section.poepoe .day-card{ background:var(--poepoe-light); border-color:#F5D8C8; }
+  .group-section.hoemi  .day-card{ background:var(--hoemi-light);  border-color:#D0ECC8; }
+  .day-card.today{ border-color:#C0392B !important; box-shadow:0 0 0 1.5px #C0392B; }
+  .day-card.today .date-info,
+  .day-card.today .dow-info{ color:#C0392B !important; }
+  .day-card.no-date{ opacity:.4; }
+
+  .day-card .moon-icon{ font-size:6.5cqw; line-height:1; }
+  .day-card .moon-num{
+    font-size:3.5cqw; font-weight:700; color:var(--ink); line-height:1.2;
+  }
+  .day-card .haw-name{
+    font-size:2cqw; color:#555; line-height:1.2;
+    width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  }
+  .day-card .kana{
+    font-size:1.7cqw; color:#888; line-height:1.2;
+    width:100%; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  }
+  .day-card .divider{ width:60%; height:1px; background:rgba(0,0,0,.1); margin:2px 0; }
+  .day-card .date-info{
+    font-size:2.8cqw; font-weight:700; color:var(--ink); line-height:1.3;
+  }
+  .day-card .dow-info{ font-size:2.2cqw; color:var(--ink-soft); line-height:1.2; }
+  .day-card .marker{ font-size:3.5cqw; line-height:1; margin-top:2px; }
+
+  /* ===== Legend ===== */
   .legend-note{
-    margin:0 16px 16px;
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:12px 14px;
-    font-size:.72rem;
-    color:var(--ink-soft);
-    line-height:1.8;
+    margin:0 12px 16px; background:#fff;
+    border:1px solid var(--line); border-radius:14px;
+    padding:12px 14px; font-size:.72rem;
+    color:var(--ink-soft); line-height:1.9;
   }
   .legend-note .legend-row{
-    display:inline-flex;
-    align-items:center;
-    gap:4px;
-    margin-right:14px;
+    display:inline-flex; align-items:center; gap:4px; margin-right:12px;
   }
 
-  .print-section{
-    margin:22px 16px 0;
-  }
+  /* ===== Print/Save button ===== */
+  .print-section{ margin:20px 12px 0; }
   .print-section button{
-    width:100%;
-    font-family:var(--font-display);
-    font-weight:700;
-    font-size:1rem;
-    letter-spacing:.06em;
-    color:#FBF6EC;
-    background:var(--ink);
-    border:none;
-    border-radius:12px;
-    padding:14px;
-    cursor:pointer;
+    width:100%; font-family:var(--font-display); font-weight:700;
+    font-size:1rem; letter-spacing:.06em;
+    color:#fff; background:var(--ink);
+    border:none; border-radius:14px; padding:15px; cursor:pointer;
   }
   .print-section button:active{ opacity:.85; }
-  .print-hint{
-    text-align:center;
-    font-size:.7rem;
-    color:var(--ink-soft);
-    margin-top:8px;
-  }
+  .print-hint{ text-align:center; font-size:.7rem; color:var(--ink-soft); margin-top:8px; }
 
-  /* iOS modal */
+  /* ===== iOS modal ===== */
   .ios-modal-overlay{
-    display:none;
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.75);
-    z-index:9999;
-    align-items:flex-end;
-    justify-content:center;
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.78); z-index:9999;
+    align-items:flex-end; justify-content:center;
   }
   .ios-modal-overlay.active{ display:flex; }
   .ios-modal{
-    background:#fff;
-    border-radius:20px 20px 0 0;
-    padding:24px 20px 40px;
-    width:100%;
-    max-width:540px;
-    text-align:center;
-    font-family:var(--font-body);
+    background:#fff; border-radius:22px 22px 0 0;
+    padding:24px 18px 44px; width:100%; max-width:560px;
+    text-align:center; font-family:var(--font-body);
   }
-  .ios-modal h3{
-    font-size:1rem;
-    font-weight:700;
-    margin:0 0 14px;
-    color:var(--ink);
-  }
+  .ios-modal h3{ font-size:1rem; font-weight:700; margin-bottom:14px; color:var(--ink); }
   .ios-modal img#capturedImg{
-    width:100%;
-    border-radius:10px;
-    border:1px solid var(--line);
-    margin-bottom:14px;
+    width:100%; border-radius:12px;
+    border:1px solid var(--line); margin-bottom:14px;
   }
   .ios-modal .guide-text{
-    font-size:.82rem;
-    color:var(--ink-soft);
-    line-height:1.7;
-    margin-bottom:18px;
+    font-size:.82rem; color:var(--ink-soft); line-height:1.75; margin-bottom:18px;
   }
   .ios-modal .guide-text strong{ color:var(--ink); }
   .ios-modal-close{
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid var(--line);
-    background:#f5f0e8;
-    font-family:var(--font-body);
-    font-size:.9rem;
-    cursor:pointer;
-    color:var(--ink);
+    width:100%; padding:13px; border-radius:12px;
+    border:1px solid var(--line); background:#f5f0e8;
+    font-family:var(--font-body); font-size:.9rem;
+    cursor:pointer; color:var(--ink);
   }
 
   @media print{
     body{ background:#fff; }
-    header.app-header{ display:none; }
-    .controls{ display:none; }
-    .cycle-nav .nav-btn{ display:none; }
-    .cycle-nav .cycle-title{ display:none; }
+    header.app-header,.controls,.view-toggle,.cycle-nav .nav-btn,
+    .cycle-nav .cycle-title,.print-section{ display:none; }
     .cycle-nav{ margin:0; }
-    .legend-note{ border:none; }
-    .print-section{ display:none; }
     .page{ max-width:100%; padding:0; }
-    .sheet-wrap{ box-shadow:none; border:none; margin:0; }
+    .sheet-wrap{ margin:0; }
     @page{ size:auto; margin:8mm; }
   }
 </style>
@@ -356,42 +311,42 @@
 
   <header class="app-header">
     <h1>ハワイアン・ムーン手帖</h1>
-    <p class="subtitle">愛泉の杜 ｰ ムーン手帖</p>
+    <p class="subtitle">愛泉の杜 ｰ Spirit Tools</p>
   </header>
 
   <section class="controls">
     <div class="field">
       <label for="yearInput">西暦年</label>
-      <select id="yearInput" required></select>
+      <select id="yearInput"></select>
     </div>
     <div class="field">
       <label for="monthInput">月</label>
-      <select id="monthInput" required>
-        <option value="1">1月</option>
-        <option value="2">2月</option>
-        <option value="3">3月</option>
-        <option value="4">4月</option>
-        <option value="5">5月</option>
-        <option value="6">6月</option>
-        <option value="7">7月</option>
-        <option value="8">8月</option>
-        <option value="9">9月</option>
-        <option value="10">10月</option>
-        <option value="11">11月</option>
-        <option value="12">12月</option>
+      <select id="monthInput">
+        <option value="1">1月</option><option value="2">2月</option>
+        <option value="3">3月</option><option value="4">4月</option>
+        <option value="5">5月</option><option value="6">6月</option>
+        <option value="7">7月</option><option value="8">8月</option>
+        <option value="9">9月</option><option value="10">10月</option>
+        <option value="11">11月</option><option value="12">12月</option>
       </select>
     </div>
-    <button id="generateBtn" type="button">表示する</button>
+    <button class="gen-btn" id="generateBtn" type="button">表示する</button>
   </section>
 
+  <!-- 表示切替トグル -->
+  <div class="view-toggle">
+    <button class="view-btn active" id="btnGrid" type="button">📓 グリッド表示</button>
+    <button class="view-btn" id="btnCard" type="button">🌙 カード表示</button>
+  </div>
+
   <div class="cycle-nav">
-    <button class="nav-btn" id="prevBtn" type="button" aria-label="前のサイクル">⬅️</button>
+    <button class="nav-btn" id="prevBtn" type="button">⬅️</button>
     <div class="cycle-title" id="calTitle"></div>
-    <button class="nav-btn" id="nextBtn" type="button" aria-label="次のサイクル">➡️</button>
+    <button class="nav-btn" id="nextBtn" type="button">➡️</button>
   </div>
 
   <div class="sheet-wrap">
-    <div class="sheet-inner" id="sheetInner">
+    <div id="sheetInner">
       <div class="period-title" id="periodBand"></div>
     </div>
   </div>
@@ -401,7 +356,7 @@
     <span class="legend-row"><span>❤️</span>休息期</span>
     <span class="legend-row"><span>🟢</span>食物パワー</span>
     <span class="legend-row"><span>🩵</span>浄化期</span>
-    <br>※ 各夜の日付・曜日マスは、その日が今日であれば赤色で表示されます。
+    <br>※ 各夜の日付・曜日は、今日であれば赤色で表示されます。
   </div>
 
   <section class="print-section">
@@ -415,88 +370,84 @@
   <div class="ios-modal">
     <h3>📸 画像を保存してください</h3>
     <img id="capturedImg" src="" alt="キャプチャ画像">
-    <p class="guide-text">
-      画像を<strong>長押し</strong>して<br>
-      「<strong>写真に追加</strong>」または「<strong>画像を保存</strong>」を選んでください
-    </p>
+    <p class="guide-text">画像を<strong>長押し</strong>して<br>「<strong>写真に追加</strong>」または「<strong>画像を保存</strong>」を選んでください</p>
     <button class="ios-modal-close" id="iosModalClose">閉じる</button>
   </div>
 </div>
 
 <script>
-  const dowNames = ['日','月','火','水','木','金','土'];
+  const dowNames=['日','月','火','水','木','金','土'];
 
-  const moonData = [
+  const moonData=[
     null,
-    {n:1,  name:"Hilo",           kana:"ヒロ",             icon:"🌑"},
-    {n:2,  name:"Hoaka",          kana:"ホアカ",            icon:"🌒"},
-    {n:3,  name:"Ku-kahi",        kana:"クーカヒ",          icon:"🌒"},
-    {n:4,  name:"Ku-lua",         kana:"クールア",          icon:"🌒"},
-    {n:5,  name:"Ku-kolu",        kana:"クーコル",          icon:"🌓"},
-    {n:6,  name:"Ku-pau",         kana:"クーパウ",          icon:"🌓"},
-    {n:7,  name:"Ole-ku-kahi",    kana:"オレクーカヒ",      icon:"🌔"},
-    {n:8,  name:"Ole-ku-lua",     kana:"オレクールア",      icon:"🌔"},
-    {n:9,  name:"Ole-ku-kolu",    kana:"オレクーコル",      icon:"🌔"},
-    {n:10, name:"Ole-pau",        kana:"オレパウ",          icon:"🌔"},
-    {n:11, name:"Huna",           kana:"フナ",              icon:"🌔"},
-    {n:12, name:"Mohalu",         kana:"モーハル",          icon:"🌕"},
-    {n:13, name:"Hua",            kana:"ファア",            icon:"🌕"},
-    {n:14, name:"Akua",           kana:"アクア",            icon:"🌕"},
-    {n:15, name:"Hoku",           kana:"ホク",              icon:"🌕"},
-    {n:16, name:"Mahealani",      kana:"マヘアラニ",        icon:"🌕"},
-    {n:17, name:"Kulu",           kana:"クル",              icon:"🌖"},
-    {n:18, name:"Laau-ku-kahi",   kana:"ラーアウクーカヒ",  icon:"🌖"},
-    {n:19, name:"Laau-ku-lua",    kana:"ラーアウクールア",  icon:"🌗"},
-    {n:20, name:"Laau-pau",       kana:"ラーアウパウ",      icon:"🌗"},
-    {n:21, name:"Ole-ku-kahi",    kana:"オレクーカヒ",      icon:"🌗"},
-    {n:22, name:"Ole-ku-lua",     kana:"オレクールア",      icon:"🌗"},
-    {n:23, name:"Ole-pau",        kana:"オレパウ",          icon:"🌘"},
-    {n:24, name:"Kaloa-ku-kahi",  kana:"カーロアクーカヒ",  icon:"🌘"},
-    {n:25, name:"Kaloa-ku-lua",   kana:"カーロアクールア",  icon:"🌘"},
-    {n:26, name:"Kaloa-pau",      kana:"カーロアパウ",      icon:"🌘"},
-    {n:27, name:"Kane",           kana:"カーネ",            icon:"🌘"},
-    {n:28, name:"Lono",           kana:"ロノ",              icon:"🌑"},
-    {n:29, name:"Mauli",          kana:"マウリ",            icon:"🌑"},
-    {n:30, name:"Muku",           kana:"ムク",              icon:"🌑"},
+    {n:1,  name:"Hilo",          kana:"ヒロ",             icon:"🌑"},
+    {n:2,  name:"Hoaka",         kana:"ホアカ",            icon:"🌒"},
+    {n:3,  name:"Ku-kahi",       kana:"クーカヒ",          icon:"🌒"},
+    {n:4,  name:"Ku-lua",        kana:"クールア",          icon:"🌒"},
+    {n:5,  name:"Ku-kolu",       kana:"クーコル",          icon:"🌓"},
+    {n:6,  name:"Ku-pau",        kana:"クーパウ",          icon:"🌓"},
+    {n:7,  name:"Ole-ku-kahi",   kana:"オレクーカヒ",      icon:"🌔"},
+    {n:8,  name:"Ole-ku-lua",    kana:"オレクールア",      icon:"🌔"},
+    {n:9,  name:"Ole-ku-kolu",   kana:"オレクーコル",      icon:"🌔"},
+    {n:10, name:"Ole-pau",       kana:"オレパウ",          icon:"🌔"},
+    {n:11, name:"Huna",          kana:"フナ",              icon:"🌔"},
+    {n:12, name:"Mohalu",        kana:"モーハル",          icon:"🌕"},
+    {n:13, name:"Hua",           kana:"ファア",            icon:"🌕"},
+    {n:14, name:"Akua",          kana:"アクア",            icon:"🌕"},
+    {n:15, name:"Hoku",          kana:"ホク",              icon:"🌕"},
+    {n:16, name:"Mahealani",     kana:"マヘアラニ",        icon:"🌕"},
+    {n:17, name:"Kulu",          kana:"クル",              icon:"🌖"},
+    {n:18, name:"Laau-ku-kahi",  kana:"ラーアウクーカヒ",  icon:"🌖"},
+    {n:19, name:"Laau-ku-lua",   kana:"ラーアウクールア",  icon:"🌗"},
+    {n:20, name:"Laau-pau",      kana:"ラーアウパウ",      icon:"🌗"},
+    {n:21, name:"Ole-ku-kahi",   kana:"オレクーカヒ",      icon:"🌗"},
+    {n:22, name:"Ole-ku-lua",    kana:"オレクールア",      icon:"🌗"},
+    {n:23, name:"Ole-pau",       kana:"オレパウ",          icon:"🌘"},
+    {n:24, name:"Kaloa-ku-kahi", kana:"カーロアクーカヒ",  icon:"🌘"},
+    {n:25, name:"Kaloa-ku-lua",  kana:"カーロアクールア",  icon:"🌘"},
+    {n:26, name:"Kaloa-pau",     kana:"カーロアパウ",      icon:"🌘"},
+    {n:27, name:"Kane",          kana:"カーネ",            icon:"🌘"},
+    {n:28, name:"Lono",          kana:"ロノ",              icon:"🌑"},
+    {n:29, name:"Mauli",         kana:"マウリ",            icon:"🌑"},
+    {n:30, name:"Muku",          kana:"ムク",              icon:"🌑"},
   ];
 
-  const GROUPS = [
-    { id:'hoonui', label:"HO'ONUI", range:[1,10]  },
-    { id:'poepoe', label:'POEPOE',  range:[11,20] },
-    { id:'hoemi',  label:"HO'EMI",  range:[21,30] },
+  const GROUPS=[
+    {id:'hoonui', label:"HO'ONUI", range:[1,10]},
+    {id:'poepoe', label:'POEPOE',  range:[11,20]},
+    {id:'hoemi',  label:"HO'EMI",  range:[21,30]},
   ];
 
   // ============================================================
   // 天文計算（Meeus低精度）
   // ============================================================
   function newMoonJDE(k){
-    const T=k/1236.85, T2=T*T, T3=T2*T, T4=T3*T;
-    let JDE=2451550.09766+29.530588861*k+0.00015437*T2-0.000000150*T3+0.00000000073*T4;
+    const T=k/1236.85,T2=T*T,T3=T2*T,T4=T3*T;
+    let J=2451550.09766+29.530588861*k+0.00015437*T2-0.000000150*T3+0.00000000073*T4;
     const M=2.5534+29.10535670*k-0.0000014*T2-0.00000011*T3;
     const Mp=201.5643+385.81693528*k+0.0107582*T2+0.00001238*T3-0.000000058*T4;
     const F=160.7108+390.67050284*k-0.0016118*T2-0.00000227*T3+0.000000011*T4;
     const Om=124.7746-1.56375588*k+0.0020672*T2+0.00000215*T3;
-    const d2r=Math.PI/180;
-    const Ms=(M%360)*d2r, Mm=(Mp%360)*d2r, Fm=(F%360)*d2r, Og=(Om%360)*d2r;
-    const E=1-0.002516*T-0.0000074*T2;
+    const r=Math.PI/180,E=1-0.002516*T-0.0000074*T2;
+    const Ms=(M%360)*r,Mm=(Mp%360)*r,Fm=(F%360)*r,Og=(Om%360)*r;
     let c=0;
-    c+=-0.40720*Math.sin(Mm); c+=0.17241*E*Math.sin(Ms); c+=0.01608*Math.sin(2*Mm);
-    c+=0.01039*Math.sin(2*Fm); c+=0.00739*E*Math.sin(Mm-Ms); c+=-0.00514*E*Math.sin(Mm+Ms);
-    c+=0.00208*E*E*Math.sin(2*Ms); c+=-0.00111*Math.sin(Mm-2*Fm); c+=-0.00057*Math.sin(Mm+2*Fm);
-    c+=0.00056*E*Math.sin(2*Mm+Ms); c+=-0.00042*Math.sin(3*Mm); c+=0.00042*E*Math.sin(Ms+2*Fm);
-    c+=0.00038*E*Math.sin(Ms-2*Fm); c+=-0.00024*E*Math.sin(2*Mm-Ms); c+=-0.00017*Math.sin(Og);
-    c+=-0.00007*Math.sin(Mm+2*Ms); c+=0.00004*Math.sin(2*Mm-2*Fm); c+=0.00004*Math.sin(3*Ms);
-    c+=0.00003*Math.sin(Mm+Ms-2*Fm); c+=0.00003*Math.sin(2*Mm+2*Fm);
-    c+=-0.00003*Math.sin(Mm+Ms+2*Fm); c+=0.00003*Math.sin(Mm-Ms+2*Fm);
-    c+=-0.00002*Math.sin(Mm-Ms-2*Fm); c+=-0.00002*Math.sin(3*Mm+Ms); c+=0.00002*Math.sin(4*Mm);
-    return JDE+c;
+    c+=-0.40720*Math.sin(Mm);c+=0.17241*E*Math.sin(Ms);c+=0.01608*Math.sin(2*Mm);
+    c+=0.01039*Math.sin(2*Fm);c+=0.00739*E*Math.sin(Mm-Ms);c+=-0.00514*E*Math.sin(Mm+Ms);
+    c+=0.00208*E*E*Math.sin(2*Ms);c+=-0.00111*Math.sin(Mm-2*Fm);c+=-0.00057*Math.sin(Mm+2*Fm);
+    c+=0.00056*E*Math.sin(2*Mm+Ms);c+=-0.00042*Math.sin(3*Mm);c+=0.00042*E*Math.sin(Ms+2*Fm);
+    c+=0.00038*E*Math.sin(Ms-2*Fm);c+=-0.00024*E*Math.sin(2*Mm-Ms);c+=-0.00017*Math.sin(Og);
+    c+=-0.00007*Math.sin(Mm+2*Ms);c+=0.00004*Math.sin(2*Mm-2*Fm);c+=0.00004*Math.sin(3*Ms);
+    c+=0.00003*Math.sin(Mm+Ms-2*Fm);c+=0.00003*Math.sin(2*Mm+2*Fm);
+    c+=-0.00003*Math.sin(Mm+Ms+2*Fm);c+=0.00003*Math.sin(Mm-Ms+2*Fm);
+    c+=-0.00002*Math.sin(Mm-Ms-2*Fm);c+=-0.00002*Math.sin(3*Mm+Ms);c+=0.00002*Math.sin(4*Mm);
+    return J+c;
   }
-  function jdeToUTCDate(jde){ return new Date((jde-2440587.5)*86400000); }
-  function kForYearMonth(y,m){ return Math.floor((y+(m-0.5)/12-2000)*12.3685); }
-  function newMoonCalendarDays(year){
+  function jdeToUTC(jde){return new Date((jde-2440587.5)*86400000);}
+  function kFor(y,m){return Math.floor((y+(m-0.5)/12-2000)*12.3685);}
+  function nmDays(year){
     const days=[];
-    for(let k=kForYearMonth(year,1)-3; k<=kForYearMonth(year,12)+3; k++){
-      const utc=jdeToUTCDate(newMoonJDE(k));
+    for(let k=kFor(year,1)-3;k<=kFor(year,12)+3;k++){
+      const utc=jdeToUTC(newMoonJDE(k));
       const jst=new Date(utc.getTime()+9*3600*1000);
       days.push(Date.UTC(jst.getUTCFullYear(),jst.getUTCMonth(),jst.getUTCDate()));
     }
@@ -504,110 +455,85 @@
     return days.filter((d,i)=>i===0||d!==days[i-1]);
   }
   const nmCache={};
-  function getNMDays(y){ if(!nmCache[y]) nmCache[y]=newMoonCalendarDays(y); return nmCache[y]; }
-  function nmNear(y){ return getNMDays(y-1).concat(getNMDays(y)).concat(getNMDays(y+1)); }
-  function findCycle(year,month){
-    const ms0=Date.UTC(year,month-1,1), list=nmNear(year);
-    for(let i=0;i<list.length-1;i++){
-      if(list[i]+86400000>=ms0) return {nm:list[i],nextNm:list[i+1]};
-    }
+  function getNM(y){if(!nmCache[y])nmCache[y]=nmDays(y);return nmCache[y];}
+  function nmNear(y){return getNM(y-1).concat(getNM(y)).concat(getNM(y+1));}
+  function findCycle(y,m){
+    const s=Date.UTC(y,m-1,1),list=nmNear(y);
+    for(let i=0;i<list.length-1;i++){if(list[i]+86400000>=s)return{nm:list[i],nextNm:list[i+1]};}
     return null;
   }
   function adjCycle(nm,nextNm,dir){
-    const list=nmNear(new Date(nm).getUTCFullYear());
-    const idx=list.indexOf(nm);
-    if(idx===-1) return null;
-    if(dir>0){ if(idx+2>=list.length) return null; return {nm:list[idx+1],nextNm:list[idx+2]}; }
-    else { if(idx-1<0) return null; return {nm:list[idx-1],nextNm:list[idx]}; }
+    const list=nmNear(new Date(nm).getUTCFullYear()),idx=list.indexOf(nm);
+    if(idx===-1)return null;
+    if(dir>0){if(idx+2>=list.length)return null;return{nm:list[idx+1],nextNm:list[idx+2]};}
+    else{if(idx-1<0)return null;return{nm:list[idx-1],nextNm:list[idx]};}
   }
-
-  function fmtDate(ms){
-    const d=new Date(ms);
-    return d.getUTCFullYear()+'年'+(d.getUTCMonth()+1)+'月'+d.getUTCDate()+'日';
-  }
-  function fmtShort(ms){
-    const d=new Date(ms);
-    return (d.getUTCMonth()+1)+'/'+d.getUTCDate();
-  }
+  function fmtDate(ms){const d=new Date(ms);return d.getUTCFullYear()+'年'+(d.getUTCMonth()+1)+'月'+d.getUTCDate()+'日';}
+  function fmtShort(ms){const d=new Date(ms);return(d.getUTCMonth()+1)+'/'+d.getUTCDate();}
   function markerForN(n){
-    if(n>=1&&n<=3) return '🔵';
-    if(n>=7&&n<=10) return '❤️';
-    if(n>=18&&n<=20) return '🟢';
-    if(n>=23&&n<=26) return '🩵';
-    return '';
+    if(n>=1&&n<=3)return'🔵';if(n>=7&&n<=10)return'❤️';
+    if(n>=18&&n<=20)return'🟢';if(n>=23&&n<=26)return'🩵';return'';
   }
-
-  // ============================================================
-  // Rendering
-  // ============================================================
-  let displayedCycle=null;
-
   function sameUTC(a,b){
     const da=new Date(a),db=new Date(b);
     return da.getUTCFullYear()===db.getUTCFullYear()&&da.getUTCMonth()===db.getUTCMonth()&&da.getUTCDate()===db.getUTCDate();
   }
 
-  function renderCycle(cycle){
-    displayedCycle=cycle;
-    const {nm,nextNm}=cycle;
-    const lunLen=Math.round((nextNm-nm)/86400000);
+  // ============================================================
+  // モード管理
+  // ============================================================
+  let currentMode = localStorage.getItem('moonTechoMode') || 'grid';
+  let displayedCycle = null;
 
-    document.getElementById('calTitle').textContent=
-      fmtDate(nm+86400000)+'〜'+fmtDate(nextNm)+'（1サイクル）';
-    document.getElementById('periodBand').textContent=
-      fmtShort(nm+86400000)+' 〜 '+fmtShort(nextNm)+
-      '（'+new Date(nm+86400000).getUTCFullYear()+'年）';
+  function setMode(mode){
+    currentMode = mode;
+    localStorage.setItem('moonTechoMode', mode);
+    document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
+    document.getElementById('btnCard').classList.toggle('active', mode==='card');
+    if(displayedCycle) renderCycle(displayedCycle);
+  }
 
+  // ============================================================
+  // Rendering
+  // ============================================================
+  function buildDayMap(nm, lunLen){
     const todayMs=Date.UTC(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
-
-    // n → 日付情報マップ
     const dayMap={};
     for(let i=1;i<=lunLen;i++){
       const n=(i===lunLen)?30:i;
       const ms=nm+i*86400000;
-      dayMap[n]={ms, isToday:sameUTC(ms,todayMs)};
+      dayMap[n]={ms,isToday:sameUTC(ms,todayMs)};
     }
+    return dayMap;
+  }
 
-    const inner=document.getElementById('sheetInner');
-    const pb=document.getElementById('periodBand');
-    inner.innerHTML='';
-    inner.appendChild(pb);
-
+  function renderGrid(inner, dayMap){
     GROUPS.forEach(group=>{
       const block=document.createElement('div');
       block.className='group-block';
-
       const hdr=document.createElement('div');
       hdr.className='group-header '+group.id;
       hdr.textContent=group.label;
       block.appendChild(hdr);
-
       const grid=document.createElement('div');
       grid.className='day-grid';
-
       for(let n=group.range[0];n<=group.range[1];n++){
-        const md=moonData[n];
-        const di=dayMap[n];
+        const md=moonData[n],di=dayMap[n];
         const cell=document.createElement('div');
-
         if(!di){
-          // 29日サイクルなどで存在しない日
           cell.className='day-cell no-date';
-          cell.innerHTML=
-            '<span class="moon-icon">'+md.icon+'</span>'+
+          cell.innerHTML='<span class="moon-icon">'+md.icon+'</span>'+
             '<span class="haw-name">'+md.name+'</span>'+
             '<span class="moon-num">'+n+'</span>';
         } else {
           cell.className='day-cell'+(di.isToday?' today':'');
-          const d=new Date(di.ms);
           const mk=markerForN(n);
-          cell.innerHTML=
-            '<span class="moon-icon">'+md.icon+'</span>'+
+          cell.innerHTML='<span class="moon-icon">'+md.icon+'</span>'+
             '<span class="haw-name">'+md.name+'</span>'+
             '<span class="kana">'+md.kana+'</span>'+
             '<span class="moon-num">'+n+'</span>'+
             '<span class="date-info">'+fmtShort(di.ms)+'</span>'+
-            '<span class="dow-info">('+dowNames[d.getUTCDay()]+')</span>'+
+            '<span class="dow-info">('+dowNames[new Date(di.ms).getUTCDay()]+')</span>'+
             (mk?'<span class="marker">'+mk+'</span>':'');
         }
         grid.appendChild(cell);
@@ -617,65 +543,118 @@
     });
   }
 
+  function renderCard(inner, dayMap){
+    GROUPS.forEach(group=>{
+      const sec=document.createElement('div');
+      sec.className='group-section '+group.id;
+      const lbl=document.createElement('div');
+      lbl.className='group-label '+group.id;
+      lbl.innerHTML='<div class="group-label-line"></div>'+
+        '<div class="group-label-text">'+group.label+'</div>'+
+        '<div class="group-label-line"></div>';
+      sec.appendChild(lbl);
+      const grid=document.createElement('div');
+      grid.className='card-grid';
+      for(let n=group.range[0];n<=group.range[1];n++){
+        const md=moonData[n],di=dayMap[n];
+        const card=document.createElement('div');
+        if(!di){
+          card.className='day-card no-date';
+          card.innerHTML='<span class="moon-icon">'+md.icon+'</span>'+
+            '<span class="moon-num">'+n+'</span>'+
+            '<span class="haw-name">'+md.name+'</span>'+
+            '<span class="kana">'+md.kana+'</span>';
+        } else {
+          card.className='day-card'+(di.isToday?' today':'');
+          const mk=markerForN(n);
+          card.innerHTML='<span class="moon-icon">'+md.icon+'</span>'+
+            '<span class="moon-num">'+n+'</span>'+
+            '<span class="haw-name">'+md.name+'</span>'+
+            '<span class="kana">'+md.kana+'</span>'+
+            '<div class="divider"></div>'+
+            '<span class="date-info">'+fmtShort(di.ms)+'</span>'+
+            '<span class="dow-info">('+dowNames[new Date(di.ms).getUTCDay()]+')</span>'+
+            (mk?'<span class="marker">'+mk+'</span>':'');
+        }
+        grid.appendChild(card);
+      }
+      sec.appendChild(grid);
+      inner.appendChild(sec);
+    });
+  }
+
+  function renderCycle(cycle){
+    displayedCycle=cycle;
+    const{nm,nextNm}=cycle;
+    const lunLen=Math.round((nextNm-nm)/86400000);
+    document.getElementById('calTitle').textContent=
+      fmtDate(nm+86400000)+'〜'+fmtDate(nextNm)+'（1サイクル）';
+    document.getElementById('periodBand').textContent=
+      fmtShort(nm+86400000)+' 〜 '+fmtShort(nextNm)+
+      '（'+new Date(nm+86400000).getUTCFullYear()+'年）';
+
+    const dayMap=buildDayMap(nm,lunLen);
+    const inner=document.getElementById('sheetInner');
+    const pb=document.getElementById('periodBand');
+    inner.innerHTML='';
+    inner.appendChild(pb);
+
+    if(currentMode==='grid') renderGrid(inner,dayMap);
+    else                     renderCard(inner,dayMap);
+  }
+
   function populateYearSelect(){
-    const sel=document.getElementById('yearInput');
-    const cur=new Date().getFullYear();
+    const sel=document.getElementById('yearInput'),cur=new Date().getFullYear();
     for(let y=cur-3;y<=cur+6;y++){
       const o=document.createElement('option');
-      o.value=y; o.textContent=y+'年';
-      if(y===cur) o.selected=true;
+      o.value=y;o.textContent=y+'年';
+      if(y===cur)o.selected=true;
       sel.appendChild(o);
     }
   }
 
-  function showForYearMonth(y,m){
-    const c=findCycle(y,m);
-    if(c) renderCycle(c);
-  }
-
+  // ===== Events =====
   document.getElementById('generateBtn').addEventListener('click',function(){
     const y=parseInt(document.getElementById('yearInput').value,10);
     const m=parseInt(document.getElementById('monthInput').value,10);
-    if(!y||!m) return;
-    showForYearMonth(y,m);
+    if(!y||!m)return;
+    const c=findCycle(y,m);if(c)renderCycle(c);
   });
   document.getElementById('prevBtn').addEventListener('click',function(){
-    if(!displayedCycle) return;
-    const p=adjCycle(displayedCycle.nm,displayedCycle.nextNm,-1);
-    if(p) renderCycle(p);
+    if(!displayedCycle)return;
+    const p=adjCycle(displayedCycle.nm,displayedCycle.nextNm,-1);if(p)renderCycle(p);
   });
   document.getElementById('nextBtn').addEventListener('click',function(){
-    if(!displayedCycle) return;
-    const n=adjCycle(displayedCycle.nm,displayedCycle.nextNm,1);
-    if(n) renderCycle(n);
+    if(!displayedCycle)return;
+    const n=adjCycle(displayedCycle.nm,displayedCycle.nextNm,1);if(n)renderCycle(n);
   });
+  document.getElementById('btnGrid').addEventListener('click',()=>setMode('grid'));
+  document.getElementById('btnCard').addEventListener('click',()=>setMode('card'));
 
-  // ===== iOS対応 =====
+  // ===== iOS =====
   function isIOS(){
-    return /iPhone|iPad|iPod/i.test(navigator.userAgent)||
+    return/iPhone|iPad|iPod/i.test(navigator.userAgent)||
       (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   }
-  (function setupUI(){
+  (function(){
     if(isIOS()){
       document.getElementById('printBtn').textContent='📸 画像として保存';
       document.getElementById('printHint').textContent='画像が表示されます。長押しして写真に保存してください。';
     }
   })();
-
   document.getElementById('printBtn').addEventListener('click',async function(){
-    if(!isIOS()){ window.print(); return; }
-    const btn=this;
-    btn.textContent='生成中...'; btn.disabled=true;
+    if(!isIOS()){window.print();return;}
+    const btn=this;btn.textContent='生成中...';btn.disabled=true;
     try{
       const canvas=await html2canvas(document.getElementById('sheetInner'),{
-        scale:2, useCORS:true, allowTaint:true, logging:false, backgroundColor:'#FBF6EC'
+        scale:2,useCORS:true,allowTaint:true,logging:false,backgroundColor:'#F7F2E8'
       });
       document.getElementById('capturedImg').src=canvas.toDataURL('image/png');
       document.getElementById('iosModal').classList.add('active');
-    } catch(e){
+    }catch(e){
       alert('キャプチャに失敗しました。\nスクリーンショット（電源＋音量↑ボタン）で保存してください。');
-    } finally{
-      btn.textContent='📸 画像として保存'; btn.disabled=false;
+    }finally{
+      btn.textContent='📸 画像として保存';btn.disabled=false;
     }
   });
   document.getElementById('iosModalClose').addEventListener('click',function(){
@@ -683,15 +662,20 @@
     document.getElementById('capturedImg').src='';
   });
   document.getElementById('iosModal').addEventListener('click',function(e){
-    if(e.target===this){ this.classList.remove('active'); document.getElementById('capturedImg').src=''; }
+    if(e.target===this){this.classList.remove('active');document.getElementById('capturedImg').src='';}
   });
+
+  // ===== トグルの初期状態を反映 =====
+  document.getElementById('btnGrid').classList.toggle('active', currentMode==='grid');
+  document.getElementById('btnCard').classList.toggle('active', currentMode==='card');
 
   // ===== Init =====
   populateYearSelect();
   (function(){
     const now=new Date();
     document.getElementById('monthInput').value=now.getMonth()+1;
-    showForYearMonth(now.getFullYear(),now.getMonth()+1);
+    const c=findCycle(now.getFullYear(),now.getMonth()+1);
+    if(c)renderCycle(c);
   })();
 </script>
 </body>
