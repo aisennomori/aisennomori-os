@@ -924,9 +924,7 @@ function getJulianDay(year, month, day) {
 }
 
 // ── 天文計算（Meeus）─────────────────────────────────────────
-const D = 86400000;
-
-  // ============================================================
+// ============================================================
   // ハワイアンムーン コアロジック
   //
   // 【基本】仮版（天文計算）
@@ -940,6 +938,7 @@ const D = 86400000;
   //   値   = { hilo, muku, hasMauli }
   // ============================================================
 
+  const D = 86400000; // 1日 = ミリ秒
 
   // ── 確定版テーブル ──────────────────────────────────────────
   // ※ 毎年先生から届いたら追加する（それだけでOK）
@@ -951,7 +950,7 @@ const D = 86400000;
     '2026-04': { hilo:'2026-04-18', muku:'2026-05-16', hasMauli:false },  // Mauli削除
     '2026-05': { hilo:'2026-05-17', muku:'2026-06-15', hasMauli:true  },  // Mauli追加 Mauli=6/14
     '2026-06': { hilo:'2026-06-16', muku:'2026-07-14', hasMauli:false },  // Mauli削除
-    '2026-07': { hilo:'2026-07-15', muku:'2026-08-12', hasMauli:false },  // Mauli削除
+    '2026-07': { hilo:'2026-07-14', muku:'2026-08-12', hasMauli:false },  // Mauli削除
     '2026-08': { hilo:'2026-08-13', muku:'2026-09-11', hasMauli:true  },  // Mauli追加 Mauli=9/10
     '2026-09': { hilo:'2026-09-12', muku:'2026-10-10', hasMauli:false },  // Mauli削除
     '2026-10': { hilo:'2026-10-11', muku:'2026-11-09', hasMauli:true  },  // Mauli追加 Mauli=11/8
@@ -1066,4 +1065,306 @@ const D = 86400000;
 
 
 
+  
+// getMoonAge互換（月相SVG用）
+function getMoonAge(year, month, day){
+  const target = Date.UTC(year, month-1, day);
+  const list = nmNear(year);
+  let nmIdx = -1;
+  for(let i=0;i<list.length;i++){if(list[i].ms<=target)nmIdx=i;else break;}
+  if(nmIdx<0||nmIdx>=list.length-1) return 14.5;
+  const nm=list[nmIdx],nextNm=list[nmIdx+1];
+  const lunLen=Math.round((nextNm.ms-nm.ms)/D);
+  const dayIdx=Math.round((target-nm.ms)/D);
+  return (dayIdx===0?lunLen:dayIdx)-1+0.5;
+}
+// 夜番号（1〜30）を返す ← getMoonNightに統一
+function getNightIndex(year, month, day) {
+  return getMoonNight(year, month, day);
+}
 
+/* ===== MAIN FUNCTION ===== */
+function doReading() {
+  const name = document.getElementById('nameInput').value.trim();
+  const year = parseInt(document.getElementById('yearInput').value);
+  const month = parseInt(document.getElementById('monthInput').value);
+  const day = parseInt(document.getElementById('dayInput').value);
+  const errEl = document.getElementById('errMsg');
+  errEl.style.display = 'none';
+
+  if (!name || isNaN(year) || isNaN(month) || isNaN(day) || month<1||month>12||day<1||day>31||year<1900||year>2015) {
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // Show loader
+  document.getElementById('loader').style.display = 'block';
+  document.getElementById('result').style.display = 'none';
+
+  setTimeout(() => {
+    const age = getMoonAge(year, month, day);
+    const nightIdx = getNightIndex(year, month, day);
+    const night = NIGHTS[nightIdx - 1];
+    const reading = READINGS[nightIdx];
+    const cycleNum = night.cycle;
+    const cycleInfo = CYCLE_READING[cycleNum];
+
+    // Render
+    const resultEl = document.getElementById('result');
+    resultEl.innerHTML = buildSheet(name, year, month, day, night, reading, cycleNum, cycleInfo, age);
+    document.getElementById('loader').style.display = 'none';
+    resultEl.style.display = 'block';
+    resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 1800);
+}
+
+function buildSheet(name, year, month, day, night, reading, cycleNum, cycleInfo, age) {
+  const cycleName = CYCLE_NAMES[cycleNum];
+  const moonPhaseEmoji = age < 7.5 ? '🌒' : age < 15 ? '🌕' : age < 22.5 ? '🌖' : '🌑';
+
+  // 30 nights list
+  let nightsList = '<div class="nights-grid">';
+  NIGHTS.forEach(n => {
+    const isActive = n.n === night.n;
+    nightsList += `<div class="night-item ${isActive ? 'active' : ''}">
+      <span class="night-num">${n.n}</span>
+      <span>${n.hw}</span>
+    </div>`;
+  });
+  nightsList += '</div>';
+
+  // Guide actions
+  const actionsHtml = cycleInfo.actions.map(a => `✦ ${a}`).join('<br>');
+
+  return `
+  <div class="sheet-header">
+    <div class="moon-badge">${moonPhaseEmoji}</div>
+    <div class="sheet-title-jp">月読みシート</div>
+    <div class="sheet-title-en">~ Moon Reading Sheet ~</div>
+    <div class="name-display">✦ ${name} 様 ✦</div>
+    <div class="bday-bar">
+      <div class="bday-item"><span>生年月日</span><span>${year}年${month}月${day}日</span></div>
+      <div class="bday-item"><span>月齢</span><span>${age.toFixed(1)}夜</span></div>
+      <div class="bday-item"><span>サイクル</span><span>${cycleName}</span></div>
+    </div>
+    <div style="font-size:0.7rem;color:rgba(201,168,76,0.5);margin-top:0.5rem;font-family:'Crimson Text',serif;font-style:italic">特別鑑定の永久保存版</div>
+  </div>
+
+  <div class="sheet-body">
+
+    <!-- Cycle Hero -->
+    <div class="cycle-hero">
+      <div class="cycle-label">✦ バースデームーン ✦</div>
+      <div class="cycle-name-hawaiian">${night.hw}</div>
+      <div class="cycle-name-jp">${night.jp}</div>
+      <div class="cycle-number">${cycleName} 第${night.n}夜</div>
+    </div>
+
+    <!-- Two col info -->
+    <div class="two-col">
+      <div class="info-card">
+        <div class="info-card-title">🌿 分析力・知的</div>
+        <div class="info-card-body">${reading.keyword}<br><br>${reading.body.split('。')[0]}。</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">💚 健康面</div>
+        <div class="info-card-body">${reading.health}</div>
+      </div>
+    </div>
+
+    <!-- Main reading -->
+    <div class="reading-section">
+      <div class="reading-title">✦ ${cycleName} の ${night.hw} について ✦</div>
+      <div class="reading-headline">${reading.headline}</div>
+      <div class="reading-body">${reading.body}</div>
+      <span class="reading-highlight">🌙 ${reading.highlight}</span>
+    </div>
+
+    <!-- Lucky -->
+    <div class="lucky-card">
+      <div class="lucky-title">✦ ラッキーカラーアイテム ✦</div>
+      <div class="lucky-item">${reading.lucky}</div>
+      <div class="lucky-desc">${reading.lucky_desc}</div>
+    </div>
+
+    <div class="divider">✦ ハワイアンムーン 30夜 ✦</div>
+
+    <!-- 30 nights -->
+    <div class="nights-section">
+      <div class="nights-title">あなたの月夜はハイライトされています</div>
+      ${nightsList}
+    </div>
+
+    <div class="divider">✦ ハワイアンムーン 活用ガイド ✦</div>
+
+    <!-- Guide -->
+    <div class="guide-grid">
+      <div class="guide-card">
+        <div class="guide-card-title">🌱 ${cycleInfo.title}</div>
+        <div class="guide-card-body">${actionsHtml}</div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-title">🌙 バースデームーン ${moonPhaseEmoji} の過ごし方</div>
+        <div class="guide-card-body">
+          あなたの生まれた月は毎月訪れます<br><br>
+          何か方向を変えたい時や<br>
+          新しく始めたいなど<br>
+          再生したい時などに、<br>
+          この月を生かして行動していくの！<br><br>
+          あなたの中の神様が、宇宙と繋がり<br>
+          あなたが行きたい方へぐっと早く<br>
+          行く力がもらえます！
+        </div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-title">😴 休息期</div>
+        <div class="guide-card-body">
+          • 'Ole-kū-kahi<br>
+          • 'Ole-kū-lua<br>
+          • 'Ole-kū-kolu<br>
+          • 'Ole-pau<br><br>
+          <span style="font-size:0.72rem;color:rgba(232,217,176,0.7)">
+          無理に頑張らない期間<br>
+          ✦ 休息・睡眠<br>
+          ✦ 自分を労わる<br>
+          ✦ エネルギー回復<br>
+          ✦ 内省・静けさ<br>
+          ✦「休むことも大切な行動」
+          </span>
+        </div>
+      </div>
+      <div class="guide-card">
+        <div class="guide-card-title">🌊 自然と繋がる期間</div>
+        <div class="guide-card-body">
+          ✦ ガーデニング・植物<br>
+          ✦ 森林浴・自然散策<br>
+          ✦ ハーブ・アロマ<br>
+          ✦ 観葉植物のお手入れ<br>
+          ✦ 霊的な感覚が高まりやすい時期<br><br>
+          <span style="font-size:0.72rem;color:rgba(201,168,76,0.7)">
+          手放しと解放の期間<br>
+          ✦ ホ・オポノポノ<br>
+          ✦ 断捨離・手放し<br>
+          ✦ 感謝解放・波を流す
+          </span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sheet-footer">
+    あなたの人生が、月の光のように美しく輝きますように… ✦ 愛泉の杜
+  </div>
+  `;
+}
+
+
+/* ===== TODAY'S MOON ===== */
+const TODAY_MESSAGES = {
+  1:  { feel:"新しいエネルギーが満ちています", how:"何か新しいことを始めるのに最高の日。行動を起こして！", avoid:"迷うこと・先送り", food:"赤いもの・辛いもの" },
+  2:  { feel:"直感が冴えわたる夜", how:"ひらめきを書き留めて。瞑想や感性を使うワークが◎", avoid:"理屈で考えすぎること", food:"白いもの・乳製品" },
+  3:  { feel:"意志と創造力が高まる", how:"計画を立て、行動に移す日。仕事や学びの開始に吉", avoid:"受け身でいること", food:"根菜類・土のもの" },
+  4:  { feel:"バランスとつながりの日", how:"人間関係を深めるのに最適。対話・調整・協力を大切に", avoid:"一人で抱え込むこと", food:"ペアで食べるもの・共食い" },
+  5:  { feel:"継続の力が湧いてくる", how:"続けていることに力を入れて。地道な作業が実を結ぶ", avoid:"焦ること・手を広げすぎ", food:"長いもの・蕎麦・うどん" },
+  6:  { feel:"完成と知恵の気が流れる", how:"仕上げ・締めくくりに最適。完了できることをひとつ終わらせて", avoid:"新しく始めること", food:"発酵食品・熟したもの" },
+  7:  { feel:"変革のエネルギーが動く", how:"固定観念を疑って。新しい視点や出会いを楽しんで", avoid:"ルーティンにしがみつくこと", food:"珍しい食材・エスニック" },
+  8:  { feel:"内省と深みの時間", how:"静かに過ごして。日記・読書・一人の時間を大切に", avoid:"人混み・騒がしい場所", food:"玄米・黒いもの" },
+  9:  { feel:"試練を超える強さが宿る", how:"困難に正面から向き合って。必ず乗り越えられます", avoid:"逃げること・誤魔化すこと", food:"苦いもの・ハーブ" },
+  10: { feel:"空白の中に可能性がある", how:"何もしない時間を作って。ゼロからのひらめきが来る日", avoid:"詰め込みすぎること", food:"さっぱりしたもの・断食も◎" },
+  11: { feel:"隠れた才能が動き出す", how:"普段と違うことを試みて。隠れた可能性が顔を出す日", avoid:"表面だけ見ること", food:"淡い色のもの・白菜・もやし" },
+  12: { feel:"崇高で美しい気が流れる", how:"美しいものに触れて。アート・音楽・花を楽しんで", avoid:"粗雑に過ごすこと", food:"見た目が美しいもの・和食" },
+  13: { feel:"実りと豊かさが訪れる", how:"感謝を表現して。誰かに贈り物をする日にも最適", avoid:"ケチること・独り占め", food:"実のなるもの・フルーツ" },
+  14: { feel:"神聖なつながりを感じる", how:"自然の中に出て、宇宙とのつながりを感じて", avoid:"スマホ・SNSの見過ぎ", food:"海のもの・自然食" },
+  15: { feel:"星のように輝く日", how:"自分の魅力を出し惜しみしないで。表現・発信・人前に出るのに◎", avoid:"遠慮すること", food:"黄色いもの・かぼちゃ・とうもろこし" },
+  16: { feel:"満月のエネルギーが最高潮", how:"感情が高ぶりやすい日。感謝と手放しのワークをして", avoid:"感情的な言い争い", food:"丸いもの・おにぎり・まんじゅう" },
+  17: { feel:"エネルギーが流れ始める", how:"詰まっていたことが動き出す日。水を飲む・川を見るのも◎", avoid:"流れに逆らうこと", food:"水分の多いもの・スープ" },
+  18: { feel:"大地の安定した力がある", how:"身体を動かして。散歩・ガーデニング・土に触れて", avoid:"宙に浮いた計画ばかり", food:"根菜類・ごぼう・れんこん" },
+  19: { feel:"成長の加速期に入る", how:"チャンスを積極的につかんで。スピードが上がる日", avoid:"のんびりしすぎること", food:"エネルギーが高いもの・肉・豆" },
+  20: { feel:"収穫と完成の気が満ちる", how:"成果をまとめて。報告・発表・提出に最適な日", avoid:"中途半端に終わらせること", food:"穀物・ご飯もの" },
+  21: { feel:"浄化のエネルギーが始まる", how:"断捨離・大掃除・不要なものを手放す日に最適", avoid:"新しく物を増やすこと", food:"白いもの・塩・梅干し" },
+  22: { feel:"魂の深い浄化が進む", how:"お風呂でゆっくり浄化を。感情の棚卸しをして", avoid:"感情を抑圧すること", food:"透明なもの・水・豆腐" },
+  23: { feel:"完全解放のエネルギー", how:"泣いてもいい日。感情を全部出し切って軽くなって", avoid:"我慢・無理すること", food:"酸っぱいもの・酢の物" },
+  24: { feel:"遥かな知恵が降りてくる", how:"先人の知恵に学んで。歴史・古典・先祖供養も◎", avoid:"目先だけで判断すること", food:"伝統的な食事・おばあちゃんの味" },
+  25: { feel:"記憶と継承の日", how:"大切な人との時間を記録して。写真を撮る・日記をつけて", avoid:"忘れっぽくなること", food:"昔なじみの味・家庭料理" },
+  26: { feel:"忍耐と深い信頼の日", how:"心身をクリアに保つことに集中して。浄化・メンテが◎", avoid:"エネルギーの使いすぎ", food:"腎臓に良いもの・黒豆・海藻" },
+  27: { feel:"創造と保護のエネルギー", how:"大切なものを守るために行動して。家族・家・自分を守る", avoid:"軽率な行動", food:"緑のもの・野菜たっぷり" },
+  28: { feel:"平和と豊穣の気が漂う", how:"音楽を聴いて・歌って。穏やかに過ごすことが吉", avoid:"争い・競争", food:"豊かなもの・ご馳走" },
+  29: { feel:"生命力がみなぎる", how:"身体を動かして生命力を感じて。踊る・歌う・笑うのも◎", avoid:"無気力に過ごすこと", food:"生命力あふれるもの・発芽野菜" },
+  30: { feel:"静寂の中に次の種が宿る", how:"今月を振り返って。感謝して静かに締めくくりを", avoid:"無理に動くこと", food:"消化に良いもの・お粥" },
+};
+
+function doToday() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+
+  const age = getMoonAge(y, m, d);
+  const nightIdx = getNightIndex(y, m, d);
+  const night = NIGHTS[nightIdx - 1];
+  const reading = READINGS[nightIdx];
+  const todayMsg = TODAY_MESSAGES[nightIdx];
+  const cycleNum = night.cycle;
+  const cycleName = CYCLE_NAMES[cycleNum];
+  const moonPhaseEmoji = age < 3 ? '🌑' : age < 7.5 ? '🌒' : age < 11 ? '🌓' : age < 15 ? '🌔' : age < 18 ? '🌕' : age < 22 ? '🌖' : age < 26 ? '🌗' : '🌘';
+
+  const weekDays = ['日','月','火','水','木','金','土'];
+  const dateStr = `${y}年${m}月${d}日（${weekDays[now.getDay()]}）`;
+
+  const panel = document.getElementById('todayPanel');
+  panel.style.display = 'block';
+  panel.innerHTML = `
+  <div class="today-header">
+    <div style="font-size:2.5rem;margin-bottom:0.3rem">${moonPhaseEmoji}</div>
+    <div class="today-title">今日はどんな日？</div>
+    <div class="today-date">${dateStr} ／ 月齢 ${age.toFixed(1)}日</div>
+  </div>
+  <div class="today-body">
+    <div class="today-night-hero">
+      <div style="font-size:0.8rem;color:var(--gold);letter-spacing:0.2em;margin-bottom:0.4rem">✦ 今夜のハワイアンムーン ✦</div>
+      <div style="font-family:'Cinzel Decorative',cursive;font-size:clamp(1.2rem,3vw,1.6rem);color:var(--gold-light);margin-bottom:0.3rem">${night.hw}</div>
+      <div style="font-size:0.95rem;color:var(--sand);margin-bottom:0.4rem">${night.jp}</div>
+      <div style="display:inline-block;background:var(--gold);color:var(--navy);font-weight:700;font-size:0.8rem;padding:0.2rem 0.8rem;border-radius:20px">${cycleName} 第${night.n}夜</div>
+    </div>
+
+    <div class="today-message">
+      <div style="font-size:0.8rem;color:var(--gold);letter-spacing:0.15em;margin-bottom:0.6rem">🌙 今日の月のエネルギー</div>
+      <div style="font-size:1rem;color:var(--cream);font-weight:700;margin-bottom:0.5rem">「${todayMsg.feel}」</div>
+      ${reading.body.split('。')[0]}。
+    </div>
+
+    <div class="today-actions">
+      <div class="today-action-card">
+        <div class="today-action-title">✦ 今日の過ごし方</div>
+        <div class="today-action-body">${todayMsg.how}</div>
+      </div>
+      <div class="today-action-card">
+        <div class="today-action-title">🌿 避けると良いこと</div>
+        <div class="today-action-body">${todayMsg.avoid}</div>
+      </div>
+      <div class="today-action-card">
+        <div class="today-action-title">🍽️ 今日のおすすめ食材</div>
+        <div class="today-action-body">${todayMsg.food}</div>
+      </div>
+      <div class="today-action-card">
+        <div class="today-action-title">💫 月からのメッセージ</div>
+        <div class="today-action-body">${reading.highlight}</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:1.2rem;font-family:'Crimson Text',serif;font-style:italic;color:rgba(201,168,76,0.5);font-size:0.82rem;letter-spacing:0.1em">
+      今日も月の光のように美しく ✦ 愛泉の杜
+    </div>
+  </div>
+  `;
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* Enter key support */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doReading();
+});
+</script>
+</body>
+</html>
