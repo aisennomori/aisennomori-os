@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="haw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pule no ka Lā | 愛泉の杜</title>
+<style>
+  :root {
+    --bg: #080b18;
+    --gold: #c9a84c;
+    --gold-l: #e8c96a;
+    --cream: #f5eed8;
+    --teal: #4ab8c8;
+    --text-dim: rgba(245,238,216,0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Georgia', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* 星 */
+  canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  .wrap { position: relative; z-index: 1; max-width: 560px; width: 100%; }
+
+  /* ヘッダー */
+  .orb {
+    width: 80px; height: 80px; margin: 0 auto 20px;
+    background: radial-gradient(circle at 38% 38%, #cde8ff, #6090e0 40%, #1a3080);
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(96,144,224,0.6), 0 0 80px rgba(96,144,224,0.2);
+    animation: glow 4s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { box-shadow: 0 0 40px rgba(96,144,224,0.6); }
+    50%      { box-shadow: 0 0 70px rgba(96,144,224,0.9), 0 0 120px rgba(96,144,224,0.3); }
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    letter-spacing: .12em;
+    color: var(--gold-l);
+    text-shadow: 0 0 30px rgba(201,168,76,0.5);
+    margin-bottom: 6px;
+  }
+  .sub {
+    text-align: center;
+    font-size: .8rem;
+    color: var(--text-dim);
+    letter-spacing: .2em;
+    margin-bottom: 36px;
+  }
+
+  /* 詩本体 */
+  .poem {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 18px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    line-height: 2.2;
+  }
+  .line {
+    display: block;
+    font-size: 1.05rem;
+    letter-spacing: .06em;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: background .3s, color .3s;
+    cursor: default;
+  }
+  .line.active {
+    background: rgba(201,168,76,0.18);
+    color: var(--gold-l);
+    text-shadow: 0 0 20px rgba(201,168,76,0.5);
+  }
+  .line.done {
+    color: var(--text-dim);
+  }
+
+  /* コントロール */
+  .controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* スピード */
+  .speed-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: .78rem;
+    color: var(--text-dim);
+  }
+  .speed-row input[type=range] {
+    width: 140px;
+    accent-color: var(--teal);
+  }
+  #speedVal { color: var(--teal); font-weight: 700; min-width: 32px; }
+
+  /* ボタン */
+  .btn-play {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: rgba(201,168,76,0.1);
+    color: var(--gold-l);
+    font-size: 2rem;
+    cursor: pointer;
+    transition: all .25s;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px rgba(201,168,76,0.2);
+  }
+  .btn-play:hover { background: rgba(201,168,76,0.22); box-shadow: 0 0 40px rgba(201,168,76,0.4); }
+  .btn-play:active { transform: scale(.94); }
+
+  .btn-row { display: flex; gap: 14px; }
+  .btn-sm {
+    padding: 9px 20px; border-radius: 20px;
+    border: 1px solid rgba(74,184,200,0.4);
+    background: rgba(74,184,200,0.08);
+    color: var(--teal); font-size: .82rem;
+    cursor: pointer; transition: all .2s; letter-spacing: .05em;
+  }
+  .btn-sm:hover { background: rgba(74,184,200,0.18); }
+
+  .status {
+    font-size: .78rem;
+    color: var(--text-dim);
+    letter-spacing: .08em;
+    min-height: 20px;
+    text-align: center;
+  }
+
+  /* 翻訳切替 */
+  .trans-toggle {
+    display: flex; gap: 8px; margin-top: 6px;
+  }
+  .tlang {
+    padding: 5px 14px; border-radius: 14px; font-size: .74rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent; color: var(--text-dim);
+    cursor: pointer; transition: all .2s;
+  }
+  .tlang.active {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.12);
+    color: var(--gold-l);
+  }
+
+  /* 翻訳表示 */
+  .translation {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 20px 28px;
+    margin-bottom: 24px;
+    line-height: 2;
+    font-size: .88rem;
+    color: var(--text-dim);
+    display: none;
+  }
+  .translation.show { display: block; }
+  .translation .tline { display: block; }
+  .translation .tline.active { color: var(--cream); }
+
+  /* フッター */
+  .footer { margin-top: 40px; text-align: center; font-size: .7rem; color: rgba(245,238,216,0.3); letter-spacing: .12em; }
+</style>
+</head>
+<body>
+<!-- パスワード保護 -->
+<div id="pwOverlay" style="
+  position:fixed;inset:0;z-index:9999;
+  background:#080b18;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Hiragino Mincho ProN','Yu Mincho',serif;
+">
+  <div style="font-size:2.5rem;margin-bottom:20px;">🔒</div>
+  <div style="color:#f5eed8;font-size:1rem;letter-spacing:.15em;margin-bottom:24px;">パスワードを入力してください</div>
+  <input id="pwInput" type="password" placeholder="password"
+    style="background:rgba(255,255,255,0.08);border:1px solid rgba(201,168,76,0.4);
+    border-radius:10px;padding:12px 20px;color:#f5eed8;font-size:1rem;
+    text-align:center;outline:none;letter-spacing:.2em;width:220px;"
+    onkeydown="if(event.key==='Enter')checkPw()">
+  <div id="pwErr" style="color:#d4608a;font-size:.78rem;margin-top:10px;height:18px;"></div>
+  <button onclick="checkPw()" style="
+    margin-top:14px;background:rgba(201,168,76,0.15);
+    border:1px solid rgba(201,168,76,0.5);border-radius:10px;
+    color:#e8c96a;padding:10px 32px;font-size:.9rem;cursor:pointer;
+    letter-spacing:.1em;">開く</button>
+</div>
+<script>
+(function(){
+  // セッション中は再入力不要
+  if(sessionStorage.getItem('auth')==='ok'){
+    document.getElementById('pwOverlay').style.display='none';
+  } else {
+    document.getElementById('pwInput').focus();
+  }
+})();
+function checkPw(){
+  const v=document.getElementById('pwInput').value;
+  if(v==='goh'){
+    sessionStorage.setItem('auth','ok');
+    document.getElementById('pwOverlay').style.display='none';
+  } else {
+    document.getElementById('pwErr').textContent='パスワードが違います';
+    document.getElementById('pwInput').value='';
+    document.getElementById('pwInput').focus();
+    setTimeout(()=>document.getElementById('pwErr').textContent='',2000);
+  }
+}
+</script>
+
+<canvas id="c"></canvas>
+
+<div class="wrap">
+  <div class="orb"></div>
+  <h1>Pule no ka Lā</h1>
+  <p class="sub">✦ 日のためのお祈り ✦</p>
+
+  <!-- ハワイ語 -->
+  <div class="poem" id="poem">
+    <span class="line" data-i="0">E ke Akua</span>
+    <span class="line" data-i="1">Ke kumu o ke aloha pau ʻole</span>
+    <span class="line" data-i="2">Mahalo nui loa no kēia lā.</span>
+    <span class="line" data-i="3">Ke noi aku nei mākou</span>
+    <span class="line" data-i="4">I kou pōmaikaʻi</span>
+    <span class="line" data-i="5">E hō mai i ke ola,</span>
+    <span class="line" data-i="6">E hō mai i ka ʻIke,</span>
+    <span class="line" data-i="7">E hō mai i ka mana</span>
+    <span class="line" data-i="8">No mākou a pau.</span>
+    <span class="line" data-i="9">No mā mau mā noa.</span>
+  </div>
+
+  <!-- 翻訳 -->
+  <div class="trans-toggle">
+    <button class="tlang" onclick="showTrans('ja')">🇯🇵 日本語</button>
+    <button class="tlang" onclick="showTrans('en')">🇺🇸 English</button>
+    <button class="tlang active" onclick="showTrans('none')">非表示</button>
+  </div>
+
+  <div class="translation" id="transJa">
+    <span class="tline" data-i="0">おお、神なるものよ</span>
+    <span class="tline" data-i="1">永遠に終わりのないアロハの源よ</span>
+    <span class="tline" data-i="2">この日を感謝します。</span>
+    <span class="tline" data-i="3">今ここに嘆願します</span>
+    <span class="tline" data-i="4">あなたの祝福を授かるために</span>
+    <span class="tline" data-i="5">我らに健康を与え給え、</span>
+    <span class="tline" data-i="6">我らに知識を与え給え、</span>
+    <span class="tline" data-i="7">我らの精神を力強くし給え</span>
+    <span class="tline" data-i="8">我らすべての者のために。</span>
+    <span class="tline" data-i="9">永遠に、限りなく。</span>
+  </div>
+
+  <div class="translation" id="transEn">
+    <span class="tline" data-i="0">O Divine One</span>
+    <span class="tline" data-i="1">The source of never-ending aloha</span>
+    <span class="tline" data-i="2">Thank you for this day.</span>
+    <span class="tline" data-i="3">We beseech you now</span>
+    <span class="tline" data-i="4">To bestow your blessings</span>
+    <span class="tline" data-i="5">Grant us health,</span>
+    <span class="tline" data-i="6">Grant us knowledge,</span>
+    <span class="tline" data-i="7">Empower our spirit</span>
+    <span class="tline" data-i="8">For all of us.</span>
+    <span class="tline" data-i="9">Forever and ever, freely.</span>
+  </div>
+
+  <!-- コントロール -->
+  <div class="controls" style="margin-top:20px;">
+    <div class="speed-row">
+      🐢 <input type="range" id="speed" min="0.5" max="1.2" step="0.05" value="0.72">
+      <span id="speedVal">0.72×</span> 🐇
+    </div>
+
+    <button class="btn-play" id="btnPlay" onclick="togglePlay()">▶</button>
+
+    <div class="btn-row">
+      <button class="btn-sm" onclick="restart()">↺ はじめから</button>
+      <button class="btn-sm" onclick="stopAll()">■ 停止</button>
+    </div>
+
+    <div class="status" id="status">タップして読み上げ開始</div>
+  </div>
+
+  <div class="footer">愛泉の杜 Spirit Tools 🌙</div>
+</div>
+
+<script>
+// ── 星 ──────────────────────────────────────────────────────
+const canvas=document.getElementById('c'),ctx=canvas.getContext('2d');
+let stars=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+function initStars(){stars=[];for(let i=0;i<120;i++)stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.4+.2,a:Math.random(),da:(Math.random()*.006+.002)*(Math.random()>.5?1:-1)});}
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(s=>{s.a+=s.da;if(s.a<=0||s.a>=1)s.da*=-1;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,248,230,${Math.max(0,Math.min(1,s.a))})`;ctx.fill();});requestAnimationFrame(draw);}
+resize();initStars();draw();
+window.addEventListener('resize',()=>{resize();initStars();});
+
+// ── 詩データ ─────────────────────────────────────────────────
+const LINES = [
+  'E ke Akua',
+  'Ke kumu o ke aloha pau ole',
+  'Mahalo nui loa no keia la.',
+  'Ke noi aku nei makou',
+  'I kou pomaikäi',
+  'E ho mai i ke ola,',
+  'E ho mai i ka Ike,',
+  'E ho mai i ka mana',
+  'No makou a pau.',
+  'No ma mau ma noa.',
+];
+
+// ── 状態 ─────────────────────────────────────────────────────
+let currentLine = -1;
+let playing = false;
+let utterances = [];
+
+// ── 翻訳表示 ─────────────────────────────────────────────────
+let currentTrans = 'none';
+function showTrans(lang) {
+  currentTrans = lang;
+  document.querySelectorAll('.tlang').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('transJa').classList.toggle('show', lang === 'ja');
+  document.getElementById('transEn').classList.toggle('show', lang === 'en');
+}
+
+// ── ハイライト ───────────────────────────────────────────────
+function highlight(i) {
+  currentLine = i;
+  document.querySelectorAll('.poem .line').forEach((el, idx) => {
+    el.classList.toggle('active', idx === i);
+    el.classList.toggle('done', idx < i);
+  });
+  // 翻訳ハイライト
+  ['transJa','transEn'].forEach(id => {
+    document.querySelectorAll(`#${id} .tline`).forEach((el,idx) => {
+      el.classList.toggle('active', idx === i);
+    });
+  });
+}
+function clearHighlight() {
+  document.querySelectorAll('.poem .line').forEach(el => {
+    el.classList.remove('active','done');
+  });
+  ['transJa','transEn'].forEach(id => {
+    document.querySelectorAll(`#${id} .tline`).forEach(el => el.classList.remove('active'));
+  });
+}
+
+// ── 読み上げ ─────────────────────────────────────────────────
+function getRate() {
+  return parseFloat(document.getElementById('speed').value);
+}
+
+function speakLine(i) {
+  if (!playing || i >= LINES.length) {
+    if (i >= LINES.length) {
+      // 完了
+      playing = false;
+      document.getElementById('btnPlay').textContent = '▶';
+      document.getElementById('status').textContent = '✦ Mahalo ✦';
+      setTimeout(clearHighlight, 2000);
+    }
+    return;
+  }
+  highlight(i);
+  // スクロール
+  const el = document.querySelectorAll('.poem .line')[i];
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  const utter = new SpeechSynthesisUtterance(LINES[i]);
+  utter.rate = getRate();
+  utter.pitch = 1.0;
+  utter.lang = 'en-US'; // ハワイ語はen-USが最も近い発音
+
+  // ハワイ語っぽく: 少しゆっくり・なめらか
+  utter.volume = 1;
+
+  utter.onend = () => {
+    // 行間ポーズ
+    setTimeout(() => speakLine(i + 1), 400);
+  };
+  utter.onerror = (e) => {
+    console.warn('speech error', e);
+    setTimeout(() => speakLine(i + 1), 200);
+  };
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+  document.getElementById('status').textContent = (i + 1) + ' / ' + LINES.length;
+}
+
+function togglePlay() {
+  if (playing) {
+    stopAll();
+  } else {
+    playing = true;
+    document.getElementById('btnPlay').textContent = '⏸';
+    document.getElementById('status').textContent = '読み上げ中...';
+    const start = (currentLine < 0 || currentLine >= LINES.length - 1) ? 0 : currentLine;
+    speakLine(start);
+  }
+}
+
+function stopAll() {
+  playing = false;
+  window.speechSynthesis.cancel();
+  document.getElementById('btnPlay').textContent = '▶';
+  document.getElementById('status').textContent = '停止中';
+}
+
+function restart() {
+  stopAll();
+  clearHighlight();
+  currentLine = -1;
+  document.getElementById('status').textContent = 'タップして読み上げ開始';
+}
+
+// スピード表示
+document.getElementById('speed').addEventListener('input', function() {
+  document.getElementById('speedVal').textContent = parseFloat(this.value).toFixed(2) + '×';
+});
+
+// ページ離脱時に停止
+window.addEventListener('beforeunload', () => window.speechSynthesis.cancel());
+// iOS対策: バックグラウンドで止まる場合がある
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && playing) stopAll();
+});
+</script>
+</body>
+</html>
