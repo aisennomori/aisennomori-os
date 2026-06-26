@@ -923,7 +923,6 @@ function getJulianDay(year, month, day) {
        + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
 }
 
-// ── 天文計算（Meeus）─────────────────────────────────────────
 // ============================================================
   // ハワイアンムーン コアロジック
   //
@@ -940,7 +939,7 @@ function getJulianDay(year, month, day) {
 
   const D = 86400000; // 1日 = ミリ秒
 
-  // ── 確定版テーブル ──────────────────────────────────────────
+// ── 確定版テーブル ──────────────────────────────────────────
   // ※ 毎年先生から届いたら追加する（それだけでOK）
   // キー = 仮版HiloのYYYY-MM
   // 値   = { hilo:確定Hilo, muku:第30夜(次の確定Muku), hasMauli:bool }
@@ -950,13 +949,14 @@ function getJulianDay(year, month, day) {
     '2026-04': { hilo:'2026-04-18', muku:'2026-05-16', hasMauli:false },  // Mauli削除
     '2026-05': { hilo:'2026-05-17', muku:'2026-06-15', hasMauli:true  },  // Mauli追加 Mauli=6/14
     '2026-06': { hilo:'2026-06-16', muku:'2026-07-14', hasMauli:false },  // Mauli削除
-    '2026-07': { hilo:'2026-07-14', muku:'2026-08-12', hasMauli:false },  // Mauli削除
+    '2026-07': { hilo:'2026-07-15', muku:'2026-08-12', hasMauli:false },  // Mauli削除
     '2026-08': { hilo:'2026-08-13', muku:'2026-09-11', hasMauli:true  },  // Mauli追加 Mauli=9/10
     '2026-09': { hilo:'2026-09-12', muku:'2026-10-10', hasMauli:false },  // Mauli削除
     '2026-10': { hilo:'2026-10-11', muku:'2026-11-09', hasMauli:true  },  // Mauli追加 Mauli=11/8
     '2026-11': { hilo:'2026-11-10', muku:'2026-12-09', hasMauli:true  },  // Mauli追加 Mauli=12/8
     '2026-12': { hilo:'2026-12-10', muku:'2027-01-08', hasMauli:true  },  // Mauli追加 Mauli=1/7
   };
+
 
   // ── 天文計算（Meeus）────────────────────────────────────────
   function newMoonJDE(k){
@@ -1064,8 +1064,6 @@ function getJulianDay(year, month, day) {
   }
 
 
-
-  
 // getMoonAge互換（月相SVG用）
 function getMoonAge(year, month, day){
   const target = Date.UTC(year, month-1, day);
