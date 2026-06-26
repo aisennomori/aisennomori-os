@@ -1069,11 +1069,11 @@ function getMoonAge(year, month, day){
   const target = Date.UTC(year, month-1, day);
   const list = nmNear(year);
   let nmIdx = -1;
-  for(let i=0;i<list.length;i++){if(list[i].ms<=target)nmIdx=i;else break;}
+  for(let i=0;i<list.length;i++){if(list[i]<=target)nmIdx=i;else break;}
   if(nmIdx<0||nmIdx>=list.length-1) return 14.5;
-  const nm=list[nmIdx],nextNm=list[nmIdx+1];
-  const lunLen=Math.round((nextNm.ms-nm.ms)/D);
-  const dayIdx=Math.round((target-nm.ms)/D);
+  const nm=list[nmIdx], nextNm=list[nmIdx+1];
+  const lunLen=Math.round((nextNm-nm)/D);
+  const dayIdx=Math.round((target-nm)/D);
   return (dayIdx===0?lunLen:dayIdx)-1+0.5;
 }
 // 夜番号（1〜30）を返す ← getMoonNightに統一
