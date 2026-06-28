@@ -94,6 +94,23 @@
     color: var(--pink-l);
     text-shadow: 0 0 15px rgba(212,96,138,0.4);
   }
+  .section-block {
+    display: block;
+    margin-bottom: 1.4rem;
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    border-left: 3px solid transparent;
+    transition: all 0.4s;
+    line-height: 2.0;
+  }
+  .sec-num {
+    display: inline-block;
+    font-family: 'Cinzel Decorative', cursive;
+    font-size: 0.7rem;
+    color: var(--gold);
+    margin-right: 0.5rem;
+    opacity: 0.6;
+  }
   .sentence.done { color: var(--dim); }
 
   /* ハワイ語セクション */
@@ -135,7 +152,6 @@
     font-size: .78rem; color: var(--dim);
   }
   .speed-row input[type=range] { width: 130px; accent-color: var(--pink); }
-  #speedVal { color: var(--pink-l); font-weight: 700; min-width: 34px; }
 
   .btn-play {
     width: 76px; height: 76px; border-radius: 50%;
@@ -240,12 +256,13 @@ function checkPw(){
     <div class="hawaii-ja">愛は無限に溢れる泉である<br>愛には境がなく、誰でも手に得られる</div>
   </div>
 
+  <!-- 音声（外部MP3） -->
+  <audio id="bgAudio" preload="auto">
+    <source src="ai_niyori.mp3" type="audio/mpeg">
+  </audio>
+
   <!-- コントロール -->
   <div class="controls">
-    <div class="speed-row">
-      🐢 <input type="range" id="speed" min="0.6" max="1.2" step="0.05" value="0.85">
-      <span id="speedVal">0.85×</span> 🐇
-    </div>
     <button class="btn-play" id="btnPlay" onclick="togglePlay()">▶</button>
     <div class="btn-row">
       <button class="btn-sm" onclick="restart()">↺ はじめから</button>
@@ -269,123 +286,119 @@ resize();initStars();draw();
 window.addEventListener('resize',()=>{resize();initStars();});
 
 // ── 朗読テキスト（文単位で分割）──────────────────────────────
-const SENTENCES = [
-  '愛は本当に不思議な事です。',
-  '人は愛を感じると言う時、それを何を意味するかを知ってる様に見えます。',
-  'しかし、自分が感じてる事を明らかに表現出来るのは少数でしょう。',
-  '愛を表し難い原因は愛という言葉の使い方が混乱しているからだと思います。',
-  '愛はあまりにも頻繁に使われ、それも誤って使われてきたので、多くの人は愛ではない事を感じていても愛を感じているのだと思うのです。',
-  '一つに、愛は願望ではなく、願望は愛の産物ではありません。',
-  '願望の対象が同時に愛の対象であるとしても、愛と願望は全く別です。',
-  '愛を説明するには、理解、受容、そして与える事という三つのキーワードがあります。',
-  '理解が愛につながるかもしれませんが、理解は愛そのものではありません。',
-  'それで、理解は、他の二つのキーワードほど重要ではありません。',
-  'しかし、多くの場合、受容の前には理解が生じます。',
-  '恐れを克服するには、知らなかった事を知る必要があります。',
-  '愛が欠如するのは、非常に恐れがあるからです。',
-  '恐れは憎しみの生みの親で、否定と自己中心を引き起こし、愛の対極です。',
-  '無知は恐れの生みの親だと言われています。',
-  '理解が無知にとって代わると、恐れが消えて愛が生じます。',
-  'しかし、愛は招き入れなければ生じません。',
-  '愛は行動ですから、愛する側が行動しなくては愛は動きません。',
-  '受容は無関心に過ぎない無視別の受け入れではありません。',
-  '扉を開けて入って来るのを招く受容を、私は意味します。',
-  '客が中に入ると、愛のもう一つの側面である与えるという行動が現れます。',
-  '物を与えるのではなく、無条件で自分を差し出すのです。',
-  '愛は何か見返りを求めるのではなく、また誰かを喜ばす為でもなく、愛自体の故に愛するで最高なのです。',
-  '理解せずに喜ばすだけの愛は謝っていて空っぽです。',
-  'お粗末な満足は得られるでしょうが、相手の気まぐれに振り回されます。',
-  '心が、愛で満たされているなら、愛する人が居ないはずありません。',
-  '輝く花に、蜂が惹きつけられる様に、人はあなたに惹きつけられるでしょう。',
-  '人を愛して愛されるには、大きな秘密があります。',
-  '蛇口がすでに水で満たされていなければ、蛇口をひねってみても水は出てきません。',
-  '自分を受け入れて、自分自身を与えることを知っていなければ、同様な事を他の人にすることは非常に困難です。',
-  '自分を受け入れるとは、自分の長所短所の全てを知り、それが自分の持ち味であるのに気づき、前に進むのを決意し、長所短所に働きかけるのを意味します。',
-  '愛が提供するのは、怠慢ではなく世話や関心であり、長所を促進し、短所を改善する試みです。',
-  '自分に自分自身を与える事は、自分を愛する事で、自分が愛に値するのを受け入れる事でもあります。',
-  '自分がした事や他人からの扱われ方のせいで、多くの人は愛に値しないと思っています。',
-  'これは大きな間違いです。',
-  'あなたは宇宙の子であり、木々や星たちと同様に、あなたはここに存在する権利を有しています。',
-  'あなたは存在しているだけで、愛される値があるのです。',
-  'あなたがした事、誰かがあなたに行った事は、この事実を変えられません。',
+const SECTIONS = [
+  { num:'1', text: '愛は本当に不思議な事です。人は愛を感じると言う時、それを何を意味するかを知ってる様に見えます。しかし、自分が感じてる事を明らかに表現出来るのは少数でしょう。愛を表し難い原因は愛という言葉の使い方が混乱しているからだと思います。愛はあまりにも頻繁に使われ、それも誤って使われてきたので、多くの人は愛ではない事を感じていても愛を感じているのだと思うのです。一つに、愛は願望ではなく、願望は愛の産物ではありません。願望の対象が同時に愛の対象であるとしても、愛と願望は全く別です。' },
+  { num:'2', text: '愛を説明するには、理解、受容、そして与える事という三つのキーワードがあります。理解が愛につながるかもしれませんが、理解は愛そのものではありません。それで、理解は、他の二つのキーワードほど重要ではありません。しかし、多くの場合、受容の前には理解が生じます。恐れを克服するには、知らなかった事を知る必要があります。愛が欠如するのは、非常に恐れがあるからです。恐れは憎しみの生みの親で、否定と自己中心を引き起こし、愛の対極です。無知は恐れの生みの親だと言われています。理解が無知にとって代わると、恐れが消えて愛が生じます。' },
+  { num:'3', text: 'しかし、愛は招き入れなければ生じません。愛は行動ですから、愛する側が行動しなくては愛は動きません。私は受容が愛のキーワードの一つだと述べましたが、受容は無関心に過ぎない無視別の受け入れではありません。扉を開けて入って来るのを招く受容を、私は意味します。客が中に入ると、愛のもう一つの側面である与えるという行動が現れます。物を与えるのではなく、無条件で自分を差し出すのです。愛は何か見返りを求めるのではなく、また誰かを喜ばす為でもなく、愛自体の故に愛するで最高なのです。' },
+  { num:'4', text: '理解せずに喜ばすだけの愛は謝っていて空っぽです。お粗末な満足は得られるでしょうが、相手の気まぐれに振り回されます。心が、愛で満たされているなら、愛する人が居ないはずありません。輝く花に、蜂が惹きつけられる様に、人はあなたに惹きつけられるでしょう。人を愛して愛されるには、大きな秘密があります。蛇口がすでに水で満たされていなければ、蛇口をひねってみても水は出てきません。自分を受け入れて、自分自身を与えることを知っていなければ、同様な事を他の人にすることは非常に困難です。' },
+  { num:'5', text: '自分を受け入れるとは、自分の長所短所の全てを知り、それが自分の持ち味であるのに気づき、前に進むのを決意し、長所短所に働きかけるのを意味します。愛が提供するのは、怠慢ではなく世話や関心であり、長所を促進し、短所を改善する試みです。自分に自分自身を与える事は、自分を愛する事で、自分が愛に値するのを受け入れる事でもあります。自分がした事や他人からの扱われ方のせいで、多くの人は愛に値しないと思っています。これは大きな間違いです。' },
+  { num:'6', text: 'あなたは宇宙の子であり、木々や星たちと同様に、あなたはここに存在する権利を有しています。あなたは存在しているだけで、愛される値があるのです。あなたがした事、誰かがあなたに行った事は、この事実を変えられません。古代のハワイ人は次の様に美しい表現をしています。He punawai kahe wale ke aloha ── 愛は無限に溢れる泉である。愛には境がなく、誰でも手に得られる。' },
 ];
-
+const TOTAL = SECTIONS.length;
 // ハワイ語は最後に別扱い
-const HAWAII_TEXT = 'He punawai kahe wale ke aloha。愛は無限に溢れる泉である。愛には境がなく、誰でも手に得られます。';
-const TOTAL = SENTENCES.length + 1; // +1 = ハワイ語
 
 // ── DOM生成 ─────────────────────────────────────────────────
 const textBody = document.getElementById('textBody');
-SENTENCES.forEach((s, i) => {
-  const span = document.createElement('span');
-  span.className = 'sentence';
-  span.dataset.i = i;
-  span.textContent = s + ' ';
-  textBody.appendChild(span);
+SECTIONS.forEach((sec, i) => {
+  const div = document.createElement('div');
+  div.className = 'sentence section-block';
+  div.dataset.i = i;
+  div.innerHTML = '<span class="sec-num">' + sec.num + '</span>' + sec.text;
+  textBody.appendChild(div);
+  if (i < SECTIONS.length - 1) textBody.appendChild(document.createElement('br'));
 });
+
+// ── タイムスタンプ（秒）── 実測後に調整してください ──
+// 210秒の音声を6セクションに分割（仮値）
+const TIMESTAMPS = [0.5, 35.0, 72.0, 110.0, 148.0, 178.0];
 
 // ── 状態 ─────────────────────────────────────────────────────
 let currentIdx = -1;
 let playing = false;
+let timerInterval = null;
 
 function highlight(i) {
   currentIdx = i;
-  const isHawaii = (i === SENTENCES.length);
-
   document.querySelectorAll('.sentence').forEach((el, idx) => {
     el.classList.toggle('active', idx === i);
     el.classList.toggle('done', idx < i);
   });
-  document.getElementById('hawaiiBox').classList.toggle('active', isHawaii);
-
-  // ハイライト部分をスクロール
-  if (!isHawaii) {
-    const el = document.querySelector(`.sentence[data-i="${i}"]`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  } else {
-    document.getElementById('hawaiiBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  // プログレス
-  const pct = Math.round((i / (TOTAL - 1)) * 100);
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('status').textContent = (i + 1) + ' / ' + TOTAL;
+  // スクロール
+  const el = document.querySelector(`.sentence[data-i="${i}"]`);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // ステータス
+  document.getElementById('status').textContent = 'Section ' + (i + 1) + ' / ' + TOTAL;
 }
 
 function clearHighlight() {
   document.querySelectorAll('.sentence').forEach(el => el.classList.remove('active','done'));
-  document.getElementById('hawaiiBox').classList.remove('active');
   document.getElementById('progressBar').style.width = '0%';
 }
 
-// ── 読み上げ ─────────────────────────────────────────────────
-function getRate() { return parseFloat(document.getElementById('speed').value); }
+// ── 再生ロジック ──────────────────────────────────────────────
+function startAudio() {
+  const audio = document.getElementById('bgAudio');
+  const btn   = document.getElementById('btnPlay');
+  btn.disabled = true;
+  audio.pause();
+  audio.currentTime = 0;
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
 
-function speakIdx(i) {
-  if (!playing || i >= TOTAL) {
-    if (i >= TOTAL) {
+  function doPlay() {
+    btn.disabled = false;
+    const p = audio.play();
+    if (p !== undefined) {
+      p.then(() => startTimer())
+       .catch(e => {
+         document.getElementById('status').textContent = '⚠ 再生エラー: ' + e.name;
+         playing = false; btn.textContent = '▶'; btn.disabled = false;
+       });
+    } else { startTimer(); }
+  }
+
+  if (audio.readyState >= 3) {
+    doPlay();
+  } else {
+    document.getElementById('status').textContent = '読み込み中...';
+    audio.oncanplaythrough = () => { audio.oncanplaythrough = null; doPlay(); };
+    audio.load();
+  }
+  document.getElementById('status').textContent = '再生中...';
+}
+
+function startTimer() {
+  const audio = document.getElementById('bgAudio');
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (!playing) { clearInterval(timerInterval); timerInterval = null; return; }
+    const t = audio.currentTime;
+    // 現在時刻に対応するセクション
+    let cur = -1;
+    for (let i = TIMESTAMPS.length - 1; i >= 0; i--) {
+      if (t >= TIMESTAMPS[i]) { cur = i; break; }
+    }
+    if (cur >= 0 && cur !== currentIdx) highlight(cur);
+    // プログレスバー更新
+    if (audio.duration > 0) {
+      document.getElementById('progressBar').style.width =
+        Math.round((t / audio.duration) * 100) + '%';
+    }
+    // 終了チェック
+    if (audio.ended || (audio.duration > 0 && t >= audio.duration - 0.2)) {
+      clearInterval(timerInterval); timerInterval = null;
       playing = false;
       document.getElementById('btnPlay').textContent = '▶';
       document.getElementById('status').textContent = '✦ Mahalo nui loa ✦';
       setTimeout(clearHighlight, 3000);
     }
-    return;
-  }
+  }, 100);
+}
 
-  highlight(i);
-
-  const text = i < SENTENCES.length ? SENTENCES[i] : HAWAII_TEXT;
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = getRate();
-  utter.pitch = 1.0;
-  utter.lang = i < SENTENCES.length ? 'ja-JP' : 'en-US';
-  utter.volume = 1;
-
-  utter.onend = () => setTimeout(() => speakIdx(i + 1), i < SENTENCES.length ? 350 : 800);
-  utter.onerror = () => setTimeout(() => speakIdx(i + 1), 200);
-
-  window.speechSynthesis.cancel();
-  window.speechSynthesis.speak(utter);
+function stopAudio() {
+  const audio = document.getElementById('bgAudio');
+  if (audio) { audio.pause(); }
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  document.getElementById('btnPlay').disabled = false;
 }
 
 function togglePlay() {
@@ -394,14 +407,13 @@ function togglePlay() {
   } else {
     playing = true;
     document.getElementById('btnPlay').textContent = '⏸';
-    const start = (currentIdx < 0 || currentIdx >= TOTAL - 1) ? 0 : currentIdx;
-    speakIdx(start);
+    startAudio();
   }
 }
 
 function stopAll() {
   playing = false;
-  window.speechSynthesis.cancel();
+  stopAudio();
   document.getElementById('btnPlay').textContent = '▶';
   document.getElementById('status').textContent = '停止中 — 続きから再生できます';
 }
@@ -413,11 +425,6 @@ function restart() {
   document.getElementById('status').textContent = 'タップして朗読開始';
 }
 
-document.getElementById('speed').addEventListener('input', function() {
-  document.getElementById('speedVal').textContent = parseFloat(this.value).toFixed(2) + '×';
-});
-
-window.addEventListener('beforeunload', () => window.speechSynthesis.cancel());
 document.addEventListener('visibilitychange', () => { if (document.hidden && playing) stopAll(); });
 </script>
 </body>
