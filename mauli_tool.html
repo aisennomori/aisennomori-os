@@ -14,27 +14,21 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--bg);color:var(--ink);font-family:var(--fb);padding-bottom:60px;}
-
 .hdr{background:linear-gradient(180deg,#3E3A33,#4A4339);color:#F7F1E4;
   padding:18px 16px 22px;border-radius:0 0 20px 20px;margin-bottom:16px;}
 .hdr h1{font-family:var(--fd);font-size:1.15rem;font-weight:700;letter-spacing:.04em;}
 .hdr .sub{font-size:.72rem;color:#CFC4AE;margin-top:3px;}
-
 .section{background:var(--card);border:1px solid var(--line);border-radius:14px;
   margin:0 12px 14px;padding:14px 16px;}
 .sec-title{font-family:var(--fd);font-weight:700;font-size:.9rem;margin-bottom:12px;
   display:flex;align-items:center;gap:8px;}
 .badge{font-size:.65rem;background:var(--accent);color:#fff;padding:2px 8px;border-radius:10px;}
-
-/* ① 年選択 */
 .year-row{display:flex;align-items:center;gap:10px;}
 select{font-family:var(--fb);font-size:.95rem;border:1px solid var(--line);
   border-radius:8px;padding:7px 10px;background:#FCFAF5;color:var(--ink);}
 .btn-load{background:var(--ink);color:#FBF6EC;border:none;border-radius:8px;
   padding:9px 18px;font-family:var(--fd);font-weight:700;font-size:.85rem;cursor:pointer;}
 .btn-load:active{opacity:.85;}
-
-/* ② 表 */
 .tbl-wrap{overflow-x:auto;margin-top:4px;}
 table{width:100%;border-collapse:collapse;font-size:.78rem;}
 thead th{background:#F0ECE4;color:var(--soft);font-weight:700;padding:7px 6px;
@@ -59,8 +53,6 @@ td.status-cell.same{color:var(--warn);}
 .btn-confirm:active{opacity:.85;}
 .btn-clear{background:#fff;color:var(--soft);border:1px solid var(--line);border-radius:6px;
   padding:5px 8px;font-size:.72rem;cursor:pointer;margin-left:4px;}
-
-/* ③ 出力 */
 .output-box{background:#1E1A16;border-radius:10px;padding:14px 16px;
   font-family:monospace;font-size:.72rem;color:#C8E6C9;white-space:pre;
   overflow-x:auto;margin-top:8px;line-height:1.6;}
@@ -68,8 +60,6 @@ td.status-cell.same{color:var(--warn);}
   padding:12px;font-family:var(--fd);font-weight:700;font-size:.9rem;cursor:pointer;margin-top:8px;}
 .btn-copy:active{opacity:.85;}
 .copy-ok{text-align:center;color:var(--accent);font-size:.8rem;margin-top:5px;height:20px;}
-
-/* アプリ反映 */
 .app-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
 .app-item{border:1px solid var(--line);border-radius:10px;padding:10px 12px;}
 .app-item .an{font-weight:700;font-size:.8rem;margin-bottom:6px;}
@@ -86,8 +76,6 @@ td.status-cell.same{color:var(--warn);}
   <h1>🌙 マウリ調整ツール</h1>
   <p class="sub">愛泉の杜 ─ CONFIRMEDテーブル生成 &amp; アプリ反映</p>
 </header>
-
-<!-- ① 年選択 -->
 <div class="section">
   <div class="sec-title">① 年を選択</div>
   <div class="year-row">
@@ -95,39 +83,26 @@ td.status-cell.same{color:var(--warn);}
     <button class="btn-load" onclick="loadYear()">読み込む</button>
   </div>
 </div>
-
-<!-- ② 表形式入力 -->
 <div class="section">
   <div class="sec-title">② 各月の調整 <span class="badge">確定ボタンで登録</span></div>
   <div class="tbl-wrap">
     <table>
       <thead>
         <tr>
-          <th>月</th>
-          <th>仮Hilo</th>
-          <th>仮Muku</th>
-          <th>仮Mauli</th>
-          <th>確定Hilo</th>
-          <th>確定Muku</th>
-          <th>Mauli</th>
-          <th>状態</th>
-          <th></th>
+          <th>月</th><th>仮Hilo</th><th>仮Muku</th><th>仮Mauli</th>
+          <th>確定Hilo</th><th>確定Muku</th><th>Mauli</th><th>状態</th><th></th>
         </tr>
       </thead>
       <tbody id="tblBody"></tbody>
     </table>
   </div>
 </div>
-
-<!-- ③ CONFIRMEDコード -->
 <div class="section">
   <div class="sec-title">③ CONFIRMEDコード生成</div>
   <div class="output-box" id="outputBox">// ② で確定すると自動生成されます</div>
   <button class="btn-copy" onclick="copyCode()">📋 コピー</button>
   <div class="copy-ok" id="copyOk"></div>
 </div>
-
-<!-- ④ アプリ反映 -->
 <div class="section">
   <div class="sec-title">④ アプリへ反映</div>
   <div class="step-hint">
@@ -137,9 +112,16 @@ td.status-cell.same{color:var(--warn);}
   </div>
   <div class="app-list" id="appList"></div>
 </div>
-
 <script>
-// ── 天文計算コア ──────────────────────────────────────────────
+const APPS=[
+  {name:'moon_techo',           label:'🌙 ムーン手帖'},
+  {name:'moon_calendar',        label:'📅 カレンダー'},
+  {name:'moon_reading',         label:'📖 リーディング'},
+  {name:'moon_practice',        label:'✏️ プラクティス'},
+  {name:'birthday_moon_lookup', label:'🎂 バースデー'},
+  {name:'cycle_tracker',        label:'🌙 サイクル手帖'},
+];
+const GITHUB_BASE='https://github.com/aisennomori/aisennomori-/blob/main/';
 const D=86400000;
 function newMoonJDE(k){
   const T=k/1236.85,T2=T*T,T3=T2*T,T4=T3*T;
@@ -188,8 +170,6 @@ function getKariCycles(y){
   }
   return res;
 }
-
-// ── ユーティリティ ────────────────────────────────────────────
 function fmtYMD(ms){
   const d=new Date(ms);
   return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')+'-'+String(d.getUTCDate()).padStart(2,'0');
@@ -199,18 +179,17 @@ function fmtMD(ms){
 }
 function msFromStr(s){return new Date(s+'T00:00:00Z').getTime();}
 
-// ── 状態 ──────────────────────────────────────────────────────
 let year=2026;
 let kariCycles=[];
-let confirmed={};  // key → {hilo, muku, hasMauli}
+let confirmed={};
 
-// ── 既存の2026年データをプリロード ───────────────────────────
+// ── PRELOADEDデータ（2026-07: hilo修正済 7/14→7/15）──────────
 const PRELOADED={
   '2026-03':{hilo:'2026-03-20',muku:'2026-04-17',hasMauli:false},
   '2026-04':{hilo:'2026-04-18',muku:'2026-05-16',hasMauli:false},
   '2026-05':{hilo:'2026-05-17',muku:'2026-06-15',hasMauli:true},
   '2026-06':{hilo:'2026-06-16',muku:'2026-07-14',hasMauli:false},
-  '2026-07':{hilo:'2026-07-14',muku:'2026-08-12',hasMauli:false},
+  '2026-07':{hilo:'2026-07-15',muku:'2026-08-12',hasMauli:false},  // 修正: 7/14→7/15
   '2026-08':{hilo:'2026-08-13',muku:'2026-09-11',hasMauli:true},
   '2026-09':{hilo:'2026-09-12',muku:'2026-10-10',hasMauli:false},
   '2026-10':{hilo:'2026-10-11',muku:'2026-11-09',hasMauli:true},
@@ -218,7 +197,6 @@ const PRELOADED={
   '2026-12':{hilo:'2026-12-10',muku:'2027-01-08',hasMauli:true},
 };
 
-// ── 初期化 ────────────────────────────────────────────────────
 (function init(){
   const sel=document.getElementById('yearSel');
   const cur=new Date().getFullYear();
@@ -234,16 +212,14 @@ const PRELOADED={
 function loadYear(){
   year=parseInt(document.getElementById('yearSel').value);
   kariCycles=getKariCycles(year);
-  // プリロードデータがあれば反映
   confirmed={};
   for(const [k,v] of Object.entries(PRELOADED)){
-    if(k.startsWith(year+'-')) confirmed[k]=v;
+    if(k.startsWith(year+'-'))confirmed[k]=v;
   }
   renderTable();
   renderOutput();
 }
 
-// ── 表描画 ───────────────────────────────────────────────────
 function renderTable(){
   const tbody=document.getElementById('tblBody');
   tbody.innerHTML='';
@@ -251,20 +227,15 @@ function renderTable(){
     const mn=parseInt(cy.key.split('-')[1]);
     const ov=confirmed[cy.key];
     const kariMauliMs=cy.hasMauli?cy.mukuMs-D:null;
-
-    // 状態計算
     let stClass='',stLabel='─';
     if(ov){
       if(ov.hasMauli&&!cy.hasMauli){stClass='add';stLabel='🟢 追加';}
       else if(!ov.hasMauli&&cy.hasMauli){stClass='remove';stLabel='🔴 削除';}
       else{stClass='same';stLabel='✦ 確定';}
     }
-
-    // 確定値のデフォルト（ov or 仮版）
     const defH=ov?ov.hilo:fmtYMD(cy.hiloMs);
     const defM=ov?ov.muku:fmtYMD(cy.mukuMs);
     const defHM=ov?ov.hasMauli:cy.hasMauli;
-
     const rid='r'+idx;
     const tr=document.createElement('tr');
     tr.innerHTML=
@@ -294,10 +265,28 @@ function confirmRow(key,rid){
   const m=document.getElementById('m'+rid).value;
   const hm=document.querySelector('input[name="ml'+rid+'"]:checked').value==='true';
   if(!h||!m){alert('日付を入力してください');return;}
+
+  // ── 整合性チェック：Hilo〜Mukuの日数とMauliあり/なしの選択 ──
+  const diffDays=Math.round((msFromStr(m)-msFromStr(h))/D);
+  if(diffDays<=0){
+    alert('⚠️ Mukuの日付はHiloより後の日付にしてください（現在の日数差：'+diffDays+'日）');
+    return;
+  }
+  if(diffDays!==29&&diffDays!==30){
+    if(!confirm('⚠️ Hilo〜Mukuの日数が'+diffDays+'日です（通常は29日か30日）。\nこのまま確定しますか？'))return;
+  }else{
+    const expectedMauli=(diffDays===30);
+    if(expectedMauli!==hm){
+      const msg=expectedMauli
+        ?'⚠️ 日数は30日（Mauliあり想定）ですが、「Mauliなし」が選択されています。\nこのまま確定しますか？'
+        :'⚠️ 日数は29日（Mauliなし想定）ですが、「Mauliあり」が選択されています。\nこのまま確定しますか？';
+      if(!confirm(msg))return;
+    }
+  }
+
   confirmed[key]={hilo:h,muku:m,hasMauli:hm};
   renderTable();
   renderOutput();
-  // スムーズスクロール
   document.getElementById('outputBox').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
@@ -307,7 +296,16 @@ function clearRow(key){
   renderOutput();
 }
 
-// ── コード生成 ────────────────────────────────────────────────
+function renderAppList(){
+  const el=document.getElementById('appList');
+  el.innerHTML=APPS.map(a=>
+    '<div class="app-item">'+
+    '<div class="an">'+a.label+'</div>'+
+    '<a class="adl" href="'+GITHUB_BASE+a.name+'.html" target="_blank">GitHub で開く →</a>'+
+    '</div>'
+  ).join('');
+}
+
 function renderOutput(){
   const keys=Object.keys(confirmed).sort();
   if(keys.length===0){
@@ -332,27 +330,6 @@ function copyCode(){
     el.textContent='✅ コピーしました';
     setTimeout(()=>el.textContent='',2500);
   });
-}
-
-// ── アプリ一覧（GitHub URL）────────────────────────────────────
-const APPS=[
-  {name:'moon_techo',    label:'🌙 ムーン手帖'},
-  {name:'moon_cycle',    label:'🔄 ムーンサイクル'},
-  {name:'moon_calendar', label:'📅 カレンダー'},
-  {name:'moon_reading',  label:'📖 リーディング'},
-  {name:'moon_practice', label:'✏️ プラクティス'},
-  {name:'birthday_moon_lookup', label:'🎂 バースデー'},
-];
-const GITHUB_BASE='https://github.com/aisennomori/aisennomori-/blob/main/';
-
-function renderAppList(){
-  const el=document.getElementById('appList');
-  el.innerHTML=APPS.map(a=>
-    '<div class="app-item">'+
-    '<div class="an">'+a.label+'</div>'+
-    '<a class="adl" href="'+GITHUB_BASE+a.name+'.html" target="_blank">GitHub で開く →</a>'+
-    '</div>'
-  ).join('');
 }
 </script>
 </body>
