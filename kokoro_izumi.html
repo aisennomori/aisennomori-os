@@ -1083,7 +1083,15 @@ async function shareToCounselor() {
       })
     });
     const data = await res.json();
-    const summaryText = (data.content?.[0]?.text || '').trim() || '（要約の作成に失敗しました。お手数ですが、内容を手動でご記入ください）';
+    const raw = data.content?.[0]?.text;
+    let summaryText;
+    if (raw && raw.trim()) {
+      summaryText = raw.trim();
+    } else {
+      console.error('要約API応答（デバッグ用）:', data);
+      const detail = data?.error?.message || JSON.stringify(data).slice(0, 300);
+      summaryText = `（要約の作成に失敗しました。お手数ですが、内容を手動でご記入ください）\n\n---\nエラー詳細（開発確認用）: ${detail}`;
+    }
     openSummaryModal(summaryText);
   } catch (e) {
     closeModal();
