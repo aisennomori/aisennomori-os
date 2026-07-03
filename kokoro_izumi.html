@@ -449,7 +449,14 @@ const PROXY_URL = 'https://aisen-nomori-proxy.aisen-nomori.workers.dev';
 
 // ── 相談員への共有先メールアドレス ───────────────────────────────────────────
 // ここを、実際に要約を受け取る相談員のメールアドレスに書き換えてください
-const COUNSELOR_EMAIL = 'info@aisennomori.com';
+// ── 相談員リスト（宛先の選択肢） ─────────────────────────────────────────────
+// name: 選択肢に表示される名前 / email: 実際の送信先アドレス
+// 必要に応じて、行を追加・編集・削除してください
+const COUNSELORS = [
+  { name: '愛泉の杜 相談窓口（代表）', email: 'info@aisennomori.com' },
+  // { name: '瑠璃さん', email: 'ruri@example.com' },
+  // { name: '滝沢さん', email: 'takizawa@example.com' },
+];
 
 // ── 要約作成専用のシステムプロンプト（傾聴用のSYSTEM_PROMPTとは別物） ────────
 const SUMMARY_SYSTEM_PROMPT = `あなたは「愛泉の杜」の相談記録作成の担当です。
@@ -984,8 +991,25 @@ function openSummaryModal(summaryText) {
 
   const body = document.createElement('div');
   body.className = 'modal-body';
+
+  const selectLabel = document.createElement('label');
+  selectLabel.textContent = '宛先（相談員を選んでください）';
+  selectLabel.style.cssText = 'display:block; font-size:12px; color:var(--text-sub); margin-bottom:6px;';
+
+  const select = document.createElement('select');
+  select.style.cssText = 'width:100%; padding:9px 10px; border:1px solid var(--border); border-radius:10px; font-family:"Noto Sans JP",sans-serif; font-size:13px; background:var(--bg); color:var(--text-main); margin-bottom:14px;';
+  COUNSELORS.forEach((c, i) => {
+    const opt = document.createElement('option');
+    opt.value = c.email;
+    opt.textContent = `${c.name}（${c.email}）`;
+    select.appendChild(opt);
+  });
+
   const textarea = document.createElement('textarea');
   textarea.value = summaryText;
+
+  body.appendChild(selectLabel);
+  body.appendChild(select);
   body.appendChild(textarea);
 
   const footer = document.createElement('div');
@@ -1015,7 +1039,7 @@ function openSummaryModal(summaryText) {
   mailBtn.onclick = () => {
     const subject = encodeURIComponent('【愛泉の杜】こころの泉 相談記録の共有');
     const bodyText = encodeURIComponent(textarea.value);
-    window.location.href = `mailto:${COUNSELOR_EMAIL}?subject=${subject}&body=${bodyText}`;
+    window.location.href = `mailto:${select.value}?subject=${subject}&body=${bodyText}`;
   };
 
   footer.appendChild(cancelBtn);
