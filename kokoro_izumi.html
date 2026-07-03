@@ -1072,6 +1072,10 @@ async function shareToCounselor() {
   openLoadingModal();
 
   try {
+    const summaryMessages = [
+      ...history,
+      { role: 'user', content: 'ここまでの会話を、指示にしたがって要約してください。' }
+    ];
     const res = await fetch(PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1079,7 +1083,7 @@ async function shareToCounselor() {
         model: 'claude-sonnet-4-6',
         max_tokens: 700,
         system: SUMMARY_SYSTEM_PROMPT,
-        messages: history,
+        messages: summaryMessages,
       })
     });
     const data = await res.json();
