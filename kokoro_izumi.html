@@ -315,12 +315,84 @@
     padding: 4px 12px;
     border-radius: 12px;
     cursor: pointer;
-    margin-left: auto;
-    display: block;
-    margin-bottom: 8px;
     transition: all 0.2s;
   }
   #reset-btn:hover { border-color: var(--sage); color: var(--forest); }
+
+  #share-btn {
+    background: none;
+    border: 1px solid var(--sage);
+    color: var(--forest-soft);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s;
+  }
+  #share-btn:hover { background: var(--sage-light); border-color: var(--forest-soft); }
+  #share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .toolbar-row { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px; }
+
+  /* ── Share modal ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(43,42,37,0.45);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; padding: 20px;
+  }
+  .modal-card {
+    background: var(--surface);
+    border-radius: 18px;
+    max-width: 480px; width: 100%;
+    max-height: 85vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-header {
+    padding: 18px 20px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .modal-header h3 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px; color: var(--forest); font-weight: 600;
+  }
+  .modal-header p {
+    font-size: 11.5px; color: var(--text-sub); margin-top: 4px; line-height: 1.7;
+  }
+  .modal-body { padding: 16px 20px; overflow-y: auto; flex: 1; }
+  .modal-body textarea {
+    width: 100%; min-height: 220px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px; line-height: 1.8;
+    padding: 12px; border: 1px solid var(--border); border-radius: 10px;
+    resize: vertical; background: var(--bg); color: var(--text-main);
+  }
+  .modal-footer {
+    padding: 14px 20px 18px;
+    display: flex; gap: 8px; flex-wrap: wrap;
+    border-top: 1px solid var(--border);
+  }
+  .modal-btn {
+    flex: 1; min-width: 100px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12.5px; padding: 9px 10px;
+    border-radius: 10px; cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text-main);
+    transition: all 0.2s;
+  }
+  .modal-btn:hover { background: var(--sage-light); }
+  .modal-btn.primary {
+    background: linear-gradient(135deg, var(--sage), var(--forest));
+    color: white; border: none;
+  }
+  .modal-btn.primary:hover { filter: brightness(1.08); }
+  .modal-loading {
+    padding: 30px 20px; text-align: center;
+    color: var(--text-sub); font-size: 13px;
+  }
 
   #chat-wrap::-webkit-scrollbar { width: 4px; }
   #chat-wrap::-webkit-scrollbar-track { background: transparent; }
@@ -354,7 +426,10 @@
 <div id="quick-wrap"></div>
 
 <div id="input-area">
-  <button id="reset-btn">会話をリセット</button>
+  <div class="toolbar-row">
+    <button id="reset-btn">会話をリセット</button>
+    <button id="share-btn">🤝 相談員へ共有</button>
+  </div>
   <div class="input-inner">
     <textarea id="input" rows="1" placeholder="今、心にあることを、そのままここに置いていってください" maxlength="600"></textarea>
     <button id="send-btn">
@@ -364,11 +439,28 @@
   <div class="char-hint">Shift+Enterで改行 / Enterで送信</div>
 </div>
 
+<div id="modal-root"></div>
+
 <script>
 // ── API中継サーバー（Cloudflare Worker）のURL ────────────────────────────────
 // デプロイ後、ここをあなたのWorkerのURLに書き換えてください
 // 例: 'https://aisennomori-proxy.your-subdomain.workers.dev'
 const PROXY_URL = 'https://aisen-nomori-proxy.aisen-nomori.workers.dev';
+
+// ── 相談員への共有先メールアドレス ───────────────────────────────────────────
+// ここを、実際に要約を受け取る相談員のメールアドレスに書き換えてください
+const COUNSELOR_EMAIL = 'info@aisennomori.com';
+
+// ── 要約作成専用のシステムプロンプト（傾聴用のSYSTEM_PROMPTとは別物） ────────
+const SUMMARY_SYSTEM_PROMPT = `あなたは「愛泉の杜」の相談記録作成の担当です。
+以下に渡される会話履歴を、人間の相談員が引き継いで対応できるよう、簡潔な引き継ぎメモとしてまとめてください。
+
+【書き方のルール】
+- 日本語、敬体、300〜500文字程度のプレーンテキストのみ（JSON不要、見出しや箇条書きは可）
+- 危機的な発言（希死念慮・自傷・身体症状など）が会話に含まれていた場合は、必ず冒頭に「⚠️ 要注意」として明記する
+- 相手が実際に話した内容（テーマ・気持ちの動き・語られた出来事）を、事実ベースで要約する
+- 診断名を書かない。原因を推測しない。断定的な言い切りを避ける（「〜と感じている様子」「〜という話があった」等の書き方にする）
+- 相談員が次にどう関わればよいか分かるよう、最後に一言、引き継ぎのポイントを添えてよい`;
 
 // ── System prompt（愛泉の杜OS憲章 v1.3 準拠）───────────────────────────────
 const SYSTEM_PROMPT = `あなたは「愛泉の杜」の心のカウンセラーAIです。
@@ -606,6 +698,8 @@ const quickWrap = document.getElementById('quick-wrap');
 const input     = document.getElementById('input');
 const sendBtn   = document.getElementById('send-btn');
 const resetBtn  = document.getElementById('reset-btn');
+const shareBtn  = document.getElementById('share-btn');
+const modalRoot = document.getElementById('modal-root');
 
 // ── Init ───────────────────────────────────────────────────────────────────
 function init() {
@@ -860,6 +954,122 @@ sendBtn.addEventListener('click', send);
 resetBtn.addEventListener('click', () => {
   if (confirm('会話をリセットしますか？')) init();
 });
+
+// ── 相談員への共有 ──────────────────────────────────────────────────────────
+function closeModal() { modalRoot.innerHTML = ''; }
+
+function openLoadingModal() {
+  modalRoot.innerHTML = `
+    <div class="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-loading">🌿 要約を作成しています…</div>
+      </div>
+    </div>`;
+}
+
+function openSummaryModal(summaryText) {
+  modalRoot.innerHTML = '';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+
+  const card = document.createElement('div');
+  card.className = 'modal-card';
+
+  const header = document.createElement('div');
+  header.className = 'modal-header';
+  header.innerHTML = `
+    <h3>相談員へ共有する内容の確認</h3>
+    <p>この内容が、相談員に届きます。送る前に、内容を確認・編集できます。実際に送信されるのは、次の画面でメールの送信ボタンを押した時点です。</p>`;
+
+  const body = document.createElement('div');
+  body.className = 'modal-body';
+  const textarea = document.createElement('textarea');
+  textarea.value = summaryText;
+  body.appendChild(textarea);
+
+  const footer = document.createElement('div');
+  footer.className = 'modal-footer';
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'modal-btn';
+  cancelBtn.textContent = 'キャンセル';
+  cancelBtn.onclick = closeModal;
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'modal-btn';
+  copyBtn.textContent = 'コピーする';
+  copyBtn.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(textarea.value);
+      copyBtn.textContent = 'コピーしました ✓';
+      setTimeout(() => { copyBtn.textContent = 'コピーする'; }, 2000);
+    } catch (e) {
+      alert('コピーに失敗しました。テキストを選択して手動でコピーしてください。');
+    }
+  };
+
+  const mailBtn = document.createElement('button');
+  mailBtn.className = 'modal-btn primary';
+  mailBtn.textContent = 'メールを開く';
+  mailBtn.onclick = () => {
+    const subject = encodeURIComponent('【愛泉の杜】こころの泉 相談記録の共有');
+    const bodyText = encodeURIComponent(textarea.value);
+    window.location.href = `mailto:${COUNSELOR_EMAIL}?subject=${subject}&body=${bodyText}`;
+  };
+
+  footer.appendChild(cancelBtn);
+  footer.appendChild(copyBtn);
+  footer.appendChild(mailBtn);
+
+  card.appendChild(header);
+  card.appendChild(body);
+  card.appendChild(footer);
+  overlay.appendChild(card);
+  modalRoot.appendChild(overlay);
+}
+
+async function shareToCounselor() {
+  // 実質的な会話がまだない場合（挨拶メッセージのみ）は共有しない
+  if (history.length < 2) {
+    alert('まだ共有できる内容がありません。少しお話しした後で、もう一度お試しください。');
+    return;
+  }
+
+  const ok = confirm(
+    'ここまでの会話の要約を作成し、担当の相談員へメールで共有する準備をします。\n\n' +
+    '・要約はAIが作成し、次の画面で内容を確認・編集できます\n' +
+    '・実際にメールが送信されるのは、あなたご自身が送信ボタンを押した時点です\n\n' +
+    'よろしいですか？'
+  );
+  if (!ok) return;
+
+  shareBtn.disabled = true;
+  openLoadingModal();
+
+  try {
+    const res = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 700,
+        system: SUMMARY_SYSTEM_PROMPT,
+        messages: history,
+      })
+    });
+    const data = await res.json();
+    const summaryText = (data.content?.[0]?.text || '').trim() || '（要約の作成に失敗しました。お手数ですが、内容を手動でご記入ください）';
+    openSummaryModal(summaryText);
+  } catch (e) {
+    closeModal();
+    alert('要約の作成中に接続エラーが発生しました。少し待ってから、もう一度お試しください。');
+  }
+
+  shareBtn.disabled = false;
+}
+
+shareBtn.addEventListener('click', shareToCounselor);
 
 // Start
 init();
