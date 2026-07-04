@@ -306,35 +306,47 @@
     margin-right: auto;
   }
 
-  #reset-btn {
+  /* ── Header menu (reset / share) ── */
+  .header-menu-wrap { position: relative; margin-left: auto; }
+  .menu-btn {
     background: none;
-    border: 1px solid var(--border);
+    border: none;
+    font-size: 20px;
+    line-height: 1;
     color: var(--text-sub);
-    font-family: 'Noto Sans JP', sans-serif;
-    font-size: 11px;
-    padding: 4px 12px;
-    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.2s;
+    padding: 6px 8px;
+    border-radius: 8px;
   }
-  #reset-btn:hover { border-color: var(--sage); color: var(--forest); }
-
-  #share-btn {
+  .menu-btn:hover { background: var(--sage-light); color: var(--forest); }
+  .menu-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    min-width: 180px;
+    overflow: hidden;
+    z-index: 50;
+    display: none;
+  }
+  .menu-dropdown.open { display: block; }
+  .menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
     background: none;
-    border: 1px solid var(--sage);
-    color: var(--forest-soft);
+    border: none;
+    padding: 12px 16px;
     font-family: 'Noto Sans JP', sans-serif;
-    font-size: 11px;
-    padding: 4px 12px;
-    border-radius: 12px;
+    font-size: 13px;
+    color: var(--text-main);
     cursor: pointer;
-    margin-left: 8px;
-    transition: all 0.2s;
   }
-  #share-btn:hover { background: var(--sage-light); border-color: var(--forest-soft); }
-  #share-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .toolbar-row { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 8px; }
+  .menu-item:hover { background: var(--sage-light); }
+  .menu-item + .menu-item { border-top: 1px solid var(--border); }
 
   /* ── Share modal ── */
   .modal-overlay {
@@ -413,6 +425,13 @@
     <div class="header-sub">愛泉の杜 — 静かに寄り添うサポートAI</div>
   </div>
   <div class="status-dot"></div>
+  <div class="header-menu-wrap">
+    <button class="menu-btn" id="menu-btn" aria-label="メニュー">⋯</button>
+    <div class="menu-dropdown" id="menu-dropdown">
+      <button class="menu-item" id="share-btn">🤝 相談員へ共有</button>
+      <button class="menu-item" id="reset-btn">🔄 会話をリセット</button>
+    </div>
+  </div>
 </header>
 
 <div class="notice">
@@ -426,10 +445,6 @@
 <div id="quick-wrap"></div>
 
 <div id="input-area">
-  <div class="toolbar-row">
-    <button id="reset-btn">会話をリセット</button>
-    <button id="share-btn">🤝 相談員へ共有</button>
-  </div>
   <div class="input-inner">
     <textarea id="input" rows="1" placeholder="今、心にあることを、そのままここに置いていってください" maxlength="600"></textarea>
     <button id="send-btn">
@@ -460,14 +475,31 @@ const COUNSELORS = [
 
 // ── 要約作成専用のシステムプロンプト（傾聴用のSYSTEM_PROMPTとは別物） ────────
 const SUMMARY_SYSTEM_PROMPT = `あなたは「愛泉の杜」の相談記録作成の担当です。
-以下に渡される会話履歴を、人間の相談員が引き継いで対応できるよう、簡潔な引き継ぎメモとしてまとめてください。
+以下に渡される会話履歴を、人間の相談員が引き継いで対応できるよう、事実に徹した記録（議事録）としてまとめてください。
 
-【書き方のルール】
-- 日本語、敬体、300〜500文字程度のプレーンテキストのみ（JSON不要、見出しや箇条書きは可）
-- 危機的な発言（希死念慮・自傷・身体症状など）が会話に含まれていた場合は、必ず冒頭に「⚠️ 要注意」として明記する
-- 相手が実際に話した内容（テーマ・気持ちの動き・語られた出来事）を、事実ベースで要約する
+【構成】
+①相談内容の概要
+　相手が実際に話した内容（テーマ・語られた出来事）を、事実ベースで記述する
+
+②確認が必要な点（該当する場合のみ）
+　希死念慮・自傷・身体症状など、危機に関わる発言があった場合、またはそれについて確認を試みたが回答が得られなかった場合は、事実としてそのまま記録する
+　（例：「〜という発言があった」「〜について確認を試みたが、回答は得られていない」）
+　該当する内容がなければ、この項目自体を書かない
+
+【最重要チェック：本人がこの文章を読んでも傷つかないか】
+この記録は、本人の目に触れる可能性があるものとして書いてください。書き終える前に、必ず次を自問してください：
+「もし相談者本人がこの文章を読んだら、決めつけられた・傷ついたと感じないか？」
+少しでもその可能性がある表現は、事実の記述だけに書き直してください。
+
+【書き方のルール（厳守）】
+- 日本語、敬体、300〜500文字程度のプレーンテキストのみ（JSON不要、見出しは可）
+- 事実の記録に徹する。相談者の状態についての憶測や解釈（「まだ多くを語れる状態ではない様子」等）を書かない
+- 相談者の人物像・性格・傾向を決めつける表現を書かない。「〜しやすい方」「〜な方なので」「〜な性格」「〜な傾向がある」のように、一般化・レッテル貼りをする言い回しは禁止（例：「自己否定の言葉が出やすい方なので」は禁止。かわりに「自己否定的な発言が複数回あった」のように、その場で実際に起きたことだけを記述する）
+- 過去の出来事と現在の状態を、AIが勝手に因果でつなげない（「〜という経験が、現在の〜につながっている可能性がある」等は禁止）。本人が話した過去の出来事と、本人が話した今の気持ちは、それぞれ別々の事実として、つなげずに並べて書く
+- 相談員への助言・推奨事項（「〜していただくと良い」「丁寧に確認を」「急がず、否定せず」等）は一切書かない。次にどう関わるかは、相談員自身が判断すること
 - 診断名を書かない。原因を推測しない。断定的な言い切りを避ける（「〜と感じている様子」「〜という話があった」等の書き方にする）
-- 相談員が次にどう関わればよいか分かるよう、最後に一言、引き継ぎのポイントを添えてよい`;
+- 「⚠️」のような強い記号や、過度に緊迫感をあおる見出しは使わない。重要な情報も、他の内容と同じ落ち着いたトーンで淡々と記載する
+- 「引き継ぎのポイント」のような、まとめのアドバイス欄は作らない。①②以外の項目を追加しない`;
 
 // ── System prompt（愛泉の杜OS憲章 v1.3 準拠）───────────────────────────────
 const SYSTEM_PROMPT = `あなたは「愛泉の杜」の心のカウンセラーAIです。
@@ -706,6 +738,8 @@ const input     = document.getElementById('input');
 const sendBtn   = document.getElementById('send-btn');
 const resetBtn  = document.getElementById('reset-btn');
 const shareBtn  = document.getElementById('share-btn');
+const menuBtn   = document.getElementById('menu-btn');
+const menuDropdown = document.getElementById('menu-dropdown');
 const modalRoot = document.getElementById('modal-root');
 
 // ── Init ───────────────────────────────────────────────────────────────────
@@ -923,7 +957,7 @@ async function send() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
+        max_tokens: 1600,
         system: SYSTEM_PROMPT,
         messages: history,
       })
@@ -933,7 +967,15 @@ async function send() {
     hideTyping();
 
     const raw = data.content?.[0]?.text || '';
-    const { message, quickReplies } = parseAiResponse(raw);
+    let { message, quickReplies } = parseAiResponse(raw);
+
+    // 文字数上限に達して、文章が不自然な位置で途切れた場合の救済
+    if (data.stop_reason === 'max_tokens') {
+      message = message.replace(/[、,]?\s*$/, '');
+      message += '\n\n……ここで、少し言葉を整理させてください。続きを、もう一度お聞かせいただけますか？';
+      quickReplies = [];
+    }
+
     addMessage('ai', message);
     history.push({ role: 'assistant', content: message });
     renderAiQuickReplies(quickReplies);
@@ -959,7 +1001,19 @@ input.addEventListener('input', () => {
 
 sendBtn.addEventListener('click', send);
 resetBtn.addEventListener('click', () => {
+  closeMenu();
   if (confirm('会話をリセットしますか？')) init();
+});
+
+// ── ヘッダーメニューの開閉 ────────────────────────────────────────────────────
+function closeMenu() { menuDropdown.classList.remove('open'); }
+function toggleMenu(e) {
+  e.stopPropagation();
+  menuDropdown.classList.toggle('open');
+}
+menuBtn.addEventListener('click', toggleMenu);
+document.addEventListener('click', (e) => {
+  if (!menuDropdown.contains(e.target) && e.target !== menuBtn) closeMenu();
 });
 
 // ── 相談員への共有 ──────────────────────────────────────────────────────────
@@ -1054,6 +1108,8 @@ function openSummaryModal(summaryText) {
 }
 
 async function shareToCounselor() {
+  closeMenu();
+
   // 実質的な会話がまだない場合（挨拶メッセージのみ）は共有しない
   if (history.length < 2) {
     alert('まだ共有できる内容がありません。少しお話しした後で、もう一度お試しください。');
