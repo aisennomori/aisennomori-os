@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>その他 | Spirit Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Zen+Old+Mincho:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080b18;
+  --gold:     #c9a84c;
+  --gold-l:   #e8c96a;
+  --cream:    #f5eed8;
+  --white:    #fff8f0;
+  --text-dim: rgba(245,238,216,0.55);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--cream); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+#canvas-stars { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.aurora-blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12; animation: auroraMove var(--dur,20s) ease-in-out infinite alternate; }
+.aurora-blob:nth-child(1) { width:600px;height:400px;background:var(--gold);top:-10%;left:-10%;--dur:18s; }
+.aurora-blob:nth-child(2) { width:500px;height:500px;background:#e8638a;bottom:-15%;right:-10%;--dur:22s; }
+.aurora-blob:nth-child(3) { width:400px;height:300px;background:var(--gold-l);top:40%;left:30%;--dur:15s; }
+@keyframes auroraMove { from { transform: translate(0,0) scale(1); } to { transform: translate(40px,30px) scale(1.15); } }
+
+.wrapper { position: relative; z-index: 1; max-width: 860px; margin: 0 auto; padding: 0 1.2rem 6rem; }
+
+.back-btn { display: inline-flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 0; font-size: 0.78rem; color: var(--gold); text-decoration: none; letter-spacing: 0.1em; font-weight: 700; opacity: 0.8; transition: opacity 0.2s; }
+.back-btn:hover { opacity: 1; }
+
+.hero { text-align: center; padding: 3rem 1rem 2.5rem; position: relative; }
+.hero-orb { width: 90px; height: 90px; background: radial-gradient(circle at 38% 38%, #fff8e0, #e8c060 40%, #9a7020); border-radius: 50%; margin: 0 auto 1.2rem; box-shadow: 0 0 30px rgba(232,200,60,0.5), 0 0 60px rgba(232,200,60,0.25), 0 0 120px rgba(232,200,60,0.1); animation: moonGlow 4s ease-in-out infinite; position: relative; }
+.hero-orb::after { content: ''; position: absolute; inset: -3px; border-radius: 50%; border: 1px solid rgba(232,200,60,0.3); animation: orbRing 4s ease-in-out infinite; }
+@keyframes moonGlow { 0%,100% { box-shadow: 0 0 30px rgba(232,200,60,0.5),0 0 60px rgba(232,200,60,0.25); } 50% { box-shadow: 0 0 50px rgba(232,200,60,0.7),0 0 100px rgba(232,200,60,0.4); } }
+@keyframes orbRing { 0%,100% { transform: scale(1); opacity:0.5; } 50% { transform: scale(1.08); opacity:1; } }
+.hero-brand { font-family: 'Cinzel Decorative', cursive; font-size: clamp(0.85rem, 2.5vw, 1.1rem); color: var(--gold-l); letter-spacing: 0.25em; text-shadow: 0 0 30px rgba(201,168,76,0.6); margin-bottom: 0.5rem; animation: fadeInDown 1s ease both; }
+.hero-title { font-family: 'Zen Old Mincho', serif; font-size: clamp(1.8rem, 6vw, 2.8rem); font-weight: 900; color: var(--white); letter-spacing: 0.1em; line-height: 1.2; margin-bottom: 0.8rem; animation: fadeInDown 1s 0.15s ease both; text-shadow: 0 2px 30px rgba(201,168,76,0.3); }
+.hero-sub { font-family: 'Crimson Text', serif; font-style: italic; font-size: clamp(0.85rem, 1.8vw, 1rem); color: var(--text-dim); letter-spacing: 0.15em; animation: fadeInDown 1s 0.3s ease both; }
+@keyframes fadeInDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+
+.divider { display: flex; align-items: center; gap: 1rem; margin: 2rem 0 1.5rem; color: rgba(201,168,76,0.4); font-size: 0.7rem; letter-spacing: 0.4em; }
+.divider::before, .divider::after { content:''; flex:1; height:1px; background: linear-gradient(90deg, transparent, rgba(201,168,76,0.35), transparent); }
+.section-title { font-family: 'Zen Old Mincho', serif; font-size: 0.8rem; color: var(--gold); letter-spacing: 0.3em; text-align: center; margin-bottom: 1.5rem; }
+
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; margin-bottom: 3rem; }
+.tool-card { background: linear-gradient(145deg, rgba(15,26,53,0.9), rgba(8,11,24,0.95)); border: 1px solid rgba(201,168,76,0.2); border-radius: 20px; padding: 1.8rem 1.5rem; text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: 0.8rem; position: relative; overflow: hidden; transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), border-color 0.3s, box-shadow 0.3s; cursor: pointer; animation: cardFadeIn 0.7s ease both; }
+.tool-card:nth-child(1) { animation-delay: 0.1s; }
+.tool-card:nth-child(2) { animation-delay: 0.2s; }
+.tool-card:nth-child(3) { animation-delay: 0.3s; }
+@keyframes cardFadeIn { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+.tool-card::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.07) 0%, transparent 60%); opacity:0; transition: opacity 0.3s; }
+.tool-card:hover { transform: translateY(-6px) scale(1.01); border-color: rgba(201,168,76,0.5); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(201,168,76,0.1); }
+.tool-card:hover::before { opacity:1; }
+.tool-card::after { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: var(--card-accent, linear-gradient(90deg, transparent, var(--gold), transparent)); opacity:0.6; }
+.tool-card.sukuyo { --card-accent: linear-gradient(90deg, transparent, #c9a84c, #e8d878, transparent); }
+.tool-card.talent { --card-accent: linear-gradient(90deg, transparent, #e8638a, #e8b85a, transparent); }
+
+.card-icon { font-size: 2.8rem; line-height: 1; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3)); }
+.card-badge { display: inline-block; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.15em; padding: 0.2rem 0.7rem; border-radius: 20px; align-self: flex-start; background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.4); color: var(--gold-l); }
+.card-title { font-family: 'Zen Old Mincho', serif; font-size: clamp(1.1rem, 2.5vw, 1.3rem); font-weight: 700; color: var(--cream); line-height: 1.4; }
+.card-title-en { font-family: 'Crimson Text', serif; font-style: italic; font-size: 0.82rem; color: var(--gold-l); letter-spacing: 0.12em; margin-top: -0.3rem; }
+.card-desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.9; flex: 1; }
+.card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.3rem; }
+.tag { font-size: 0.68rem; padding: 0.15rem 0.55rem; border-radius: 10px; background: rgba(255,255,255,0.05); color: var(--text-dim); border: 1px solid rgba(255,255,255,0.08); }
+.card-arrow { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--gold-l); font-weight: 700; letter-spacing: 0.1em; margin-top: 0.5rem; transition: gap 0.3s; }
+.tool-card:hover .card-arrow { gap: 0.7rem; }
+
+.footer { text-align: center; padding: 2rem 1rem; border-top: 1px solid rgba(201,168,76,0.1); }
+.footer-brand { font-family: 'Cinzel Decorative', cursive; font-size: 0.9rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 0.4rem; }
+.footer-copy { font-size: 0.72rem; color: var(--text-dim); letter-spacing: 0.1em; }
+.footer-back { margin-top: 1rem; }
+.footer-back a { font-size: 0.75rem; color: var(--gold); text-decoration: none; letter-spacing: 0.1em; }
+.footer-back a:hover { opacity: 0.8; }
+</style>
+</head>
+<body>
+
+<div class="aurora"><div class="aurora-blob"></div><div class="aurora-blob"></div><div class="aurora-blob"></div></div>
+<canvas id="canvas-stars"></canvas>
+
+<div class="wrapper">
+
+  <a class="back-btn" href="../../index.html">← トップメニューへ戻る</a>
+
+  <div class="hero">
+    <div class="hero-orb"></div>
+    <div class="hero-brand">✦ Other Tools ✦</div>
+    <div class="hero-title">その他</div>
+    <div class="hero-sub">〜 宿曜術・数秘術で、本質を読み解く 〜</div>
+  </div>
+
+  <div class="divider">✦ TOOLS ✦</div>
+  <div class="section-title">ツールを選んでください</div>
+
+  <div class="tools-grid">
+
+    <a class="tool-card sukuyo" href="sukuyo_individual.html">
+      <div class="card-icon">✨</div>
+      <div class="card-badge">✦ 公開中</div>
+      <div class="card-title">宿曜個人鑑定</div>
+      <div class="card-title-en">Sukuyo Individual Reading</div>
+      <div class="card-desc">
+        生年月日から本命宿・吉宿四種を算出。今日の運勢と今後30日間の運勢カレンダーも表示します。
+      </div>
+      <div class="card-tags">
+        <span class="tag">🌙 宿曜術</span>
+        <span class="tag">💫 本命宿</span>
+        <span class="tag">📅 運勢カレンダー</span>
+      </div>
+      <div class="card-arrow">ツールを開く →</div>
+    </a>
+
+    <a class="tool-card sukuyo" href="sukuyo_compatibility.html">
+      <div class="card-icon">🌙</div>
+      <div class="card-badge">✦ 公開中</div>
+      <div class="card-title">宿曜相性鑑定</div>
+      <div class="card-title-en">Sukuyo Compatibility</div>
+      <div class="card-desc">
+        お二人の生年月日から27宿を算出。宿曜術で「命・業・胎・栄・親・友・衰・安・壊・危・成」の相性を鑑定します。
+      </div>
+      <div class="card-tags">
+        <span class="tag">🌙 宿曜術</span>
+        <span class="tag">💫 27宿</span>
+        <span class="tag">💕 相性</span>
+      </div>
+      <div class="card-arrow">ツールを開く →</div>
+    </a>
+
+    <a class="tool-card talent" href="talent_number.html">
+      <div class="card-icon">✨</div>
+      <div class="card-badge">✦ 公開中</div>
+      <div class="card-title">才能数診断</div>
+      <div class="card-title-en">Talent Number</div>
+      <div class="card-desc">
+        生年月日から才能数（1〜9・11・22・33）を算出。あなたの才能・お金・恋愛のアファメーションを導き出します。
+      </div>
+      <div class="card-tags">
+        <span class="tag">🔢 数秘術</span>
+        <span class="tag">💫 マスターナンバー</span>
+        <span class="tag">2026年版</span>
+      </div>
+      <div class="card-arrow">ツールを開く →</div>
+    </a>
+
+  </div>
+
+  <div class="footer">
+    <div class="footer-brand">✦ Spirit Tools ✦</div>
+    <div class="footer-copy">あなたの人生が、月の光のように美しく輝きますように</div>
+    <div class="footer-back"><a href="../../index.html">← トップメニューへ戻る</a></div>
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById('canvas-stars');
+const ctx = canvas.getContext('2d');
+let stars = [];
+function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+function initStars() {
+  stars = [];
+  for(let i = 0; i < 160; i++) {
+    stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 1.5 + 0.2, a: Math.random(), da: (Math.random() * 0.008 + 0.002) * (Math.random() > 0.5 ? 1 : -1), speed: Math.random() * 0.15 + 0.03 });
+  }
+}
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  stars.forEach(s => {
+    s.a += s.da;
+    if(s.a <= 0 || s.a >= 1) s.da *= -1;
+    s.y -= s.speed;
+    if(s.y < -2) s.y = canvas.height + 2;
+    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+    ctx.fillStyle = `rgba(255,248,230,${Math.max(0,Math.min(1,s.a))})`; ctx.fill();
+  });
+  requestAnimationFrame(drawStars);
+}
+resize(); initStars(); drawStars();
+window.addEventListener('resize', () => { resize(); initStars(); });
+</script>
+</body>
+</html>
