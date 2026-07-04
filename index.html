@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spirit Tools | 魂のツール集</title>
+<title>愛泉の杜 | 安心して、本来の自分へ還る場所</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Zen+Old+Mincho:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -316,52 +316,128 @@ body {
 .tool-card:hover .card-arrow { gap: 0.7rem; }
 .tool-card.coming .card-arrow { color: var(--text-dim); }
 
-/* ===== HOW TO ADD ===== */
-.howto-section {
-  background: linear-gradient(135deg, rgba(15,26,53,0.8), rgba(8,11,24,0.9));
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: 16px;
-  padding: 1.8rem;
-  margin-bottom: 2rem;
-}
-.howto-section-title {
-  font-family: 'Zen Old Mincho', serif;
-  font-size: 0.9rem;
-  color: var(--gold-l);
-  letter-spacing: 0.15em;
-  margin-bottom: 1.2rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.steps {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-.step {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  font-size: 0.83rem;
+/* ===== INTRO TEXT ===== */
+.intro-desc {
+  max-width: 620px;
+  margin: 0 auto 1rem;
+  text-align: center;
+  font-size: 0.88rem;
+  line-height: 2.1;
   color: var(--text-dim);
-  line-height: 1.8;
 }
-.step-num {
-  min-width: 26px;
-  height: 26px;
-  background: linear-gradient(135deg, var(--gold-d), var(--gold));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.72rem;
+
+/* ===== CATEGORY BLOCK ===== */
+.category-block {
+  margin-bottom: 1.5rem;
+}
+.category-header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+.category-icon {
+  font-size: 2.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+  margin-bottom: 0.4rem;
+}
+.category-name {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1rem;
+  color: var(--gold-l);
+  letter-spacing: 0.2em;
+}
+
+.intro-card {
+  background: linear-gradient(145deg, rgba(15,26,53,0.9), rgba(8,11,24,0.95));
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 20px;
+  padding: 2rem 1.8rem;
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform 0.35s cubic-bezier(.22,.68,0,1.2), border-color 0.3s, box-shadow 0.3s;
+}
+.intro-card::after {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  background: var(--card-accent, linear-gradient(90deg, transparent, var(--gold), transparent));
+  opacity:0.6;
+}
+.intro-card.live {
+  cursor: pointer;
+  --card-accent: linear-gradient(90deg, transparent, #d4608a, #c9a84c, transparent);
+}
+.intro-card.live:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(212,96,138,0.5);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(212,96,138,0.15);
+}
+.intro-card.pending {
+  --card-accent: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+}
+
+.intro-item-title {
+  font-family: 'Zen Old Mincho', serif;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--bg);
-  flex-shrink: 0;
-  margin-top: 0.1rem;
+  color: var(--cream);
+  margin-bottom: 0.6rem;
 }
-.step strong { color: var(--cream); }
+.intro-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(245,238,216,0.5);
+}
+.intro-card.live .intro-badge {
+  background: rgba(212,96,138,0.15);
+  border: 1px solid rgba(212,96,138,0.4);
+  color: var(--pink-l);
+}
+.intro-card-desc {
+  font-size: 0.85rem;
+  line-height: 1.95;
+  color: var(--text-dim);
+}
+.intro-card-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--pink-l);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-top: 1rem;
+  transition: gap 0.3s;
+}
+.intro-card.live:hover .intro-card-arrow { gap: 0.7rem; }
+
+/* ===== CLOSING MESSAGE ===== */
+.closing-section {
+  text-align: center;
+  padding: 1rem 1rem 0;
+  margin-bottom: 1rem;
+}
+.closing-text {
+  max-width: 560px;
+  margin: 0 auto;
+  font-size: 0.85rem;
+  line-height: 2.2;
+  color: var(--text-dim);
+}
 
 /* ===== FOOTER ===== */
 .footer {
@@ -400,126 +476,85 @@ body {
   <!-- Hero -->
   <div class="hero">
     <div class="hero-orb"></div>
-    <div class="hero-brand">✦ Spirit Tools ✦</div>
-    <div class="hero-title">魂のツール集</div>
-    <div class="hero-sub">〜 あなたの本質を知り、人生を輝かせるツール 〜</div>
+    <div class="hero-brand">✦ Aisennomori ✦</div>
+    <div class="hero-title">愛泉の杜</div>
+    <div class="hero-sub">安心して、本来の自分へ還る場所。</div>
   </div>
 
-  <div class="divider">✦ TOOLS ✦</div>
-  <div class="section-title">ツールを選んでください</div>
+  <p class="intro-desc">
+    愛泉の杜では、一つひとつの対話やツールを大切に育てながら、<br>
+    少しずつ皆さまへお届けしています。
+  </p>
 
-  <!-- Tool Cards -->
-  <div class="tools-grid">
+  <div class="divider">✦ ✦ ✦</div>
 
-    <!-- 🌿 カウンセリング -->
-    <a class="tool-card counselor" href="products/ai-counselor/counseling_tools.html">
-      <div class="card-icon">🌿</div>
-      <div class="card-badge badge-live">✦ 2つのツール</div>
-      <div class="card-title">カウンセリング</div>
-      <div class="card-title-en">Counseling</div>
-      <div class="card-desc">
-        AI版カウンセラー「こころの泉」と、心のブロックパターンを診断するツール集を収録。
-      </div>
-      <div class="card-tags">
-        <span class="tag">🌿 傾聴</span>
-        <span class="tag">🧠 心理</span>
-      </div>
-      <div class="card-arrow">カテゴリを開く →</div>
-    </a>
-
-    <!-- 🔮 オラクルカード -->
-    <a class="tool-card truelove" href="products/card-reading/oracle_tools.html">
-      <div class="card-icon">🔮</div>
-      <div class="card-badge badge-live">✦ 公開中</div>
-      <div class="card-title">オラクルカード</div>
-      <div class="card-title-en">Oracle Cards</div>
-      <div class="card-desc">
-        カードから届く、今のあなたへのメッセージ。真実の愛カードを収録。
-      </div>
-      <div class="card-tags">
-        <span class="tag">🌹 ラブ</span>
-        <span class="tag">💌 カード</span>
-      </div>
-      <div class="card-arrow">カテゴリを開く →</div>
-    </a>
-
-    <!-- 🌙 月読みツール カテゴリカード -->
-    <a class="tool-card moon" href="products/moon-tools/moon_tools.html">
-      <div class="card-icon">🌙</div>
-      <div class="card-badge badge-live">✦ 5つのツール</div>
-      <div class="card-title">月読みツール集</div>
-      <div class="card-title-en">Hawaiian Moon Tools</div>
-      <div class="card-desc">
-        ハワイの月暦をベースにした5つのツールを収録。月読みシート・カレンダー・サイクル・手帖・誕生日診断。
-      </div>
-      <div class="card-tags">
-        <span class="tag">🌺 ハワイアン</span>
-        <span class="tag">🌙 月読み</span>
-        <span class="tag">📅 カレンダー</span>
-        <span class="tag">📓 手帖</span>
-      </div>
-      <div class="card-arrow">カテゴリを開く →</div>
-    </a>
-
-    <!-- ✨ その他 -->
-    <a class="tool-card sukuyo" href="products/card-reading/other_tools.html">
-      <div class="card-icon">✨</div>
-      <div class="card-badge badge-live">✦ 3つのツール</div>
-      <div class="card-title">その他</div>
-      <div class="card-title-en">Other Tools</div>
-      <div class="card-desc">
-        宿曜術・数秘術で本質を読み解く。宿曜個人鑑定・宿曜相性鑑定・才能数診断を収録。
-      </div>
-      <div class="card-tags">
-        <span class="tag">🌙 宿曜術</span>
-        <span class="tag">🔢 数秘術</span>
-      </div>
-      <div class="card-arrow">カテゴリを開く →</div>
-    </a>
-
-    <!-- Coming Soon -->
-    <div class="tool-card coming">
-      <div class="card-icon" style="opacity:0.3">🔮</div>
-      <div class="card-badge badge-coming">準備中</div>
-      <div class="card-title" style="color:var(--text-dim)">Coming Soon</div>
-      <div class="card-title-en" style="color:rgba(201,168,76,0.3)">Next Tool</div>
-      <div class="card-desc">
-        新しいツールを準備中です。<br>お楽しみに…
-      </div>
-      <div class="card-arrow" style="color:var(--text-dim)">準備中</div>
+  <!-- 🌿 カウンセリング -->
+  <div class="category-block">
+    <div class="category-header">
+      <div class="category-icon">🌿</div>
+      <div class="category-name">カウンセリング</div>
     </div>
-
+    <div class="intro-card pending">
+      <div class="intro-item-title">こころの泉</div>
+      <div class="intro-badge">現在育成中</div>
+      <div class="intro-card-desc">
+        愛泉の杜の対話AI「こころの泉」は、安心してご利用いただける対話を目指し、一つひとつ丁寧に育てています。<br><br>
+        公開まで、もうしばらくお待ちください。
+      </div>
+    </div>
   </div>
 
-  <div class="divider">✦ HOW TO ADD ✦</div>
+  <div class="divider">✦ ✦ ✦</div>
 
-  <!-- How to add new tools -->
-  <div class="howto-section">
-    <div class="howto-section-title">📖 新しいツールを追加する方法</div>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div><strong>Claudeに依頼</strong>して新しいHTMLツールを作成・ダウンロード</div>
+  <!-- 🔮 オラクルカード -->
+  <div class="category-block">
+    <div class="category-header">
+      <div class="category-icon">🔮</div>
+      <div class="category-name">オラクルカード</div>
+    </div>
+    <a class="intro-card live" href="products/card-reading/true_love_cards.html">
+      <div class="intro-item-title">真実の愛カード</div>
+      <div class="intro-badge">✦ 公開中</div>
+      <div class="intro-card-desc">
+        今日のあなたへ必要なメッセージを、静かに受け取ってみませんか。
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>GitHubのリポジトリに<strong>新しいHTMLファイルをアップロード</strong></div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>Claudeに<strong>「index.htmlに○○ツールを追加して」</strong>と依頼して更新</div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div>更新した<strong>index.htmlをGitHubにアップロード</strong>して完了</div>
+      <div class="intro-card-arrow">カードを引く →</div>
+    </a>
+  </div>
+
+  <div class="divider">✦ ✦ ✦</div>
+
+  <!-- ✨ その他 -->
+  <div class="category-block">
+    <div class="category-header">
+      <div class="category-icon">✨</div>
+      <div class="category-name">その他</div>
+    </div>
+    <div class="intro-card pending">
+      <div class="intro-item-title">順次公開予定</div>
+      <div class="intro-badge">準備中</div>
+      <div class="intro-card-desc">
+        宿曜鑑定や才能数診断など、愛泉の杜の各種ツールは、準備が整ったものから順次公開していきます。
       </div>
     </div>
+  </div>
+
+  <div class="divider">✦ ✦ ✦</div>
+
+  <!-- 最後に -->
+  <div class="closing-section">
+    <p class="closing-text">
+      愛泉の杜では、完成したものを一度に並べるのではなく、<br>
+      一つひとつを丁寧に育てながら、安心してご利用いただける形で公開しています。<br><br>
+      どうぞ、愛泉の杜の歩みも<br>
+      あたたかく見守っていただけたら嬉しいです。
+    </p>
   </div>
 
   <!-- Footer -->
   <div class="footer">
-    <div class="footer-brand">✦ Spirit Tools ✦</div>
-    <div class="footer-copy">あなたの人生が、月の光のように美しく輝きますように</div>
+    <div class="footer-brand">✦ 愛泉の杜 ✦</div>
+    <div class="footer-copy">安心して、本来の自分へ還る場所でありますように</div>
   </div>
 
 </div>
