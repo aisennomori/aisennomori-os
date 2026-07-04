@@ -68,9 +68,8 @@ AIは次の順番で文書を読みます。
 7. VOICE/
 8. DESIGN/
 9. BRAIN/
-10. KNOWLEDGE/
-11. DIALOGUES/
-12. products/
+10. KNOWLEDGE/（DIALOGUESを含む。対話に関する知識資産として、KNOWLEDGE配下で管理する）
+11. products/
 
 ---
 
@@ -150,14 +149,17 @@ DESIGN
 BRAIN
       │
       ▼
-KNOWLEDGE
-      │
-      ▼
-DIALOGUES
+KNOWLEDGE（DIALOGUESを含む）
       │
       ▼
 PRODUCTS
 ```
+
+---
+
+# 更新履歴（Architecture変更点）
+
+- DIALOGUESは、当初は独立した階層として構想していましたが、「対話そのもの」ではなく「対話に関する知識資産」であるという位置付けに変更したため、KNOWLEDGE配下（KNOWLEDGE/DIALOGUES/）へ統合しました。本文書のArchitecture図・Read Orderは、この実際の構成に合わせて更新しています。
 
 ---
 
