@@ -40,6 +40,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
   }
 
   header {
@@ -265,7 +266,7 @@
   textarea {
     flex: 1;
     font-family: 'Noto Sans JP', sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     padding: 11px 15px;
     border: 1px solid var(--border);
     border-radius: 20px;
@@ -308,6 +309,117 @@
 
   /* ── Header menu (reset / share) ── */
   .header-menu-wrap { position: relative; margin-left: auto; }
+
+  .breathing-btn {
+    background: none;
+    border: 1px solid var(--sage);
+    color: var(--forest-soft);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 14px;
+    cursor: pointer;
+    margin-left: auto;
+    margin-right: 8px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .breathing-btn:hover { background: var(--sage-light); }
+
+  /* ── 静かな時間 ── */
+  .quiet-overlay {
+    position: fixed; inset: 0;
+    background: linear-gradient(160deg, #1c2b23, #0f1a15);
+    display: flex; flex-direction: column;
+    z-index: 200;
+    overflow: hidden;
+  }
+  .quiet-header {
+    text-align: center;
+    flex-shrink: 0;
+    padding: 40px 24px 24px;
+  }
+  .quiet-header-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    color: #d9ecd0;
+    margin-bottom: 6px;
+  }
+  .quiet-header-sub {
+    font-family: 'Noto Serif JP', serif;
+    font-style: italic;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: rgba(238,243,236,0.55);
+  }
+  .quiet-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 24px;
+  }
+  .quiet-card {
+    max-width: 460px; width: 100%;
+    text-align: center;
+    color: #eef3ec;
+    margin: 0 auto;
+  }
+  .quiet-footer {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 20px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  .quiet-close {
+    position: absolute; top: 20px; right: 20px;
+    background: rgba(255,255,255,0.08);
+    border: none; color: #eef3ec;
+    width: 34px; height: 34px; border-radius: 50%;
+    font-size: 16px; cursor: pointer;
+  }
+  .quiet-sound-btn {
+    position: absolute; top: 20px; left: 20px;
+    background: rgba(255,255,255,0.08);
+    border: none; color: #eef3ec;
+    width: 34px; height: 34px; border-radius: 50%;
+    font-size: 15px; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .quiet-sound-btn.playing { background: rgba(124,150,131,0.4); }
+  .quiet-breath-label {
+    font-size: 12px; letter-spacing: 0.15em; color: rgba(238,243,236,0.6);
+    margin-bottom: 24px; min-height: 16px;
+  }
+  .quiet-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 17px; margin-bottom: 24px; letter-spacing: 0.05em;
+    color: #d9ecd0;
+  }
+  .quiet-body {
+    font-size: 14.5px; line-height: 2.2;
+    color: #eef3ec; white-space: pre-wrap;
+    margin-bottom: 12px;
+  }
+  .quiet-next {
+    background: rgba(238,243,236,0.12);
+    border: 1px solid rgba(238,243,236,0.3);
+    color: #eef3ec;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    padding: 10px 28px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quiet-next:hover { background: rgba(238,243,236,0.2); }
+  .quiet-progress {
+    margin-top: 14px;
+    font-size: 11px;
+    color: rgba(238,243,236,0.4);
+    letter-spacing: 0.1em;
+  }
   .menu-btn {
     background: none;
     border: none;
@@ -425,6 +537,7 @@
     <div class="header-sub">愛泉の杜 — 静かに寄り添うサポートAI</div>
   </div>
   <div class="status-dot"></div>
+  <button class="breathing-btn" id="breathing-btn">🌿 静かな時間</button>
   <div class="header-menu-wrap">
     <button class="menu-btn" id="menu-btn" aria-label="メニュー">⋯</button>
     <div class="menu-dropdown" id="menu-dropdown">
@@ -433,6 +546,14 @@
     </div>
   </div>
 </header>
+
+<div id="quiet-root"></div>
+<audio id="quiet-audio" preload="none">
+  <source src="quiet_ambient.mp3" type="audio/mpeg">
+</audio>
+<audio id="quiet-audio-b" preload="none">
+  <source src="quiet_ambient.mp3" type="audio/mpeg">
+</audio>
 
 <div class="notice">
   <strong>ご利用にあたって</strong>
@@ -667,6 +788,13 @@ const SYSTEM_PROMPT = `あなたは「愛泉の杜」の心のカウンセラー
 - その後は、相手から求められた場合や危機的状況を除き、繰り返し案内しない
 - 案内先：よりそいホットライン 0120-279-338 / いのちの電話 0570-064-556 / 該当する専門機関（話の内容に応じて自然に触れる程度でよい）
 
+【「静かな時間」を提案してよい場面】
+このアプリには、「静かな時間」という、自然環境音とともに呼吸を整えられるひとときを体験できる機能がある（画面上部の「🌿 静かな時間」ボタンから、いつでも本人が自分で開ける）。
+- 相手が「強い緊張や不安」を示したときのみ、急かさない範囲で、そっと提案してよい（例文：「もしよければ、1分ほど『静かな時間』をご一緒しませんか。」）
+- 提案するときは、quick_repliesの選択肢に、必ず次の文字列をそのまま1つ含める：["🌿 静かな時間を試す", "今は大丈夫です"] のように
+- 利用するかどうかは、必ず利用者自身が選べるようにする。押し付けない。相手が乗り気でなさそうであれば、それ以上勧めない
+- 危機的な場面（希死念慮・自傷等）では、この提案よりも安全確認・専門機関案内を優先する
+
 【会話を終わらせないために】
 どんな返答も、相手が「あ、もう終わりなのかな」と迷うような、宙ぶらりんな終わり方をしない。必ず次のどちらかで締めくくる：
 - ①静かな問いかけで終える（例：「今日は、どんなことが気になっていますか？」）
@@ -741,6 +869,10 @@ const shareBtn  = document.getElementById('share-btn');
 const menuBtn   = document.getElementById('menu-btn');
 const menuDropdown = document.getElementById('menu-dropdown');
 const modalRoot = document.getElementById('modal-root');
+const quietRoot = document.getElementById('quiet-root');
+const quietAudio = document.getElementById('quiet-audio');
+const quietAudioB = document.getElementById('quiet-audio-b');
+const breathingBtn = document.getElementById('breathing-btn');
 
 // ── Init ───────────────────────────────────────────────────────────────────
 function init() {
@@ -826,6 +958,8 @@ function parseAiResponse(raw) {
 }
 
 // ── Render AI-suggested quick replies (yes/no etc.) + always-on "other" ─────
+const QUIET_TIME_TRIGGER = '🌿 静かな時間を試す';
+
 function renderAiQuickReplies(items) {
   quickWrap.innerHTML = '';
   if (!items || items.length === 0) return;
@@ -833,7 +967,11 @@ function renderAiQuickReplies(items) {
     const btn = document.createElement('button');
     btn.className = 'quick-btn';
     btn.textContent = item;
-    btn.onclick = () => { input.value = item; send(); };
+    if (item === QUIET_TIME_TRIGGER) {
+      btn.onclick = () => { quickWrap.innerHTML = ''; openQuietTime(); };
+    } else {
+      btn.onclick = () => { input.value = item; send(); };
+    }
     quickWrap.appendChild(btn);
   });
   const otherBtn = document.createElement('button');
@@ -1162,6 +1300,200 @@ async function shareToCounselor() {
 }
 
 shareBtn.addEventListener('click', shareToCounselor);
+
+// ── 静かな時間 ────────────────────────────────────────────────────────────
+const QUIET_STAGES = [
+  {
+    title: '',
+    body: 'もしよければ、ほんの一分ほど、静かな時間をご一緒しませんか。\n\n何かを変えようとしなくても大丈夫です。\nただ今ここにいる自分を、やさしく感じてみましょう。'
+  },
+  {
+    title: '🌿 支えを感じる',
+    body: 'まず、足の裏を感じてみます。\n椅子のぬくもり。床の感触。\n\n今、この場所が、静かにあなたを支えています。\n\n何もしなくても、あなたはもう、支えられています。'
+  },
+  {
+    title: '🌿 呼吸を感じる',
+    body: '鼻から、ゆっくり息を吸います。\n無理に深く吸わなくても大丈夫です。\n\nそして、口からゆっくり息を吐きます。\n肩や首の力が少しずつゆるんでいくように。\n\n森の中を流れる静かな川のように、\n呼吸も、心も、ゆっくりと流れていきます。',
+    breathing: true
+  },
+  {
+    title: '🌿 自分に還る',
+    body: '呼吸が落ち着いてきたら、心の中で、そっと自分に伝えてみましょう。\n\n「今のあなたで、大丈夫です。」\n\nその言葉を、無理に信じようとしなくても大丈夫です。\nただ、静かな川にそっと流すような気持ちで、心に届けてみます。'
+  },
+  {
+    title: '🌿 今ここへ戻る',
+    body: 'もう一度、足の裏を感じます。呼吸をひとつ。\n\n静かな川が流れるように、心もゆっくりと流れていきます。\n\nそして、ゆっくり目を開けます。'
+  },
+  {
+    title: '🌿',
+    body: '森の中を流れる川は、急ぐことなく、誰かと比べることもなく、ただ静かに流れています。\n\n私たちも、いつも強くある必要はありません。\n立ち止まる日があっても、揺れる日があっても大丈夫。\n\n今日のこの時間が、あなたにとって、本来の自分へ還る、やさしいひとときとなりますように。'
+  }
+];
+
+const BREATH_LABELS = ['吸って……', '止めて……', '吐いて……', '止めて……'];
+let quietBreathTimer = null;
+
+// ── 環境音：2トラック・クロスフェードループ ──────────────────────────────────
+const QUIET_TARGET_VOLUME = 0.6;
+const CROSSFADE_SEC = 3; // 終わりのこの秒数前からクロスフェードを開始する
+
+let quietTracks = [quietAudio, quietAudioB];
+let quietActiveIndex = 0;   // 現在鳴っている方のindex（0 or 1）
+let quietIsOn = false;      // ユーザーがONにしているかどうか
+let quietCrossfading = false;
+let quietMasterFadeTimer = null;
+
+function activeTrack() { return quietTracks[quietActiveIndex]; }
+function standbyTrack() { return quietTracks[1 - quietActiveIndex]; }
+
+// 全体としての音量（ON/OFFのフェードイン・フェードアウト用）を、今鳴っている方に適用
+function setQuietMasterVolume(target, durationMs, onDone) {
+  if (quietMasterFadeTimer) { clearInterval(quietMasterFadeTimer); quietMasterFadeTimer = null; }
+  const track = activeTrack();
+  const steps = 24;
+  const stepTime = durationMs / steps;
+  const start = track.volume;
+  const delta = (target - start) / steps;
+  let count = 0;
+  quietMasterFadeTimer = setInterval(() => {
+    count++;
+    track.volume = Math.min(1, Math.max(0, start + delta * count));
+    if (count >= steps) {
+      clearInterval(quietMasterFadeTimer);
+      quietMasterFadeTimer = null;
+      track.volume = target;
+      if (onDone) onDone();
+    }
+  }, stepTime);
+}
+
+// 再生中のトラックの終わりが近づいたら、もう一方のトラックへなめらかに引き継ぐ
+function handleQuietTimeUpdate() {
+  if (!quietIsOn || quietCrossfading) return;
+  const track = activeTrack();
+  if (!track.duration || isNaN(track.duration)) return;
+  if (track.currentTime >= track.duration - CROSSFADE_SEC) {
+    quietCrossfading = true;
+    const incoming = standbyTrack();
+    incoming.currentTime = 0;
+    incoming.volume = 0;
+    incoming.play().catch(() => {});
+
+    const steps = 24;
+    const stepTime = (CROSSFADE_SEC * 1000) / steps;
+    let count = 0;
+    const outStart = track.volume;
+    const timer = setInterval(() => {
+      count++;
+      const t = count / steps;
+      track.volume = Math.max(0, outStart * (1 - t));
+      incoming.volume = Math.min(QUIET_TARGET_VOLUME, QUIET_TARGET_VOLUME * t);
+      if (count >= steps) {
+        clearInterval(timer);
+        track.pause();
+        incoming.volume = QUIET_TARGET_VOLUME;
+        quietActiveIndex = 1 - quietActiveIndex;
+        quietCrossfading = false;
+      }
+    }, stepTime);
+  }
+}
+
+quietTracks.forEach(t => t.addEventListener('timeupdate', handleQuietTimeUpdate));
+
+async function playQuietSoundFadeIn() {
+  try {
+    quietIsOn = true;
+    quietActiveIndex = 0;
+    const track = activeTrack();
+    track.currentTime = 0;
+    track.volume = 0;
+    standbyTrack().pause();
+    await track.play();
+    setQuietMasterVolume(QUIET_TARGET_VOLUME, 2500);
+  } catch (e) {
+    quietIsOn = false;
+    console.info('静かな時間：環境音ファイルが見つからないか、再生できませんでした。');
+  }
+}
+
+function stopQuietSoundFadeOut() {
+  quietIsOn = false;
+  if (activeTrack().paused && standbyTrack().paused) return;
+  setQuietMasterVolume(0, 1500, () => {
+    quietTracks.forEach(t => t.pause());
+  });
+}
+
+async function toggleQuietSound() {
+  const btn = document.getElementById('quiet-sound-btn');
+  if (!quietIsOn) {
+    await playQuietSoundFadeIn();
+    if (btn) { btn.textContent = '🔊'; btn.classList.add('playing'); }
+  } else {
+    stopQuietSoundFadeOut();
+    if (btn) { btn.textContent = '🔈'; btn.classList.remove('playing'); }
+  }
+}
+
+function closeQuietTime() {
+  quietRoot.innerHTML = '';
+  if (quietBreathTimer) { clearInterval(quietBreathTimer); quietBreathTimer = null; }
+  stopQuietSoundFadeOut();
+}
+
+function renderQuietStage(index) {
+  if (quietBreathTimer) { clearInterval(quietBreathTimer); quietBreathTimer = null; }
+
+  const stage = QUIET_STAGES[index];
+  const isLast = index === QUIET_STAGES.length - 1;
+  const isPlaying = quietIsOn;
+
+  quietRoot.innerHTML = `
+    <div class="quiet-overlay">
+      <button class="quiet-sound-btn${isPlaying ? ' playing' : ''}" id="quiet-sound-btn">${isPlaying ? '🔊' : '🔈'}</button>
+      <button class="quiet-close" id="quiet-close-btn">✕</button>
+      <div class="quiet-header">
+        <div class="quiet-header-title">🌿 静かな時間</div>
+        <div class="quiet-header-sub">本来の自分へ還るひととき</div>
+      </div>
+      <div class="quiet-content">
+        <div class="quiet-card">
+          <div class="quiet-breath-label" id="quiet-breath-label"></div>
+          ${stage.title ? `<div class="quiet-title">${stage.title}</div>` : ''}
+          <div class="quiet-body">${stage.body}</div>
+        </div>
+      </div>
+      <div class="quiet-footer">
+        <button class="quiet-next" id="quiet-next-btn">${isLast ? '静かに終える' : '次へ　→'}</button>
+        <div class="quiet-progress">${index + 1} / ${QUIET_STAGES.length}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('quiet-close-btn').addEventListener('click', closeQuietTime);
+  document.getElementById('quiet-next-btn').addEventListener('click', () => {
+    if (isLast) { closeQuietTime(); } else { renderQuietStage(index + 1); }
+  });
+  document.getElementById('quiet-sound-btn').addEventListener('click', toggleQuietSound);
+
+  // 呼吸のステージ：4-4-4-4のラベルを自動でめぐらせる
+  if (stage.breathing) {
+    const label = document.getElementById('quiet-breath-label');
+    let i = 0;
+    label.textContent = BREATH_LABELS[0];
+    quietBreathTimer = setInterval(() => {
+      i = (i + 1) % BREATH_LABELS.length;
+      label.textContent = BREATH_LABELS[i];
+    }, 4000);
+  }
+}
+
+function openQuietTime() {
+  closeMenu();
+  renderQuietStage(0);
+}
+
+breathingBtn.addEventListener('click', openQuietTime);
 
 // Start
 init();
