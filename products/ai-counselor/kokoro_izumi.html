@@ -30,6 +30,10 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html, body {
+    height: 100%;
+  }
+
   body {
     font-family: 'Noto Sans JP', sans-serif;
     background:
@@ -37,10 +41,9 @@
       radial-gradient(ellipse at 100% 0%, rgba(124,150,131,0.14), transparent 50%),
       var(--bg);
     color: var(--text-main);
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
+    overflow: hidden;
   }
 
   header {
