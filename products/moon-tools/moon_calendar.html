@@ -52,7 +52,7 @@
   .grid{display:grid;grid-template-columns:repeat(7,1fr);}
 
   .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);
-    padding:4px 2px 5px;min-height:74px;
+    padding:4px 2px 5px;min-height:92px;
     display:flex;flex-direction:column;align-items:center;gap:1px;}
   .cell:nth-child(7n){border-right:none;}
   .cell.empty{background:rgba(0,0,0,.018);}
@@ -71,6 +71,11 @@
   .dname{font-size:.54rem;color:var(--soft);text-align:center;
     white-space:nowrap;overflow:hidden;max-width:100%;}
   .dmark{font-size:.85rem;line-height:1;}
+  .delem{font-size:.72rem;line-height:1.2;margin-top:2px;display:flex;align-items:center;justify-content:space-between;width:100%;padding:0 2px;}
+  .delem .mk{flex:0 0 auto;}
+  .delem .el{flex:0 0 auto;}
+  .dkami{font-size:.5rem;color:var(--soft);font-weight:700;line-height:1.2;
+    white-space:nowrap;overflow:hidden;max-width:100%;letter-spacing:.01em;}
 
   /* 凡例 */
   .leg{display:flex;gap:12px;margin:10px 14px 6px;font-size:.67rem;
@@ -135,6 +140,18 @@
   <span>🟢 食物パワー</span>
   <span>🩵 浄化期</span>
 </div>
+<div class="leg leg2">
+  <span>🌬 風（方向性・意図）</span>
+  <span>🌊 水（浄化・癒し）</span>
+  <span>🌍 土（安定・祖先）</span>
+  <span>🔥 火（変容・情熱）</span>
+</div>
+<div class="leg leg2">
+  <span>Kū神：戦争の神・戦い</span>
+  <span>Kāne神：生命の神、創造</span>
+  <span>Lono神：収穫の神、豊穣</span>
+  <span>Kanaloa神：海の神</span>
+</div>
 
 <button class="pbtn" id="pBtn">📄 PDFとして印刷</button>
 <p class="phint">印刷ダイアログで「PDFに保存」を選ぶとPDF化できます</p>
@@ -175,36 +192,36 @@ const MOON_IMGS = [
 ];
 
 const MD=[null,
-  {n:1, name:'Hilo',         kana:'ヒロ',          icon:'🌑',g:'wax'},
-  {n:2, name:'Hoaka',        kana:'ホアカ',         icon:'🌒',g:'wax'},
-  {n:3, name:'Kū-kahi',      kana:'クーカヒ',       icon:'🌒',g:'wax'},
-  {n:4, name:'Kū-lua',       kana:'クールア',        icon:'🌒',g:'wax'},
-  {n:5, name:'Kū-kolu',      kana:'クーコル',        icon:'🌓',g:'wax'},
-  {n:6, name:'Kū-pau',       kana:'クーパウ',        icon:'🌓',g:'wax'},
-  {n:7, name:'ʻOle-kū-kahi',  kana:'オレ・クー・カヒ',    icon:'🌔',g:'wax'},
-  {n:8, name:'ʻOle-kū-lua',   kana:'オレ・クー・ルア',    icon:'🌔',g:'wax'},
-  {n:9, name:'ʻOle-kū-kolu',  kana:'オレ・クー・コル',    icon:'🌔',g:'wax'},
-  {n:10,name:'ʻOle-pau',      kana:'オレ・パウ',        icon:'🌔',g:'wax'},
-  {n:11,name:'Huna',         kana:'フナ',           icon:'🌔',g:'full'},
-  {n:12,name:'Mōhalu',       kana:'モハル',        icon:'🌕',g:'full'},
-  {n:13,name:'Hua',          kana:'フア',          icon:'🌕',g:'full'},
-  {n:14,name:'Akua',         kana:'アクア',          icon:'🌕',g:'full'},
-  {n:15,name:'Hoku',         kana:'ホク',           icon:'🌕',g:'full'},
-  {n:16,name:'Māhealani',    kana:'マヘアラニ',      icon:'🌕',g:'full'},
-  {n:17,name:'Kulu',         kana:'クル',           icon:'🌖',g:'full'},
-  {n:18,name:'Lāʻau-kū-kahi', kana:'ラーアウ・クー・カヒ',icon:'🌖',g:'full'},
-  {n:19,name:'Lāʻau-kū-lua',  kana:'ラーアウ・クー・ルア',icon:'🌗',g:'full'},
-  {n:20,name:'Lāʻau-pau',     kana:'ラーアウ・パウ',    icon:'🌗',g:'full'},
-  {n:21,name:'ʻOle-kū-kahi',  kana:'オレ・クー・カヒ',    icon:'🌗',g:'wan'},
-  {n:22,name:'ʻOle-kū-lua',   kana:'オレ・クー・ルア',    icon:'🌗',g:'wan'},
-  {n:23,name:'ʻOle-pau',      kana:'オレ・パウ',        icon:'🌘',g:'wan'},
-  {n:24,name:'Kāloa-kū-kahi',kana:'カーロア・クー・カヒ',icon:'🌘',g:'wan'},
-  {n:25,name:'Kāloa-kū-lua', kana:'カーロア・クー・ルア',icon:'🌘',g:'wan'},
-  {n:26,name:'Kāloa-pau',    kana:'カーロア・パウ',    icon:'🌘',g:'wan'},
-  {n:27,name:'Kāne',         kana:'カーネ',          icon:'🌘',g:'wan'},
-  {n:28,name:'Lono',         kana:'ロノ',           icon:'🌑',g:'wan'},
-  {n:29,name:'Mauli',        kana:'マウリ',          icon:'🌑',g:'wan'},
-  {n:30,name:'Muku',         kana:'ムク',           icon:'🌑',g:'wan'},
+  {n:1, name:'Hilo',         kana:'ヒロ',          icon:'🌑',g:'wax', el:'🌬', kami:null},
+  {n:2, name:'Hoaka',        kana:'ホアカ',         icon:'🌒',g:'wax', el:'🌬', kami:'Kū神'},
+  {n:3, name:'Kū-kahi',      kana:'クーカヒ',       icon:'🌒',g:'wax', el:'🌬', kami:'Kū神'},
+  {n:4, name:'Kū-lua',       kana:'クールア',        icon:'🌒',g:'wax', el:'🌬', kami:null},
+  {n:5, name:'Kū-kolu',      kana:'クーコル',        icon:'🌓',g:'wax', el:'🌬', kami:null},
+  {n:6, name:'Kū-pau',       kana:'クーパウ',        icon:'🌓',g:'wax', el:'🌬', kami:null},
+  {n:7, name:'ʻOle-kū-kahi',  kana:'オレ・クー・カヒ',    icon:'🌔',g:'wax', el:'🌬', kami:null},
+  {n:8, name:'ʻOle-kū-lua',   kana:'オレ・クー・ルア',    icon:'🌔',g:'wax', el:'🌬', kami:null},
+  {n:9, name:'ʻOle-kū-kolu',  kana:'オレ・クー・コル',    icon:'🌔',g:'wax', el:'🌬', kami:null},
+  {n:10,name:'ʻOle-pau',      kana:'オレ・パウ',        icon:'🌔',g:'wax', el:'🌬', kami:null},
+  {n:11,name:'Huna',         kana:'フナ',           icon:'🌔',g:'full', el:'🌊', kami:null},
+  {n:12,name:'Mōhalu',       kana:'モハル',        icon:'🌕',g:'full', el:'🌊', kami:'Kāne神'},
+  {n:13,name:'Hua',          kana:'フア',          icon:'🌕',g:'full', el:'🌊', kami:'Lono神'},
+  {n:14,name:'Akua',         kana:'アクア',          icon:'🌕',g:'full', el:'🌊', kami:null},
+  {n:15,name:'Hoku',         kana:'ホク',           icon:'🌕',g:'full', el:'🌊', kami:null},
+  {n:16,name:'Māhealani',    kana:'マヘアラニ',      icon:'🌕',g:'full', el:'🌊', kami:null},
+  {n:17,name:'Kulu',         kana:'クル',           icon:'🌖',g:'full', el:'🌍', kami:null},
+  {n:18,name:'Lāʻau-kū-kahi', kana:'ラーアウ・クー・カヒ',icon:'🌖',g:'full', el:'🌍', kami:null},
+  {n:19,name:'Lāʻau-kū-lua',  kana:'ラーアウ・クー・ルア',icon:'🌗',g:'full', el:'🌍', kami:null},
+  {n:20,name:'Lāʻau-pau',     kana:'ラーアウ・パウ',    icon:'🌗',g:'full', el:'🌍', kami:null},
+  {n:21,name:'ʻOle-kū-kahi',  kana:'オレ・クー・カヒ',    icon:'🌗',g:'wan', el:'🌬', kami:null},
+  {n:22,name:'ʻOle-kū-lua',   kana:'オレ・クー・ルア',    icon:'🌗',g:'wan', el:'🌬', kami:null},
+  {n:23,name:'ʻOle-pau',      kana:'オレ・パウ',        icon:'🌘',g:'wan', el:'🌬', kami:'ｶﾅﾛｱ/ﾛﾉ神'},
+  {n:24,name:'Kāloa-kū-kahi',kana:'カーロア・クー・カヒ',icon:'🌘',g:'wan', el:'🌊', kami:'ｶﾅﾛｱ/ﾛﾉ神'},
+  {n:25,name:'Kāloa-kū-lua', kana:'カーロア・クー・ルア',icon:'🌘',g:'wan', el:'🌊', kami:null},
+  {n:26,name:'Kāloa-pau',    kana:'カーロア・パウ',    icon:'🌘',g:'wan', el:'🌊', kami:null},
+  {n:27,name:'Kāne',         kana:'カーネ',          icon:'🌘',g:'wan', el:'🔥', kami:'Kāne神'},
+  {n:28,name:'Lono',         kana:'ロノ',           icon:'🌑',g:'wan', el:'🔥', kami:'Lono神'},
+  {n:29,name:'Mauli',        kana:'マウリ',          icon:'🌑',g:'wan', el:'🔥', kami:null},
+  {n:30,name:'Muku',         kana:'ムク',           icon:'🌑',g:'wan', el:'🌬', kami:null},
 ];
 
 // ── 天文計算 ─────────────────────────────────────────────────
@@ -451,13 +468,18 @@ function render(year,month){
       nm.className='dname';
       nm.textContent=md.name;
       c.appendChild(nm);
-      // マーカー
+      // マーカー（左）＋元素（右）
       const mk=markerForN(n);
-      if(mk){
-        const mel=document.createElement('div');
-        mel.className='dmark';
-        mel.textContent=mk;
-        c.appendChild(mel);
+      const el=document.createElement('div');
+      el.className='delem';
+      el.innerHTML='<span class="mk">'+(mk?mk:'')+'</span><span class="el">'+md.el+'</span>';
+      c.appendChild(el);
+      // 神様名
+      if(md.kami){
+        const km=document.createElement('div');
+        km.className='dkami';
+        km.textContent=md.kami;
+        c.appendChild(km);
       }
     }
 
