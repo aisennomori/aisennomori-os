@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ハワイアン・ムーン・カレンダー | 愛泉の杜</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
   :root{
@@ -92,11 +93,33 @@
     padding:13px;cursor:pointer;text-align:center;}
   .pbtn:active{opacity:.85;}
   .phint{text-align:center;font-size:.67rem;color:var(--soft);margin:6px 0 24px;}
+  .cap-title{display:none;font-family:var(--fd);font-weight:700;font-size:.95rem;
+    text-align:center;padding:10px 0 8px;color:var(--ink);
+    border-bottom:2px solid var(--line);letter-spacing:.04em;}
   @media print{
     .hdr{background:none;color:var(--ink);border-radius:0;}
     .today-bar,.nav,.leg,.pbtn,.phint{display:none;}
     .cal-wrap{border:none;border-radius:0;margin:0;}
   }
+
+  /* 画像として保存（iOS等） */
+  .ios-modal-overlay{display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.78);z-index:9999;
+    align-items:flex-end;justify-content:center;}
+  .ios-modal-overlay.active{display:flex;}
+  .ios-modal{background:#fff;border-radius:22px 22px 0 0;
+    padding:24px 18px 44px;width:100%;max-width:560px;
+    text-align:center;font-family:var(--fb);}
+  .ios-modal h3{font-family:var(--fd);font-size:1rem;font-weight:700;
+    margin-bottom:14px;color:var(--ink);}
+  .ios-modal img#capturedImg{width:100%;border-radius:12px;
+    border:1px solid var(--line);margin-bottom:14px;}
+  .ios-modal .guide-text{font-size:.82rem;color:var(--soft);
+    line-height:1.75;margin-bottom:18px;}
+  .ios-modal .guide-text strong{color:var(--ink);}
+  .ios-modal-close{width:100%;padding:13px;border-radius:12px;
+    border:1px solid var(--line);background:#F7F1E4;
+    font-family:var(--fb);font-size:.9rem;cursor:pointer;color:var(--ink);}
 </style>
 </head>
 <body>
@@ -118,7 +141,8 @@
   <button class="nbtn" id="nextBtn">→</button>
 </div>
 
-<div class="cal-wrap">
+<div class="cal-wrap" id="sheetInner">
+  <div class="cap-title" id="capTitle">─</div>
   <div class="dow-row">
     <div class="dc s">日</div>
     <div class="dc">月</div><div class="dc">火</div>
@@ -154,7 +178,16 @@
 </div>
 
 <button class="pbtn" id="pBtn">📄 PDFとして印刷</button>
-<p class="phint">印刷ダイアログで「PDFに保存」を選ぶとPDF化できます</p>
+<p class="phint" id="printHint">印刷ダイアログで「PDFに保存」を選ぶとPDF化できます</p>
+
+<div class="ios-modal-overlay" id="iosModal">
+  <div class="ios-modal">
+    <h3>📸 画像を保存してください</h3>
+    <img id="capturedImg" src="" alt="キャプチャ画像">
+    <p class="guide-text">画像を<strong>長押し</strong>して<br>「<strong>写真に追加</strong>」または「<strong>画像を保存</strong>」を選んでください</p>
+    <button class="ios-modal-close" id="iosModalClose">閉じる</button>
+  </div>
+</div>
 
 <script>
 const MOON_IMGS = [
@@ -419,6 +452,7 @@ let cY,cM;
 function render(year,month){
   cY=year; cM=month;
   document.getElementById('navTitle').textContent=`${year}年 ${month}月`;
+  document.getElementById('capTitle').textContent=`${year}年 ${month}月`;
 
   const now=new Date();
   const todayMs=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
@@ -509,7 +543,45 @@ document.getElementById('nextBtn').addEventListener('click',()=>{
   if(m>12){m=1;y++;}
   render(y,m);
 });
-document.getElementById('pBtn').addEventListener('click',()=>window.print());
+document.getElementById('pBtn').addEventListener('click',async function(){
+  if(!isMobileSave()){window.print();return;}
+  const btn=this;
+  const origText=btn.textContent;
+  btn.textContent='生成中...';btn.disabled=true;
+  const capTitle=document.getElementById('capTitle');
+  capTitle.style.display='block';
+  try{
+    const canvas=await html2canvas(document.getElementById('sheetInner'),{
+      scale:2,useCORS:true,allowTaint:true,logging:false,backgroundColor:'#FFFFFF'
+    });
+    document.getElementById('capturedImg').src=canvas.toDataURL('image/png');
+    document.getElementById('iosModal').classList.add('active');
+  }catch(e){
+    alert('キャプチャに失敗しました。\nスクリーンショットで保存してください。');
+  }finally{
+    capTitle.style.display='none';
+    btn.textContent=origText;btn.disabled=false;
+  }
+});
+document.getElementById('iosModalClose').addEventListener('click',function(){
+  document.getElementById('iosModal').classList.remove('active');
+  document.getElementById('capturedImg').src='';
+});
+document.getElementById('iosModal').addEventListener('click',function(e){
+  if(e.target===this){this.classList.remove('active');document.getElementById('capturedImg').src='';}
+});
+
+// ── スマホ判定（iOS／Android共通）─────────────────────────────
+function isMobileSave(){
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)||
+    (navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+}
+(function(){
+  if(isMobileSave()){
+    document.getElementById('pBtn').textContent='📸 画像として保存';
+    document.getElementById('printHint').textContent='画像が表示されます。長押しして写真に保存してください。';
+  }
+})();
 
 // 初期表示
 const _now=new Date();
