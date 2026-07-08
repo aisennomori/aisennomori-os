@@ -170,6 +170,8 @@ Soul Brainへ統合する。
 
 共通のSoul Brainを利用する。
 
+共通のSoul思想を保ちながら、機能の深さ・現れ方は各AIの役割に応じて調整する。
+
 ---
 
 # Development Cycle
