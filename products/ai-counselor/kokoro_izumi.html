@@ -166,7 +166,31 @@
     font-size: 12px;
     color: #5c5747;
     line-height: 1.8;
+    position: relative;
+    transition: opacity 0.25s, max-height 0.25s, margin 0.25s, padding 0.25s;
+    overflow: hidden;
   }
+  .notice.hidden {
+    opacity: 0;
+    max-height: 0;
+    margin: 0 20px;
+    padding: 0 16px;
+    border-left-width: 0;
+    pointer-events: none;
+  }
+  .notice-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-sub);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+  }
+  .notice-close:hover { color: var(--warning); }
   .notice strong {
     color: var(--warning);
     font-size: 12px;
@@ -534,7 +558,8 @@
   <source src="quiet_ambient.mp3" type="audio/mpeg">
 </audio>
 
-<div class="notice">
+<div class="notice" id="notice-banner">
+  <button class="notice-close" id="notice-close-btn" aria-label="閉じる">✕</button>
   <strong>ご利用にあたって</strong>
   ここは傾聴と気づきのための場であり、医療的な診断や治療に代わるものではありません。
   緊急の場合は「よりそいホットライン（0120-279-338）」「いのちの電話（0570-064-556）」または医療機関にご相談ください。
@@ -954,6 +979,13 @@ const sendBtn   = document.getElementById('send-btn');
 const resetBtn  = document.getElementById('reset-btn');
 const shareBtn  = document.getElementById('share-btn');
 const modalRoot = document.getElementById('modal-root');
+const noticeBanner = document.getElementById('notice-banner');
+const noticeCloseBtn = document.getElementById('notice-close-btn');
+
+function hideNotice() {
+  if (noticeBanner) noticeBanner.classList.add('hidden');
+}
+if (noticeCloseBtn) noticeCloseBtn.addEventListener('click', hideNotice);
 const quietRoot = document.getElementById('quiet-root');
 const quietAudio = document.getElementById('quiet-audio');
 const quietAudioB = document.getElementById('quiet-audio-b');
@@ -1141,6 +1173,8 @@ function isMedicalUrgency(text) {
 async function send() {
   const text = input.value.trim();
   if (!text) return;
+
+  hideNotice();
 
   input.value = '';
   input.style.height = 'auto';
