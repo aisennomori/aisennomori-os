@@ -37,7 +37,20 @@ Sprint002（依存型）完了
 
 ---
 
-## INNER PATH（必要な時だけ現れる小径）
+## BRAIN強化（Emotion / Thinking / Decision Tree）
+
+### Added
+
+- Emotionに身体感覚・言葉になる前の体験への理解を追加
+- Thinkingに「理解の6層」を追加
+- Decision Treeに「深掘り可否の判断」を追加
+
+### Note
+
+- 瑠璃講座のAIカウンセラープロンプトとの設計照合を実施
+- 新規Engine追加ではなく既存3Engine（Emotion / Thinking / Decision Tree）の強化を選択
+- 「深掘りできるから深掘りするのではなく、今必要な深さに留まる」という愛泉の杜OSの原則を維持
+- Knowledge → Wisdom → Soulの既存構造を維持
 
 ### Added
 
