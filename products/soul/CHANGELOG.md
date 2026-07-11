@@ -181,7 +181,29 @@ Sprint002（依存型）完了
 ### Note
 
 - 「取り込まないという判断」自体を正式な開発プロセスの成果として記録
-- この判断プロセスを`DOCS/project_operation.md`のWisdom追加手順、`DOCS/DECISIONS.md`のDecision 005として運用ルール化
+- この判断プロセスを`products/soul/OPERATIONS.md`の「Sprintの流れ」、`DOCS/DECISIONS.md`のDecision 005として運用ルール化
+
+---
+
+## 運用ドキュメントの一本化（OPERATIONS.md）
+
+### 背景
+
+- CHANGELOG整理と同様の重複が、運用文書（`products/soul/OPERATIONS.md`と`DOCS/project_operation.md`）でも確認された
+- 内容比較の結果、`OPERATIONS.md`は他ドキュメント（`products/chappy/README.md`）から実際に機能参照されており、実務上の正本として機能していた
+- 一方`project_operation.md`の「Wisdom追加手順」には、Knowledge Intakeで確立した最新ロジック（既存OSとの照合・取り込まない判断・プロダクト個別の反映判断）が先に反映されていた
+
+### 判断
+
+- `OPERATIONS.md`を正式な運用文書として一本化
+- `OPERATIONS.md`の「Sprintの流れ」を、`project_operation.md`の最新ロジックを統合した9段階フローへ更新
+- `DOCS/project_operation.md`は削除
+- `products/soul/CHANGELOG.md`内の`project_operation.md`への参照を`OPERATIONS.md`へ修正
+
+### Note
+
+- ファイルの場所や名称ではなく、実際にどちらが機能し、他から参照されているかを判断基準とした
+- 運用ルールの重複管理を防ぐため、「運用ルールの一本化について」を`OPERATIONS.md`へ明記
 
 ---
 
