@@ -46,7 +46,7 @@
 - Sprint002：完了。`BRAIN/wisdom/dependency.md`（依存型のWisdom）作成済み
 - Sprint003以降（逃避型・自立型・アドラー等）：**未着手**
 
-型ごとのWisdomは、Soul Promptには詳細を書かず「Self Understanding」の原則だけを残し、詳細は`BRAIN/wisdom/*.md`に格納する設計。
+型ごとのWisdomは、Soul Promptには詳細を書かず「Self Understanding」の原則だけを残し、詳細は`BRAIN/wisdom/`配下のWisdomファイル（サブフォルダを含む）に格納する設計。
 
 ---
 

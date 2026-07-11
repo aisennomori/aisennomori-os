@@ -94,7 +94,7 @@ Knowledgeを
 
 成果物
 
-・BRAIN/wisdom/*.md
+・BRAIN/wisdom/ 配下のWisdomファイル（サブフォルダを含む）
 
 ---
 
