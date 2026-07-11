@@ -234,7 +234,7 @@ BRAIN更新のたびに、少なくとも次のプロダクトへの反映要否
 
 ・こころの泉
 
-・チャッピー
+・チャッピー（products/chappy/instructions_published.md）
 
 ・Soul Prompt正式版
 
