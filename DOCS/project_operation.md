@@ -18,28 +18,53 @@ Knowledgeへ原本を保存
 ↓
 
 2.
-Claude CodeがWisdom化
+既存OS（CONSTITUTION・BRAIN・Wisdom・各プロダクト）と照合する
 
 ↓
 
 3.
-BRAIN/wisdomへ保存
+本当に不足している智慧か、
+重複や矛盾がないかを判断する
 
 ↓
 
 4.
-必要ならSoul Promptへ
-原則だけ反映
+取り込まない場合は、
+Knowledgeに留め、
+判断理由を記録して終了する
+
+取り込む場合は、
+Wisdom化する
 
 ↓
 
 5.
-実対話レビュー
+BRAIN/wisdomへ保存
 
 ↓
 
 6.
-Version更新
+影響範囲を調査する
+
+Soul Promptだけでなく、
+各プロダクトについて
+個別に反映要否を判断する
+
+↓
+
+7.
+必要なプロダクトだけに
+反映する
+
+↓
+
+8.
+実対話レビュー
+
+↓
+
+9.
+CHANGELOG等を更新する
 
 ---
 
