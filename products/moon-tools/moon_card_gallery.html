@@ -359,7 +359,7 @@ function cardHTML(rec){
   }
 
   const mediaBlock = rec.hasImage
-    ? `<div class="media-frame"><img src="images/card_${String(rec.day).padStart(2,'0')}.jpg" alt="${escapeHtml(rec.name_en)}の雰囲気" loading="lazy"><div class="ring"></div></div>`
+    ? `<div class="media-frame"><img src="moon_card_images/card_${String(rec.day).padStart(2,'0')}.jpg" alt="${escapeHtml(rec.name_en)}の雰囲気" loading="lazy"><div class="ring"></div></div>`
     : `<div class="media-frame"><div class="media-pending">${pendingImageSVG()}<span>image coming soon</span></div></div>`;
 
   return `
