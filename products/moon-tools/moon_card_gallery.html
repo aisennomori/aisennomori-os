@@ -56,11 +56,14 @@
     padding:2px 4px 14px;
     flex-shrink:0;
   }
-  .brand{
-    font-size:11px;letter-spacing:0.18em;color:var(--ink-soft);
-    text-transform:uppercase;
+  .today-label{
+    font-family:'Shippori Mincho', serif;
+    font-size:13px;letter-spacing:0.03em;color:var(--gold-soft);
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
   }
-  .counter-wrap{display:flex;align-items:center;gap:8px;}
+  .counter-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0;}
   .phase-glyph{
     width:20px;height:20px;border-radius:50%;position:relative;
     overflow:hidden;background:var(--navy-deep);
@@ -77,12 +80,17 @@
     font-size:13px;background:none;border-color:transparent;
   }
   .phase-glyph.emoji-mode::after{display:none;}
-  .counter{
+  .day-select{
     font-family:'Shippori Mincho', serif;
-    font-size:14px;letter-spacing:0.06em;color:var(--gold-soft);
+    font-size:13px;letter-spacing:0.04em;color:var(--gold-soft);
+    background:var(--navy-deep);
+    border:1px solid rgba(212,175,106,0.4);
+    border-radius:7px;
+    padding:3px 6px;
     font-variant-numeric:tabular-nums;
   }
-  .counter b{color:var(--moonlight);font-weight:700;}
+  .day-select:focus{outline:none;border-color:var(--gold);}
+
 
   /* stage: card + arrows */
   .stage{
@@ -386,10 +394,10 @@
 <div class="app">
 
   <div class="topbar">
-    <div class="brand">月読みカード ・ 愛泉の杜</div>
+    <div class="today-label" id="todayLabel"></div>
     <div class="counter-wrap">
       <div class="phase-glyph" id="phaseGlyph"></div>
-      <div class="counter"><b id="dayNow">01</b> / 30</div>
+      <select class="day-select" id="daySelect" aria-label="夜を選択"></select>
     </div>
   </div>
 
@@ -423,7 +431,7 @@ const TOTAL = MOON_DATA.length; // 30
 let current = 0; // index
 
 const track = document.getElementById('cardTrack');
-const dayNowEl = document.getElementById('dayNow');
+const daySelect = document.getElementById('daySelect');
 const dotsEl = document.getElementById('dots');
 const phaseGlyph = document.getElementById('phaseGlyph');
 const prevBtn = document.getElementById('prevBtn');
@@ -615,7 +623,7 @@ function goTo(index, animate = true){
     void track.offsetHeight;
     track.style.transition = '';
   }
-  dayNowEl.textContent = String(current + 1).padStart(2, '0');
+  daySelect.value = String(current + 1);
   updatePhaseGlyph(MOON_DATA[current]);
   updateDots();
   const card = track.children[current];
@@ -657,6 +665,120 @@ dotsEl.addEventListener('click', (e) => {
   if(!dot) return;
   goTo(parseInt(dot.dataset.i, 10));
 });
+
+// ── プルダウン（1〜30夜選択） ──────────────────────────────────
+for(let i = 1; i <= TOTAL; i++){
+  const opt = document.createElement('option');
+  opt.value = String(i);
+  opt.textContent = `第${i}夜`;
+  daySelect.appendChild(opt);
+}
+daySelect.addEventListener('change', () => {
+  goTo(parseInt(daySelect.value, 10) - 1);
+});
+
+// ── 今日の日付・夜番号の表示 ─────────────────────────────────
+// ※ 誕生日検索（birthday_moon_lookup.html）で確立した「新月リストを直接
+//   ブラケット探索する」方式をベースに、先生確定版（CONFIRMED）があれば
+//   そちらを優先する。CONFIRMEDはmoon_calendar.htmlと同じ運用ルールで、
+//   年が変わるごとに先生データが届き次第ここに追記する。
+const D = 86400000;
+
+// キー = 仮版HiloのYYYY-MM／値 = { hilo:確定Hilo, muku:第30夜(次の確定Muku), hasMauli:bool }
+const CONFIRMED = {
+  '2026-03': { hilo:'2026-03-20', muku:'2026-04-17', hasMauli:false },
+  '2026-04': { hilo:'2026-04-18', muku:'2026-05-16', hasMauli:false },
+  '2026-05': { hilo:'2026-05-17', muku:'2026-06-15', hasMauli:true  },
+  '2026-06': { hilo:'2026-06-16', muku:'2026-07-14', hasMauli:false },
+  '2026-07': { hilo:'2026-07-15', muku:'2026-08-12', hasMauli:false },
+  '2026-08': { hilo:'2026-08-13', muku:'2026-09-11', hasMauli:true  },
+  '2026-09': { hilo:'2026-09-12', muku:'2026-10-10', hasMauli:false },
+  '2026-10': { hilo:'2026-10-11', muku:'2026-11-09', hasMauli:true  },
+  '2026-11': { hilo:'2026-11-10', muku:'2026-12-09', hasMauli:true  },
+  '2026-12': { hilo:'2026-12-10', muku:'2027-01-08', hasMauli:true  },
+};
+
+function newMoonJDE(k){
+  const T=k/1236.85,T2=T*T,T3=T2*T,T4=T3*T;
+  const r=Math.PI/180,E=1-0.002516*T-0.0000074*T2;
+  const Mm=((201.5643+385.81693528*k+0.0107582*T2+0.00001238*T3-0.000000058*T4)%360)*r;
+  const Ms=((2.5534+29.10535670*k-0.0000014*T2-0.00000011*T3)%360)*r;
+  const Fm=((160.7108+390.67050284*k-0.0016118*T2-0.00000227*T3)%360)*r;
+  const Og=((124.7746-1.56375588*k+0.0020672*T2+0.00000215*T3)%360)*r;
+  const s=Math.sin,E2=E*E;
+  return 2451550.09766+29.530588861*k+0.00015437*T2-0.000000150*T3+0.00000000073*T4
+    -0.40720*s(Mm)+0.17241*E*s(Ms)+0.01608*s(2*Mm)+0.01039*s(2*Fm)
+    +0.00739*E*s(Mm-Ms)-0.00514*E*s(Mm+Ms)+0.00208*E2*s(2*Ms)
+    -0.00111*s(Mm-2*Fm)-0.00057*s(Mm+2*Fm)+0.00056*E*s(2*Mm+Ms)
+    -0.00042*s(3*Mm)+0.00042*E*s(Ms+2*Fm)+0.00038*E*s(Ms-2*Fm)
+    -0.00024*E*s(2*Mm-Ms)-0.00017*s(Og)-0.00007*s(Mm+2*Ms)
+    +0.00004*s(2*Mm-2*Fm)+0.00004*s(3*Ms)+0.00003*s(Mm+Ms-2*Fm)
+    +0.00003*s(2*Mm+2*Fm)-0.00003*s(Mm+Ms+2*Fm)+0.00003*s(Mm-Ms+2*Fm)
+    -0.00002*s(Mm-Ms-2*Fm)-0.00002*s(3*Mm+Ms)+0.00002*s(4*Mm);
+}
+function kFor(y,m){ return Math.floor((y+(m-0.5)/12-2000)*12.3685); }
+
+const nmCache={};
+function getNM(y){
+  if(nmCache[y]) return nmCache[y];
+  const seen=new Set(), list=[];
+  for(let k=kFor(y,1)-4; k<=kFor(y,12)+4; k++){
+    const jst=new Date((newMoonJDE(k)-2440587.5)*D+9*3600*1000);
+    const ms=Date.UTC(jst.getUTCFullYear(),jst.getUTCMonth(),jst.getUTCDate());
+    if(!seen.has(ms)){ seen.add(ms); list.push(ms); }
+  }
+  return nmCache[y]=list.sort((a,b)=>a-b);
+}
+function nmNear(y){
+  const merged=getNM(y-1).concat(getNM(y),getNM(y+1));
+  const seen=new Set();
+  return merged.filter(ms=>seen.has(ms)?false:seen.add(ms)).sort((a,b)=>a-b);
+}
+
+// 対象日を挟む新月ブラケットを直接探す（バグ修正版。CONFIRMEDがあれば優先上書き）
+function findBracket(target, year){
+  const list=nmNear(year);
+  for(let i=1; i<list.length; i++){
+    const provHilo=list[i-1]+D, provMuku=list[i];
+    if(target<provHilo || target>provMuku) continue;
+    const hd=new Date(provHilo);
+    const key=hd.getUTCFullYear()+'-'+String(hd.getUTCMonth()+1).padStart(2,'0');
+    const ov=CONFIRMED[key];
+    if(ov){
+      const hiloMs=new Date(ov.hilo+'T00:00:00Z').getTime();
+      const mukuMs=new Date(ov.muku+'T00:00:00Z').getTime();
+      if(target<hiloMs || target>mukuMs) continue; // 確定版で範囲がずれた場合は次を探索
+      return { hiloMs, mukuMs, hasMauli: ov.hasMauli };
+    }
+    const hasMauli=Math.round((provMuku-list[i-1])/D)===30;
+    return { hiloMs:provHilo, mukuMs:provMuku, hasMauli };
+  }
+  return null;
+}
+
+function getMoonNight(year,month,day){
+  const target=Date.UTC(year,month-1,day);
+  const cy=findBracket(target,year);
+  if(!cy) return null;
+  const{hiloMs,mukuMs,hasMauli}=cy;
+  if(target===mukuMs) return 30;
+  if(target===mukuMs-D && hasMauli) return 29;
+  const offset=Math.round((target-hiloMs)/D);
+  if(offset>=0 && offset<=27) return offset+1;
+  return null;
+}
+
+(function renderTodayLabel(){
+  const now=new Date();
+  const y=now.getFullYear(), m=now.getMonth()+1, d=now.getDate();
+  const dow=['日','月','火','水','木','金','土'][now.getDay()];
+  const n=getMoonNight(y,m,d);
+  const rec=n ? MOON_DATA[n-1] : null;
+  const todayLabelEl=document.getElementById('todayLabel');
+  todayLabelEl.textContent = rec
+    ? `${y}年${m}月${d}日（${dow}）第${n}夜 ${rec.name_en}`
+    : `${y}年${m}月${d}日（${dow}）`;
+})();
 
 render();
 
