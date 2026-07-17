@@ -72,6 +72,11 @@
     background:var(--gold);
     transform:translateX(var(--dx, 0px));
   }
+  .phase-glyph.emoji-mode{
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;background:none;border-color:transparent;
+  }
+  .phase-glyph.emoji-mode::after{display:none;}
   .counter{
     font-family:'Shippori Mincho', serif;
     font-size:14px;letter-spacing:0.06em;color:var(--gold-soft);
@@ -138,86 +143,125 @@
   .card::-webkit-scrollbar{width:5px;}
   .card::-webkit-scrollbar-thumb{background:rgba(212,175,106,0.3);border-radius:3px;}
 
-  .card-inner{padding:26px 26px 34px;}
+  .card-inner{padding:20px 18px 26px;}
 
-  .media-frame{
-    position:relative;
-    width:100%;
-    aspect-ratio:1/1;
-    border-radius:16px;
-    overflow:hidden;
-    margin-bottom:20px;
+  .card-header{
+    display:flex;align-items:flex-start;gap:12px;
+    margin-bottom:14px;
+  }
+  .header-text{flex:1;min-width:0;}
+
+  .media-thumb{
+    position:relative;flex-shrink:0;
+    width:76px;height:76px;
+    border-radius:14px;overflow:hidden;
+    border:1px solid rgba(212,175,106,0.3);
     background:linear-gradient(135deg,#1c3448,#0c1b28);
-    border:1px solid rgba(212,175,106,0.2);
   }
-  .media-frame img{
-    width:100%;height:100%;object-fit:cover;display:block;
-  }
-  .media-frame .ring{
-    position:absolute;inset:8px;border-radius:12px;
-    border:1px solid rgba(243,239,228,0.15);
-    pointer-events:none;
-  }
+  .media-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
   .media-pending{
     width:100%;height:100%;
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:10px;color:var(--ink-soft);
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink-soft);
     background:
       radial-gradient(circle at 50% 40%, rgba(212,175,106,0.12), transparent 60%),
       linear-gradient(135deg,#1c3448,#0c1b28);
   }
-  .media-pending svg{width:34px;height:34px;opacity:0.75;}
-  .media-pending span{font-size:12px;letter-spacing:0.08em;}
+  .media-pending svg{width:22px;height:22px;opacity:0.7;}
 
   .day-tag{
     display:inline-block;
-    font-size:11px;letter-spacing:0.14em;color:var(--gold);
+    font-size:10.5px;letter-spacing:0.12em;color:var(--gold);
     border:1px solid var(--divider);
-    padding:3px 10px;border-radius:20px;
-    margin-bottom:12px;
+    padding:2px 9px;border-radius:20px;
+    margin-bottom:8px;
   }
 
   .name-en{
     font-family:'Shippori Mincho', serif;
-    font-size:32px;font-weight:700;
+    font-size:23px;font-weight:700;
     color:var(--moonlight);
-    margin:0 0 4px;
-    line-height:1.2;
+    margin:0 0 3px;
+    line-height:1.15;
+  }
+  .name-en .kana{
+    font-family:'Zen Kaku Gothic New', sans-serif;
+    font-size:12px;font-weight:400;
+    color:var(--ink-soft);
+    margin-left:8px;
+    letter-spacing:0.02em;
   }
   .meaning{
-    font-size:15px;color:var(--gold-soft);
-    margin:0 0 10px;
+    font-size:12.5px;color:var(--gold-soft);
+    margin:0 0 5px;
     font-weight:500;
+    line-height:1.4;
   }
   .calendar-note{
-    font-size:12.5px;color:var(--ink-soft);
-    margin:0 0 20px;
+    font-size:11px;color:var(--ink-soft);
+    margin:0;
+    line-height:1.4;
+  }
+  .meta-tags{
+    display:flex;flex-wrap:wrap;gap:6px;
+    margin-top:8px;
+  }
+  .meta-tag{
+    font-size:10px;color:var(--gold-soft);
+    background:rgba(212,175,106,0.1);
+    border:1px solid rgba(212,175,106,0.28);
+    padding:2px 9px;border-radius:20px;
+    white-space:nowrap;
   }
 
   .divider{
     height:1px;
     background:linear-gradient(90deg, var(--divider), transparent 85%);
-    margin:18px 0;
+    margin:14px 0;
   }
 
-  .section{margin-bottom:20px;}
-  .section:last-child{margin-bottom:0;}
-  .section-head{
-    display:flex;align-items:center;gap:8px;
-    margin-bottom:8px;
+  .sections-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:9px;
   }
-  .section-head svg{width:16px;height:16px;color:var(--gold);flex-shrink:0;}
+  .detail-pending{
+    padding:16px 14px;text-align:center;
+    color:var(--ink-soft);font-size:11.5px;line-height:1.7;
+    border:1px dashed rgba(212,175,106,0.32);
+    border-radius:13px;
+  }
+  .section{
+    background:rgba(212,175,106,0.05);
+    border:1px solid rgba(212,175,106,0.16);
+    border-radius:13px;
+    padding:10px 11px;
+  }
+  .section-head{
+    display:flex;align-items:center;gap:5px;
+    margin-bottom:6px;
+  }
+  .section-head svg{width:12.5px;height:12.5px;color:var(--gold);flex-shrink:0;}
   .section-head h3{
-    font-size:12px;letter-spacing:0.12em;
+    font-size:10px;letter-spacing:0.08em;
     color:var(--gold);
     margin:0;font-weight:500;
     text-transform:uppercase;
   }
-  .section p{
-    font-size:13.5px;line-height:1.85;
+  .section-list{
+    list-style:none;margin:0;padding:0;
+  }
+  .section-list li{
+    font-size:10.8px;line-height:1.5;
     color:var(--ink-soft);
-    margin:0;
-    white-space:pre-line;
+    padding-left:9px;position:relative;
+    margin-bottom:3px;
+  }
+  .section-list li:last-child{margin-bottom:0;}
+  .section-list li::before{
+    content:'';position:absolute;left:0;top:0.55em;
+    width:3px;height:3px;border-radius:50%;
+    background:var(--gold);opacity:0.75;
   }
 
   .pending-card{
@@ -296,7 +340,7 @@
 </div>
 
 <script id="moon-data" type="application/json">
-[{"day": 1, "name_en": "Hilo", "meaning": "月の先駆者", "calendar": "古来ハワイ太陰暦　１日目", "action": "独立心が高く自己中心的、想像力豊か　生まれもってのリーダー気質", "trait": "野心が原動力　起業家マインド　冒険心を持って目標を追い求め手に入れる\nクリエイティブで障害を回避して落とし穴を避けることができる　情熱を持って人生を歩む", "health": "幼少期は、感染症　胸　肺　腹部\n成長してからは、頭　目　脚　消化器系\n概ね健康である", "mood": "金色の光が広がる背景。情熱・太陽・王族の象徴。\n右側に柔らかい光の粒が舞っている。", "relationship": "リーダーで子分を従えることを好む\n指示を出して行動を決めたがる\n結婚生活はうまくいきにくい\n相手が妥協してくれるんじゃ無いと衝突する\n受け入れて協力的な人と好ましい", "career": "強い精神力とクリエイティブ知性を刺激する職\n起業家\n最高責任者\nコンサル\n管理職", "color": "黄色\n宇宙の中で日光の意味を持つ\n成功の達成\n勝利\nハワイでは王族の高貴な地位と霊的保護の意味を持つ", "hasImage": true}, {"day": 2, "name_en": "Hoaka", "meaning": "アロハ大使", "calendar": "古来ハワイ太陰暦２日目", "action": "思いやり　礼儀正しい　おもてなしの心　社交的活動　家族や友人を大切にする", "trait": "親切心に溢れている　トラブルや戦いなどを嫌うので直ぐに身を引く\nチャーミングでカリスマ性があり折り合いが上手です　人々に影響を与える力を持っている", "health": "幼少期　熱病　頭痛　吐き気　むかつき\n成長期　不安症　鬱　精神的なストレスで悩まされる傾向　薬物依存にも注意", "mood": "深い海の青。マッコウクジラが泳ぐ神秘的な水中。\n優しさ・献身・深い愛の象徴。", "relationship": "愛情深く従順な配偶者になる\n熱心な親になる\n自分より他人のことを優先してしまう\n思いやり深く同情心を利用されることがある", "career": "豊かな社交性を生かす\nホテル\n旅行\n接客\n広報\n管理職", "color": "アイボリー\nココナッツの花の色\nマッコウ鯨の牙\n牙から彫ったペンダントは霊的な能力開花\nアイボリーの装飾品は伝統的に富やステータスに関連している", "hasImage": true}, {"day": 3, "name_en": "Ku-kahi", "meaning": "ハワイに最初に君臨した神", "calendar": "太陰暦３日目の月", "action": "心底戦士　競争心と人助けの精神　自発的　成功　勝利", "trait": "勝つことに努力を惜しまない　冠を追い続ける\n信念、道徳心がある、家族優先\n仕事、使命が完遂するために取り組む　ブレない", "health": "スタミナ全開、怪我病気の回復が早い、我慢強い\n成長してからは、慢性的な病気にかかったり、運動不足、過度のストレスで重度の障害を患うことがたまにある", "mood": "燃え上がる炎。赤・オレンジの強い光。\n戦士・勝利・情熱の象徴。", "relationship": "異性の心理が分からない\n心の奥深い感情や愛情を表すことが不得意\n結婚した相手には、親の面倒や友人のことも全て面倒見れる", "career": "モチベーションが高い\n行動、エネルギーがある\nリーダー性を発揮できるあらゆる職\n技能訓練、昇給チャンス\nスポーツ、軍隊、政治や企業活動で地位を上げる", "color": "燃え立つ赤\nKu神と霊的に繋がる色\n勇気・勇気・情熱", "hasImage": true}, {"day": 4, "name_en": "Ku-lua", "meaning": "二人で一緒に立つ", "calendar": "太陰暦４日目", "action": "二面性がある　人間的な物質世界と精神性との関係をよく理解している", "trait": "調和、内面の平穏さ、内と外のバランスを大切にする\n矛盾が直ぐに分かり、公平になるように努力を惜しまない\n平等、平和、正義の揺るぎなき提唱者", "health": "首、肩、腕・手、胸、脚の怪我しやすい\n心配性で精神的ストレス、不安、鬱\n成長すると、神経炎、神経痛神経系統の不調に悩まされる", "mood": "正義の女神像（天秤）。\n石像の重厚感と、静かな青白い背景。", "relationship": "長続きする友人関係\n調和の取れた結婚生活\n理性的に思考して衝動を抑え冷静沈着さを保つ能力にかける", "career": "気配り社交性\n機転の早さ\n事務、書記、法律家、営業のプロになる", "color": "ハワイの漁業の神の色\n緋色（ヒイロ）\nこの色をつけた者だけが神に捧げた神殿に近づくことが許される", "hasImage": true}, {"day": 5, "name_en": "Ku-kolu", "meaning": "天と地の支配者", "calendar": "太陰暦５日目", "action": "誠実、開放的、率直　知りたかったことを教えてくれる", "trait": "野心が強く、最高の結果を勝ち取る為に努力を惜しまない\n楽観的で陽気、知人を招いて分かち合う\n人生の局面をうまく抜けられる　打ち勝つ", "health": "正しく食事を摂って、身体、精神、感情のバランスを保つスタイルを維持することにかかっている\n崩れると、高血圧、糖尿病、心臓病、メタボリック障害を引き起こす恐れ", "mood": "黒い月桂冠のシンボル。\n勝利・名誉・王族の血統を示す重厚な黒背景。", "relationship": "忠誠心あり、信頼できる誠実な仲間作り\n愛情と献身に満ちた配偶者となる\n友達との仲も良いので嫉妬されることも", "career": "先進的なことに強い興味を持つ\nテクノロジーの発達に追いついて行くことが喜び\nクリエイティブな仕事、多様性\nコミュニケーション能力\nコンピューター関係の知識を生かした職業", "color": "血の色\n古来ハワイ人が敬意を表す色\n生命力の意味\n王族との血統繋がりを表す色", "hasImage": true}, {"day": 6, "name_en": "Ku-pau", "meaning": "知識は力", "calendar": "古来ハワイ太陰暦６日目", "action": "知識への飽きなき欲求をもち、学んだことを力に変える", "trait": "学び教えて行く教育者、幼い時から個性と態度を確立させる\n正しく教育されると高潔な大人になる\n教えの源", "health": "頭痛やめまい、脳震盪、頭の病気\n顔・目・耳・鼻・喉\n晩年、黄昏時に健忘症など", "mood": "複数の手がパズルを組み立てる写真。\n知識・協働・教育の象徴。\nもう一枚は公園で本を開く写真。", "relationship": "肉体的にも感情的にも幸せな結婚生活\n教育を受けた人との交流を好む\n共通の趣味や共感性の友達と支え合う関係を築く", "career": "教育的技能\n自らの知識能力を生かす職業\nモチベーションが非常に高い\n独立して働く\n学的な資格も追求", "color": "赤い綿模様（しまもよう）\n王族の赤い羽のマントを表す霊的な象徴\n能力開花、大いなる進展、幸運", "hasImage": true}, {"day": 7, "name_en": "Ole-ku-kahi", "meaning": "ALOHAの精神で生きる者", "calendar": "古来ハワイ太陰暦７日目", "action": "性格がよく、おおらかでのんびり\n世俗性を乗り越えて宇宙や高次元と自分との繋がりを大切にする\n浸る思考で過去の成功体験を追想しがち", "trait": "家族優先、日常のありふれた幸せを共有することを好む\nアロハの精神を生きている\n心配事や悩み、愚痴を言わない\n霊的に自制して究極の運命の力を信じている", "health": "健康第一\nノンストレスを送ることが最良と考えているので\n自然治療方法で健康維持を保つ努力を惜しまない\n天候の変化に敏感、喘息、感染症、免疫系等の不調、呼吸器関係", "mood": "霧の森。白い霧が神秘的に漂う。\n高次元・宇宙との繋がりの象徴。", "relationship": "ロマンティストで理想主義者\n配偶者を溺愛\n両親愛\n友人を賞賛", "career": "温かい性格でユーモアのセンス抜群\n笑うことを大切にしている\n情報伝達系\nコミュニケーション能力を使う職\nチームで与えられた仕事を遂行し共通の目標を達成して行く\nチームプレーで成功", "color": "霧のような白\n神々の謎めいた山の領域\n天国の霧\n世俗を乗り越え高次元の自分を神と調和に結びつける", "hasImage": true}, {"day": 8, "name_en": "Ole-ku-lua", "meaning": "現実的に調和させる力を持つ者", "calendar": "古来ハワイ太陰暦８日目", "action": "時に性格が複雑になる\n物事をはっきりと定義する力がある\n善悪の見分けができ両方の良い部分を見つける力がある", "trait": "優れた組織づくりの能力がありビジネスの洞察力に長けている\n願望を達成する為にあらゆる努力を惜しまない\n心を強くすることで達成することができる", "health": "頭・心臓・胸\n頭痛・めまい・ストレス・風邪・インフルエンザ・肺炎・感染症・躁病", "mood": "陰陽マーク（黒と白）。\n調和・バランス・二元性の象徴。", "relationship": "自分自身や配偶者、友人に高水準であることを求める\n多くは要らない\n認めた人だけと長く続く\nお互いの無条件の愛があって分かち合えるパートナー\nサポートと完全な信頼関係が築けるかにかかっている", "career": "正しい、正しくないの判断ができる仕事\n人生を高める為に追い求める傾向\n情熱を燃やす\n倫理的思考\n優れたコミュニケーション能力", "color": "黒と白\n人間が抱える２つの霊的かつ肉体的性質を表す", "hasImage": true}, {"day": 9, "name_en": "Ole-ku-kolu", "meaning": "魂の探索者", "calendar": "古来ハワイ太陰暦9日目", "action": "知性があって、慎み深く、静かに内省\n知識の探求者\n判断や考えはシンプルで古くからの常識を用いる", "trait": "身体、精神、認識思考の力に頼る\n直感的な洞察力の力が強い\nその奥の魂が何を求めているのか\n内面から魂を引き出す\n哲学的、倫理的だけでなく実践的な方法も見出せる", "health": "健康に気を使う\n自分にあったライフスタイル維持を心がける\n不必要な心配事をする傾向あり\n不要なストレスを自ら抱えてしまう\n老年期は・心臓・背骨・胃　高齢になった時に特に出やすいので注意", "mood": "淡い水色の背景に光の輪。\n静けさ・満ちる月・霊的な白の象徴。", "relationship": "意義深く永続的な人間関係を大切にする\n誠実なパートナー、忠実な友人、献身的な親\n結婚にとても向いてるタイプ", "career": "安心、安全\n長期に渡って働けることを大切にしている\n自己啓発できる\n部下ではなく役職を求める\n頭を使って部署をリードできるように成長している\n自由に意見を言える職場", "color": "輝く白\n月が満ちる相\n瞑想中の静かな魂\n輝く白は内面の霊的エネルギーや神聖な繋がり\nより高い自己と結びついている", "hasImage": true}, {"day": 10, "name_en": "Ole-pau", "meaning": "自由になり明るい未来を作る者", "calendar": "古来ハワイ太陰暦　１０日目", "action": "クリエイティブで知識が豊富、将来を見通せる人\n予見の才に恵まれている\n計画を立てる力がある\n変化と常に起こりえる行動に戦略的に前もって充分な用意ができる", "trait": "生まれつき自由人\n型に囚われない思考\nあらゆる状況に柔軟に対応できる力が備わっている\n前向き\n必ず良い未来が待っていると信じている\n目的を一つに絞ると強みになる", "health": "目・背骨・脚・膝・虫歯\n精神的なストレス心配症\n感情的な波\n神経過敏\n発疹", "mood": "青空と草原。\n自由・未来・解放の象徴。", "relationship": "仲の良い誠実な友人を作ると同時に執拗\nない良い意味でしがらみ・独立心があり自分を信じて\nいて自由な精神を持っている\n早い結婚はしない方が良い", "career": "組織作り\n戦略的な計画作成、チーム編成\nインストラクター、指導者\nコーチング\nコンサルティング", "color": "スカイブルー\n天国の青いアーチ\n天国との繋がり\n昼間にどこまでも広がる空\n自由、創造的思考、想像、閃き", "hasImage": true}, {"day": 11, "name_en": "Laʻau-pau", "meaning": "人の本質と付き合う者", "calendar": "古来ハワイ太陰暦　１１日目", "action": "職業や学歴などでは無く、人となりを受け入れる\nお互いの尊敬、誠実さ信頼に基づいて人間関係を築くことを好む\n良い配偶者　素晴らしい親　親友になる", "trait": "組織力、分析術、問題解決と管理能力に恵まれている\nプライドを持っているので潜在意識をフルに発揮できるあらゆる職業、一人で行う作業を好む", "health": "ライトグリーン　レースシダの葉の色\n胃の不具合や消化器系統の治療に使われる\n新たな誕生や再生した健康　希望や楽観主義", "mood": "明るいライトグリーンのシダの葉。\n再生・癒し・自然の生命力を象徴する柔らかな緑。", "relationship": "人となりを受け入れ、尊敬と誠実さで関係を築く\n良い配偶者・親・親友になる", "career": "分析・管理・問題解決に優れる\n一人で集中して行う作業を好む", "color": "ライトグリーン\n再生・健康・希望・楽観主義", "hasImage": true}, {"day": 12, "name_en": "Huna", "meaning": "秘密の守護者たち", "calendar": "古来ハワイ太陰暦　１２日目", "action": "予見、直感的な洞察力、霊的な能力を持ち謎めいた天性を持つ", "trait": "才能豊かで学習熱心で使命と目的意識を持つ\n宇宙の聖なるものと一体化して困難を人生を切り開く\n聖職者（カフナ）の精神を持つ\n人が見えないものを見ることができる　感じることができる", "health": "頭・喉・肺・背骨・脚と足・爪先怪我しやすい\n成人すると、メタボリック系　薬物中毒、アルコール依存\n高齢になると呼吸器、筋肉の衰え　関節炎", "mood": "青いグラデーションの神秘的な背景。\n静かな霊性・直感・月の秘密を象徴する深い青。", "relationship": "敏感で感情的、友情を大切にする\n子供や動物への思いやりが強い\n迷いやすく約束を守れないこともある", "career": "想像力・先進性・創造性・ひらめきを活かす仕事\n未知の謎を探求する分野に向く", "color": "深紫\n清め・任命\n霊的能力の開花　知識　名誉　特異性", "hasImage": true}, {"day": 13, "name_en": "Mohalu", "meaning": "決して枯れない花", "calendar": "古来ハワイ太陰暦　１３日目", "action": "身体的に恵まれた幸運な人\n魅力的で人目を引く\nどこへ行ってもモテる\n憧れ、注意を引く存在", "trait": "変化に敏感\n逆境に弱い一面\n成功のために特別な食べ物や日々の思いやりが必要\n大器晩成型\n社交的、鋭い美的センス\nささやかなことに感謝できる", "health": "天候や季節の変化に敏感\n免疫系統に問題が起きやすい\n風邪、喘息、伝染性ウイルス、アレルギー、皮膚疾患\n脱水症状や呼吸器系の不調\n長期に渡ると精神的影響", "mood": "青い背景に柔らかな光。\n繊細さ・美しさ・花の生命力を象徴する淡い光。", "relationship": "他人の愛情やアドバイスで成長する\n気質の似た人を惹きつける\n批判的になりやすく結婚生活は難しい", "career": "独立心が強くモチベーションが高い\n努力してキャリアを積み起業を目指す\n政治に興味\nリーダー的な仕事に向く", "color": "オパール\n母なる自然 Haumea\n尊敬・愛情・敬意\n特別な個人に贈られる na pua like‘ole", "hasImage": true}, {"day": 14, "name_en": "Hua", "meaning": "生命の種　繁栄への天の祝福", "calendar": "古来ハワイ太陰暦　１４日目", "action": "エネルギッシュで創造性がある\n生産性を生み出す力が高い\n生命への熱意\n人間の活力", "trait": "モチベーションが高く競争心が強い\n驚くようなことを達成する能力\n環境と育成、愛情のサポートが必要\n根を張ると大きく成長し生産性を上げる\n心優しく思いやりがある\n家族を大切にする", "health": "季節ごとのアレルギーやウイルスからの治癒力が高い\n病気にかかりにくい体質\n成長後は胃腸系・生殖器系・腎臓の病気に注意", "mood": "赤褐色の大地。\n生命の根・繁栄・大地の力を象徴する土の色。", "relationship": "強い友情を育む\n長く意義ある人間関係を好む\n愛情と思いやりの家族", "career": "暇を嫌う\n自律性があり勤勉\n監督されるのが苦痛\n製造部門・サービス関連", "color": "赤褐色\n塩・染料・清めの儀式に使われた色\nLonoとの関連", "hasImage": true}, {"day": 15, "name_en": "Akua", "meaning": "神々の集う月", "calendar": "古来ハワイ太陰暦　１５日目", "action": "神聖な使命と意義深い目的を達成するよう霊的に定められた人", "trait": "道徳心があり思いやりがある\n寛大\n純粋な愛を表現する\n人生の局面で愛を選択することで信念を強くし切り開く力\n愛の人", "health": "精神的・感情的・心理的ストレスに影響される\n高齢期：頭部・認知・記憶障害・心臓病に注意", "mood": "星空と月の光。\n神々・霊性・静かな夜のエネルギーを象徴。", "relationship": "家族を最優先\n献身的な配偶者・保護心の強い親\n親しい友人を大切にする", "career": "神々の力を持つ\n創造力・知識\n監視されず努力できる環境\n製造部門・サービス関連", "color": "月の虹\n神々の霊的エネルギー\n幸運と平和\n約束された明るい未来", "hasImage": true}, {"day": 16, "name_en": "Hoku", "meaning": "この日に生まれし者は幸運", "calendar": "古来ハワイ太陰暦　１６日目", "action": "カリスマ性\n活力ある外見で魅力的な人を惹きつける", "trait": "技能と才能\n目標に向かって突き進み高いゴールを達成する\n頂点に達し名声と豊かさを得る潜在力", "health": "幼少期：風邪・インフルエンザ・熱病\n高齢期：呼吸器・関節炎・膝・足首・骨の障害・心臓病", "mood": "銀色の植物。\n月の女神・静けさ・霊的な銀光を象徴。", "relationship": "誠実な真の友\n愛情と信頼の結婚\nロマンティックで理想的に見る傾向", "career": "勤勉・几帳面・高いモチベーション\n多くを学びエキスパートを目指す\n柔軟で独立性が高い\n創造的なキャリアを追求", "color": "銀げるそう\n銀色がかった灰色\n月の女神\n天空の安らぎと絶対的な美", "hasImage": true}, {"day": 17, "name_en": "Mahealani", "meaning": "知識の探求者", "calendar": "古来ハワイ太陰暦　１７日目", "action": "見た目よく魅力的\nカリスマ性\n謎めいた引力で人を惹きつける", "trait": "好奇心と分析能力\n未知の領域を探検し新しい発見をする\n難しい問題を解決しようとする\n空想的な活動が好き\nマルチ才能\n様々なことに興味", "health": "健康第一\n慢性病を避けるよう注意\n高齢期：肥満症・糖尿病・貧血・感染症\n偏った食生活でメタボ傾向", "mood": "真珠の白い光。\n満月の天空・純粋さ・反射する光の象徴。", "relationship": "人付き合い上手\n社交的で礼儀正しい\n家族や友人との集まりを楽しむ\n愛情溢れる配偶者", "career": "戦略的計画・決断力\n管理者やリーダー\n哲学的分野\n組織で働くのがベスト", "color": "真珠の白\n満月の光\n神像の目・装飾品・お守りに使われた", "hasImage": true}, {"day": 18, "name_en": "Kulu", "meaning": "流れに沿って進め", "calendar": "古来ハワイ太陰暦　１８日目", "action": "我慢強い\n進歩的\n実践的\n消極的で受け身", "trait": "一日一日を大切に生きる\n宇宙の流れを信じる\n天空との調和を目指す\n強い信念\n困難を切り抜ける力", "health": "目・腹部・腎臓\n幼少期：季節性の病気・胃腸系\n高齢期：泌尿生殖器・腎臓・循環器", "mood": "白い砂浜と青い海。\n天と地の境界・流れ・変化を象徴。", "relationship": "友人を大切にする\n無私無欲で他人を優先\n感情表現は控えめ\n言葉より行動を見る", "career": "あらゆる職業に向く\n個人的ゴール設定で達成\n変化を受け入れる職場が最適", "color": "白い砂\n死は終わりではなく移行\n変化の象徴", "hasImage": true}, {"day": 19, "name_en": "Laʻau-ku-kahi", "meaning": "骨太　恐れ知らず", "calendar": "古来ハワイ太陰暦　１９日目", "action": "健康・健全に気を使う\n地に足がついている\n土地に愛情\nアウトドア派\n自然との対話", "trait": "土地の管理保全の責任\n環境保護の提唱者\n土地を大事にすれば土地が大事にしてくれる", "health": "丈夫な身体と強い骨\n適度な運動\nストレスを溜めない\n日光と新鮮な空気が最大の治療薬", "mood": "赤い岩山の大地。\n力強さ・大地の根源・自然の雄大さを象徴。", "relationship": "共に成長し続ける深い愛\n配偶者・友と深い愛情を育む", "career": "勤勉・独立性・実行力\n環境問題・研究・分析・調査\nデータ管理・専門技術\nプロセスを大切にする", "color": "ダークブラウン\n大地・肥沃な土壌\n母なる大地 Papa\n力強さ・復元力・安定性・繁栄", "hasImage": true}, {"day": 20, "name_en": "Laʻau-ku-lua", "meaning": "困った人を助ける慈悲深い人", "calendar": "古来ハワイ太陰暦　２０日目", "action": "地に足がつき実行力がある\n機知に富む\n家族優先\n自律的", "trait": "心と精神から人を大切にする\n寛大で必要な人に手を差し伸べる\n理性と感情のバランスが上手\n落ち着きがある\n極端を避ける\n自然を好む\n農業・狩猟・収穫を楽しむ\n土地を大切に思う", "health": "幼少期：お腹が敏感・むかつき\n成長後：吐き気・胸焼け・胃・消化器系の病気", "mood": "緑の森と光。\n癒し・慈悲・自然との調和を象徴。", "relationship": "親切・思いやり・陽気\n配偶者や友人に気を配る\n共通の趣味\n相互サポート\n共に向上する関係", "career": "状況分析と必要な行動\n救済・健康・安全・福祉・介護\nあなたの行動が他者にインスピレーションを与える", "color": "緑\n植物の葉\n薬草治癒の準備に使う", "hasImage": true}, {"day": 21, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 22, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 23, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 24, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 25, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 26, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 27, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 28, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 29, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}, {"day": 30, "name_en": null, "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false}]
+[{"day": 1, "name_en": "Hilo", "meaning": "月の先駆者", "calendar": "古来ハワイ太陰暦　１日目", "action": "独立心が高く自己中心的、想像力豊か　生まれもってのリーダー気質", "trait": "野心が原動力　起業家マインド　冒険心を持って目標を追い求め手に入れる\nクリエイティブで障害を回避して落とし穴を避けることができる　情熱を持って人生を歩む", "health": "幼少期は、感染症　胸　肺　腹部\n成長してからは、頭　目　脚　消化器系\n概ね健康である", "mood": "金色の光が広がる背景。情熱・太陽・王族の象徴。\n右側に柔らかい光の粒が舞っている。", "relationship": "リーダーで子分を従えることを好む\n指示を出して行動を決めたがる\n結婚生活はうまくいきにくい\n相手が妥協してくれるんじゃ無いと衝突する\n受け入れて協力的な人と好ましい", "career": "強い精神力とクリエイティブ知性を刺激する職\n起業家\n最高責任者\nコンサル\n管理職", "color": "黄色\n宇宙の中で日光の意味を持つ\n成功の達成\n勝利\nハワイでは王族の高貴な地位と霊的保護の意味を持つ", "hasImage": true, "kana": "ヒロ", "phase_icon": "🌑", "element": "🌬", "kami": null}, {"day": 2, "name_en": "Hoaka", "meaning": "アロハ大使", "calendar": "古来ハワイ太陰暦２日目", "action": "思いやり　礼儀正しい　おもてなしの心　社交的活動　家族や友人を大切にする", "trait": "親切心に溢れている　トラブルや戦いなどを嫌うので直ぐに身を引く\nチャーミングでカリスマ性があり折り合いが上手です　人々に影響を与える力を持っている", "health": "幼少期　熱病　頭痛　吐き気　むかつき\n成長期　不安症　鬱　精神的なストレスで悩まされる傾向　薬物依存にも注意", "mood": "深い海の青。マッコウクジラが泳ぐ神秘的な水中。\n優しさ・献身・深い愛の象徴。", "relationship": "愛情深く従順な配偶者になる\n熱心な親になる\n自分より他人のことを優先してしまう\n思いやり深く同情心を利用されることがある", "career": "豊かな社交性を生かす\nホテル\n旅行\n接客\n広報\n管理職", "color": "アイボリー\nココナッツの花の色\nマッコウ鯨の牙\n牙から彫ったペンダントは霊的な能力開花\nアイボリーの装飾品は伝統的に富やステータスに関連している", "hasImage": true, "kana": "ホアカ", "phase_icon": "🌒", "element": "🌬", "kami": "Kū神"}, {"day": 3, "name_en": "Kū-kahi", "meaning": "ハワイに最初に君臨した神", "calendar": "太陰暦３日目の月", "action": "心底戦士　競争心と人助けの精神　自発的　成功　勝利", "trait": "勝つことに努力を惜しまない　冠を追い続ける\n信念、道徳心がある、家族優先\n仕事、使命が完遂するために取り組む　ブレない", "health": "スタミナ全開、怪我病気の回復が早い、我慢強い\n成長してからは、慢性的な病気にかかったり、運動不足、過度のストレスで重度の障害を患うことがたまにある", "mood": "燃え上がる炎。赤・オレンジの強い光。\n戦士・勝利・情熱の象徴。", "relationship": "異性の心理が分からない\n心の奥深い感情や愛情を表すことが不得意\n結婚した相手には、親の面倒や友人のことも全て面倒見れる", "career": "モチベーションが高い\n行動、エネルギーがある\nリーダー性を発揮できるあらゆる職\n技能訓練、昇給チャンス\nスポーツ、軍隊、政治や企業活動で地位を上げる", "color": "燃え立つ赤\nKu神と霊的に繋がる色\n勇気・勇気・情熱", "hasImage": true, "kana": "クーカヒ", "phase_icon": "🌒", "element": "🌬", "kami": "Kū神"}, {"day": 4, "name_en": "Kū-lua", "meaning": "二人で一緒に立つ", "calendar": "太陰暦４日目", "action": "二面性がある　人間的な物質世界と精神性との関係をよく理解している", "trait": "調和、内面の平穏さ、内と外のバランスを大切にする\n矛盾が直ぐに分かり、公平になるように努力を惜しまない\n平等、平和、正義の揺るぎなき提唱者", "health": "首、肩、腕・手、胸、脚の怪我しやすい\n心配性で精神的ストレス、不安、鬱\n成長すると、神経炎、神経痛神経系統の不調に悩まされる", "mood": "正義の女神像（天秤）。\n石像の重厚感と、静かな青白い背景。", "relationship": "長続きする友人関係\n調和の取れた結婚生活\n理性的に思考して衝動を抑え冷静沈着さを保つ能力にかける", "career": "気配り社交性\n機転の早さ\n事務、書記、法律家、営業のプロになる", "color": "ハワイの漁業の神の色\n緋色（ヒイロ）\nこの色をつけた者だけが神に捧げた神殿に近づくことが許される", "hasImage": true, "kana": "クールア", "phase_icon": "🌒", "element": "🌬", "kami": null}, {"day": 5, "name_en": "Kū-kolu", "meaning": "天と地の支配者", "calendar": "太陰暦５日目", "action": "誠実、開放的、率直　知りたかったことを教えてくれる", "trait": "野心が強く、最高の結果を勝ち取る為に努力を惜しまない\n楽観的で陽気、知人を招いて分かち合う\n人生の局面をうまく抜けられる　打ち勝つ", "health": "正しく食事を摂って、身体、精神、感情のバランスを保つスタイルを維持することにかかっている\n崩れると、高血圧、糖尿病、心臓病、メタボリック障害を引き起こす恐れ", "mood": "黒い月桂冠のシンボル。\n勝利・名誉・王族の血統を示す重厚な黒背景。", "relationship": "忠誠心あり、信頼できる誠実な仲間作り\n愛情と献身に満ちた配偶者となる\n友達との仲も良いので嫉妬されることも", "career": "先進的なことに強い興味を持つ\nテクノロジーの発達に追いついて行くことが喜び\nクリエイティブな仕事、多様性\nコミュニケーション能力\nコンピューター関係の知識を生かした職業", "color": "血の色\n古来ハワイ人が敬意を表す色\n生命力の意味\n王族との血統繋がりを表す色", "hasImage": true, "kana": "クーコル", "phase_icon": "🌓", "element": "🌬", "kami": null}, {"day": 6, "name_en": "Kū-pau", "meaning": "知識は力", "calendar": "古来ハワイ太陰暦６日目", "action": "知識への飽きなき欲求をもち、学んだことを力に変える", "trait": "学び教えて行く教育者、幼い時から個性と態度を確立させる\n正しく教育されると高潔な大人になる\n教えの源", "health": "頭痛やめまい、脳震盪、頭の病気\n顔・目・耳・鼻・喉\n晩年、黄昏時に健忘症など", "mood": "複数の手がパズルを組み立てる写真。\n知識・協働・教育の象徴。\nもう一枚は公園で本を開く写真。", "relationship": "肉体的にも感情的にも幸せな結婚生活\n教育を受けた人との交流を好む\n共通の趣味や共感性の友達と支え合う関係を築く", "career": "教育的技能\n自らの知識能力を生かす職業\nモチベーションが非常に高い\n独立して働く\n学的な資格も追求", "color": "赤い綿模様（しまもよう）\n王族の赤い羽のマントを表す霊的な象徴\n能力開花、大いなる進展、幸運", "hasImage": true, "kana": "クーパウ", "phase_icon": "🌓", "element": "🌬", "kami": null}, {"day": 7, "name_en": "ʻOle-kū-kahi", "meaning": "ALOHAの精神で生きる者", "calendar": "古来ハワイ太陰暦７日目", "action": "性格がよく、おおらかでのんびり\n世俗性を乗り越えて宇宙や高次元と自分との繋がりを大切にする\n浸る思考で過去の成功体験を追想しがち", "trait": "家族優先、日常のありふれた幸せを共有することを好む\nアロハの精神を生きている\n心配事や悩み、愚痴を言わない\n霊的に自制して究極の運命の力を信じている", "health": "健康第一\nノンストレスを送ることが最良と考えているので\n自然治療方法で健康維持を保つ努力を惜しまない\n天候の変化に敏感、喘息、感染症、免疫系等の不調、呼吸器関係", "mood": "霧の森。白い霧が神秘的に漂う。\n高次元・宇宙との繋がりの象徴。", "relationship": "ロマンティストで理想主義者\n配偶者を溺愛\n両親愛\n友人を賞賛", "career": "温かい性格でユーモアのセンス抜群\n笑うことを大切にしている\n情報伝達系\nコミュニケーション能力を使う職\nチームで与えられた仕事を遂行し共通の目標を達成して行く\nチームプレーで成功", "color": "霧のような白\n神々の謎めいた山の領域\n天国の霧\n世俗を乗り越え高次元の自分を神と調和に結びつける", "hasImage": true, "kana": "オレ・クー・カヒ", "phase_icon": "🌔", "element": "🌬", "kami": null}, {"day": 8, "name_en": "ʻOle-kū-lua", "meaning": "現実的に調和させる力を持つ者", "calendar": "古来ハワイ太陰暦８日目", "action": "時に性格が複雑になる\n物事をはっきりと定義する力がある\n善悪の見分けができ両方の良い部分を見つける力がある", "trait": "優れた組織づくりの能力がありビジネスの洞察力に長けている\n願望を達成する為にあらゆる努力を惜しまない\n心を強くすることで達成することができる", "health": "頭・心臓・胸\n頭痛・めまい・ストレス・風邪・インフルエンザ・肺炎・感染症・躁病", "mood": "陰陽マーク（黒と白）。\n調和・バランス・二元性の象徴。", "relationship": "自分自身や配偶者、友人に高水準であることを求める\n多くは要らない\n認めた人だけと長く続く\nお互いの無条件の愛があって分かち合えるパートナー\nサポートと完全な信頼関係が築けるかにかかっている", "career": "正しい、正しくないの判断ができる仕事\n人生を高める為に追い求める傾向\n情熱を燃やす\n倫理的思考\n優れたコミュニケーション能力", "color": "黒と白\n人間が抱える２つの霊的かつ肉体的性質を表す", "hasImage": true, "kana": "オレ・クー・ルア", "phase_icon": "🌔", "element": "🌬", "kami": null}, {"day": 9, "name_en": "ʻOle-kū-kolu", "meaning": "魂の探索者", "calendar": "古来ハワイ太陰暦9日目", "action": "知性があって、慎み深く、静かに内省\n知識の探求者\n判断や考えはシンプルで古くからの常識を用いる", "trait": "身体、精神、認識思考の力に頼る\n直感的な洞察力の力が強い\nその奥の魂が何を求めているのか\n内面から魂を引き出す\n哲学的、倫理的だけでなく実践的な方法も見出せる", "health": "健康に気を使う\n自分にあったライフスタイル維持を心がける\n不必要な心配事をする傾向あり\n不要なストレスを自ら抱えてしまう\n老年期は・心臓・背骨・胃　高齢になった時に特に出やすいので注意", "mood": "淡い水色の背景に光の輪。\n静けさ・満ちる月・霊的な白の象徴。", "relationship": "意義深く永続的な人間関係を大切にする\n誠実なパートナー、忠実な友人、献身的な親\n結婚にとても向いてるタイプ", "career": "安心、安全\n長期に渡って働けることを大切にしている\n自己啓発できる\n部下ではなく役職を求める\n頭を使って部署をリードできるように成長している\n自由に意見を言える職場", "color": "輝く白\n月が満ちる相\n瞑想中の静かな魂\n輝く白は内面の霊的エネルギーや神聖な繋がり\nより高い自己と結びついている", "hasImage": true, "kana": "オレ・クー・コル", "phase_icon": "🌔", "element": "🌬", "kami": null}, {"day": 10, "name_en": "ʻOle-pau", "meaning": "自由になり明るい未来を作る者", "calendar": "古来ハワイ太陰暦　１０日目", "action": "クリエイティブで知識が豊富、将来を見通せる人\n予見の才に恵まれている\n計画を立てる力がある\n変化と常に起こりえる行動に戦略的に前もって充分な用意ができる", "trait": "生まれつき自由人\n型に囚われない思考\nあらゆる状況に柔軟に対応できる力が備わっている\n前向き\n必ず良い未来が待っていると信じている\n目的を一つに絞ると強みになる", "health": "目・背骨・脚・膝・虫歯\n精神的なストレス心配症\n感情的な波\n神経過敏\n発疹", "mood": "青空と草原。\n自由・未来・解放の象徴。", "relationship": "仲の良い誠実な友人を作ると同時に執拗\nない良い意味でしがらみ・独立心があり自分を信じて\nいて自由な精神を持っている\n早い結婚はしない方が良い", "career": "組織作り\n戦略的な計画作成、チーム編成\nインストラクター、指導者\nコーチング\nコンサルティング", "color": "スカイブルー\n天国の青いアーチ\n天国との繋がり\n昼間にどこまでも広がる空\n自由、創造的思考、想像、閃き", "hasImage": true, "kana": "オレ・パウ", "phase_icon": "🌔", "element": "🌬", "kami": null}, {"day": 11, "name_en": "Huna", "meaning": "秘密の守護者たち", "calendar": "古来ハワイ太陰暦　１１日目", "action": "予見、直感的な洞察力、霊的な能力を持ち謎めいた天性を持つ", "trait": "才能豊かで学習熱心で使命と目的意識を持つ\n宇宙の聖なるものと一体化して困難を人生を切り開く\n聖職者（カフナ）の精神を持つ\n人が見えないものを見ることができる　感じることができる", "health": "頭・喉・肺・背骨・脚と足・爪先怪我しやすい\n成人すると、メタボリック系　薬物中毒、アルコール依存\n高齢になると呼吸器、筋肉の衰え　関節炎", "mood": "明るいライトグリーンのシダの葉。\n再生・癒し・自然の生命力を象徴する柔らかな緑。", "relationship": "敏感で感情的、友情を大切にする\n子供や動物への思いやりが強い\n迷いやすく約束を守れないこともある", "career": "想像力・先進性・創造性・ひらめきを活かす仕事\n未知の謎を探求する分野に向く", "color": "深紫\n清め・任命\n霊的能力の開花　知識　名誉　特異性", "hasImage": true, "kana": "フナ", "phase_icon": "🌔", "element": "🌊", "kami": null}, {"day": 12, "name_en": "Mōhalu", "meaning": "決して枯れない花", "calendar": "古来ハワイ太陰暦　１２日目", "action": "身体的に恵まれた幸運な人\n魅力的で人目を引く\nどこへ行ってもモテる\n憧れ、注意を引く存在", "trait": "変化に敏感\n逆境に弱い一面\n成功のために特別な食べ物や日々の思いやりが必要\n大器晩成型\n社交的、鋭い美的センス\nささやかなことに感謝できる", "health": "天候や季節の変化に敏感\n免疫系統に問題が起きやすい\n風邪、喘息、伝染性ウイルス、アレルギー、皮膚疾患\n脱水症状や呼吸器系の不調\n長期に渡ると精神的影響", "mood": "青いグラデーションの神秘的な背景。\n静かな霊性・直感・月の秘密を象徴する深い青。", "relationship": "他人の愛情やアドバイスで成長する\n気質の似た人を惹きつける\n批判的になりやすく結婚生活は難しい", "career": "独立心が強くモチベーションが高い\n努力してキャリアを積み起業を目指す\n政治に興味\nリーダー的な仕事に向く", "color": "オパール\n母なる自然 Haumea\n尊敬・愛情・敬意\n特別な個人に贈られる na pua like‘ole", "hasImage": true, "kana": "モハル", "phase_icon": "🌕", "element": "🌊", "kami": "Kāne神"}, {"day": 13, "name_en": "Hua", "meaning": "生命の種　繁栄への天の祝福", "calendar": "古来ハワイ太陰暦　１３日目", "action": "エネルギッシュで創造性がある\n生産性を生み出す力が高い\n生命への熱意\n人間の活力", "trait": "モチベーションが高く競争心が強い\n驚くようなことを達成する能力\n環境と育成、愛情のサポートが必要\n根を張ると大きく成長し生産性を上げる\n心優しく思いやりがある\n家族を大切にする", "health": "季節ごとのアレルギーやウイルスからの治癒力が高い\n病気にかかりにくい体質\n成長後は胃腸系・生殖器系・腎臓の病気に注意", "mood": "青い背景に柔らかな光。\n繊細さ・美しさ・花の生命力を象徴する淡い光。", "relationship": "強い友情を育む\n長く意義ある人間関係を好む\n愛情と思いやりの家族", "career": "暇を嫌う\n自律性があり勤勉\n監督されるのが苦痛\n製造部門・サービス関連", "color": "赤褐色\n塩・染料・清めの儀式に使われた色\nLonoとの関連", "hasImage": true, "kana": "フア", "phase_icon": "🌕", "element": "🌊", "kami": "Lono神"}, {"day": 14, "name_en": "Akua", "meaning": "神々の集う月", "calendar": "古来ハワイ太陰暦　１４日目", "action": "神聖な使命と意義深い目的を達成するよう霊的に定められた人", "trait": "道徳心があり思いやりがある\n寛大\n純粋な愛を表現する\n人生の局面で愛を選択することで信念を強くし切り開く力\n愛の人", "health": "精神的・感情的・心理的ストレスに影響される\n高齢期：頭部・認知・記憶障害・心臓病に注意", "mood": "赤褐色の大地。\n生命の根・繁栄・大地の力を象徴する土の色。", "relationship": "家族を最優先\n献身的な配偶者・保護心の強い親\n親しい友人を大切にする", "career": "神々の力を持つ\n創造力・知識\n監視されず努力できる環境\n製造部門・サービス関連", "color": "月の虹\n神々の霊的エネルギー\n幸運と平和\n約束された明るい未来", "hasImage": true, "kana": "アクア", "phase_icon": "🌕", "element": "🌊", "kami": null}, {"day": 15, "name_en": "Hoku", "meaning": "この日に生まれし者は幸運", "calendar": "古来ハワイ太陰暦　１５日目", "action": "カリスマ性\n活力ある外見で魅力的な人を惹きつける", "trait": "技能と才能\n目標に向かって突き進み高いゴールを達成する\n頂点に達し名声と豊かさを得る潜在力", "health": "幼少期：風邪・インフルエンザ・熱病\n高齢期：呼吸器・関節炎・膝・足首・骨の障害・心臓病", "mood": "星空と月の光。\n神々・霊性・静かな夜のエネルギーを象徴。", "relationship": "誠実な真の友\n愛情と信頼の結婚\nロマンティックで理想的に見る傾向", "career": "勤勉・几帳面・高いモチベーション\n多くを学びエキスパートを目指す\n柔軟で独立性が高い\n創造的なキャリアを追求", "color": "銀げるそう\n銀色がかった灰色\n月の女神\n天空の安らぎと絶対的な美", "hasImage": true, "kana": "ホク", "phase_icon": "🌕", "element": "🌊", "kami": null}, {"day": 16, "name_en": "Māhealani", "meaning": "知識の探求者", "calendar": "古来ハワイ太陰暦　１６日目", "action": "見た目よく魅力的\nカリスマ性\n謎めいた引力で人を惹きつける", "trait": "好奇心と分析能力\n未知の領域を探検し新しい発見をする\n難しい問題を解決しようとする\n空想的な活動が好き\nマルチ才能\n様々なことに興味", "health": "健康第一\n慢性病を避けるよう注意\n高齢期：肥満症・糖尿病・貧血・感染症\n偏った食生活でメタボ傾向", "mood": "銀色の植物。\n月の女神・静けさ・霊的な銀光を象徴。", "relationship": "人付き合い上手\n社交的で礼儀正しい\n家族や友人との集まりを楽しむ\n愛情溢れる配偶者", "career": "戦略的計画・決断力\n管理者やリーダー\n哲学的分野\n組織で働くのがベスト", "color": "真珠の白\n満月の光\n神像の目・装飾品・お守りに使われた", "hasImage": true, "kana": "マヘアラニ", "phase_icon": "🌕", "element": "🌊", "kami": null}, {"day": 17, "name_en": "Kulu", "meaning": "流れに沿って進め", "calendar": "古来ハワイ太陰暦　１７日目", "action": "我慢強い\n進歩的\n実践的\n消極的で受け身", "trait": "一日一日を大切に生きる\n宇宙の流れを信じる\n天空との調和を目指す\n強い信念\n困難を切り抜ける力", "health": "目・腹部・腎臓\n幼少期：季節性の病気・胃腸系\n高齢期：泌尿生殖器・腎臓・循環器", "mood": "真珠の白い光。\n満月の天空・純粋さ・反射する光の象徴。", "relationship": "友人を大切にする\n無私無欲で他人を優先\n感情表現は控えめ\n言葉より行動を見る", "career": "あらゆる職業に向く\n個人的ゴール設定で達成\n変化を受け入れる職場が最適", "color": "白い砂\n死は終わりではなく移行\n変化の象徴", "hasImage": true, "kana": "クル", "phase_icon": "🌖", "element": "🌍", "kami": null}, {"day": 18, "name_en": "Lāʻau-kū-kahi", "meaning": "骨太　恐れ知らず", "calendar": "古来ハワイ太陰暦　１８日目", "action": "健康・健全に気を使う\n地に足がついている\n土地に愛情\nアウトドア派\n自然との対話", "trait": "土地の管理保全の責任\n環境保護の提唱者\n土地を大事にすれば土地が大事にしてくれる", "health": "丈夫な身体と強い骨\n適度な運動\nストレスを溜めない\n日光と新鮮な空気が最大の治療薬", "mood": "白い砂浜と青い海。\n天と地の境界・流れ・変化を象徴。", "relationship": "共に成長し続ける深い愛\n配偶者・友と深い愛情を育む", "career": "勤勉・独立性・実行力\n環境問題・研究・分析・調査\nデータ管理・専門技術\nプロセスを大切にする", "color": "ダークブラウン\n大地・肥沃な土壌\n母なる大地 Papa\n力強さ・復元力・安定性・繁栄", "hasImage": true, "kana": "ラーアウ・クー・カヒ", "phase_icon": "🌖", "element": "🌍", "kami": null}, {"day": 19, "name_en": "Lāʻau-kū-lua", "meaning": "困った人を助ける慈悲深い人", "calendar": "古来ハワイ太陰暦　１９日目", "action": "地に足がつき実行力がある\n機知に富む\n家族優先\n自律的", "trait": "心と精神から人を大切にする\n寛大で必要な人に手を差し伸べる\n理性と感情のバランスが上手\n落ち着きがある\n極端を避ける\n自然を好む\n農業・狩猟・収穫を楽しむ\n土地を大切に思う", "health": "幼少期：お腹が敏感・むかつき\n成長後：吐き気・胸焼け・胃・消化器系の病気", "mood": "赤い岩山の大地。\n力強さ・大地の根源・自然の雄大さを象徴。", "relationship": "親切・思いやり・陽気\n配偶者や友人に気を配る\n共通の趣味\n相互サポート\n共に向上する関係", "career": "状況分析と必要な行動\n救済・健康・安全・福祉・介護\nあなたの行動が他者にインスピレーションを与える", "color": "緑\n植物の葉\n薬草治癒の準備に使う", "hasImage": true, "kana": "ラーアウ・クー・ルア", "phase_icon": "🌗", "element": "🌍", "kami": null}, {"day": 20, "name_en": "Lāʻau-pau", "meaning": "人の本質と付き合う者", "calendar": "古来ハワイ太陰暦　２０日目", "action": "職業や学歴などでは無く、人となりを受け入れる\nお互いの尊敬、誠実さ信頼に基づいて人間関係を築くことを好む\n良い配偶者　素晴らしい親　親友になる", "trait": "組織力、分析術、問題解決と管理能力に恵まれている\nプライドを持っているので潜在意識をフルに発揮できるあらゆる職業、一人で行う作業を好む", "health": "ライトグリーン　レースシダの葉の色\n胃の不具合や消化器系統の治療に使われる\n新たな誕生や再生した健康　希望や楽観主義", "mood": "緑の森と光。\n癒し・慈悲・自然との調和を象徴。", "relationship": "人となりを受け入れ、尊敬と誠実さで関係を築く\n良い配偶者・親・親友になる", "career": "分析・管理・問題解決に優れる\n一人で集中して行う作業を好む", "color": "ライトグリーン\n再生・健康・希望・楽観主義", "hasImage": true, "kana": "ラーアウ・パウ", "phase_icon": "🌗", "element": "🌍", "kami": null}, {"day": 21, "name_en": "ʻOle-kū-kahi", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "オレ・クー・カヒ", "phase_icon": "🌗", "element": "🌬", "kami": null}, {"day": 22, "name_en": "ʻOle-kū-lua", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "オレ・クー・ルア", "phase_icon": "🌗", "element": "🌬", "kami": null}, {"day": 23, "name_en": "ʻOle-pau", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "オレ・パウ", "phase_icon": "🌘", "element": "🌬", "kami": "カナロア/ロノ神"}, {"day": 24, "name_en": "Kāloa-kū-kahi", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "カーロア・クー・カヒ", "phase_icon": "🌘", "element": "🌊", "kami": "カナロア/ロノ神"}, {"day": 25, "name_en": "Kāloa-kū-lua", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "カーロア・クー・ルア", "phase_icon": "🌘", "element": "🌊", "kami": null}, {"day": 26, "name_en": "Kāloa-pau", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "カーロア・パウ", "phase_icon": "🌘", "element": "🌊", "kami": null}, {"day": 27, "name_en": "Kāne", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "カーネ", "phase_icon": "🌘", "element": "🔥", "kami": "Kāne神"}, {"day": 28, "name_en": "Lono", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "ロノ", "phase_icon": "🌑", "element": "🔥", "kami": "Lono神"}, {"day": 29, "name_en": "Mauli", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "マウリ", "phase_icon": "🌑", "element": "🔥", "kami": null}, {"day": 30, "name_en": "Muku", "meaning": null, "calendar": null, "action": null, "trait": null, "health": null, "mood": null, "relationship": null, "career": null, "color": null, "hasImage": false, "kana": "ムク", "phase_icon": "🌑", "element": "🌬", "kami": null}]
 </script>
 <script>
 const MOON_DATA = JSON.parse(document.getElementById('moon-data').textContent);
@@ -332,11 +376,28 @@ function pendingImageSVG(){
 
 function buildSection(iconName, label, text){
   if(!text) return '';
+  const lines = String(text).split('\n').map(s => s.trim()).filter(Boolean);
+  const items = lines.map(l => `<li>${escapeHtml(l)}</li>`).join('');
   return `
     <div class="section">
       <div class="section-head">${sectionIcon(iconName)}<h3>${label}</h3></div>
-      <p>${escapeHtml(text)}</p>
+      <ul class="section-list">${items}</ul>
     </div>`;
+}
+
+const ELEMENT_LABELS = { '🌬':'風', '🌊':'水', '🌍':'地', '🔥':'火' };
+
+function metaTags(rec){
+  const tags = [];
+  if(rec.element){
+    const label = ELEMENT_LABELS[rec.element] || '';
+    tags.push(`<span class="meta-tag">${rec.element} ${label}</span>`);
+  }
+  if(rec.kami){
+    tags.push(`<span class="meta-tag">${escapeHtml(rec.kami)}</span>`);
+  }
+  if(!tags.length) return '';
+  return `<div class="meta-tags">${tags.join('')}</div>`;
 }
 
 function escapeHtml(str){
@@ -348,7 +409,7 @@ function escapeHtml(str){
 
 function cardHTML(rec){
   if(!rec.name_en){
-    // pending card (data + image not yet available)
+    // fully pending (no data at all yet) - safety fallback
     return `
       <div class="pending-card">
         <span class="day-tag">DAY ${String(rec.day).padStart(2,'0')}</span>
@@ -358,24 +419,36 @@ function cardHTML(rec){
       </div>`;
   }
 
-  const mediaBlock = rec.hasImage
-    ? `<div class="media-frame"><img src="moon_card_images/card_${String(rec.day).padStart(2,'0')}.jpg" alt="${escapeHtml(rec.name_en)}の雰囲気" loading="lazy"><div class="ring"></div></div>`
-    : `<div class="media-frame"><div class="media-pending">${pendingImageSVG()}<span>image coming soon</span></div></div>`;
+  const thumb = rec.hasImage
+    ? `<img src="moon_card_images/card_${String(rec.day).padStart(2,'0')}.jpg" alt="${escapeHtml(rec.name_en)}の雰囲気" loading="lazy">`
+    : `<div class="media-pending">${pendingImageSVG()}</div>`;
+
+  const hasDetail = !!rec.action;
+  const body = hasDetail
+    ? `<div class="sections-grid">
+        ${buildSection('action','行動', rec.action)}
+        ${buildSection('trait','特徴', rec.trait)}
+        ${buildSection('health','健康', rec.health)}
+        ${buildSection('relationship','人間関係', rec.relationship)}
+        ${buildSection('career','職業', rec.career)}
+        ${buildSection('color','ラッキーカラー', rec.color)}
+      </div>`
+    : `<div class="detail-pending">この夜の詳しい物語（行動・特徴・健康など）は、近日公開予定です。</div>`;
 
   return `
     <div class="card-inner">
-      ${mediaBlock}
-      <span class="day-tag">DAY ${String(rec.day).padStart(2,'0')}</span>
-      <h1 class="name-en">${escapeHtml(rec.name_en)}</h1>
-      <p class="meaning">${escapeHtml(rec.meaning || '')}</p>
-      <p class="calendar-note">${escapeHtml(rec.calendar || '')}</p>
+      <div class="card-header">
+        <div class="header-text">
+          <span class="day-tag">DAY ${String(rec.day).padStart(2,'0')}</span>
+          <h1 class="name-en">${escapeHtml(rec.name_en)}${rec.kana ? `<span class="kana">${escapeHtml(rec.kana)}</span>` : ''}</h1>
+          ${rec.meaning ? `<p class="meaning">${escapeHtml(rec.meaning)}</p>` : ''}
+          ${rec.calendar ? `<p class="calendar-note">${escapeHtml(rec.calendar)}</p>` : ''}
+          ${metaTags(rec)}
+        </div>
+        <div class="media-thumb">${thumb}</div>
+      </div>
       <div class="divider"></div>
-      ${buildSection('action','行動', rec.action)}
-      ${buildSection('trait','特徴', rec.trait)}
-      ${buildSection('health','健康', rec.health)}
-      ${buildSection('relationship','人間関係', rec.relationship)}
-      ${buildSection('career','職業', rec.career)}
-      ${buildSection('color','ラッキーカラー', rec.color)}
+      ${body}
     </div>`;
 }
 
@@ -401,7 +474,15 @@ function updateDots(){
   });
 }
 
-function updatePhaseGlyph(day){
+function updatePhaseGlyph(rec){
+  if(rec.phase_icon){
+    phaseGlyph.classList.add('emoji-mode');
+    phaseGlyph.textContent = rec.phase_icon;
+    return;
+  }
+  phaseGlyph.classList.remove('emoji-mode');
+  phaseGlyph.textContent = '';
+  const day = rec.day;
   const t = (day - 1) / 29; // 0 = new moon, 0.5 = full moon, 1 = new moon again
   const distFromFull = Math.abs(t - 0.5) * 2; // 0 at full, 1 at new
   const size = 20;
@@ -420,7 +501,7 @@ function goTo(index, animate = true){
     track.style.transition = '';
   }
   dayNowEl.textContent = String(current + 1).padStart(2, '0');
-  updatePhaseGlyph(current + 1);
+  updatePhaseGlyph(MOON_DATA[current]);
   updateDots();
   const card = track.children[current];
   if(card) card.scrollTop = 0;
