@@ -151,14 +151,15 @@
   }
   .header-text{flex:1;min-width:0;}
 
-  .media-thumb{
+  .media-thumb, .mood-thumb{
     position:relative;flex-shrink:0;
     width:76px;height:76px;
     border-radius:14px;overflow:hidden;
     border:1px solid rgba(212,175,106,0.3);
     background:linear-gradient(135deg,#1c3448,#0c1b28);
   }
-  .media-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .media-thumb img, .mood-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .media-thumb.moon-phase-thumb img{object-fit:contain;padding:6px;}
   .media-pending{
     width:100%;height:100%;
     display:flex;align-items:center;justify-content:center;
@@ -169,48 +170,46 @@
   }
   .media-pending svg{width:22px;height:22px;opacity:0.7;}
 
+  .day-meta-row{
+    display:flex;align-items:center;flex-wrap:wrap;
+    gap:7px;
+    margin-bottom:9px;
+  }
   .day-tag{
     display:inline-block;
-    font-size:10.5px;letter-spacing:0.12em;color:var(--gold);
+    font-size:13px;font-weight:600;letter-spacing:0.1em;color:var(--gold);
     border:1px solid var(--divider);
-    padding:2px 9px;border-radius:20px;
-    margin-bottom:8px;
+    padding:3px 10px;border-radius:20px;
   }
 
   .name-en{
     font-family:'Shippori Mincho', serif;
     font-size:23px;font-weight:700;
     color:var(--moonlight);
-    margin:0 0 3px;
+    margin:0 0 2px;
     line-height:1.15;
   }
-  .name-en .kana{
+  .kana-line{
     font-family:'Zen Kaku Gothic New', sans-serif;
-    font-size:12px;font-weight:400;
+    font-size:12.5px;font-weight:400;
     color:var(--ink-soft);
-    margin-left:8px;
-    letter-spacing:0.02em;
+    margin:0 0 6px;
+    letter-spacing:0.03em;
   }
-  .meaning{
+  .meaning-line{
     font-size:12.5px;color:var(--gold-soft);
-    margin:0 0 5px;
-    font-weight:500;
-    line-height:1.4;
-  }
-  .calendar-note{
-    font-size:11px;color:var(--ink-soft);
     margin:0;
-    line-height:1.4;
+    font-weight:500;
+    line-height:1.45;
   }
   .meta-tags{
     display:flex;flex-wrap:wrap;gap:6px;
-    margin-top:8px;
   }
   .meta-tag{
-    font-size:10px;color:var(--gold-soft);
+    font-size:13px;font-weight:600;color:var(--gold-soft);
     background:rgba(212,175,106,0.1);
     border:1px solid rgba(212,175,106,0.28);
-    padding:2px 9px;border-radius:20px;
+    padding:3px 10px;border-radius:20px;
     white-space:nowrap;
   }
 
@@ -237,6 +236,22 @@
     border-radius:13px;
     padding:10px 11px;
   }
+  .section--action{ background:rgba(212,175,106,0.09); border-color:rgba(212,175,106,0.22); }
+  .section--trait{ background:rgba(90,150,148,0.12); border-color:rgba(90,150,148,0.28); }
+  .section--health{ background:rgba(196,105,105,0.11); border-color:rgba(196,105,105,0.26); }
+  .section--relationship{ background:rgba(120,145,205,0.11); border-color:rgba(120,145,205,0.26); }
+  .section--career{ background:rgba(150,158,178,0.10); border-color:rgba(150,158,178,0.24); }
+  .section--color{ background:rgba(185,120,175,0.11); border-color:rgba(185,120,175,0.26); }
+
+  .mood-tile{
+    display:flex;align-items:center;justify-content:center;
+    padding:10px 11px;
+    background:rgba(212,175,106,0.05);
+    border:1px solid rgba(212,175,106,0.16);
+    border-radius:13px;
+  }
+  .mood-tile img{width:76px;height:76px;object-fit:cover;border-radius:10px;display:block;}
+
   .section-head{
     display:flex;align-items:center;gap:5px;
     margin-bottom:6px;
@@ -374,12 +389,21 @@ function pendingImageSVG(){
   </svg>`;
 }
 
+const SECTION_CLASS = {
+  action: 'section--action',
+  trait: 'section--trait',
+  health: 'section--health',
+  relationship: 'section--relationship',
+  career: 'section--career',
+  color: 'section--color',
+};
+
 function buildSection(iconName, label, text){
   if(!text) return '';
   const lines = String(text).split('\n').map(s => s.trim()).filter(Boolean);
   const items = lines.map(l => `<li>${escapeHtml(l)}</li>`).join('');
   return `
-    <div class="section">
+    <div class="section ${SECTION_CLASS[iconName] || ''}">
       <div class="section-head">${sectionIcon(iconName)}<h3>${label}</h3></div>
       <ul class="section-list">${items}</ul>
     </div>`;
@@ -387,7 +411,7 @@ function buildSection(iconName, label, text){
 
 const ELEMENT_LABELS = { '🌬':'風', '🌊':'水', '🌍':'地', '🔥':'火' };
 
-function metaTags(rec){
+function metaTagsInline(rec){
   const tags = [];
   if(rec.element){
     const label = ELEMENT_LABELS[rec.element] || '';
@@ -396,8 +420,7 @@ function metaTags(rec){
   if(rec.kami){
     tags.push(`<span class="meta-tag">${escapeHtml(rec.kami)}</span>`);
   }
-  if(!tags.length) return '';
-  return `<div class="meta-tags">${tags.join('')}</div>`;
+  return tags.join('');
 }
 
 function escapeHtml(str){
@@ -419,9 +442,17 @@ function cardHTML(rec){
       </div>`;
   }
 
-  const thumb = rec.hasImage
-    ? `<img src="moon_card_images/card_${String(rec.day).padStart(2,'0')}.jpg" alt="${escapeHtml(rec.name_en)}の雰囲気" loading="lazy">`
-    : `<div class="media-pending">${pendingImageSVG()}</div>`;
+  const dayPadded = String(rec.day).padStart(2,'0');
+
+  const moonPhaseThumb = `<div class="media-thumb moon-phase-thumb"><img src="画像/moon_${dayPadded}.png" alt="DAY${dayPadded}の月" loading="lazy" onerror="this.closest('.moon-phase-thumb').style.visibility='hidden'"></div>`;
+
+  const moodThumb = rec.hasImage
+    ? `<div class="mood-tile"><img src="moon_card_images/card_${dayPadded}.jpg" alt="${escapeHtml(rec.name_en)}の雰囲気" loading="lazy"></div>`
+    : '';
+
+  const meaningLines = rec.meaning
+    ? rec.meaning.split('／').map(s => `<p class="meaning-line">${escapeHtml(s.trim())}</p>`).join('')
+    : '';
 
   const hasDetail = !!rec.action;
   const body = hasDetail
@@ -432,20 +463,23 @@ function cardHTML(rec){
         ${buildSection('relationship','人間関係', rec.relationship)}
         ${buildSection('career','職業', rec.career)}
         ${buildSection('color','ラッキーカラー', rec.color)}
+        ${moodThumb}
       </div>`
     : `<div class="detail-pending">この夜の詳しい物語（行動・特徴・健康など）は、近日公開予定です。</div>`;
 
   return `
     <div class="card-inner">
       <div class="card-header">
+        ${moonPhaseThumb}
         <div class="header-text">
-          <span class="day-tag">DAY ${String(rec.day).padStart(2,'0')}</span>
-          <h1 class="name-en">${escapeHtml(rec.name_en)}${rec.kana ? `<span class="kana">${escapeHtml(rec.kana)}</span>` : ''}</h1>
-          ${rec.meaning ? `<p class="meaning">${escapeHtml(rec.meaning)}</p>` : ''}
-          ${rec.calendar ? `<p class="calendar-note">${escapeHtml(rec.calendar)}</p>` : ''}
-          ${metaTags(rec)}
+          <div class="day-meta-row">
+            <span class="day-tag">DAY ${dayPadded}</span>
+            ${metaTagsInline(rec)}
+          </div>
+          <h1 class="name-en">${escapeHtml(rec.name_en)}</h1>
+          ${rec.kana ? `<p class="kana-line">${escapeHtml(rec.kana)}</p>` : ''}
+          ${meaningLines}
         </div>
-        <div class="media-thumb">${thumb}</div>
       </div>
       <div class="divider"></div>
       ${body}
