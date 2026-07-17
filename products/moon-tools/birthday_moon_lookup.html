@@ -482,20 +482,32 @@
         return null;
       }
 
+      // ── 対象日を挟む新月ブラケットを直接探す（★新規追加）─────────────
+      // このアプリ（バースデー・ムーン診断）は、過去の任意の年月日を扱うため、
+      // 2026年分のみを収録するCONFIRMEDテーブル（mauli_tool.html由来の確定値）
+      // は参照しない。常に新月の天文計算のみで、直近の新月の翌日をHiloとする。
+      function findBracket(target, year){
+        const list = nmNear(year);
+        for(let i=1; i<list.length; i++){
+          const hiloMs = list[i-1] + D;   // 直近の１つ前の新月の翌日 = Hilo
+          const mukuMs = list[i];
+          if(target < hiloMs || target > mukuMs) continue;
+          const hasMauli = Math.round((mukuMs - list[i-1]) / D) === 30;
+          return { hiloMs, mukuMs, hasMauli };
+        }
+        return null;
+      }
+
       // ── 指定日の夜番号（1〜30）───────────────────────────────────
       function getMoonNight(year,month,day){
         const target=Date.UTC(year,month-1,day);
-        for(let dm=-1; dm<=1; dm++){
-          let m=month+dm, y=year;
-          if(m<1){m=12;y--;} if(m>12){m=1;y++;}
-          const cy=findCycle(y,m);
-          if(!cy) continue;
-          const{hiloMs,mukuMs,hasMauli}=cy;
-          if(target===mukuMs) return 30;
-          if(target===mukuMs-D && hasMauli) return 29;
-          const offset=Math.round((target-hiloMs)/D);
-          if(offset>=0 && offset<=27) return offset+1;
-        }
+        const cy=findBracket(target, year);
+        if(!cy) return null;
+        const{hiloMs,mukuMs,hasMauli}=cy;
+        if(target===mukuMs) return 30;
+        if(target===mukuMs-D && hasMauli) return 29;
+        const offset=Math.round((target-hiloMs)/D);
+        if(offset>=0 && offset<=27) return offset+1;
         return null;
       }
 
@@ -558,18 +570,9 @@ const MOON_IMGS = [
   function getMoonNightInfo(year, month, day){
     const n = getMoonNight(year, month, day);
     if(!n) return { n:0, dayIdx:0, lunLen:29 };
-    let lunLen = 29;
-    for(let dm=-1; dm<=1; dm++){
-      let mm=month+dm, yy=year;
-      if(mm<1){mm=12;yy--;} if(mm>12){mm=1;yy++;}
-      const cy=findCycle(yy,mm);
-      if(!cy) continue;
-      const target=Date.UTC(year,month-1,day);
-      const{hiloMs,mukuMs,hasMauli}=cy;
-      const inRange=(target>=hiloMs&&target<=mukuMs)||
-                    (hasMauli&&target===mukuMs-D);
-      if(inRange){ lunLen=hasMauli?30:29; break; }
-    }
+    const target = Date.UTC(year, month-1, day);
+    const cy = findBracket(target, year);
+    const lunLen = cy && cy.hasMauli ? 30 : 29;
     return { n, dayIdx:n-1, lunLen };
   }
 
