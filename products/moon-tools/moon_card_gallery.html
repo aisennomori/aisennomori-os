@@ -151,24 +151,30 @@
   }
 
   .header-top-row{
-    display:flex;align-items:flex-start;justify-content:space-between;
-    margin-bottom:10px;
+    display:flex;align-items:center;gap:12px;
+    margin-bottom:12px;
   }
 
   .moon-phase-thumb{
     flex-shrink:0;
   }
   .moon-phase-thumb img{
-    width:76px;height:76px;object-fit:contain;display:block;
+    width:84px;height:84px;object-fit:contain;display:block;
+  }
+
+  .day-name-block{
+    flex:1;min-width:0;
   }
 
   .meta-tags-stack{
     display:flex;flex-direction:column;align-items:flex-end;
     gap:5px;flex-shrink:0;
+    margin-left:auto;
+    align-self:flex-start;
   }
 
   .media-pending{
-    width:76px;height:76px;
+    width:84px;height:84px;
     display:flex;align-items:center;justify-content:center;
     color:var(--ink-soft);
     background:
@@ -179,11 +185,9 @@
   .media-pending svg{width:22px;height:22px;opacity:0.7;}
 
   .day-tag{
-    display:inline-block;
-    font-size:13px;font-weight:600;letter-spacing:0.1em;color:var(--gold);
-    border:1px solid var(--divider);
-    padding:3px 10px;border-radius:20px;
-    margin-bottom:9px;
+    display:block;
+    font-size:12.5px;font-weight:600;letter-spacing:0.1em;color:var(--gold);
+    margin-bottom:4px;
   }
 
   .name-en{
@@ -197,7 +201,7 @@
     font-family:'Zen Kaku Gothic New', sans-serif;
     font-size:12.5px;font-weight:400;
     color:var(--ink-soft);
-    margin:0 0 10px;
+    margin:0;
     letter-spacing:0.03em;
   }
   .meaning-line{
@@ -259,7 +263,7 @@
   .section--color .section-head h3{ color:#dd9ed1; }
 
   .mood-tile{
-    display:flex;align-items:center;justify-content:center;
+    display:flex;align-items:center;justify-content:flex-start;
     padding:4px;
   }
   .mood-tile img{width:76px;height:76px;object-fit:cover;border-radius:10px;display:block;}
@@ -488,11 +492,13 @@ function cardHTML(rec){
       <div class="card-header">
         <div class="header-top-row">
           ${moonPhaseThumb}
+          <div class="day-name-block">
+            <span class="day-tag">DAY ${dayPadded}</span>
+            <h1 class="name-en">${escapeHtml(rec.name_en)}</h1>
+            ${rec.kana ? `<p class="kana-line">${escapeHtml(rec.kana)}</p>` : ''}
+          </div>
           ${metaStack}
         </div>
-        <span class="day-tag">DAY ${dayPadded}</span>
-        <h1 class="name-en">${escapeHtml(rec.name_en)}</h1>
-        ${rec.kana ? `<p class="kana-line">${escapeHtml(rec.kana)}</p>` : ''}
         ${meaningLines}
       </div>
       <div class="divider"></div>
