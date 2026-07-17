@@ -40,9 +40,37 @@ AIのために書く。
 
 ---
 
+## 論理構造と物理構造の分離
+
+Documentation Standardが定義する `Apps/{AppName}/DOCS/...` という表記は、
+**論理構造**である。実際のリポジトリ上の**物理パス**とは、必ずしも一致しない。
+
+理由：既存のリポジトリには、すでに積み上げてきた資産（フォルダ構成、既存のリンク、
+外部ツールとの連携設定など）がある。論理構造に合わせて物理構造を無理に変更すると、
+Git履歴の分断やリンク切れなど、運用コストが発生する。
+
+この2つの構造の対応関係は、`APP_REGISTRY.md`（OS直下）に一元管理する。
+
+```
+論理構造（Documentation Standardが使う名前）
+    MoonCard
+        ↓
+APP_REGISTRY.md が対応を管理
+        ↓
+物理構造（実際のリポジトリのパス）
+    products/moon-tools/DOCS/MoonCard/
+```
+
+各アプリの `PROJECT_OVERVIEW.md` には、そのアプリの論理名と物理パスの対応を
+明記すること。ただし対応関係の**正**は常に `APP_REGISTRY.md` であり、
+食い違いが生じた場合は `APP_REGISTRY.md` を正とする。
+
+---
+
 ## Reference Implementation
 
 このEdition 1 / Version 1.0は、**MoonCard**を最初の実装例（Reference Implementation）として策定された。
+MoonCardの論理名と物理パスの対応は `APP_REGISTRY.md` を参照。
 
 新しいアプリ（ManaCard、SoulReading、Healing、HSP、AI Counselorなど）の
 DOCSを作る際は、MoonCardの `Apps/MoonCard/DOCS/` 一式をそのまま雛形として複製し、
