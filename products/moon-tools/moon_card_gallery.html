@@ -146,40 +146,44 @@
   .card-inner{padding:20px 18px 26px;}
 
   .card-header{
-    display:flex;align-items:flex-start;gap:12px;
+    display:flex;flex-direction:column;
     margin-bottom:14px;
   }
-  .header-text{flex:1;min-width:0;}
 
-  .media-thumb, .mood-thumb{
-    position:relative;flex-shrink:0;
-    width:76px;height:76px;
-    border-radius:14px;overflow:hidden;
-    border:1px solid rgba(212,175,106,0.3);
-    background:linear-gradient(135deg,#1c3448,#0c1b28);
+  .header-top-row{
+    display:flex;align-items:flex-start;justify-content:space-between;
+    margin-bottom:10px;
   }
-  .media-thumb img, .mood-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-  .media-thumb.moon-phase-thumb img{object-fit:contain;padding:6px;}
+
+  .moon-phase-thumb{
+    flex-shrink:0;
+  }
+  .moon-phase-thumb img{
+    width:76px;height:76px;object-fit:contain;display:block;
+  }
+
+  .meta-tags-stack{
+    display:flex;flex-direction:column;align-items:flex-end;
+    gap:5px;flex-shrink:0;
+  }
+
   .media-pending{
-    width:100%;height:100%;
+    width:76px;height:76px;
     display:flex;align-items:center;justify-content:center;
     color:var(--ink-soft);
     background:
       radial-gradient(circle at 50% 40%, rgba(212,175,106,0.12), transparent 60%),
       linear-gradient(135deg,#1c3448,#0c1b28);
+    border-radius:14px;
   }
   .media-pending svg{width:22px;height:22px;opacity:0.7;}
 
-  .day-meta-row{
-    display:flex;align-items:center;flex-wrap:wrap;
-    gap:7px;
-    margin-bottom:9px;
-  }
   .day-tag{
     display:inline-block;
     font-size:13px;font-weight:600;letter-spacing:0.1em;color:var(--gold);
     border:1px solid var(--divider);
     padding:3px 10px;border-radius:20px;
+    margin-bottom:9px;
   }
 
   .name-en{
@@ -193,17 +197,15 @@
     font-family:'Zen Kaku Gothic New', sans-serif;
     font-size:12.5px;font-weight:400;
     color:var(--ink-soft);
-    margin:0 0 6px;
+    margin:0 0 10px;
     letter-spacing:0.03em;
   }
   .meaning-line{
-    font-size:12.5px;color:var(--gold-soft);
-    margin:0;
-    font-weight:500;
-    line-height:1.45;
-  }
-  .meta-tags{
-    display:flex;flex-wrap:wrap;gap:6px;
+    font-size:16px;color:var(--moonlight);
+    margin:0 0 3px;
+    font-weight:700;
+    line-height:1.4;
+    text-align:left;
   }
   .meta-tag{
     font-size:13px;font-weight:600;color:var(--gold-soft);
@@ -243,12 +245,22 @@
   .section--career{ background:rgba(150,158,178,0.10); border-color:rgba(150,158,178,0.24); }
   .section--color{ background:rgba(185,120,175,0.11); border-color:rgba(185,120,175,0.26); }
 
+  .section--action .section-head svg,
+  .section--action .section-head h3{ color:#d4af6a; }
+  .section--trait .section-head svg,
+  .section--trait .section-head h3{ color:#7fc4bf; }
+  .section--health .section-head svg,
+  .section--health .section-head h3{ color:#e08d8d; }
+  .section--relationship .section-head svg,
+  .section--relationship .section-head h3{ color:#a3b8ee; }
+  .section--career .section-head svg,
+  .section--career .section-head h3{ color:#c3c9db; }
+  .section--color .section-head svg,
+  .section--color .section-head h3{ color:#dd9ed1; }
+
   .mood-tile{
     display:flex;align-items:center;justify-content:center;
-    padding:10px 11px;
-    background:rgba(212,175,106,0.05);
-    border:1px solid rgba(212,175,106,0.16);
-    border-radius:13px;
+    padding:4px;
   }
   .mood-tile img{width:76px;height:76px;object-fit:cover;border-radius:10px;display:block;}
 
@@ -256,11 +268,11 @@
     display:flex;align-items:center;gap:5px;
     margin-bottom:6px;
   }
-  .section-head svg{width:12.5px;height:12.5px;color:var(--gold);flex-shrink:0;}
+  .section-head svg{width:13px;height:13px;color:var(--gold);flex-shrink:0;}
   .section-head h3{
-    font-size:10px;letter-spacing:0.08em;
+    font-size:12px;letter-spacing:0.05em;
     color:var(--gold);
-    margin:0;font-weight:500;
+    margin:0;font-weight:700;
     text-transform:uppercase;
   }
   .section-list{
@@ -444,11 +456,15 @@ function cardHTML(rec){
 
   const dayPadded = String(rec.day).padStart(2,'0');
 
-  const moonPhaseThumb = `<div class="media-thumb moon-phase-thumb"><img src="画像/moon_${dayPadded}.png" alt="DAY${dayPadded}の月" loading="lazy" onerror="this.closest('.moon-phase-thumb').style.visibility='hidden'"></div>`;
+  const moonPhaseThumb = `<div class="moon-phase-thumb"><img src="画像/moon_${dayPadded}.png" alt="DAY${dayPadded}の月" loading="lazy" onerror="this.closest('.moon-phase-thumb').innerHTML='<div class=&quot;media-pending&quot;></div>'"></div>`;
 
   const moodThumb = rec.hasImage
     ? `<div class="mood-tile"><img src="moon_card_images/card_${dayPadded}.jpg" alt="${escapeHtml(rec.name_en)}の雰囲気" loading="lazy"></div>`
     : '';
+
+  const metaStack = metaTagsInline(rec)
+    ? `<div class="meta-tags-stack">${metaTagsInline(rec)}</div>`
+    : '<div></div>';
 
   const meaningLines = rec.meaning
     ? rec.meaning.split('／').map(s => `<p class="meaning-line">${escapeHtml(s.trim())}</p>`).join('')
@@ -470,16 +486,14 @@ function cardHTML(rec){
   return `
     <div class="card-inner">
       <div class="card-header">
-        ${moonPhaseThumb}
-        <div class="header-text">
-          <div class="day-meta-row">
-            <span class="day-tag">DAY ${dayPadded}</span>
-            ${metaTagsInline(rec)}
-          </div>
-          <h1 class="name-en">${escapeHtml(rec.name_en)}</h1>
-          ${rec.kana ? `<p class="kana-line">${escapeHtml(rec.kana)}</p>` : ''}
-          ${meaningLines}
+        <div class="header-top-row">
+          ${moonPhaseThumb}
+          ${metaStack}
         </div>
+        <span class="day-tag">DAY ${dayPadded}</span>
+        <h1 class="name-en">${escapeHtml(rec.name_en)}</h1>
+        ${rec.kana ? `<p class="kana-line">${escapeHtml(rec.kana)}</p>` : ''}
+        ${meaningLines}
       </div>
       <div class="divider"></div>
       ${body}
