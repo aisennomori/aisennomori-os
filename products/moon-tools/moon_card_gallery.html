@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
     --navy-deep:#0a1620;
@@ -91,6 +92,56 @@
   }
   .day-select:focus{outline:none;border-color:var(--gold);}
 
+  .capture-btn{
+    width:28px;height:28px;border-radius:50%;
+    background:var(--navy-deep);
+    border:1px solid rgba(212,175,106,0.4);
+    color:var(--gold-soft);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;flex-shrink:0;
+    transition:background .2s ease;
+  }
+  .capture-btn:hover{background:rgba(212,175,106,0.18);}
+  .capture-btn svg{width:15px;height:15px;}
+
+  /* 画像として保存（iOS等）モーダル */
+  .ios-modal-overlay{display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.78);z-index:9999;
+    align-items:flex-end;justify-content:center;}
+  .ios-modal-overlay.active{display:flex;}
+  .ios-modal{background:var(--navy-card);border-radius:22px 22px 0 0;
+    padding:24px 18px 40px;width:100%;max-width:460px;
+    text-align:center;font-family:'Zen Kaku Gothic New', sans-serif;
+    border-top:1px solid var(--divider);}
+  .ios-modal h3{font-family:'Shippori Mincho', serif;font-size:15px;font-weight:700;
+    margin:0 0 14px;color:var(--moonlight);}
+  .ios-modal img#capturedImg{width:100%;border-radius:14px;
+    border:1px solid var(--divider);margin-bottom:14px;display:block;}
+  .ios-modal .guide-text{font-size:12px;color:var(--ink-soft);
+    line-height:1.75;margin-bottom:18px;}
+  .ios-modal .guide-text strong{color:var(--gold-soft);}
+  .ios-modal-close{width:100%;padding:12px;border-radius:12px;
+    border:1px solid var(--divider);background:transparent;
+    font-family:'Zen Kaku Gothic New', sans-serif;font-size:13px;cursor:pointer;
+    color:var(--moonlight);}
+
+  /* 印刷（PDF保存）: 現在表示中のカード1枚だけを対象にする */
+  @media print{
+    .topbar, .nav-btn, .bottombar, .swipe-hint{ display:none !important; }
+    html,body{ background:var(--navy) !important; overflow:visible !important; }
+    .app{ height:auto !important; padding:0 !important; }
+    .stage{ width:100% !important; max-width:none !important; }
+    .card-viewport{ overflow:visible !important; height:auto !important; border-radius:0 !important; }
+    .card-track{ transform:none !important; transition:none !important; display:block !important; height:auto !important; }
+    .card-track > .card{ display:none !important; }
+    .card-track > .card.print-active{
+      display:block !important;
+      overflow:visible !important;
+      max-height:none !important;
+      width:100% !important;
+      flex:none !important;
+    }
+  }
 
   /* stage: card + arrows */
   .stage{
@@ -398,6 +449,9 @@
     <div class="counter-wrap">
       <div class="phase-glyph" id="phaseGlyph"></div>
       <select class="day-select" id="daySelect" aria-label="夜を選択"></select>
+      <button class="capture-btn" id="captureBtn" aria-label="この夜を保存・印刷">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+      </button>
     </div>
   </div>
 
@@ -420,6 +474,15 @@
   </div>
   <div class="swipe-hint">← スワイプ / 矢印キーで、前後のMOONへ →</div>
 
+</div>
+
+<div class="ios-modal-overlay" id="iosModal">
+  <div class="ios-modal">
+    <h3>📸 画像を保存してください</h3>
+    <img id="capturedImg" src="" alt="キャプチャ画像">
+    <p class="guide-text">画像を<strong>長押し</strong>して<br>「<strong>写真に追加</strong>」または「<strong>画像を保存</strong>」を選んでください</p>
+    <button class="ios-modal-close" id="iosModalClose">閉じる</button>
+  </div>
 </div>
 
 <script id="moon-data" type="application/json">
@@ -779,6 +842,65 @@ function getMoonNight(year,month,day){
     ? `${y}年${m}月${d}日（${dow}）第${n}夜 ${rec.name_en}`
     : `${y}年${m}月${d}日（${dow}）`;
 })();
+
+// ── この夜のカードを保存・印刷（moon_calendar.htmlと同じ方式） ──
+// スマホ：html2canvasでカード画像を生成し、長押し保存できるモーダルを表示
+// PC：印刷ダイアログを開き、現在のカード1枚だけを印刷対象にする
+const captureBtn = document.getElementById('captureBtn');
+const iosModal = document.getElementById('iosModal');
+const capturedImg = document.getElementById('capturedImg');
+const iosModalClose = document.getElementById('iosModalClose');
+
+function isMobileSave(){
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+captureBtn.addEventListener('click', async () => {
+  const cardEl = track.children[current];
+  if(!cardEl) return;
+
+  if(!isMobileSave()){
+    cardEl.classList.add('print-active');
+    window.print();
+    return;
+  }
+
+  const origOverflow = cardEl.style.overflow;
+  const origMaxHeight = cardEl.style.maxHeight;
+  cardEl.style.overflow = 'visible';
+  cardEl.style.maxHeight = 'none';
+  const origLabel = captureBtn.innerHTML;
+  captureBtn.innerHTML = '···';
+  try{
+    const canvas = await html2canvas(cardEl, {
+      scale: 2, useCORS: true, allowTaint: true, logging: false, backgroundColor: null
+    });
+    capturedImg.src = canvas.toDataURL('image/png');
+    iosModal.classList.add('active');
+  } catch(e){
+    alert('キャプチャに失敗しました。\nスクリーンショットで保存してください。');
+  } finally {
+    cardEl.style.overflow = origOverflow;
+    cardEl.style.maxHeight = origMaxHeight;
+    captureBtn.innerHTML = origLabel;
+  }
+});
+
+window.addEventListener('afterprint', () => {
+  document.querySelectorAll('.card.print-active').forEach(c => c.classList.remove('print-active'));
+});
+
+iosModalClose.addEventListener('click', () => {
+  iosModal.classList.remove('active');
+  capturedImg.src = '';
+});
+iosModal.addEventListener('click', (e) => {
+  if(e.target === iosModal){
+    iosModal.classList.remove('active');
+    capturedImg.src = '';
+  }
+});
 
 render();
 
