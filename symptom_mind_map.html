@@ -8,6 +8,7 @@
     h1 { font-size: 1.4rem; }
     label { font-weight: 600; }
     select { padding: 4px 8px; margin-left: 8px; }
+    input[type="text"] { padding: 4px 8px; margin-left: 8px; width: 200px; }
     table { border-collapse: collapse; width: 100%; margin-top: 16px; }
     th, td { border: 1px solid #ccc; padding: 8px; vertical-align: top; }
     th { background: #f5f5f5; }
@@ -21,6 +22,9 @@
   <select id="diseaseSelect">
     <option value="">（すべて表示）</option>
   </select>
+
+  <label for="diseaseSearch" style="margin-left:16px;">検索（部分一致）：</label>
+  <input type="text" id="diseaseSearch" placeholder="例：胃、頭、痛み など" />
 
   <div class="note">※病気や問題を選ぶと、その項目だけが表示されます。</div>
 
@@ -114,6 +118,7 @@
     ];
 
     const select = document.getElementById("diseaseSelect");
+    const searchInput = document.getElementById("diseaseSearch");
     const tbody = document.getElementById("resultBody");
 
     // セレクトボックスに病気名を追加
@@ -125,11 +130,16 @@
       select.appendChild(opt);
     });
 
-    function renderTable(filterDisease = "") {
+    function renderTable() {
       tbody.innerHTML = "";
-      const rows = filterDisease
-        ? data.filter(item => item.disease === filterDisease)
-        : data;
+      const selected = select.value;
+      const keyword = searchInput.value.trim();
+
+      const rows = data.filter(item => {
+        const matchesSelect = !selected || item.disease === selected;
+        const matchesSearch = !keyword || item.disease.includes(keyword);
+        return matchesSelect && matchesSearch;
+      });
 
       rows.forEach(item => {
         const tr = document.createElement("tr");
@@ -151,7 +161,10 @@
     }
 
     select.addEventListener("change", () => {
-      renderTable(select.value);
+      renderTable();
+    });
+    searchInput.addEventListener("input", () => {
+      renderTable();
     });
 
     // 初期表示（全件）
