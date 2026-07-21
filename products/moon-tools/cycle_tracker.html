@@ -168,11 +168,11 @@
 <div class="cal-wrap" id="sheetInner">
   <div class="cap-title" id="capTitle">─</div>
   <div class="dow-row">
-    <div class="dc s">日</div>
     <div class="dc">月</div><div class="dc">火</div>
     <div class="dc">水</div><div class="dc">木</div>
     <div class="dc">金</div>
     <div class="dc sa">土</div>
+    <div class="dc s">日</div>
   </div>
   <div class="grid" id="grid"></div>
 </div>
@@ -435,7 +435,7 @@ function render(year,month){
 
   const now=new Date();
   const todayMs=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
-  const firstDow=new Date(year,month-1,1).getDay();
+  const firstDow=(new Date(year,month-1,1).getDay()+6)%7; // 月曜=0列目になるよう変換
   const dim=new Date(year,month,0).getDate();
   const grid=document.getElementById('grid');
   grid.innerHTML='';
