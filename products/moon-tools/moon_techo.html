@@ -330,10 +330,13 @@
   .confirmed-month .group-section { background:#FFF0F3; }
   .confirmed-month .day-cell { background:#FFF0F3; }
   .confirmed-month .day-card { background:#FFF0F3; }
+  .back-link{display:inline-block;margin:14px 16px 0;font-size:.75rem;color:var(--hoonui);text-decoration:none;font-weight:700;letter-spacing:.05em;}
+  .back-link:hover{text-decoration:underline;}
+
   @media print{
     body{ background:#fff; }
     header.app-header,.controls,.view-toggle,.cycle-nav .nav-btn,
-    .cycle-nav .cycle-title,.print-section{ display:none; }
+    .cycle-nav .cycle-title,.print-section,.back-link{ display:none; }
     .cycle-nav{ margin:0; }
     .page{ max-width:100%; padding:0; }
     .sheet-wrap{ margin:0; }
@@ -348,6 +351,8 @@
     <h1>ハワイアン・ムーン手帖</h1>
     <p class="subtitle">愛泉の杜 ｰ Spirit Tools</p>
   </header>
+
+  <a class="back-link" href="moon_tools.html">← 月読みツール集へ戻る</a>
 
   <section class="controls">
     <div class="field">

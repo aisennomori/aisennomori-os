@@ -96,9 +96,12 @@
   .cap-title{display:none;font-family:var(--fd);font-weight:700;font-size:.95rem;
     text-align:center;padding:10px 0 8px;color:var(--ink);
     border-bottom:2px solid var(--line);letter-spacing:.04em;}
+  .back-link{display:inline-block;margin:14px 16px 0;font-size:.75rem;color:var(--wax);text-decoration:none;font-weight:700;letter-spacing:.05em;}
+  .back-link:hover{text-decoration:underline;}
+
   @media print{
     .hdr{background:none;color:var(--ink);border-radius:0;}
-    .today-bar,.nav,.leg,.pbtn,.phint{display:none;}
+    .today-bar,.nav,.leg,.pbtn,.phint,.back-link{display:none;}
     .cal-wrap{border:none;border-radius:0;margin:0;}
   }
 
@@ -134,6 +137,8 @@
     </div>
   </div>
 </header>
+
+<a class="back-link" href="moon_tools.html">← 月読みツール集へ戻る</a>
 
 <div class="nav">
   <button class="nbtn" id="prevBtn">←</button>

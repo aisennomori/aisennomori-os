@@ -254,6 +254,9 @@
     margin-top:8px;
   }
 
+  .back-link{display:inline-block;margin:14px 16px 0;font-size:.75rem;color:var(--waxing);text-decoration:none;font-weight:700;letter-spacing:.05em;}
+  .back-link:hover{text-decoration:underline;}
+
   @media print{
     body{ background:#fff; }
     header.app-header{
@@ -262,6 +265,7 @@
     .section-title:first-of-type, .input-card, .input-actions, .hint{ display:none; }
     .legend{ display:none; }
     .print-section{ display:none; }
+    .back-link{ display:none; }
     .result-list{ border:none; border-radius:0; margin:0; }
     .page{ max-width:100%; padding:0; }
     .result-card{ padding:6px 4px 6px 10px; break-inside:avoid; }
@@ -275,6 +279,8 @@
     <h1>バースデー・ムーン診断</h1>
     <p class="subtitle">愛泉の杜 ｰ 生年月日からムーンデー番号を一括チェック</p>
   </header>
+
+  <a class="back-link" href="moon_tools.html">← 月読みツール集へ戻る</a>
 
   <h2 class="section-title">名前と生年月日を入力(最大20件)</h2>
 

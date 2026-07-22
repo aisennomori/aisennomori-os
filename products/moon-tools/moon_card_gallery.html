@@ -131,8 +131,11 @@
     color:var(--moonlight);}
 
   /* 印刷（PDF保存）: 現在表示中のカード1枚だけを対象にする */
+  .back-link{display:inline-block;margin:0 0 8px;font-size:.72rem;color:var(--gold-soft);text-decoration:none;font-weight:700;letter-spacing:.05em;opacity:.85;flex-shrink:0;align-self:flex-start;}
+  .back-link:hover{opacity:1;text-decoration:underline;}
+
   @media print{
-    .topbar, .nav-btn, .bottombar, .swipe-hint, .capture-btn, .capture-hint{ display:none !important; }
+    .topbar, .nav-btn, .bottombar, .swipe-hint, .capture-btn, .capture-hint, .back-link{ display:none !important; }
     html,body{ background:var(--navy) !important; overflow:visible !important; height:auto !important; }
     .app{ height:auto !important; padding:0 !important; overflow:visible !important; }
     .stage{ width:100% !important; max-width:none !important; overflow:visible !important; height:auto !important; }
@@ -449,6 +452,8 @@
 <body>
 <div id="stars"></div>
 <div class="app">
+
+  <a class="back-link" href="moon_tools.html">← 月読みツール集へ戻る</a>
 
   <div class="topbar">
     <div class="today-label" id="todayLabel"></div>
