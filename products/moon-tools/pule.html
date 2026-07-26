@@ -167,6 +167,20 @@
   .translation.show { display: block; }
   .translation .tline { display: block; }
   .translation .tline.active { color: var(--cream); }
+  #transJa{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 20px;
+    row-gap: 10px;
+  }
+  #transJa .tline{ display: contents; }
+  #transJa .tline-yomi{
+    white-space: nowrap;
+    text-align: left;
+    opacity: .75;
+    font-size: .85em;
+    align-self: baseline;
+  }
 
   /* フッター */
   .footer { margin-top: 40px; text-align: center; font-size: .7rem; color: rgba(245,238,216,0.3); letter-spacing: .12em; }
@@ -265,16 +279,16 @@ function checkPw(){
   </div>
 
   <div class="translation" id="transJa">
-    <span class="tline" data-i="0">おお、神なるものよ　エケアクア</span>
-    <span class="tline" data-i="1">永遠に終わりのないアロハの源よ　ケクムオケ　アロハ　パウオレ </span>
-    <span class="tline" data-i="2">この日を感謝します。　マハロヌイロアノ　ケーイアラー</span>
-    <span class="tline" data-i="3">今ここに嘆願します　ケノウアクネイ　マーコウ</span>
-    <span class="tline" data-i="4">あなたの祝福を授かるために　イコーポーマイカッイ</span>
-    <span class="tline" data-i="5">我らに健康を与え給え、　エホーマイ　ケオラ</span>
-    <span class="tline" data-i="6">我らに知識を与え給え、　エホーマイ　カッイケイ</span>
-    <span class="tline" data-i="7">我らの精神を力強くし給え　エホーマイ　カマナ</span>
-    <span class="tline" data-i="8">我らすべての者のために。　ノマーコウ　アパウ</span>
-    <span class="tline" data-i="9">アーママ。タブーは時は解き放たれた。　アーママ　ウアノア</span>
+    <span class="tline" data-i="0"><span class="tline-ja">おお、神なるものよ</span><span class="tline-yomi">エケアクア</span></span>
+    <span class="tline" data-i="1"><span class="tline-ja">永遠に終わりのないアロハの源よ</span><span class="tline-yomi">ケクムオケ　アロハ　パウオレ</span></span>
+    <span class="tline" data-i="2"><span class="tline-ja">この日を感謝します。</span><span class="tline-yomi">マハロヌイロアノ　ケーイアラー</span></span>
+    <span class="tline" data-i="3"><span class="tline-ja">今ここに嘆願します</span><span class="tline-yomi">ケノウアクネイ　マーコウ</span></span>
+    <span class="tline" data-i="4"><span class="tline-ja">あなたの祝福を授かるために</span><span class="tline-yomi">イコーポーマイカッイ</span></span>
+    <span class="tline" data-i="5"><span class="tline-ja">我らに健康を与え給え、</span><span class="tline-yomi">エホーマイ　ケオラ</span></span>
+    <span class="tline" data-i="6"><span class="tline-ja">我らに知識を与え給え、</span><span class="tline-yomi">エホーマイ　カッイケイ</span></span>
+    <span class="tline" data-i="7"><span class="tline-ja">我らの精神を力強くし給え</span><span class="tline-yomi">エホーマイ　カマナ</span></span>
+    <span class="tline" data-i="8"><span class="tline-ja">我らすべての者のために。</span><span class="tline-yomi">ノマーコウ　アパウ</span></span>
+    <span class="tline" data-i="9"><span class="tline-ja">アーママ。タブーは時は解き放たれた。</span><span class="tline-yomi">アーママ　ウアノア</span></span>
   </div>
 
   <div class="translation" id="transEn">
