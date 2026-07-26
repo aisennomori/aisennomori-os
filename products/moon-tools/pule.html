@@ -172,12 +172,13 @@
     grid-template-columns: 1fr auto;
     column-gap: 20px;
     row-gap: 10px;
+    padding-right: 3em; /* 読みを気持ち（全角3文字分）左に寄せる */
   }
   #transJa .tline{ display: contents; }
   #transJa .tline-yomi{
     white-space: nowrap;
     text-align: left;
-    opacity: .75;
+    color: #ff6b6b; /* カナ読みは赤文字（スマホでの視認性対策） */
     font-size: .85em;
     align-self: baseline;
   }
