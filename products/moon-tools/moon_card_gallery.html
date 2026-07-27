@@ -556,7 +556,7 @@ const ELEMENT_LABELS = { '🌬':'風', '🌊':'水', '🌍':'地', '🔥':'火' 
 function metaTagsInline(rec){
   const tags = [];
   if(rec.yinyang){
-    tags.push(`<span class="meta-tag">陰陽相性：${rec.yinyang.day} ${escapeHtml(rec.yinyang.name)}</span>`);
+    tags.push(`<span class="meta-tag">☯️${rec.yinyang.day} ${escapeHtml(rec.yinyang.name)}</span>`);
   }
   if(rec.element){
     const label = ELEMENT_LABELS[rec.element] || '';
