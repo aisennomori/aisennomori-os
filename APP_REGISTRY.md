@@ -28,6 +28,7 @@ Documentation Standard（`DOC_STANDARD.md`）は、会話・設計・ドキュ�
 | Logical App | Repository Path（実装） | Repository Path（DOCS） | Status |
 |---|---|---|---|
 | MoonCard | `products/moon-tools/`（`moon_card_gallery.html`、`moon_card_images/`。他の月読みツールと同居） | `products/moon-tools/DOCS/MoonCard/` | Active |
+| MoonAgeCalendar | `products/moon-tools/moon_age_calendar.html`（他の月読みツールと同居。ハワイ暦とは独立した月齢専用カレンダー） | 未定 | Active |
 | ManaCard | 未定 | 未定 | Planned |
 | SoulReading | 未定 | 未定 | Planned |
 | Healing | 未定 | 未定 | Planned |

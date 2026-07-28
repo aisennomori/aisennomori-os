@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月齢カレンダー | 愛泉の杜</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+  :root{
+    --bg:#FBF6EC; --card:#FFF; --ink:#3A322A; --soft:#9A8F80;
+    --line:#EAE1D2; --wax:#4F9D94; --full:#E2A23C; --wan:#8FAE7E; --new:#7A7268;
+    --fd:'Shippori Mincho','Yu Mincho',serif;
+    --fb:'Zen Kaku Gothic New','Yu Gothic',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--fb);}
+
+  .back-link{display:inline-block;margin:14px 16px 0;font-size:.75rem;color:var(--wax);text-decoration:none;font-weight:700;letter-spacing:.05em;}
+  .back-link:hover{text-decoration:underline;}
+
+  /* ヘッダー */
+  .hdr{background:linear-gradient(180deg,#3E3A33,#4A4339);color:#F7F1E4;
+    padding:18px 16px 20px;border-radius:0 0 20px 20px;margin-top:10px;}
+  .hdr h1{font-family:var(--fd);font-size:1.2rem;font-weight:700;letter-spacing:.04em;margin-bottom:2px;}
+  .hdr .sub{font-size:.7rem;color:#CFC4AE;letter-spacing:.08em;}
+
+  /* 今日 */
+  .today-bar{margin-top:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:12px;}
+  .today-icon{width:36px;height:36px;border-radius:50%;flex-shrink:0;position:relative;overflow:hidden;background:#2b2620;}
+  .today-icon .lit{position:absolute;top:0;left:0;height:100%;background:#F2D879;}
+  .today-lbl{font-size:.64rem;color:#CFC4AE;letter-spacing:.07em;}
+  .today-nm{font-family:var(--fd);font-weight:700;font-size:.9rem;color:#FBF6EC;}
+  .today-nm .pct{font-weight:400;font-size:.72rem;color:#D8CDB8;margin-left:5px;}
+
+  /* ナビ */
+  .nav{display:flex;align-items:center;gap:8px;margin:14px 12px 8px;}
+  .nbtn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
+    background:var(--card);font-size:1.1rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--ink);flex-shrink:0;}
+  .nbtn:active{background:var(--line);}
+  .ntitle{flex:1;text-align:center;font-family:var(--fd);font-weight:700;
+    font-size:1.1rem;letter-spacing:.04em;}
+
+  /* ジャンプ機能 */
+  .jump-row{display:flex;align-items:center;gap:6px;margin:0 12px 12px;flex-wrap:wrap;}
+  .jump-row select{
+    font-family:var(--fb);font-size:.85rem;border:1px solid var(--line);
+    border-radius:8px;padding:7px 8px;background:var(--card);color:var(--ink);}
+  .jump-row select#jumpYear{width:100px;}
+  .jump-row .jbtn{
+    font-family:var(--fd);font-weight:700;font-size:.82rem;letter-spacing:.03em;
+    color:#FBF6EC;background:var(--ink);border:none;border-radius:8px;
+    padding:8px 14px;cursor:pointer;}
+  .jump-row .jbtn:active{opacity:.85;}
+  .jump-row .jlbl{font-size:.72rem;color:var(--soft);}
+
+  /* カレンダー枠 */
+  .cal-wrap{margin:0 12px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;overflow:hidden;}
+
+  /* 曜日行（月曜始まり） */
+  .dow-row{display:grid;grid-template-columns:repeat(7,1fr);
+    border-bottom:2px solid var(--line);}
+  .dc{text-align:center;font-size:.68rem;font-weight:700;padding:8px 0;color:var(--soft);}
+  .dc.s{color:#C25450;} .dc.sa{color:#4A6FA5;}
+
+  /* グリッド */
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);}
+
+  .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:4px 2px 6px;min-height:88px;
+    display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .cell:nth-child(7n){border-right:none;}
+  .cell.empty{background:rgba(0,0,0,.018);}
+  .cell.today{background:#FFF7E2;}
+
+  /* 満ち欠け区分の上線 */
+  .cell[data-g="wax"]{border-top:2.5px solid var(--wax);}
+  .cell[data-g="full"]{border-top:2.5px solid var(--full);}
+  .cell[data-g="wan"]{border-top:2.5px solid var(--wan);}
+  .cell[data-g="new"]{border-top:2.5px solid var(--new);}
+
+  .dnum{font-family:var(--fd);font-weight:700;font-size:.9rem;line-height:1.3;
+    width:100%;text-align:center;}
+  .dnum.s{color:#C25450;} .dnum.sa{color:#4A6FA5;}
+
+  .dicon{width:1.9rem;height:1.9rem;border-radius:50%;position:relative;overflow:hidden;
+    margin:2px auto 1px;background:#2b2620;border:1px solid rgba(0,0,0,.08);}
+  .dicon .lit{position:absolute;top:0;left:0;height:100%;background:#E8C96A;}
+
+  .dphase{font-size:.6rem;color:var(--soft);font-weight:700;line-height:1.3;text-align:center;}
+  .dpct{font-size:.6rem;color:var(--soft);line-height:1.3;text-align:center;}
+
+  /* 凡例 */
+  .leg{display:flex;gap:12px;margin:10px 14px 6px;font-size:.67rem;
+    color:var(--soft);flex-wrap:wrap;}
+  .leg span{display:inline-flex;align-items:center;gap:5px;}
+  .leg i{display:inline-block;width:10px;height:10px;border-radius:2px;}
+  .lw{background:var(--wax);} .lf{background:var(--full);} .ln{background:var(--wan);} .lz{background:var(--new);}
+
+  /* 印刷 */
+  .pbtn{display:block;width:calc(100% - 24px);margin:14px 12px 0;
+    font-family:var(--fd);font-weight:700;font-size:.9rem;letter-spacing:.05em;
+    color:#FBF6EC;background:var(--ink);border:none;border-radius:12px;
+    padding:13px;cursor:pointer;text-align:center;}
+  .pbtn:active{opacity:.85;}
+  .phint{text-align:center;font-size:.67rem;color:var(--soft);margin:6px 0 24px;}
+  .cap-title{display:none;font-family:var(--fd);font-weight:700;font-size:.95rem;
+    text-align:center;padding:10px 0 8px;color:var(--ink);
+    border-bottom:2px solid var(--line);letter-spacing:.04em;}
+  @media print{
+    .back-link,.hdr,.today-bar,.nav,.jump-row,.leg,.pbtn,.phint{display:none;}
+    .cal-wrap{border:none;border-radius:0;margin:0;}
+  }
+
+  /* 画像として保存（iOS等） */
+  .ios-modal-overlay{display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.78);z-index:9999;
+    align-items:flex-end;justify-content:center;}
+  .ios-modal-overlay.active{display:flex;}
+  .ios-modal{background:#fff;border-radius:22px 22px 0 0;
+    padding:24px 18px 44px;width:100%;max-width:560px;
+    text-align:center;font-family:var(--fb);}
+  .ios-modal h3{font-family:var(--fd);font-size:1rem;font-weight:700;
+    margin-bottom:14px;color:var(--ink);}
+  .ios-modal img#capturedImg{width:100%;border-radius:12px;
+    border:1px solid var(--line);margin-bottom:14px;}
+  .ios-modal .guide-text{font-size:.82rem;color:var(--soft);
+    line-height:1.75;margin-bottom:18px;}
+  .ios-modal .guide-text strong{color:var(--ink);}
+  .ios-modal-close{width:100%;padding:13px;border-radius:12px;
+    border:1px solid var(--line);background:#F7F1E4;
+    font-family:var(--fb);font-size:.9rem;cursor:pointer;color:var(--ink);}
+</style>
+</head>
+<body>
+
+<a class="back-link" href="moon_tools.html">← 月読みツール集へ戻る</a>
+
+<header class="hdr">
+  <h1>🌙 月齢カレンダー</h1>
+  <p class="sub">愛泉の杜 ─ Spirit Tools</p>
+  <div class="today-bar">
+    <div class="today-icon" id="tIcon"><div class="lit" id="tIconLit"></div></div>
+    <div>
+      <div class="today-lbl" id="tLbl">今日の月</div>
+      <div class="today-nm" id="tNm">─</div>
+    </div>
+  </div>
+</header>
+
+<div class="nav">
+  <button class="nbtn" id="prevBtn">←</button>
+  <div class="ntitle" id="navTitle">─</div>
+  <button class="nbtn" id="nextBtn">→</button>
+</div>
+
+<div class="jump-row">
+  <span class="jlbl">移動：</span>
+  <select id="jumpYear"></select>
+  <select id="jumpMonth"></select>
+  <button class="jbtn" id="jumpBtn">この月へ</button>
+</div>
+
+<div class="cal-wrap" id="sheetInner">
+  <div class="cap-title" id="capTitle">─</div>
+  <div class="dow-row">
+    <div class="dc">月</div><div class="dc">火</div>
+    <div class="dc">水</div><div class="dc">木</div>
+    <div class="dc">金</div>
+    <div class="dc sa">土</div>
+    <div class="dc s">日</div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<div class="leg">
+  <span><i class="lz"></i>新月</span>
+  <span><i class="lw"></i>上弦（満ちる）</span>
+  <span><i class="lf"></i>満月</span>
+  <span><i class="ln"></i>下弦（欠ける）</span>
+</div>
+
+<button class="pbtn" id="pBtn">📄 PDFとして印刷</button>
+<p class="phint" id="printHint">印刷ダイアログで「PDFに保存」を選ぶとPDF化できます</p>
+
+<div class="ios-modal-overlay" id="iosModal">
+  <div class="ios-modal">
+    <h3>📸 画像を保存してください</h3>
+    <img id="capturedImg" src="" alt="キャプチャ画像">
+    <p class="guide-text">画像を<strong>長押し</strong>して<br>「<strong>写真に追加</strong>」または「<strong>画像を保存</strong>」を選んでください</p>
+    <button class="ios-modal-close" id="iosModalClose">閉じる</button>
+  </div>
+</div>
+
+<script>
+// ── 新月計算（birthday_moon_lookup.html / moon_calendar.html と同一の検証済みロジック）──
+const D = 86400000;
+
+function newMoonJDE(k){
+  const T=k/1236.85,T2=T*T,T3=T2*T,T4=T3*T;
+  const r=Math.PI/180,E=1-0.002516*T-0.0000074*T2;
+  const Mm=((201.5643+385.81693528*k+0.0107582*T2+0.00001238*T3-0.000000058*T4)%360)*r;
+  const Ms=((2.5534+29.10535670*k-0.0000014*T2-0.00000011*T3)%360)*r;
+  const Fm=((160.7108+390.67050284*k-0.0016118*T2-0.00000227*T3)%360)*r;
+  const Og=((124.7746-1.56375588*k+0.0020672*T2+0.00000215*T3)%360)*r;
+  const s=Math.sin,E2=E*E;
+  return 2451550.09766+29.530588861*k+0.00015437*T2-0.000000150*T3+0.00000000073*T4
+    -0.40720*s(Mm)+0.17241*E*s(Ms)+0.01608*s(2*Mm)+0.01039*s(2*Fm)
+    +0.00739*E*s(Mm-Ms)-0.00514*E*s(Mm+Ms)+0.00208*E2*s(2*Ms)
+    -0.00111*s(Mm-2*Fm)-0.00057*s(Mm+2*Fm)+0.00056*E*s(2*Mm+Ms)
+    -0.00042*s(3*Mm)+0.00042*E*s(Ms+2*Fm)+0.00038*E*s(Ms-2*Fm)
+    -0.00024*E*s(2*Mm-Ms)-0.00017*s(Og)-0.00007*s(Mm+2*Ms)
+    +0.00004*s(2*Mm-2*Fm)+0.00004*s(3*Ms)+0.00003*s(Mm+Ms-2*Fm)
+    +0.00003*s(2*Mm+2*Fm)-0.00003*s(Mm+Ms+2*Fm)+0.00003*s(Mm-Ms+2*Fm)
+    -0.00002*s(Mm-Ms-2*Fm)-0.00002*s(3*Mm+Ms)+0.00002*s(4*Mm);
+}
+function kFor(y,m){ return Math.floor((y+(m-0.5)/12-2000)*12.3685); }
+
+function jdeToUtcMs(jde){ return (jde-2440587.5)*D; }
+function utcMsToJstDayMs(utcMs){
+  const jst=new Date(utcMs+9*3600*1000);
+  return Date.UTC(jst.getUTCFullYear(), jst.getUTCMonth(), jst.getUTCDate());
+}
+
+// k(整数)ごとの新月イベント一覧（JST上の暦日と、正確なUTC時刻の両方を保持）
+const nmCache={};
+function getNM(y){
+  if(nmCache[y]) return nmCache[y];
+  const seen=new Set(), list=[];
+  for(let k=kFor(y,1)-4; k<=kFor(y,12)+4; k++){
+    const utcMs=jdeToUtcMs(newMoonJDE(k));
+    const dayMs=utcMsToJstDayMs(utcMs);
+    if(!seen.has(dayMs)){ seen.add(dayMs); list.push({ k, utcMs, dayMs }); }
+  }
+  return nmCache[y]=list.sort((a,b)=>a.utcMs-b.utcMs);
+}
+function nmNear(y){
+  const merged=getNM(y-1).concat(getNM(y),getNM(y+1));
+  const seen=new Set();
+  return merged.filter(e=>seen.has(e.dayMs)?false:seen.add(e.dayMs)).sort((a,b)=>a.utcMs-b.utcMs);
+}
+
+// 対象日を挟む新月ブラケット（前後の新月のk・暦日・正確な時刻）を探す
+function findMoonBracket(targetDayMs, year){
+  const list=nmNear(year);
+  for(let i=1; i<list.length; i++){
+    if(targetDayMs<list[i-1].dayMs || targetDayMs>=list[i].dayMs) continue;
+    return { prev:list[i-1], next:list[i] };
+  }
+  return null;
+}
+
+// 指定日の月齢情報（輝面比%・呼び名・区分）を返す
+// 満月は k+0.5 で正確な瞬間を直接計算し（前後の新月の中間点で近似しない）、
+// 新月→満月／満月→次の新月、それぞれの半周期ごとに輝面比を補間する
+function getPhaseInfo(year, month, day){
+  const targetDayMs=Date.UTC(year, month-1, day);
+  const br=findMoonBracket(targetDayMs, year);
+  if(!br) return null;
+
+  const fullUtcMs=jdeToUtcMs(newMoonJDE(br.prev.k + 0.5));
+  const fullDayMs=utcMsToJstDayMs(fullUtcMs);
+
+  // その日の代表時刻として正午UTCを使う（1日の中間的な瞬間として採用）
+  const targetRepMs=targetDayMs + 12*3600*1000;
+
+  let pct, group;
+  if(targetDayMs===br.prev.dayMs){
+    pct=0; group='new';
+  } else if(targetDayMs===fullDayMs){
+    pct=100; group='full';
+  } else if(targetRepMs < fullUtcMs){
+    const frac=(targetRepMs - br.prev.utcMs) / (fullUtcMs - br.prev.utcMs);
+    pct=Math.round((1-Math.cos(Math.PI*frac))/2*100);
+    group='wax';
+  } else {
+    const frac=(targetRepMs - fullUtcMs) / (br.next.utcMs - fullUtcMs);
+    pct=Math.round((1+Math.cos(Math.PI*frac))/2*100);
+    group='wan';
+  }
+
+  const label = group==='new' ? '新月' : group==='full' ? '満月' : group==='wax' ? '上弦' : '下弦';
+  return { pct, label, group };
+}
+
+// ── 状態 ─────────────────────────────────────────────────────
+let cY, cM;
+
+// ── 今日ウィジェット ─────────────────────────────────────────
+(function(){
+  const now=new Date();
+  const y=now.getFullYear(), m=now.getMonth()+1, d=now.getDate();
+  const info=getPhaseInfo(y,m,d);
+  const dow=['日','月','火','水','木','金','土'][now.getDay()];
+  document.getElementById('tLbl').textContent=`${y}年${m}月${d}日（${dow}）`;
+  if(info){
+    document.getElementById('tIconLit').style.width=info.pct+'%';
+    document.getElementById('tNm').innerHTML=
+      `${info.label}<span class="pct">輝面比 ${info.pct}%</span>`;
+  }
+})();
+
+// ── カレンダー描画 ───────────────────────────────────────────
+function render(year, month){
+  cY=year; cM=month;
+  document.getElementById('navTitle').textContent=`${year}年 ${month}月`;
+  document.getElementById('capTitle').textContent=`${year}年 ${month}月`;
+  document.getElementById('jumpYear').value = year;
+  document.getElementById('jumpMonth').value = String(month);
+
+  const now=new Date();
+  const todayMs=Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const firstDow=(new Date(year,month-1,1).getDay()+6)%7; // 月曜=0列目
+  const dim=new Date(year,month,0).getDate();
+  const grid=document.getElementById('grid');
+  grid.innerHTML='';
+
+  // 前月の空白
+  for(let i=0;i<firstDow;i++){
+    const c=document.createElement('div');
+    c.className='cell empty';
+    grid.appendChild(c);
+  }
+
+  // 各日
+  for(let d=1; d<=dim; d++){
+    const ms=Date.UTC(year, month-1, d);
+    const dow=new Date(year, month-1, d).getDay();
+    const isToday=(ms===todayMs);
+    const info=getPhaseInfo(year, month, d);
+
+    const c=document.createElement('div');
+    c.className='cell'+(isToday?' today':'');
+    if(info) c.dataset.g=info.group;
+
+    const dn=document.createElement('div');
+    dn.className='dnum'+(dow===0?' s':dow===6?' sa':'');
+    dn.textContent=d;
+    c.appendChild(dn);
+
+    if(info){
+      const ic=document.createElement('div');
+      ic.className='dicon';
+      ic.innerHTML=`<div class="lit" style="width:${info.pct}%;"></div>`;
+      c.appendChild(ic);
+
+      const ph=document.createElement('div');
+      ph.className='dphase';
+      ph.textContent=info.label;
+      c.appendChild(ph);
+
+      const pc=document.createElement('div');
+      pc.className='dpct';
+      pc.textContent=(info.label==='新月'||info.label==='満月') ? '' : info.pct+'%';
+      c.appendChild(pc);
+    }
+
+    grid.appendChild(c);
+  }
+
+  // 末尾の空白
+  const total=firstDow+dim;
+  const rem=total%7;
+  if(rem>0){
+    for(let i=0;i<7-rem;i++){
+      const c=document.createElement('div');
+      c.className='cell empty';
+      grid.appendChild(c);
+    }
+  }
+}
+
+// ── イベント ─────────────────────────────────────────────────
+document.getElementById('prevBtn').addEventListener('click', () => {
+  let m=cM-1, y=cY;
+  if(m<1){ m=12; y--; }
+  render(y,m);
+});
+document.getElementById('nextBtn').addEventListener('click', () => {
+  let m=cM+1, y=cY;
+  if(m>12){ m=1; y++; }
+  render(y,m);
+});
+
+// 月ジャンプ用プルダウンの生成
+(function(){
+  const sel=document.getElementById('jumpMonth');
+  for(let m=1; m<=12; m++){
+    const o=document.createElement('option');
+    o.value=String(m);
+    o.textContent=m+'月';
+    sel.appendChild(o);
+  }
+})();
+// 年ジャンプ用プルダウンの生成（1500年〜現在+20年）
+(function(){
+  const sel=document.getElementById('jumpYear');
+  const curY=new Date().getFullYear();
+  for(let y=1500; y<=curY+20; y++){
+    const o=document.createElement('option');
+    o.value=String(y);
+    o.textContent=y+'年';
+    if(y===curY) o.selected=true;
+    sel.appendChild(o);
+  }
+})();
+document.getElementById('jumpBtn').addEventListener('click', () => {
+  const y=parseInt(document.getElementById('jumpYear').value, 10);
+  const m=parseInt(document.getElementById('jumpMonth').value, 10);
+  if(!y || y<1 || m<1 || m>12){ alert('年を正しく入力してください'); return; }
+  render(y, m);
+});
+
+// ── 印刷／画像保存 ───────────────────────────────────────────
+document.getElementById('pBtn').addEventListener('click', async function(){
+  if(!isMobileSave()){ window.print(); return; }
+  const btn=this;
+  const origText=btn.textContent;
+  btn.textContent='生成中...'; btn.disabled=true;
+  const capTitle=document.getElementById('capTitle');
+  capTitle.style.display='block';
+  try{
+    const canvas=await html2canvas(document.getElementById('sheetInner'),{
+      scale:2, useCORS:true, allowTaint:true, logging:false, backgroundColor:'#FFFFFF'
+    });
+    document.getElementById('capturedImg').src=canvas.toDataURL('image/png');
+    document.getElementById('iosModal').classList.add('active');
+  }catch(e){
+    alert('キャプチャに失敗しました。\nスクリーンショットで保存してください。');
+  }finally{
+    capTitle.style.display='none';
+    btn.textContent=origText; btn.disabled=false;
+  }
+});
+document.getElementById('iosModalClose').addEventListener('click', function(){
+  document.getElementById('iosModal').classList.remove('active');
+  document.getElementById('capturedImg').src='';
+});
+document.getElementById('iosModal').addEventListener('click', function(e){
+  if(e.target===this){ this.classList.remove('active'); document.getElementById('capturedImg').src=''; }
+});
+
+function isMobileSave(){
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+}
+(function(){
+  if(isMobileSave()){
+    document.getElementById('pBtn').textContent='📸 画像として保存';
+    document.getElementById('printHint').textContent='画像が表示されます。長押しして写真に保存してください。';
+  }
+})();
+
+// 初期表示
+const _now=new Date();
+render(_now.getFullYear(), _now.getMonth()+1);
+</script>
+</body>
+</html>
