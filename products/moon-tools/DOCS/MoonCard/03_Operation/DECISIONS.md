@@ -1,4 +1,4 @@
-> Documentation Standard: Edition 1 / Version 1.0 (Frozen)　|　Layer: Operation　|　App: MoonCard　|　Status: Approved
+> Documentation Standard: Edition 1 / Version 2.0　|　Layer: Operation　|　App: MoonCard　|　Status: Approved
 
 # DECISIONS.md
 
@@ -154,3 +154,16 @@
 
 **将来の見直し**：`moon-tools`内の他ツール（moon_calendar.html等）にもDOCSを作る場合は、同じ考え方で `products/moon-tools/DOCS/{ToolName}/` として追加する。
 
+---
+
+## DEC-012：画像保存・印刷機能は、現在表示中のカードのみを対象とする
+
+**カテゴリ**：UI
+
+**決定**：`moon_card_gallery.html` の画像保存・印刷機能は、カルーセル全体ではなく、現在表示中のカード1枚のみを対象とする。
+
+**理由**
+- 利用者が今見ているカードを、そのまま保存・印刷できることを優先した
+- カルーセル全体を対象にすると、複数枚のカードが出力に含まれてしまい、「今見ているものだけを保存したい」という利用者の期待と一致しない
+
+**実装**：`print-active` クラスを表示中のカードに付与し、html2canvas（スマホでの画像保存）・印刷用CSS（PCでの印刷）とも、このクラスが付いたカードのみをキャプチャ・印刷対象とする。実装方法（クラス名やライブラリ）が将来変わっても、この決定（表示中の1枚のみを対象とする、という仕様）自体は独立して残る。

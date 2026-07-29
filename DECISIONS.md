@@ -1,4 +1,4 @@
-> Documentation Standard: Edition 1 / Version 1.0 (Frozen)　|　Layer: OS Root　|　Status: Approved
+> Documentation Standard: Edition 1 / Version 2.0　|　Layer: OS Root　|　Status: Approved
 
 # DECISIONS.md（OS Root）
 
@@ -55,3 +55,18 @@
 - カテゴリ（`VALIDATION.md`等）についても同じ基準を適用する。今は`DATA_AUDIT.md`内の「調査」セクションに留め、同種の記録が繰り返し必要になった実例が積み重なってから独立を検討する
 
 **将来の見直し**：OS-root Documentationにさらにカテゴリを追加したくなった場合、必ず「これは実際に運用で繰り返し必要になったか、それとも思いつきか」を自問してから判断する。
+
+---
+
+## OS-DEC-004：Documentation Standard と APP_REGISTRY の責務を分離する
+
+**カテゴリ**：Documentation
+
+**決定**：`DOC_STANDARD.md`は、アプリの論理構造・文書構成・執筆ルールのみを定義する。論理アプリと実装・Documentation・関連資産の対応関係は、`APP_REGISTRY.md`を唯一の正本として管理する。OS-root Documentationには、OS全体の長期的な設計原則のみを記録する。
+
+**理由**
+- Documentation Standardが物理構造に依存すると、実装や資産の移動のたびに標準自体が古くなる
+- 対応関係をAPP_REGISTRYに集約することで、物理構造変更時の更新箇所を一つに限定できる
+- OS-root Documentationを長期的な設計原則に限定することで、個別アプリの運用履歴との混在を防ぐ
+
+**将来の見直し**：APP_REGISTRYで実装・Documentation・関連資産の対応を管理できない実例が、複数アプリで継続的に発生した場合に見直す。

@@ -1,9 +1,9 @@
 # APP_REGISTRY.md
 
-> Documentation Standard: Edition 1 / Version 1.0 (Frozen)　|　Layer: OS Root　|　Status: Approved
+> Documentation Standard: Edition 1 / Version 2.0　|　Layer: OS Root　|　Status: Approved
 
-このファイルは、愛泉の杜OSにおける**論理名（Logical Name）**と
-**物理パス（Repository Path）**の対応を一元管理する。
+このファイルは、愛泉の杜OSにおける**論理名（Logical Name）**と、
+その実体である**実装・Documentation・関連資産**の対応関係を一元管理する唯一の正本である。
 
 ## なぜ必要か
 
@@ -14,11 +14,11 @@ Documentation Standard（`DOC_STANDARD.md`）は、会話・設計・ドキュ�
 既存のリンク、既存のツール連携設定など）を尊重し、無理に論理名へ合わせて
 リネームしない。
 
-この2つの構造を橋渡しするのが、このファイルである。
+論理構造と実体を橋渡しするのが、このファイルである。
 
 **論理構造（Documentation Standardが使う名前）と、
 物理構造（実際のGitリポジトリのパス）は分離する。**
-この対応関係を一元管理する場所を、このファイル1つに限定する
+実装・Documentation・関連資産を含む対応関係を一元管理する場所を、このファイル1つに限定する
 （`PURPOSE.md`を単一実体にしたのと同じ理由＝ドリフト防止）。
 
 ---
@@ -52,5 +52,5 @@ MoonCardはその中の1ツールであるため、DOCSも
 ## 運用ルール
 
 - 新しいアプリを追加する際は、まずこのファイルに1行追加する
-- `Repository Path` が「未定」のうちは、そのアプリのDOCSに実パスへのリンクを書かない（`PROJECT_OVERVIEW.md`にPlanned状態である旨だけ書く）
-- 物理パスの変更（リネーム・移動）が発生した場合、このファイルの該当行のみを更新する。各アプリのDOCS内で物理パスを直書きしている箇所があれば、このファイルを正として合わせる
+- 実体が「未定」のうちは、そのアプリのDOCSに実体への対応を記載しない（`PROJECT_OVERVIEW.md`にPlanned状態である旨だけ書く）
+- 実装・Documentation・関連資産の物理構造に変更（リネーム・移動・追加）が発生した場合は、このファイルの該当行を更新する。他のDocumentationに対応関係を複製しない

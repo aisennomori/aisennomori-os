@@ -1,17 +1,16 @@
 # DOC_STANDARD.md
 ## 愛泉の杜 Documentation Standard（ADS）
-### Edition 1 / Version 1.0 — **Frozen（正式採用）**
+### Edition 1 / Version 2.0 — **Approved（正式運用）**
 **Status**: Approved
 
-> 配置場所：愛泉の杜OSの直下（`愛泉の杜OS/DOC_STANDARD.md`）。
 > MoonCard専用のファイルではなく、**すべてのアプリに共通するOS標準**である。
 
 > **凍結宣言**
-> Documentation Standard Edition 1 / Version 1.0 は、この時点をもって正式採用（Freeze）される。
+> Documentation Standard Edition 1 / Version 2.0 は、この時点をもって正式運用とする。
 > 以後の改善は、実際にアプリ（ManaCard、SoulReading、Healingなど）を作り、運用する中で
 > 「この標準に足りない点」が具体的に見えたときにのみ行う。
-> 思いつきベースでの改訂は行わず、次の版は Edition 1 / Version 1.1 として、
-> 変更理由とともに `DECISIONS.md`（該当アプリ）に記録した上で改訂する。
+> 思いつきベースでの改訂は行わず、変更理由と影響範囲を記録した上で改訂する。
+> OS全体の長期的な設計原則に関わる改訂はOS-rootの `DECISIONS.md` に記録する。
 
 このドキュメントは、愛泉の杜OSに属するすべてのアプリが持つべき
 ドキュメント構成・執筆ルールの標準を定義する。
@@ -38,43 +37,46 @@ AIのために書く。
 この一文が、Documentation Standardのすべての規則の根拠である。
 個別の判断に迷ったときは、規則の字面よりも、この原則に立ち返ること。
 
+論理アプリと実体の対応関係については、`APP_REGISTRY.md` を唯一の正本とする。
+APP_REGISTRY.md は物理パスだけでなく、論理アプリと実装・Documentation・関連資産の
+対応関係を管理する。
+
 ---
 
 ## 論理構造と物理構造の分離
 
 Documentation Standardが定義する `Apps/{AppName}/DOCS/...` という表記は、
-**論理構造**である。実際のリポジトリ上の**物理パス**とは、必ずしも一致しない。
+**論理構造**である。実際のリポジトリ上の物理構造を定義・記載しない。
 
 理由：既存のリポジトリには、すでに積み上げてきた資産（フォルダ構成、既存のリンク、
 外部ツールとの連携設定など）がある。論理構造に合わせて物理構造を無理に変更すると、
 Git履歴の分断やリンク切れなど、運用コストが発生する。
 
-この2つの構造の対応関係は、`APP_REGISTRY.md`（OS直下）に一元管理する。
+論理アプリ名と実装・Documentation・関連資産の実体との対応関係は、
+`APP_REGISTRY.md` に一元管理する。
 
 ```
 論理構造（Documentation Standardが使う名前）
-    MoonCard
+    {AppName}
         ↓
-APP_REGISTRY.md が対応を管理
+APP_REGISTRY.md が唯一の正本として対応を管理
         ↓
-物理構造（実際のリポジトリのパス）
-    products/moon-tools/DOCS/MoonCard/
+実体（実装・Documentation・関連資産）
 ```
 
-各アプリの `PROJECT_OVERVIEW.md` には、そのアプリの論理名と物理パスの対応を
-明記すること。ただし対応関係の**正**は常に `APP_REGISTRY.md` であり、
-食い違いが生じた場合は `APP_REGISTRY.md` を正とする。
+物理構造の新設・移動・改名が発生した場合は、`APP_REGISTRY.md` を更新する。
+他のDocumentationに物理パスを複製しない。対応関係に食い違いが生じた場合は、
+`APP_REGISTRY.md` を正として確認する。
 
 ---
 
 ## Reference Implementation
 
-このEdition 1 / Version 1.0は、**MoonCard**を最初の実装例（Reference Implementation）として策定された。
-MoonCardの論理名と物理パスの対応は `APP_REGISTRY.md` を参照。
+このEdition 1 / Version 2.0は、**MoonCard**を最初の実装例（Reference Implementation）として扱う。
+MoonCardの実体は `APP_REGISTRY.md` を参照して解決する。
 
 新しいアプリ（ManaCard、SoulReading、Healing、HSP、AI Counselorなど）の
-DOCSを作る際は、MoonCardの `Apps/MoonCard/DOCS/` 一式をそのまま雛形として複製し、
-内容だけをそのアプリのものに置き換える。
+DOCSを作る際は、MoonCardの論理構造と文書構成を参照し、内容をそのアプリのものに置き換える。
 
 **重要**：MoonCardのDOCSに書かれている内容は、あくまでMoonCard固有の実装例である。
 一方、この`DOC_STANDARD.md`に書かれている構成・ルールは、全アプリに共通するOS標準である。
@@ -93,8 +95,8 @@ Documentation Standardのバージョンは、**Edition**と**Version**の2軸�
 
 ```
 Edition 1
-  ├─ Version 1.0（現行・Frozen）
-  └─ Version 1.1（将来、運用の中で必要になった時点で）
+  ├─ Version 1.0（初版・Frozen）
+  └─ Version 2.0（現行・Approved）
 
 Edition 2（将来、体系ごと作り直す場合）
   └─ Version 1.0
@@ -137,7 +139,7 @@ AIはファイル名よりもフォルダ構造から先に意味を理解する
 
 ### PURPOSE.md の扱い（OS全体の理念）
 
-`PURPOSE.md` は、OS全体で唯一の理念文書であり、`愛泉の杜OS/PURPOSE.md` にのみ存在する。
+`PURPOSE.md` は、OS全体で唯一の理念文書である。
 各アプリの `01_Foundation/` には複製せず、`README.md` の冒頭から参照リンクする。
 
 理由：複製すると、PURPOSEが更新された際に複製先が古いまま取り残される
@@ -165,20 +167,25 @@ AI_INDEX.mdの書式例：
 
 ## 読む順番
 
-1. ../../../PURPOSE.md
-2. ../../../DOC_STANDARD.md
-3. 01_Foundation/MANIFEST.md
-4. 01_Foundation/README.md
-5. 01_Foundation/PROJECT_OVERVIEW.md
-6. 02_Architecture/DATA_SPEC.md
-7. 02_Architecture/SCREEN_SPEC.md
-8. 02_Architecture/DESIGN_RULES.md
-9. 03_Operation/DECISIONS.md
-10. 03_Operation/DATA_AUDIT.md
-11. 03_Operation/CHANGELOG.md
-12. 03_Operation/FUTURE_IDEAS.md
-13. 03_Operation/GLOSSARY.md
+1. OS-root / PURPOSE.md
+2. OS-root / DOC_STANDARD.md
+3. OS-root / APP_REGISTRY.md
+4. OS-root / DECISIONS.md
+5. {AppName} / 01_Foundation / MANIFEST.md
+6. {AppName} / 01_Foundation / README.md
+7. {AppName} / 01_Foundation / PROJECT_OVERVIEW.md
+8. {AppName} / 02_Architecture / DATA_SPEC.md
+9. {AppName} / 02_Architecture / SCREEN_SPEC.md
+10. {AppName} / 02_Architecture / DESIGN_RULES.md
+11. {AppName} / 03_Operation / DECISIONS.md
+12. {AppName} / 03_Operation / DATA_AUDIT.md
+13. {AppName} / 03_Operation / CHANGELOG.md
+14. {AppName} / 03_Operation / FUTURE_IDEAS.md
+15. {AppName} / 03_Operation / GLOSSARY.md
 ```
+
+この例は論理的な読了対象を示す。具体的な実体を確認する必要がある場合は、
+`APP_REGISTRY.md` を参照する。
 
 ---
 
@@ -189,7 +196,11 @@ PURPOSE              OS全体：なぜ存在するのか（OS直下、単一の�
 　　↓
 CONSTITUTION           OS全体：何を守るのか（未整備。今後追加）
 　　↓
-DOC_STANDARD            OS全体：ドキュメントをどう作るか　← このファイル（Edition 1 / v1.0・Frozen）
+DOC_STANDARD            OS全体：ドキュメントをどう作るか　← このファイル（Edition 1 / v2.0・Approved）
+　　↓
+APP_REGISTRY            OS全体：論理アプリと実体の対応を管理する唯一の正本
+　　↓
+DECISIONS               OS全体：長期的なOS設計原則
 　　↓
 AI_INDEX（アプリ別）      アプリ：AIはここから読み始める
 　　↓
@@ -226,12 +237,18 @@ AI_INDEX（アプリ別）      アプリ：AIはここから読み始める
 - 前置き・説明文を書かない。読む順番のリストのみで構成する
 - 特定のAI製品名を書かない。「AI全般」を対象に書く
 - 人向けの文脈説明は書かない（それはREADME.mdの役割）
+- OS-rootの `PURPOSE.md`、`DOC_STANDARD.md`、`APP_REGISTRY.md`、`DECISIONS.md` を先に読む
+- 物理パスを列挙せず、具体的な実体が必要な場合は `APP_REGISTRY.md` を参照する
+
+### OS-root Documentation
+- OS-rootには、複数アプリに影響し、長期的にOS全体の設計原則となる内容のみを記録する
+- 個別アプリの実装詳細・運用履歴・固有の設計判断は、各アプリのDocumentationに記録する
 
 ### 全ドキュメント共通
 - 各ファイルの冒頭に、以下の1行メタ情報を付与する
 
   ```
-  > Documentation Standard: Edition 1 / Version 1.0 (Frozen)　|　Layer: {Foundation|Architecture|Operation}　|　App: {AppName}　|　Status: {Draft|Review|Approved|Deprecated}
+  > Documentation Standard: Edition 1 / Version 2.0　|　Layer: {Foundation|Architecture|Operation}　|　App: {AppName}　|　Status: {Draft|Review|Approved|Deprecated}
   ```
 
 - **Status** の意味（内容の確定状況を示すものであり、実リポジトリへの反映＝デプロイ状況とは別に管理する）：
@@ -254,3 +271,4 @@ AI_INDEX（アプリ別）      アプリ：AIはここから読み始める
 | Edition | Version | 内容 |
 |---|---|---|
 | 1 | 1.0 | 初版。MoonCardを Reference Implementation として策定。Foundation / Architecture / Operation の3層構造、Edition／Version分離、Statusフィールド、DECISIONSのカテゴリ分類、AI_INDEX.mdを導入。**この版をもって正式採用（Freeze）** |
+| 1 | 2.0 | Documentation Standardを論理構造・文書構成・執筆ルールに限定。論理アプリと実装・Documentation・関連資産の対応関係は、`APP_REGISTRY.md` を唯一の正本として管理する方針を正式化。AIの推奨読了順にOS-rootの `APP_REGISTRY.md` と `DECISIONS.md` を追加。 |

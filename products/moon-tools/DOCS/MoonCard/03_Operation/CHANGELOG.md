@@ -1,4 +1,4 @@
-> Documentation Standard: Edition 1 / Version 1.0 (Frozen)　|　Layer: Operation　|　App: MoonCard　|　Status: Approved
+> Documentation Standard: Edition 1 / Version 2.0　|　Layer: Operation　|　App: MoonCard　|　Status: Approved
 
 # CHANGELOG.md
 
@@ -65,3 +65,11 @@
 - 各DOCS内の相対パスを、実際の物理配置（`products/moon-tools/DOCS/MoonCard/`）に合わせて修正
 - **反映状況**：引き続きDraft運用中。実際のリポジトリへの反映はこれから
 
+## Docs v2.0 - 論理構造と実体の対応管理を正式運用化
+
+- Documentation StandardをEdition 1 / Version 2.0へ改訂
+- Documentation Standardは論理構造のみを定義し、論理アプリと実装・Documentation・関連資産の対応関係はAPP_REGISTRY.mdを唯一の正本として管理する方針を正式化
+- AI_INDEXに、APP_REGISTRY.mdとOS-root DECISIONS.mdを含む推奨読了順を反映
+- READMEを物理構造の説明から論理構成の説明へ整理
+- PROJECT_OVERVIEWから対応関係の重複記載を除き、APP_REGISTRY.mdを唯一の参照先として明記
+- 旧Documentationツリーにのみ存在した画像保存・印刷のUI判断をDEC-012として正本へ統合

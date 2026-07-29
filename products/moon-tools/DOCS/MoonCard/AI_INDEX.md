@@ -10,20 +10,21 @@
 
 ## 読む順番
 
-1. `../../../../PURPOSE.md` — OS全体の理念。すべての判断はここに立ち返る
-2. `../../../../DOC_STANDARD.md` — このドキュメント体系自体のルール（Edition 1 / Version 1.0・Frozen）
-3. `../../../../APP_REGISTRY.md` — 論理名（MoonCard）と物理パス（`products/moon-tools/`）の対応
-4. `01_Foundation/MANIFEST.md` — MoonCardは何を大切にしているか
-5. `01_Foundation/README.md` — MoonCardは何ができるか
-6. `01_Foundation/PROJECT_OVERVIEW.md` — 背景・データの出自
-7. `02_Architecture/DATA_SPEC.md` — データ構造。矛盾時に何を信じるか
-8. `02_Architecture/SCREEN_SPEC.md` — 画面構成・操作仕様
-9. `02_Architecture/DESIGN_RULES.md` — 配色・タイポグラフィ・命名規則
-10. `03_Operation/DECISIONS.md` — 設計判断とその理由（DEC-XXX）
-11. `03_Operation/DATA_AUDIT.md` — 過去に起きたデータ不整合と再発防止策
-12. `03_Operation/CHANGELOG.md` — 更新履歴
-13. `03_Operation/FUTURE_IDEAS.md` — 未着手・保留中の事項
-14. `03_Operation/GLOSSARY.md` — 用語・表記ルール・Alias
+1. OS-root / `PURPOSE.md` — OS全体の理念。すべての判断はここに立ち返る
+2. OS-root / `DOC_STANDARD.md` — このドキュメント体系自体のルール（Edition 1 / Version 2.0）
+3. OS-root / `APP_REGISTRY.md` — 論理名MoonCardと実装・Documentation・関連資産の対応関係を確認する唯一の正本
+4. OS-root / `DECISIONS.md` — OS全体の長期的な設計原則
+5. MoonCard / `01_Foundation/MANIFEST.md` — MoonCardは何を大切にしているか
+6. MoonCard / `01_Foundation/README.md` — MoonCardは何ができるか
+7. MoonCard / `01_Foundation/PROJECT_OVERVIEW.md` — 背景・データの出自
+8. MoonCard / `02_Architecture/DATA_SPEC.md` — データ構造。矛盾時に何を信じるか
+9. MoonCard / `02_Architecture/SCREEN_SPEC.md` — 画面構成・操作仕様
+10. MoonCard / `02_Architecture/DESIGN_RULES.md` — 配色・タイポグラフィ・命名規則
+11. MoonCard / `03_Operation/DECISIONS.md` — 設計判断とその理由（DEC-XXX）
+12. MoonCard / `03_Operation/DATA_AUDIT.md` — 過去に起きたデータ不整合と再発防止策
+13. MoonCard / `03_Operation/CHANGELOG.md` — 更新履歴
+14. MoonCard / `03_Operation/FUTURE_IDEAS.md` — 未着手・保留中の事項
+15. MoonCard / `03_Operation/GLOSSARY.md` — 用語・表記ルール・Alias
 
 ---
 
@@ -39,5 +40,5 @@
 
 ## このファイル自体のStatus
 
-Status: Approved（Documentation Standard Edition 1 / Version 1.0 の一部として正式採用済み。
+Status: Approved（Documentation Standard Edition 1 / Version 2.0 に準拠。
 実際のリポジトリへの反映状況は `CHANGELOG.md` を確認すること）

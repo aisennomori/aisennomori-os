@@ -1,4 +1,4 @@
-> Documentation Standard: Edition 1 / Version 1.0 (Frozen)　|　Layer: Foundation　|　App: MoonCard　|　Status: Approved
+> Documentation Standard: Edition 1 / Version 2.0　|　Layer: Foundation　|　App: MoonCard　|　Status: Approved
 
 # PROJECT_OVERVIEW.md
 
@@ -48,22 +48,14 @@ birthday_moon_lookup.html／cycle_tracker.html／mauli_tool.html）
 - 画像アセットは `moon_card_images/` フォルダに分離し、既存の月相アイコン用フォルダ（`画像`／moon_01〜30.png）とは独立させている
 - GitHub Pages想定の静的サイトとして、他の月読みツール群と同じ階層に配置される
 
-## 論理名と物理パス
+## 論理名と実体の対応
 
 Documentation Standardの中で、このアプリは「MoonCard」という論理名で扱われる。
-実際のリポジトリでは、複数の月読みツールが同居する `products/moon-tools/` の中に存在する。
-
-| 項目 | 内容 |
-|---|---|
-| 論理名 | MoonCard |
-| 実装の物理パス | `products/moon-tools/moon_card_gallery.html`、`products/moon-tools/moon_card_images/` |
-| DOCSの物理パス | `products/moon-tools/DOCS/MoonCard/` |
-
-この対応関係の正は `APP_REGISTRY.md`（OS直下）であり、食い違いが生じた場合はそちらを正とする。
+実装・Documentation・関連資産の対応関係は、`APP_REGISTRY.md` を唯一の正本として参照する。
 
 ## このアプリの位置付け
 
-月読みカードは、愛泉の杜OS Documentation Standard v1.0 の
+月読みカードは、愛泉の杜OS Documentation Standard v2.0 の
 **Reference Implementation（最初の実装例）**でもあります。
 今後追加されるManaCard、SoulReading、Healingなどのアプリは、
 このアプリのDOCS一式を雛形として複製されます（`DOC_STANDARD.md` 参照）。

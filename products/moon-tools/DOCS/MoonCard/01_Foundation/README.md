@@ -1,4 +1,4 @@
-> Documentation Standard: Edition 1 / Version 1.0 (Frozen)　|　Layer: Foundation　|　App: MoonCard　|　Status: Approved
+> Documentation Standard: Edition 1 / Version 2.0　|　Layer: Foundation　|　App: MoonCard　|　Status: Approved
 
 # 月読みカード（MoonCard）
 
@@ -64,45 +64,25 @@ OS全体の理念を定義した `PURPOSE.md`（OS直下、単一の実体）に
 
 ---
 
-## 5. フォルダ構成
+## 5. 論理構成
 
-### 論理構造と物理構造
-
-MoonCardは、Documentation Standardの中では「MoonCard」という論理名で扱われるが、
-実際のリポジトリでは `products/moon-tools/` という、複数の月読みツールが同居する
-製品ファミリーのフォルダの中に存在する。論理名と物理パスの対応は
-`APP_REGISTRY.md`（OS直下）を正とする。
+MoonCardは、愛泉の杜OSの中で「月の物語を通じて、静かに自分と向き合う時間を届ける」
+論理アプリとして扱う。実装・Documentation・関連資産の対応関係は、
+`APP_REGISTRY.md` を唯一の正本として参照する。
 
 ```
-products/moon-tools/                    ← 物理パス（他の月読みツールと同居）
-├── moon_card_gallery.html              … MoonCard本体（HTML/CSS/JS、データも内包）
-├── moon_card_images/                   … MoonCard用の各夜の雰囲気画像
-├── moon_calendar.html 他               … 同じ製品ファミリーの他ツール（MoonCard外）
-│
-└── DOCS/
-    └── MoonCard/                       ← MoonCard専用のDOCS（論理名でスコープを区切る）
-        ├── AI_INDEX.md
-        ├── 01_Foundation/
-        │   ├── MANIFEST.md
-        │   ├── README.md               … このファイル
-        │   └── PROJECT_OVERVIEW.md
-        ├── 02_Architecture/
-        │   ├── DATA_SPEC.md
-        │   ├── SCREEN_SPEC.md
-        │   └── DESIGN_RULES.md
-        └── 03_Operation/
-            ├── DECISIONS.md
-            ├── DATA_AUDIT.md
-            ├── CHANGELOG.md
-            ├── FUTURE_IDEAS.md
-            └── GLOSSARY.md
+MoonCard
+├── AI_INDEX             … AIが読む順番
+├── Foundation           … 思想・目的・背景
+├── Architecture         … データ・画面・デザインの設計
+└── Operation            … 判断・監査・変更履歴・将来構想
 ```
 
-> 現状、30夜分のデータは `moon_card_gallery.html` 内にJSONとして埋め込まれています。
+> 現状、30夜分のデータはアプリ本体にJSONとして埋め込まれています。
 > 外部データファイルへの分離は将来構想として `FUTURE_IDEAS.md` に記載します。
 >
 > このDOCS構成は、愛泉の杜OS全体の `DOC_STANDARD.md`（OS直下）に定義された
-> Documentation Standard Edition 1 / Version 1.0（Frozen）に準拠しています。MoonCardはその Reference Implementation（最初の実装例）です。
+> Documentation Standard Edition 1 / Version 2.0に準拠しています。MoonCardはその Reference Implementation（最初の実装例）です。
 
 ---
 
@@ -136,4 +116,5 @@ products/moon-tools/                    ← 物理パス（他の月読みツー
 |---|---|
 | `PURPOSE.md` | 愛泉の杜OS全体の理念（OS直下） |
 | `DOC_STANDARD.md` | このDOCS構成自体のルール（OS直下） |
-| `APP_REGISTRY.md` | 論理名（MoonCard等）と物理パス（`products/moon-tools/`等）の対応表（OS直下） |
+| `APP_REGISTRY.md` | 論理名と実装・Documentation・関連資産の対応関係を管理する唯一の正本 |
+| `DECISIONS.md` | OS全体の長期的な設計原則 |
