@@ -5,11 +5,17 @@
 <meta charset="utf-8"/>
 <title>マナカード一覧（分離版）</title>
 <style>
-  body { font-family: "Yu Gothic", sans-serif; margin: 40px; }
+  body { font-family: "Yu Gothic", sans-serif; margin: 40px; font-size: 16px; }
   table { border-collapse: collapse; width: 100%; }
   th, td { border: 1px solid #999; padding: 6px 10px; }
   th { background: #f0f0f0; }
 
+  .img-cell { text-align: center; padding: 4px; }
+  .img-cell img { width: 64px; height: 64px; object-fit: cover; border-radius: 4px; display: block; margin: 0 auto; }
+
+  /* URLとアルファベットの間隔を詰める */
+  .url-cell { padding-right: 4px; }
+  .alpha-cell { padding-left: 4px; }
 
 a { color:#0066cc; text-decoration:none; font-weight:bold; }
 a:hover{text-decoration:underline;}
@@ -20,59 +26,60 @@ a:hover{text-decoration:underline;}
 <table>
 <tr>
 <th>No</th>
+<th>画像</th>
+<th>URL</th>
 <th>アルファベット</th>
 <th>カナ</th>
-<th>URL</th>
 </tr>
-<tr><td>1</td><td>‘I‘O</td><td>イオ</td><td><a href="https://diadem-cb.com/manacards-io-2201/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>2A</td><td>PO</td><td>ポー</td><td><a href="https://diadem-cb.com/manacards-poao-2205/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>2B</td><td>AO</td><td>アオ</td><td><a href="https://diadem-cb.com/manacards-poao-2201/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>3</td><td>TAPA</td><td>タパ</td><td><a href="https://diadem-cb.com/manacards-tapa-2205/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>4</td><td>MANA</td><td>マナ</td><td><a href="https://diadem-cb.com/manacards-mana-2210/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>5A</td><td>KU</td><td>クー</td><td><a href="https://diadem-cb.com/manacards-ku-hina-2209/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>5B</td><td>HINA</td><td>ヒナ</td><td><a href="https://diadem-cb.com/manacards-ku-hina-2210/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>6</td><td>HI‘IAKA</td><td>ヒイアカ</td><td><a href="https://diadem-cb.com/manacards-hiiaka-2202/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>7</td><td>HUNA</td><td>フナ</td><td><a href="https://diadem-cb.com/manacards-huna-2201/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>8A</td><td>LONO</td><td>ロノ</td><td><a href="https://diadem-cb.com/manacards-lono-kamapuaa-2205/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>8B</td><td>KAMAPUA‘A</td><td>カマプアア</td><td><a href="https://diadem-cb.com/manacards-lono-kamapuaa-2204/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>9A</td><td>MANO</td><td>マノ 赤珊瑚が上</td><td><a href="https://diadem-cb.com/manacards-mano-2205/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>9B</td><td>MANO</td><td>マノ 白珊瑚が上</td><td><a href="https://diadem-cb.com/manacards-mano-2112/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>10</td><td>LA‘AMAOMAO</td><td>ラアマオマオ</td><td><a href="https://diadem-cb.com/manacards-laamaomao-2209/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>11</td><td>KA WAI A KA PILILIKO</td><td>カ ワイ ア カ ピリリコ</td><td><a href="https://diadem-cb.com/manacards-ka-wai-a-ka-pililiko-2203/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>12</td><td>KANALOA</td><td>カナロア</td><td><a href="https://diadem-cb.com/manacards-kanaloa-2112/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>13</td><td>PAHU</td><td>パフ</td><td><a href="https://diadem-cb.com/manacards-pahu-2205/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>14</td><td>ALOHA</td><td>アロハ</td><td><a href="https://diadem-cb.com/manacards-aloha-2111/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>15</td><td>‘AWA</td><td>アヴァ</td><td><a href="https://diadem-cb.com/manacards-awa-2209/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>16</td><td>MENEHUNE</td><td>メネフネ</td><td><a href="https://diadem-cb.com/manacards-menehune-2203/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>17</td><td>TI</td><td>ティ</td><td><a href="https://diadem-cb.com/manacards-ti-2202/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>18</td><td>PUEO</td><td>プエオ</td><td><a href="https://diadem-cb.com/manacards-pueo-2207/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>19</td><td>‘OLE</td><td>オレ</td><td><a href="https://diadem-cb.com/manacards-ole-2204/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>20</td><td>IWI</td><td>イヴィ</td><td><a href="https://diadem-cb.com/manacards-iwi-2204/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>21</td><td>LAMAKU</td><td>ラマク</td><td><a href="https://diadem-cb.com/manacards-lamaku-2207/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>22</td><td>PELE</td><td>ペレ</td><td><a href="https://diadem-cb.com/manacards-pele-2203/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>23</td><td>LAKA</td><td>ラカ</td><td><a href="https://diadem-cb.com/manacards-laka-2111/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>24</td><td>HO‘OPONOPONO</td><td>ホオポノポノ</td><td><a href="https://diadem-cb.com/manacards-hooponopono-2201/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>25</td><td>HULU</td><td>フル</td><td><a href="https://diadem-cb.com/manacards-hulu-2202/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>26</td><td>NALU</td><td>ナル</td><td><a href="https://diadem-cb.com/manacards-nalu-2208/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>27</td><td>MAMALAHOE</td><td>ママラホエ</td><td><a href="https://diadem-cb.com/manacards-mamalahoe-2206/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>28</td><td>POLI‘AHU</td><td>ポリアフ</td><td><a href="https://diadem-cb.com/manacards-poliahu-2201/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>29</td><td>MO‘O</td><td>モオ</td><td><a href="https://diadem-cb.com/manacards-moo-2206/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>30</td><td>PU‘OLO</td><td>プオロ</td><td><a href="https://diadem-cb.com/manacards-puolo-2203/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>31</td><td>PUHI</td><td>プヒ</td><td><a href="https://diadem-cb.com/manacards-puhi-2206/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>32</td><td>HAUMEA</td><td>ハウメア</td><td><a href="https://diadem-cb.com/manacards-haumea-2111/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>33</td><td>WA‘A</td><td>ヴァア</td><td><a href="https://diadem-cb.com/manacards-waa-2112/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>34</td><td>PUA</td><td>プア</td><td><a href="https://diadem-cb.com/manacards-pua-2111/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>35</td><td>MAUI</td><td>マウイ</td><td><a href="https://diadem-cb.com/manacards-maui-2202/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>36</td><td>POHAKU</td><td>ポハク</td><td><a href="https://diadem-cb.com/manacards-pohaku-2207/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>37</td><td>NAUPAKA</td><td>ナウパカ</td><td><a href="https://diadem-cb.com/manacards-naupaka-2209/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>38</td><td>PAPA＆WAKEA</td><td>パパ＆ワケア</td><td><a href="https://diadem-cb.com/manacards-papaandwakea-2208/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>39</td><td>LEHUA</td><td>レフア</td><td><a href="https://diadem-cb.com/manacards-lehua-2208/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>40</td><td>KANE</td><td>カネ</td><td><a href="https://diadem-cb.com/manacards-kane-2207/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>41</td><td>HINA</td><td>ヒナ</td><td><a href="https://diadem-cb.com/manacards-hina-2206/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>42</td><td>ANUENUE</td><td>アヌエヌエ</td><td><a href="https://diadem-cb.com/manacards-anuenue-2204/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>43</td><td>LEI</td><td>レイ</td><td><a href="https://diadem-cb.com/manacards-lei-2112/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>44A</td><td>’ANO’ANO</td><td>アノアノ ヒョウタンが下向き</td><td><a href="https://diadem-cb.com/manacards-anoano-2111/" target="_blank">🔗 開く</a></td></tr>
-<tr><td>44B</td><td>’ANO’ANO</td><td>アノアノ ヒョウタンが上向き</td><td><a href="https://diadem-cb.com/manacards-anoano-2207/" target="_blank">🔗 開く</a></td></tr>
+<tr><td>1</td><td class="img-cell"><img src="MANA-CARD/01.jpg" alt="‘I‘O" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-io-2201/" target="_blank">🔗 開く</a></td><td class="alpha-cell">‘I‘O</td><td>イオ</td></tr>
+<tr><td>2A</td><td class="img-cell"><img src="MANA-CARD/02A.jpg" alt="PO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-poao-2205/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PO</td><td>ポー</td></tr>
+<tr><td>2B</td><td class="img-cell"><img src="MANA-CARD/02B.jpg" alt="AO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-poao-2201/" target="_blank">🔗 開く</a></td><td class="alpha-cell">AO</td><td>アオ</td></tr>
+<tr><td>3</td><td class="img-cell"><img src="MANA-CARD/03.jpg" alt="TAPA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-tapa-2205/" target="_blank">🔗 開く</a></td><td class="alpha-cell">TAPA</td><td>タパ</td></tr>
+<tr><td>4</td><td class="img-cell"><img src="MANA-CARD/04.jpg" alt="MANA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-mana-2210/" target="_blank">🔗 開く</a></td><td class="alpha-cell">MANA</td><td>マナ</td></tr>
+<tr><td>5A</td><td class="img-cell"><img src="MANA-CARD/05A.jpg" alt="KU" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-ku-hina-2209/" target="_blank">🔗 開く</a></td><td class="alpha-cell">KU</td><td>クー</td></tr>
+<tr><td>5B</td><td class="img-cell"><img src="MANA-CARD/05B.jpg" alt="HINA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-ku-hina-2210/" target="_blank">🔗 開く</a></td><td class="alpha-cell">HINA</td><td>ヒナ</td></tr>
+<tr><td>6</td><td class="img-cell"><img src="MANA-CARD/06.jpg" alt="HI‘IAKA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-hiiaka-2202/" target="_blank">🔗 開く</a></td><td class="alpha-cell">HI‘IAKA</td><td>ヒイアカ</td></tr>
+<tr><td>7</td><td class="img-cell"><img src="MANA-CARD/07.jpg" alt="HUNA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-huna-2201/" target="_blank">🔗 開く</a></td><td class="alpha-cell">HUNA</td><td>フナ</td></tr>
+<tr><td>8A</td><td class="img-cell"><img src="MANA-CARD/08A.jpg" alt="LONO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-lono-kamapuaa-2205/" target="_blank">🔗 開く</a></td><td class="alpha-cell">LONO</td><td>ロノ</td></tr>
+<tr><td>8B</td><td class="img-cell"><img src="MANA-CARD/08B.jpg" alt="KAMAPUA‘A" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-lono-kamapuaa-2204/" target="_blank">🔗 開く</a></td><td class="alpha-cell">KAMAPUA‘A</td><td>カマプアア</td></tr>
+<tr><td>9A</td><td class="img-cell"><img src="MANA-CARD/09A.jpg" alt="MANO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-mano-2205/" target="_blank">🔗 開く</a></td><td class="alpha-cell">MANO</td><td>マノ 赤珊瑚が上</td></tr>
+<tr><td>9B</td><td class="img-cell"><img src="MANA-CARD/09B.jpg" alt="MANO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-mano-2112/" target="_blank">🔗 開く</a></td><td class="alpha-cell">MANO</td><td>マノ 白珊瑚が上</td></tr>
+<tr><td>10</td><td class="img-cell"><img src="MANA-CARD/10.jpg" alt="LA‘AMAOMAO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-laamaomao-2209/" target="_blank">🔗 開く</a></td><td class="alpha-cell">LA‘AMAOMAO</td><td>ラアマオマオ</td></tr>
+<tr><td>11</td><td class="img-cell"><img src="MANA-CARD/11.jpg" alt="KA WAI A KA PILILIKO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-ka-wai-a-ka-pililiko-2203/" target="_blank">🔗 開く</a></td><td class="alpha-cell">KA WAI A KA PILILIKO</td><td>カ ワイ ア カ ピリリコ</td></tr>
+<tr><td>12</td><td class="img-cell"><img src="MANA-CARD/12.jpg" alt="KANALOA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-kanaloa-2112/" target="_blank">🔗 開く</a></td><td class="alpha-cell">KANALOA</td><td>カナロア</td></tr>
+<tr><td>13</td><td class="img-cell"><img src="MANA-CARD/13.jpg" alt="PAHU" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-pahu-2205/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PAHU</td><td>パフ</td></tr>
+<tr><td>14</td><td class="img-cell"><img src="MANA-CARD/14.jpg" alt="ALOHA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-aloha-2111/" target="_blank">🔗 開く</a></td><td class="alpha-cell">ALOHA</td><td>アロハ</td></tr>
+<tr><td>15</td><td class="img-cell"><img src="MANA-CARD/15.jpg" alt="‘AWA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-awa-2209/" target="_blank">🔗 開く</a></td><td class="alpha-cell">‘AWA</td><td>アヴァ</td></tr>
+<tr><td>16</td><td class="img-cell"><img src="MANA-CARD/16.jpg" alt="MENEHUNE" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-menehune-2203/" target="_blank">🔗 開く</a></td><td class="alpha-cell">MENEHUNE</td><td>メネフネ</td></tr>
+<tr><td>17</td><td class="img-cell"><img src="MANA-CARD/17.jpg" alt="TI" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-ti-2202/" target="_blank">🔗 開く</a></td><td class="alpha-cell">TI</td><td>ティ</td></tr>
+<tr><td>18</td><td class="img-cell"><img src="MANA-CARD/18.jpg" alt="PUEO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-pueo-2207/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PUEO</td><td>プエオ</td></tr>
+<tr><td>19</td><td class="img-cell"><img src="MANA-CARD/19.jpg" alt="‘OLE" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-ole-2204/" target="_blank">🔗 開く</a></td><td class="alpha-cell">‘OLE</td><td>オレ</td></tr>
+<tr><td>20</td><td class="img-cell"><img src="MANA-CARD/20.jpg" alt="IWI" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-iwi-2204/" target="_blank">🔗 開く</a></td><td class="alpha-cell">IWI</td><td>イヴィ</td></tr>
+<tr><td>21</td><td class="img-cell"><img src="MANA-CARD/21.jpg" alt="LAMAKU" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-lamaku-2207/" target="_blank">🔗 開く</a></td><td class="alpha-cell">LAMAKU</td><td>ラマク</td></tr>
+<tr><td>22</td><td class="img-cell"><img src="MANA-CARD/22.jpg" alt="PELE" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-pele-2203/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PELE</td><td>ペレ</td></tr>
+<tr><td>23</td><td class="img-cell"><img src="MANA-CARD/23.jpg" alt="LAKA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-laka-2111/" target="_blank">🔗 開く</a></td><td class="alpha-cell">LAKA</td><td>ラカ</td></tr>
+<tr><td>24</td><td class="img-cell"><img src="MANA-CARD/24.jpg" alt="HO‘OPONOPONO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-hooponopono-2201/" target="_blank">🔗 開く</a></td><td class="alpha-cell">HO‘OPONOPONO</td><td>ホオポノポノ</td></tr>
+<tr><td>25</td><td class="img-cell"><img src="MANA-CARD/25.jpg" alt="HULU" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-hulu-2202/" target="_blank">🔗 開く</a></td><td class="alpha-cell">HULU</td><td>フル</td></tr>
+<tr><td>26</td><td class="img-cell"><img src="MANA-CARD/26.jpg" alt="NALU" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-nalu-2208/" target="_blank">🔗 開く</a></td><td class="alpha-cell">NALU</td><td>ナル</td></tr>
+<tr><td>27</td><td class="img-cell"><img src="MANA-CARD/27.jpg" alt="MAMALAHOE" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-mamalahoe-2206/" target="_blank">🔗 開く</a></td><td class="alpha-cell">MAMALAHOE</td><td>ママラホエ</td></tr>
+<tr><td>28</td><td class="img-cell"><img src="MANA-CARD/28.jpg" alt="POLI‘AHU" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-poliahu-2201/" target="_blank">🔗 開く</a></td><td class="alpha-cell">POLI‘AHU</td><td>ポリアフ</td></tr>
+<tr><td>29</td><td class="img-cell"><img src="MANA-CARD/29.jpg" alt="MO‘O" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-moo-2206/" target="_blank">🔗 開く</a></td><td class="alpha-cell">MO‘O</td><td>モオ</td></tr>
+<tr><td>30</td><td class="img-cell"><img src="MANA-CARD/30.jpg" alt="PU‘OLO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-puolo-2203/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PU‘OLO</td><td>プオロ</td></tr>
+<tr><td>31</td><td class="img-cell"><img src="MANA-CARD/31.jpg" alt="PUHI" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-puhi-2206/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PUHI</td><td>プヒ</td></tr>
+<tr><td>32</td><td class="img-cell"><img src="MANA-CARD/32.jpg" alt="HAUMEA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-haumea-2111/" target="_blank">🔗 開く</a></td><td class="alpha-cell">HAUMEA</td><td>ハウメア</td></tr>
+<tr><td>33</td><td class="img-cell"><img src="MANA-CARD/33.jpg" alt="WA‘A" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-waa-2112/" target="_blank">🔗 開く</a></td><td class="alpha-cell">WA‘A</td><td>ヴァア</td></tr>
+<tr><td>34</td><td class="img-cell"><img src="MANA-CARD/34.jpg" alt="PUA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-pua-2111/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PUA</td><td>プア</td></tr>
+<tr><td>35</td><td class="img-cell"><img src="MANA-CARD/35.jpg" alt="MAUI" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-maui-2202/" target="_blank">🔗 開く</a></td><td class="alpha-cell">MAUI</td><td>マウイ</td></tr>
+<tr><td>36</td><td class="img-cell"><img src="MANA-CARD/36.jpg" alt="POHAKU" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-pohaku-2207/" target="_blank">🔗 開く</a></td><td class="alpha-cell">POHAKU</td><td>ポハク</td></tr>
+<tr><td>37</td><td class="img-cell"><img src="MANA-CARD/37.jpg" alt="NAUPAKA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-naupaka-2209/" target="_blank">🔗 開く</a></td><td class="alpha-cell">NAUPAKA</td><td>ナウパカ</td></tr>
+<tr><td>38</td><td class="img-cell"><img src="MANA-CARD/38.jpg" alt="PAPA＆WAKEA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-papaandwakea-2208/" target="_blank">🔗 開く</a></td><td class="alpha-cell">PAPA＆WAKEA</td><td>パパ＆ワケア</td></tr>
+<tr><td>39</td><td class="img-cell"><img src="MANA-CARD/39.jpg" alt="LEHUA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-lehua-2208/" target="_blank">🔗 開く</a></td><td class="alpha-cell">LEHUA</td><td>レフア</td></tr>
+<tr><td>40</td><td class="img-cell"><img src="MANA-CARD/40.jpg" alt="KANE" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-kane-2207/" target="_blank">🔗 開く</a></td><td class="alpha-cell">KANE</td><td>カネ</td></tr>
+<tr><td>41</td><td class="img-cell"><img src="MANA-CARD/41.jpg" alt="HINA" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-hina-2206/" target="_blank">🔗 開く</a></td><td class="alpha-cell">HINA</td><td>ヒナ</td></tr>
+<tr><td>42</td><td class="img-cell"><img src="MANA-CARD/42.jpg" alt="ANUENUE" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-anuenue-2204/" target="_blank">🔗 開く</a></td><td class="alpha-cell">ANUENUE</td><td>アヌエヌエ</td></tr>
+<tr><td>43</td><td class="img-cell"><img src="MANA-CARD/43.jpg" alt="LEI" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-lei-2112/" target="_blank">🔗 開く</a></td><td class="alpha-cell">LEI</td><td>レイ</td></tr>
+<tr><td>44A</td><td class="img-cell"><img src="MANA-CARD/44A.jpg" alt="’ANO’ANO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-anoano-2111/" target="_blank">🔗 開く</a></td><td class="alpha-cell">’ANO’ANO</td><td>アノアノ ヒョウタンが下向き</td></tr>
+<tr><td>44B</td><td class="img-cell"><img src="MANA-CARD/44B.jpg" alt="’ANO’ANO" loading="lazy"></td><td class="url-cell"><a href="https://diadem-cb.com/manacards-anoano-2207/" target="_blank">🔗 開く</a></td><td class="alpha-cell">’ANO’ANO</td><td>アノアノ ヒョウタンが上向き</td></tr>
 </table>
 </body>
 </html>
