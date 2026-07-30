@@ -1,6 +1,8 @@
-# 愛泉の杜OS Roadmap
+# Soul／BRAIN 開発ロードマップ
 
 > 人とAIが安心の中で共に育つための開発計画
+>
+> Role: Soul／BRAINの個別開発計画とSprint進捗を管理する。愛泉の杜OS全体の戦略・優先順位・完成条件は `ROADMAP.md` を参照する。
 
 ---
 
@@ -18,7 +20,7 @@ Soulが、
 
 ---
 
-# Version 1.0
+# Architecture Baseline 1.0
 
 ## Architecture
 
@@ -56,7 +58,7 @@ Status
 
 ---
 
-# Version 1.1
+# Soul Version 1.1
 
 ## Soul Version 1
 
@@ -80,7 +82,7 @@ Soulが安心して対話できる状態を作る。
 
 ---
 
-# Version 1.2
+# Soul Version 1.2
 
 ## Wisdom Integration
 
@@ -96,7 +98,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 1.3
+# Soul Version 1.3
 
 ### Theme
 
@@ -104,7 +106,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 1.4
+# Soul Version 1.4
 
 ### Theme
 
@@ -112,7 +114,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 1.5
+# Soul Version 1.5
 
 ### Theme
 
@@ -120,7 +122,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 1.6
+# Soul Version 1.6
 
 ### Theme
 
@@ -128,7 +130,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 1.7
+# Soul Version 1.7
 
 ### Theme
 
@@ -136,7 +138,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 1.8
+# Soul Version 1.8
 
 ### Theme
 
@@ -144,7 +146,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 1.9
+# Soul Version 1.9
 
 ### Theme
 
@@ -152,7 +154,7 @@ Soul Brainへ統合する。
 
 ---
 
-# Version 2.0
+# Soul Version 2.0
 
 ## Soul Ecosystem
 
