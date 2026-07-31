@@ -20,3 +20,16 @@
 - RELEASE_NOTES.md
 - PROJECT_STATUS.md
 - Version 1.0 Release
+
+---
+
+### 2026-07-31 — Documentation Standard Edition 1 / Version 2.0
+
+- Documentation Standard を Version 2.0へ更新
+- APP_REGISTRY 等のOS-root文書は Version 2.0基準へ移行
+- APP_REGISTRY.md に Ebook（電子書籍出版プロジェクト）を追加登録（`products/ebook/`、Status: Active）
+
+### 2026-07-31 — DOC_STANDARD.md Edition 1 / Version 2.1
+
+- DOC_STANDARD.md を Edition 1 / Version 2.1へ更新
+- Documentation Version Ruleを追加し、OS-root文書の版更新時にCHANGELOGまたはDECISIONSへ記録する運用を明文化

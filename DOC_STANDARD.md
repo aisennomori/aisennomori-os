@@ -1,12 +1,12 @@
 # DOC_STANDARD.md
 ## 愛泉の杜 Documentation Standard（ADS）
-### Edition 1 / Version 2.0 — **Approved（正式運用）**
+### Edition 1 / Version 2.1 — **Approved（正式運用）**
 **Status**: Approved
 
 > MoonCard専用のファイルではなく、**すべてのアプリに共通するOS標準**である。
 
 > **凍結宣言**
-> Documentation Standard Edition 1 / Version 2.0 は、この時点をもって正式運用とする。
+> Documentation Standard Edition 1 / Version 2.1 は、この時点をもって正式運用とする。
 > 以後の改善は、実際にアプリ（ManaCard、SoulReading、Healingなど）を作り、運用する中で
 > 「この標準に足りない点」が具体的に見えたときにのみ行う。
 > 思いつきベースでの改訂は行わず、変更理由と影響範囲を記録した上で改訂する。
@@ -72,7 +72,7 @@ APP_REGISTRY.md が唯一の正本として対応を管理
 
 ## Reference Implementation
 
-このEdition 1 / Version 2.0は、**MoonCard**を最初の実装例（Reference Implementation）として扱う。
+このEdition 1 / Version 2.1は、**MoonCard**を最初の実装例（Reference Implementation）として扱う。
 MoonCardの実体は `APP_REGISTRY.md` を参照して解決する。
 
 新しいアプリ（ManaCard、SoulReading、Healing、HSP、AI Counselorなど）の
@@ -96,7 +96,8 @@ Documentation Standardのバージョンは、**Edition**と**Version**の2軸�
 ```
 Edition 1
   ├─ Version 1.0（初版・Frozen）
-  └─ Version 2.0（現行・Approved）
+  ├─ Version 2.0（APP_REGISTRY正本化）
+  └─ Version 2.1（現行・Approved）
 
 Edition 2（将来、体系ごと作り直す場合）
   └─ Version 1.0
@@ -244,11 +245,16 @@ AI_INDEX（アプリ別）      アプリ：AIはここから読み始める
 - OS-rootには、複数アプリに影響し、長期的にOS全体の設計原則となる内容のみを記録する
 - 個別アプリの実装詳細・運用履歴・固有の設計判断は、各アプリのDocumentationに記録する
 
+### Documentation Version Rule
+- OS-root文書（`README.md` / `APP_REGISTRY.md` / `DECISIONS.md` / `PROJECT_STATUS.md` / `DOC_STANDARD.md`）のEditionまたはVersionを更新した場合は、`CHANGELOG.md`または`DECISIONS.md`へ、更新内容を一行記録すること
+- これにより、版管理担当は変更履歴を追跡でき、旧Versionとの整合性を容易に確認できる
+- 記録は「何が変わったか」（事実）であり、「なぜ変えるべきか」という運用ルールそのものの追加・変更は、この`DOC_STANDARD.md`側で管理する（CHANGELOG＝事実の記録、DOC_STANDARD＝運用ルールの管理、という役割分担を保つ）
+
 ### 全ドキュメント共通
 - 各ファイルの冒頭に、以下の1行メタ情報を付与する
 
   ```
-  > Documentation Standard: Edition 1 / Version 2.0　|　Layer: {Foundation|Architecture|Operation}　|　App: {AppName}　|　Status: {Draft|Review|Approved|Deprecated}
+  > Documentation Standard: Edition 1 / Version 2.1　|　Layer: {Foundation|Architecture|Operation}　|　App: {AppName}　|　Status: {Draft|Review|Approved|Deprecated}
   ```
 
 - **Status** の意味（内容の確定状況を示すものであり、実リポジトリへの反映＝デプロイ状況とは別に管理する）：
@@ -272,3 +278,4 @@ AI_INDEX（アプリ別）      アプリ：AIはここから読み始める
 |---|---|---|
 | 1 | 1.0 | 初版。MoonCardを Reference Implementation として策定。Foundation / Architecture / Operation の3層構造、Edition／Version分離、Statusフィールド、DECISIONSのカテゴリ分類、AI_INDEX.mdを導入。**この版をもって正式採用（Freeze）** |
 | 1 | 2.0 | Documentation Standardを論理構造・文書構成・執筆ルールに限定。論理アプリと実装・Documentation・関連資産の対応関係は、`APP_REGISTRY.md` を唯一の正本として管理する方針を正式化。AIの推奨読了順にOS-rootの `APP_REGISTRY.md` と `DECISIONS.md` を追加。 |
+| 1 | 2.1 | Documentation Version Ruleを追加。OS-root文書（README／APP_REGISTRY／DECISIONS／PROJECT_STATUS／DOC_STANDARD）のEditionまたはVersionを更新した場合、CHANGELOGまたはDECISIONSへ一行記録する運用を明文化。 |
