@@ -44,16 +44,17 @@
     border-radius:16px;overflow:hidden;}
 
   /* 曜日行 */
-  .dow-row{display:grid;grid-template-columns:repeat(7,1fr);
+  .dow-row{display:flex;
     border-bottom:2px solid var(--line);}
-  .dc{text-align:center;font-size:.68rem;font-weight:700;padding:8px 0;color:var(--soft);}
+  .dc{flex:0 0 14.2857%;max-width:14.2857%;box-sizing:border-box;text-align:center;font-size:.68rem;font-weight:700;padding:8px 0;color:var(--soft);}
   .dc.s{color:#C25450;} .dc.sa{color:#4A6FA5;}
 
-  /* グリッド */
-  .grid{display:grid;grid-template-columns:repeat(7,1fr);}
+  /* グリッド（html2canvasのGrid最終列欠落対策としてFlexboxで組む） */
+  .grid{display:flex;flex-wrap:wrap;overflow:hidden;}
 
-  .cell{border-right:1px solid var(--line);border-bottom:1px solid var(--line);
-    padding:4px 2px 5px;min-height:92px;
+  .cell{flex:0 0 14.2857%;max-width:14.2857%;box-sizing:border-box;
+    border-right:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:4px 2px 5px;min-height:92px;min-width:0;overflow:hidden;
     display:flex;flex-direction:column;align-items:center;gap:1px;}
   .cell:nth-child(7n){border-right:none;}
   .cell.empty{background:rgba(0,0,0,.018);}
@@ -107,17 +108,24 @@
   .hdr-row{display:flex;align-items:center;gap:8px;}
 
   /* 行の高さ圧縮：夜番号＋マーカー＋元素を1行に、夜名＋神様名を1行に */
-  .dnight-row{display:flex;align-items:center;justify-content:space-between;gap:2px;font-size:.58rem;color:var(--soft);font-weight:700;width:100%;padding:0 1px;}
+  .dnight-row{display:flex;align-items:center;justify-content:space-between;gap:2px;font-size:.58rem;color:var(--soft);font-weight:700;width:100%;min-width:0;padding:0 1px;}
   .dnight-row .mk{font-size:.72rem;line-height:1;flex:0 0 auto;text-align:left;}
-  .dnight-row .nt{flex:1;text-align:center;white-space:nowrap;}
+  .dnight-row .nt{flex:1;min-width:0;text-align:center;white-space:nowrap;overflow:hidden;}
   .dnight-row .el{font-size:.62rem;line-height:1;flex:0 0 auto;text-align:right;}
-  .dname-row{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;flex-wrap:wrap;}
-  .dname-row .nm{font-size:.54rem;color:var(--soft);white-space:nowrap;overflow:hidden;}
-  .dname-row .km{font-size:.48rem;color:var(--soft);font-weight:700;white-space:nowrap;overflow:hidden;letter-spacing:.01em;}
+  .dname-row{display:flex;align-items:center;justify-content:center;gap:4px;width:100%;min-width:0;flex-wrap:wrap;overflow:hidden;}
+  .dname-row .nm{font-size:.54rem;color:var(--soft);white-space:nowrap;overflow:hidden;max-width:100%;min-width:0;flex:1 1 auto;text-overflow:ellipsis;}
+  .dname-row .km{font-size:.48rem;color:var(--soft);font-weight:700;white-space:nowrap;overflow:hidden;max-width:100%;min-width:0;flex:0 1 auto;text-overflow:ellipsis;letter-spacing:.01em;}
 
   /* 登録者マーカー（バースデー●／陰陽〇） */
-  .pmarks{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;line-height:1;margin-top:1px;}
+  .pmarks{display:flex;gap:2px;justify-content:center;flex-wrap:wrap;line-height:1;margin-top:1px;width:100%;min-width:0;overflow:hidden;}
   .pmarks span{font-size:.62rem;}
+
+  /* 極端に狭い画面（情報量過多対策の保険）：神様名を省略してでも横崩れを防ぐ */
+  @media (max-width:380px){
+    .dname-row .km{display:none;}
+    .dnight-row .nt{font-size:.54rem;}
+    .dnight-row .el{font-size:.56rem;}
+  }
 
   /* 設定モーダル */
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9998;
@@ -587,7 +595,7 @@ function fillRowResult(idx){
   if(!p.set){ el.classList.remove('show'); el.innerHTML=''; return; }
   const bm = p.birthMoonNight ? `第${p.birthMoonNight}夜 ${p.birthMoonName}` : '算出不可';
   const yy = p.yinyangNight ? `第${p.yinyangNight}夜 ${p.yinyangName}` : '算出不可';
-  el.innerHTML = `<b>${escapeAttr(p.name)}</b>（${p.color}）<br>バースデームーン：${bm}<br>陰陽ムーン：☯${yy}`;
+  el.innerHTML = `<b>${escapeAttr(p.name)}</b>（${p.color}）<br>バースデームーン：${bm}<br>陰陽ムーン：☯\ufe0e${yy}`;
   el.classList.add('show');
 }
 
@@ -625,7 +633,7 @@ function renderFooterList(){
     const hex=COLOR_HEX[p.color]||'#999';
     return `<div class="footer-line">
       <span class="footer-dot" style="background:${hex};"></span>
-      <span>${escapeAttr(p.name)}：第${p.birthMoonNight}夜 ${p.birthMoonName}　／☯第${p.yinyangNight}夜 ${p.yinyangName}</span>
+      <span>${escapeAttr(p.name)}：第${p.birthMoonNight}夜 ${p.birthMoonName}　／☯\ufe0e第${p.yinyangNight}夜 ${p.yinyangName}</span>
     </div>`;
   }).join('');
 }
@@ -727,7 +735,7 @@ function render(year,month){
         const yyNight=resolveDisplayNight(p.yinyangNight, cycleHasMauli);
         const hex=COLOR_HEX[p.color]||'#999';
         if(bmNight===n) marks.push(`<span style="color:${hex};">●</span>`);
-        if(yyNight===n) marks.push(`<span>☯<span style="color:${hex};">●</span></span>`);
+        if(yyNight===n) marks.push(`<span>☯\ufe0e<span style="color:${hex};">●</span></span>`);
       });
       if(marks.length){
         const pm=document.createElement('div');
@@ -771,6 +779,8 @@ document.getElementById('pBtn').addEventListener('click',async function(){
   const capTitle=document.getElementById('capTitle');
   capTitle.style.display='block';
   try{
+    if(document.fonts && document.fonts.ready){ await document.fonts.ready; }
+    await new Promise(r=>setTimeout(r,50));
     const canvas=await html2canvas(document.getElementById('sheetInner'),{
       scale:2,useCORS:true,allowTaint:true,logging:false,backgroundColor:'#FFFFFF'
     });
