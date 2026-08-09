@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ヤオコー店舗検索</title>
+<style>
+  :root{
+    --paper:#F6F4EE;
+    --card:#FFFFFF;
+    --ink:#1F2A24;
+    --ink-soft:#5B6560;
+    --green:#2B6B4F;
+    --green-deep:#1D4B37;
+    --tag:#B9762F;
+    --tag-bg:#FBEEDD;
+    --line:#E4E0D4;
+    --line-strong:#CFC9B8;
+    --focus:#2B6B4F;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic","Meiryo",sans-serif;
+    line-height:1.6;
+    min-height:100vh;
+  }
+  .mono{
+    font-family:"JetBrains Mono","SFMono-Regular",Consolas,"Menlo",monospace;
+    font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    background:linear-gradient(180deg,var(--green-deep) 0%,var(--green) 100%);
+    color:#F5F2E8;
+    padding:28px 20px 22px;
+    position:relative;
+    overflow:hidden;
+  }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-40px; top:-60px;
+    width:220px; height:220px;
+    border-radius:50%;
+    background:rgba(255,255,255,0.06);
+  }
+  .header-inner{
+    max-width:980px;
+    margin:0 auto;
+    position:relative;
+    z-index:1;
+  }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#CFE3D6;
+    margin:0 0 6px;
+  }
+  h1{
+    margin:0 0 4px;
+    font-size:clamp(22px,4vw,30px);
+    font-weight:700;
+    letter-spacing:.02em;
+  }
+  .header-sub{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px 16px;
+    align-items:baseline;
+    color:#E4EEE7;
+    font-size:13.5px;
+    margin-top:10px;
+  }
+  .count-badge{
+    display:inline-flex;
+    align-items:baseline;
+    gap:5px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.25);
+    border-radius:999px;
+    padding:4px 12px;
+  }
+  .count-badge b{ font-size:15px; }
+
+  /* ---------- main layout ---------- */
+  main{
+    max-width:980px;
+    margin:0 auto;
+    padding:22px 20px 60px;
+  }
+
+  .panel{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px 20px 18px;
+    box-shadow:0 1px 2px rgba(31,42,36,0.04);
+  }
+
+  .field-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 16px;
+  }
+  @media (max-width:620px){
+    .field-grid{ grid-template-columns:1fr; }
+  }
+
+  label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+    letter-spacing:.02em;
+  }
+  input[type="text"], select{
+    width:100%;
+    font-size:15px;
+    padding:10px 12px;
+    border:1px solid var(--line-strong);
+    border-radius:9px;
+    background:#FCFBF8;
+    color:var(--ink);
+    font-family:inherit;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  input[type="text"]:focus, select:focus{
+    outline:none;
+    border-color:var(--focus);
+    box-shadow:0 0 0 3px rgba(43,107,79,0.14);
+    background:#fff;
+  }
+  select{ appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235B6560' stroke-width='2.4'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    padding-right:34px;
+  }
+
+  .panel-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed var(--line-strong);
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .result-count{
+    font-size:13.5px;
+    color:var(--ink-soft);
+  }
+  .result-count b{ color:var(--ink); font-size:15px; }
+
+  button.reset{
+    border:1px solid var(--line-strong);
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:13px;
+    padding:7px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:inherit;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  button.reset:hover{ border-color:var(--green); color:var(--green-deep); }
+
+  /* ---------- results ---------- */
+  .results{ margin-top:18px; }
+
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  thead th{
+    text-align:left;
+    font-size:12px;
+    letter-spacing:.05em;
+    color:var(--ink-soft);
+    background:#F1EEE4;
+    padding:11px 14px;
+    border-bottom:1px solid var(--line-strong);
+    font-weight:600;
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover{ background:#FAF8F2; }
+
+  .code-tag{
+    display:inline-block;
+    font-size:14px;
+    font-weight:700;
+    color:var(--tag);
+    background:var(--tag-bg);
+    border:1px solid #F0D9B8;
+    border-radius:7px;
+    padding:3px 9px;
+    letter-spacing:.03em;
+  }
+  .store-name{ font-weight:600; }
+  .muted{ color:var(--ink-soft); font-size:13px; }
+  .na{ color:#B8B2A2; font-style:italic; }
+
+  a.url-link{
+    color:var(--green-deep);
+    text-decoration:none;
+    font-size:13px;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    border-bottom:1px solid transparent;
+  }
+  a.url-link:hover{ border-bottom-color:var(--green-deep); }
+
+  .empty-state{
+    text-align:center;
+    padding:52px 20px;
+    color:var(--ink-soft);
+    background:var(--card);
+    border:1px dashed var(--line-strong);
+    border-radius:12px;
+  }
+  .empty-state .big{ font-size:28px; margin-bottom:8px; }
+
+  /* mobile cards */
+  .cards{ display:none; flex-direction:column; gap:10px; }
+  .store-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+  }
+  .store-card .top-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:8px;
+  }
+  .store-card dl{ margin:8px 0 0; font-size:13.5px; }
+  .store-card .row{ display:flex; justify-content:space-between; padding:3px 0; }
+  .store-card .row span:first-child{ color:var(--ink-soft); }
+
+  @media (max-width:700px){
+    table{ display:none; }
+    .cards{ display:flex; }
+  }
+
+  footer{
+    max-width:980px;
+    margin:0 auto;
+    padding:0 20px 40px;
+    color:var(--ink-soft);
+    font-size:12px;
+    line-height:1.8;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <p class="eyebrow">Yaoko Store Directory</p>
+    <h1>ヤオコー店舗検索</h1>
+    <div class="header-sub">
+      <span class="count-badge">全<b id="totalCount">—</b>店舗</span>
+      <span>店舗コード・店名・センター・地区で検索／絞り込み</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="field-grid">
+      <div>
+        <label for="codeSearch">店舗コードで検索</label>
+        <input type="text" id="codeSearch" class="mono" placeholder="例：099　または　1099" inputmode="numeric">
+      </div>
+      <div>
+        <label for="nameSearch">店名で検索（あいまい検索）</label>
+        <input type="text" id="nameSearch" placeholder="例：わかば　／　ワカバ　／　若葉">
+      </div>
+      <div>
+        <label for="centerFilter">センターで絞り込み</label>
+        <select id="centerFilter"><option value="">すべてのセンター</option></select>
+      </div>
+      <div>
+        <label for="districtFilter">地区で絞り込み</label>
+        <select id="districtFilter"><option value="">すべての地区</option></select>
+      </div>
+    </div>
+    <div class="panel-footer">
+      <div class="result-count"><b id="hitCount">0</b> 件ヒット</div>
+      <button class="reset" id="resetBtn" type="button">条件をリセット</button>
+    </div>
+  </section>
+
+  <section class="results">
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>店舗コード</th>
+          <th>店舗名</th>
+          <th>地区名</th>
+          <th>センター</th>
+          <th>URL</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+
+    <div class="cards" id="cardsView"></div>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="big">🔍</div>
+      該当する店舗が見つかりませんでした。<br>検索条件を変更してお試しください。
+    </div>
+  </section>
+</main>
+
+<footer>
+  データ出典：ヤオコー店番表（2026年2月26日時点、237店番まで収録／有効202店舗）。福生牛浜店・東戸塚店はセンター・地区が未確定のため空欄表示。<br>
+  URLは「https://www.yaoko-net.com/store/store01/【店舗コード下3桁】.html」の規則で自動生成しています。店舗の新設・閉店・センター再編等により最新の店番表と差異が生じる場合があります。
+</footer>
+
+<script>
+const STORE_DATA = [{"code":"001","fullCode":"1001","name":"小川ＳＣ店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/001.html"},{"code":"003","fullCode":"1003","name":"長瀬店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/003.html"},{"code":"006","fullCode":"1006","name":"岡部店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/006.html"},{"code":"011","fullCode":"1011","name":"高麗川店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/011.html"},{"code":"014","fullCode":"1014","name":"所沢松井店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/014.html"},{"code":"018","fullCode":"1018","name":"行田門井店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/018.html"},{"code":"020","fullCode":"1020","name":"新白岡店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/020.html"},{"code":"021","fullCode":"1021","name":"北本店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/021.html"},{"code":"026","fullCode":"1026","name":"東所沢店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/026.html"},{"code":"027","fullCode":"1027","name":"みどりが丘店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/027.html"},{"code":"029","fullCode":"1029","name":"大宮上小町店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/029.html"},{"code":"031","fullCode":"1031","name":"浦和大久保店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/031.html"},{"code":"041","fullCode":"1041","name":"寄居店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/041.html"},{"code":"043","fullCode":"1043","name":"狭山店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/043.html"},{"code":"044","fullCode":"1044","name":"深谷上野台店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/044.html"},{"code":"045","fullCode":"1045","name":"みつわ台店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/045.html"},{"code":"046","fullCode":"1046","name":"川島店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/046.html"},{"code":"047","fullCode":"1047","name":"富士見羽沢店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/047.html"},{"code":"048","fullCode":"1048","name":"児玉バイパス店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/048.html"},{"code":"049","fullCode":"1049","name":"大宮宮原店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/049.html"},{"code":"050","fullCode":"1050","name":"入間仏子店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/050.html"},{"code":"051","fullCode":"1051","name":"中之条店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/051.html"},{"code":"052","fullCode":"1052","name":"足利店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/052.html"},{"code":"054","fullCode":"1054","name":"越谷蒲生店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/054.html"},{"code":"055","fullCode":"1055","name":"高崎井野店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/055.html"},{"code":"056","fullCode":"1056","name":"おゆみ野店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/056.html"},{"code":"058","fullCode":"1058","name":"羽生店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/058.html"},{"code":"060","fullCode":"1060","name":"佐野浅沼店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/060.html"},{"code":"061","fullCode":"1061","name":"坂戸泉店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/061.html"},{"code":"063","fullCode":"1063","name":"深谷国済寺店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/063.html"},{"code":"064","fullCode":"1064","name":"前橋関根店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/064.html"},{"code":"065","fullCode":"1065","name":"安中店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/065.html"},{"code":"066","fullCode":"1066","name":"竜ヶ崎佐貫店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/066.html"},{"code":"067","fullCode":"1067","name":"南桜井店","center":"草加チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/067.html"},{"code":"068","fullCode":"1068","name":"嵐山バイパス店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/068.html"},{"code":"069","fullCode":"1069","name":"蕨南町店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/069.html"},{"code":"070","fullCode":"1070","name":"前橋六供店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/070.html"},{"code":"071","fullCode":"1071","name":"川越山田店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/071.html"},{"code":"072","fullCode":"1072","name":"野木店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/072.html"},{"code":"073","fullCode":"1073","name":"入間下藤沢店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/073.html"},{"code":"074","fullCode":"1074","name":"鴻巣逆川店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/074.html"},{"code":"075","fullCode":"1075","name":"坂戸千代田店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/075.html"},{"code":"077","fullCode":"1077","name":"北入曽店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/077.html"},{"code":"078","fullCode":"1078","name":"熊谷箱田店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/078.html"},{"code":"079","fullCode":"1079","name":"竜ヶ崎店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/079.html"},{"code":"080","fullCode":"1080","name":"学園前店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/080.html"},{"code":"081","fullCode":"1081","name":"足利八幡店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/081.html"},{"code":"082","fullCode":"1082","name":"皆野店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/082.html"},{"code":"083","fullCode":"1083","name":"所沢北原店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/083.html"},{"code":"084","fullCode":"1084","name":"船橋三咲店","center":"千葉チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/084.html"},{"code":"085","fullCode":"1085","name":"一本松南店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/085.html"},{"code":"086","fullCode":"1086","name":"浦安東野店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/086.html"},{"code":"087","fullCode":"1087","name":"入曽店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/087.html"},{"code":"088","fullCode":"1088","name":"川越南古谷店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/088.html"},{"code":"089","fullCode":"1089","name":"熊谷ニットーモール店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/089.html"},{"code":"090","fullCode":"1090","name":"大宮蓮沼店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/090.html"},{"code":"091","fullCode":"1091","name":"成田駅前店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/091.html"},{"code":"092","fullCode":"1092","name":"行田藤原店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/092.html"},{"code":"093","fullCode":"1093","name":"富岡店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/093.html"},{"code":"094","fullCode":"1094","name":"川口朝日店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/094.html"},{"code":"095","fullCode":"1095","name":"大宮島町店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/095.html"},{"code":"096","fullCode":"1096","name":"つきのわ駅前店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/096.html"},{"code":"097","fullCode":"1097","name":"藤代店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/097.html"},{"code":"098","fullCode":"1098","name":"足利大前店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/098.html"},{"code":"099","fullCode":"1099","name":"ワカバウォーク店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/099.html"},{"code":"100","fullCode":"1100","name":"モラージュ柏店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/100.html"},{"code":"101","fullCode":"1101","name":"野田つつみ野店","center":"草加チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/101.html"},{"code":"102","fullCode":"1102","name":"所沢椿峰店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/102.html"},{"code":"103","fullCode":"1103","name":"取手青柳店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/103.html"},{"code":"105","fullCode":"1105","name":"牧の原モア店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/105.html"},{"code":"106","fullCode":"1106","name":"桐生相生店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/106.html"},{"code":"107","fullCode":"1107","name":"上福岡駒林店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/107.html"},{"code":"108","fullCode":"1108","name":"フレスポ若葉台店","center":"横浜チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/108.html"},{"code":"109","fullCode":"1109","name":"三芳藤久保店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/109.html"},{"code":"110","fullCode":"1110","name":"上福岡西口店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/110.html"},{"code":"111","fullCode":"1111","name":"伊奈店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/111.html"},{"code":"112","fullCode":"1112","name":"成田はなのき台店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/112.html"},{"code":"114","fullCode":"1114","name":"籠原店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/114.html"},{"code":"115","fullCode":"1115","name":"川口本町店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/115.html"},{"code":"116","fullCode":"1116","name":"古河松並店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/116.html"},{"code":"117","fullCode":"1117","name":"幸手店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/117.html"},{"code":"118","fullCode":"1118","name":"太田小舞木店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/118.html"},{"code":"119","fullCode":"1119","name":"川越新宿店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/119.html"},{"code":"120","fullCode":"1120","name":"上里店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/120.html"},{"code":"121","fullCode":"1121","name":"ユニモちはら台店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/121.html"},{"code":"122","fullCode":"1122","name":"浦和上木崎店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/122.html"},{"code":"123","fullCode":"1123","name":"取手戸頭店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/123.html"},{"code":"124","fullCode":"1124","name":"四街道店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/124.html"},{"code":"125","fullCode":"1125","name":"岩槻西町店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/125.html"},{"code":"126","fullCode":"1126","name":"高崎飯塚店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/126.html"},{"code":"127","fullCode":"1127","name":"高崎高関店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/127.html"},{"code":"128","fullCode":"1128","name":"前橋日吉店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/128.html"},{"code":"129","fullCode":"1129","name":"新座店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/129.html"},{"code":"130","fullCode":"1130","name":"所沢美原店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/130.html"},{"code":"131","fullCode":"1131","name":"秩父上野町店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/131.html"},{"code":"132","fullCode":"1132","name":"青梅今寺店","center":"狭山チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/132.html"},{"code":"133","fullCode":"1133","name":"桐生境野店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/133.html"},{"code":"134","fullCode":"1134","name":"草加原町店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/134.html"},{"code":"135","fullCode":"1135","name":"鴻巣吹上店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/135.html"},{"code":"136","fullCode":"1136","name":"佐倉染井野店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/136.html"},{"code":"137","fullCode":"1137","name":"相模原下九沢店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/137.html"},{"code":"138","fullCode":"1138","name":"八王子並木町店","center":"狭山チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/138.html"},{"code":"140","fullCode":"1140","name":"市川田尻店","center":"千葉チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/140.html"},{"code":"141","fullCode":"1141","name":"大宮盆栽町店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/141.html"},{"code":"142","fullCode":"1142","name":"船橋三山店","center":"千葉チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/142.html"},{"code":"143","fullCode":"1143","name":"立川若葉町店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/143.html"},{"code":"144","fullCode":"1144","name":"市川中国分店","center":"千葉チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/144.html"},{"code":"145","fullCode":"1145","name":"若葉駅西口店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/145.html"},{"code":"146","fullCode":"1146","name":"稲毛海岸店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/146.html"},{"code":"147","fullCode":"1147","name":"川越的場店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/147.html"},{"code":"148","fullCode":"1148","name":"三郷中央店","center":"草加チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/148.html"},{"code":"149","fullCode":"1149","name":"小平回田店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/149.html"},{"code":"150","fullCode":"1150","name":"市川新田店","center":"千葉チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/150.html"},{"code":"151","fullCode":"1151","name":"相模原鹿沼台店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/151.html"},{"code":"152","fullCode":"1152","name":"新座栗原店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/152.html"},{"code":"153","fullCode":"1153","name":"柏若葉町店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/153.html"},{"code":"154","fullCode":"1154","name":"東大和店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/154.html"},{"code":"155","fullCode":"1155","name":"西武立川駅前店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/155.html"},{"code":"156","fullCode":"1156","name":"志木宗岡店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/156.html"},{"code":"157","fullCode":"1157","name":"戸田駅前店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/157.html"},{"code":"158","fullCode":"1158","name":"八千代大和田店","center":"千葉チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/158.html"},{"code":"159","fullCode":"1159","name":"前橋箱田店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/159.html"},{"code":"160","fullCode":"1160","name":"平塚宮松町店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/160.html"},{"code":"161","fullCode":"1161","name":"松戸稔台店","center":"草加チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/161.html"},{"code":"162","fullCode":"1162","name":"藤沢柄沢店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/162.html"},{"code":"163","fullCode":"1163","name":"ミノリア稲毛海岸店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/163.html"},{"code":"164","fullCode":"1164","name":"秦野店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/164.html"},{"code":"165","fullCode":"1165","name":"相模原光が丘店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/165.html"},{"code":"166","fullCode":"1166","name":"鴻巣免許センター店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/166.html"},{"code":"167","fullCode":"1167","name":"ららガーデン春日部店","center":"草加チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/167.html"},{"code":"168","fullCode":"1168","name":"八潮店","center":"草加チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/168.html"},{"code":"169","fullCode":"1169","name":"志木本町店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/169.html"},{"code":"170","fullCode":"1170","name":"南流山店","center":"草加チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/170.html"},{"code":"171","fullCode":"1171","name":"川越西口店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/171.html"},{"code":"172","fullCode":"1172","name":"ららぽーと富士見店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/172.html"},{"code":"173","fullCode":"1173","name":"検見川浜店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/173.html"},{"code":"174","fullCode":"1174","name":"朝霞岡店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/174.html"},{"code":"175","fullCode":"1175","name":"柏高柳駅前店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/175.html"},{"code":"176","fullCode":"1176","name":"鶴ヶ島店","center":"熊谷チルドC","district":"1 小川地区","url":"https://www.yaoko-net.com/store/store01/176.html"},{"code":"177","fullCode":"1177","name":"稲城南山店","center":"横浜チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/177.html"},{"code":"178","fullCode":"1178","name":"浦和中尾店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/178.html"},{"code":"179","fullCode":"1179","name":"千葉ニュータウン店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/179.html"},{"code":"180","fullCode":"1180","name":"柏南増尾店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/180.html"},{"code":"181","fullCode":"1181","name":"藤沢片瀬店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/181.html"},{"code":"182","fullCode":"1182","name":"浦和美園店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/182.html"},{"code":"183","fullCode":"1183","name":"藤岡店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/183.html"},{"code":"184","fullCode":"1184","name":"流山おおたかの森店","center":"草加チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/184.html"},{"code":"185","fullCode":"1185","name":"館林アゼリアモール店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/185.html"},{"code":"186","fullCode":"1186","name":"日野南平店","center":"狭山チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/186.html"},{"code":"187","fullCode":"1187","name":"成城店","center":"横浜チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/187.html"},{"code":"188","fullCode":"1188","name":"浦和パルコ店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/188.html"},{"code":"189","fullCode":"1189","name":"東松山新宿町店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/189.html"},{"code":"190","fullCode":"1190","name":"作草部店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/190.html"},{"code":"191","fullCode":"1191","name":"北本中央店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/191.html"},{"code":"192","fullCode":"1192","name":"小田原ダイナシティ店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/192.html"},{"code":"193","fullCode":"1193","name":"新浦安店","center":"千葉チルドC","district":"11 千葉地区","url":"https://www.yaoko-net.com/store/store01/193.html"},{"code":"194","fullCode":"1194","name":"久喜菖蒲店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/194.html"},{"code":"195","fullCode":"1195","name":"西大宮店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/195.html"},{"code":"196","fullCode":"1196","name":"川越今福店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/196.html"},{"code":"197","fullCode":"1197","name":"東松山シルピア店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/197.html"},{"code":"198","fullCode":"1198","name":"本庄中央店","center":"熊谷チルドC","district":"3 熊谷地区","url":"https://www.yaoko-net.com/store/store01/198.html"},{"code":"199","fullCode":"1199","name":"東久留米滝山店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/199.html"},{"code":"200","fullCode":"1200","name":"スマーク伊勢崎店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/200.html"},{"code":"201","fullCode":"1201","name":"所沢有楽町店","center":"狭山チルドC","district":"8 所沢地区","url":"https://www.yaoko-net.com/store/store01/201.html"},{"code":"202","fullCode":"1202","name":"桶川上日出谷店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/202.html"},{"code":"203","fullCode":"1203","name":"まるひろ南浦和店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/203.html"},{"code":"204","fullCode":"1204","name":"古河大堤店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/204.html"},{"code":"205","fullCode":"1205","name":"蕨錦町店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/205.html"},{"code":"206","fullCode":"1206","name":"三浦初声店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/206.html"},{"code":"207","fullCode":"1207","name":"八千代緑が丘店","center":"千葉チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/207.html"},{"code":"208","fullCode":"1208","name":"府中フォーリス店","center":"横浜チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/208.html"},{"code":"209","fullCode":"1209","name":"川越藤間店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/209.html"},{"code":"210","fullCode":"1210","name":"天王台店","center":"千葉チルドC","district":"7 取手地区","url":"https://www.yaoko-net.com/store/store01/210.html"},{"code":"211","fullCode":"1211","name":"ふじみ野大原店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/211.html"},{"code":"212","fullCode":"1212","name":"和光丸山台店","center":"草加チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/212.html"},{"code":"213","fullCode":"1213","name":"川越霞ケ関店","center":"狭山チルドC","district":"2 川越地区","url":"https://www.yaoko-net.com/store/store01/213.html"},{"code":"214","fullCode":"1214","name":"和光南店","center":"草加チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/214.html"},{"code":"215","fullCode":"1215","name":"大宮櫛引店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/215.html"},{"code":"216","fullCode":"1216","name":"横浜磯子店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/216.html"},{"code":"217","fullCode":"1217","name":"八王子鑓水店","center":"狭山チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/217.html"},{"code":"218","fullCode":"1218","name":"加須店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/218.html"},{"code":"219","fullCode":"1219","name":"トナリエ宇都宮店","center":"伊勢崎CC","district":"5 足利地区","url":"https://www.yaoko-net.com/store/store01/219.html"},{"code":"220","fullCode":"1220","name":"草加松原店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/220.html"},{"code":"221","fullCode":"1221","name":"川崎枡形店","center":"横浜チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/221.html"},{"code":"222","fullCode":"1222","name":"松戸上本郷店","center":"草加チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/222.html"},{"code":"223","fullCode":"1223","name":"横浜天神橋店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/223.html"},{"code":"224","fullCode":"1224","name":"新百合ヶ丘店","center":"横浜チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/224.html"},{"code":"225","fullCode":"1225","name":"東大和清原店","center":"狭山チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/225.html"},{"code":"226","fullCode":"1226","name":"武蔵浦和店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/226.html"},{"code":"227","fullCode":"1227","name":"浦和三室店","center":"草加チルドC","district":"9 さいたま地区","url":"https://www.yaoko-net.com/store/store01/227.html"},{"code":"228","fullCode":"1228","name":"久喜吉羽店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/228.html"},{"code":"229","fullCode":"1229","name":"東鷲宮店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/229.html"},{"code":"230","fullCode":"1230","name":"渋川店","center":"伊勢崎CC","district":"6 高崎地区","url":"https://www.yaoko-net.com/store/store01/230.html"},{"code":"231","fullCode":"1231","name":"川口SKIPシティ店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/231.html"},{"code":"232","fullCode":"1232","name":"綾瀬店","center":"横浜チルドC","district":"15 藤沢地区","url":"https://www.yaoko-net.com/store/store01/232.html"},{"code":"233","fullCode":"1233","name":"杉並桃井店","center":"狭山チルドC","district":"14 川崎地区","url":"https://www.yaoko-net.com/store/store01/233.html"},{"code":"234","fullCode":"1234","name":"松戸古ケ崎店","center":"草加チルドC","district":"12 市川地区","url":"https://www.yaoko-net.com/store/store01/234.html"},{"code":"235","fullCode":"1235","name":"まるひろ上尾店","center":"熊谷チルドC","district":"4 春日部地区","url":"https://www.yaoko-net.com/store/store01/235.html"},{"code":"236","fullCode":"1236","name":"板橋四葉店","center":"草加チルドC","district":"13 多摩地区","url":"https://www.yaoko-net.com/store/store01/236.html"},{"code":"237","fullCode":"1237","name":"岩槻本丸店","center":"草加チルドC","district":"10 川口地区","url":"https://www.yaoko-net.com/store/store01/237.html"},{"code":"238","fullCode":"1238","name":"福生牛浜店","center":null,"district":null,"url":"https://www.yaoko-net.com/store/store01/238.html"},{"code":"239","fullCode":"1239","name":"東戸塚店","center":null,"district":null,"url":"https://www.yaoko-net.com/store/store01/239.html"}];
+
+// ---- kana normalization for fuzzy search ----
+function normalize(str){
+  if(!str) return "";
+  // full-width -> half-width (numbers/letters), then katakana -> hiragana, lowercase, strip spaces
+  let s = str.normalize("NFKC");
+  s = s.replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+  s = s.toLowerCase().replace(/[\s　]/g, "");
+  return s;
+}
+
+const codeInput = document.getElementById("codeSearch");
+const nameInput = document.getElementById("nameSearch");
+const centerSelect = document.getElementById("centerFilter");
+const districtSelect = document.getElementById("districtFilter");
+const tableBody = document.getElementById("tableBody");
+const cardsView = document.getElementById("cardsView");
+const emptyState = document.getElementById("emptyState");
+const hitCount = document.getElementById("hitCount");
+const totalCount = document.getElementById("totalCount");
+const resetBtn = document.getElementById("resetBtn");
+
+totalCount.textContent = STORE_DATA.length;
+
+// populate filter dropdowns
+const centers = [...new Set(STORE_DATA.map(d => d.center).filter(Boolean))].sort();
+const districts = [...new Set(STORE_DATA.map(d => d.district).filter(Boolean))]
+  .sort((a,b) => parseInt(a) - parseInt(b));
+
+centers.forEach(c => {
+  const opt = document.createElement("option");
+  opt.value = c; opt.textContent = c;
+  centerSelect.appendChild(opt);
+});
+districts.forEach(d => {
+  const opt = document.createElement("option");
+  opt.value = d; opt.textContent = d;
+  districtSelect.appendChild(opt);
+});
+
+function escapeHtml(str){
+  return (str ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+function render(){
+  const codeQ = normalize(codeInput.value);
+  const nameQ = normalize(nameInput.value);
+  const centerQ = centerSelect.value;
+  const districtQ = districtSelect.value;
+
+  let filtered = STORE_DATA.filter(d => {
+    if(codeQ){
+      const codeMatch = normalize(d.code).includes(codeQ) || normalize(d.fullCode).includes(codeQ);
+      if(!codeMatch) return false;
+    }
+    if(nameQ){
+      if(!normalize(d.name).includes(nameQ)) return false;
+    }
+    if(centerQ && d.center !== centerQ) return false;
+    if(districtQ && d.district !== districtQ) return false;
+    return true;
+  });
+
+  filtered.sort((a,b) => parseInt(a.code) - parseInt(b.code));
+
+  hitCount.textContent = filtered.length;
+
+  if(filtered.length === 0){
+    tableBody.innerHTML = "";
+    cardsView.innerHTML = "";
+    emptyState.style.display = "block";
+    document.getElementById("resultsTable").style.display = "none";
+    return;
+  }
+  emptyState.style.display = "none";
+  document.getElementById("resultsTable").style.display = "";
+
+  tableBody.innerHTML = filtered.map(d => `
+    <tr>
+      <td><span class="code-tag mono">${escapeHtml(d.code)}</span></td>
+      <td class="store-name">${escapeHtml(d.name)}</td>
+      <td>${d.district ? escapeHtml(d.district) : '<span class="na">未確定</span>'}</td>
+      <td>${d.center ? escapeHtml(d.center) : '<span class="na">未確定</span>'}</td>
+      <td><a class="url-link mono" href="${escapeHtml(d.url)}" target="_blank" rel="noopener">${escapeHtml(d.url)} ↗</a></td>
+    </tr>
+  `).join("");
+
+  cardsView.innerHTML = filtered.map(d => `
+    <div class="store-card">
+      <div class="top-row">
+        <span class="code-tag mono">${escapeHtml(d.code)}</span>
+        <span class="store-name">${escapeHtml(d.name)}</span>
+      </div>
+      <dl>
+        <div class="row"><span>地区</span><span>${d.district ? escapeHtml(d.district) : '<span class="na">未確定</span>'}</span></div>
+        <div class="row"><span>センター</span><span>${d.center ? escapeHtml(d.center) : '<span class="na">未確定</span>'}</span></div>
+      </dl>
+      <div style="margin-top:8px;">
+        <a class="url-link mono" href="${escapeHtml(d.url)}" target="_blank" rel="noopener">${escapeHtml(d.url)} ↗</a>
+      </div>
+    </div>
+  `).join("");
+}
+
+[codeInput, nameInput].forEach(el => el.addEventListener("input", render));
+[centerSelect, districtSelect].forEach(el => el.addEventListener("change", render));
+resetBtn.addEventListener("click", () => {
+  codeInput.value = "";
+  nameInput.value = "";
+  centerSelect.value = "";
+  districtSelect.value = "";
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
