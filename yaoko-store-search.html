@@ -157,6 +157,55 @@
     flex-wrap:wrap;
     gap:10px;
   }
+
+  .area-filter{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  .area-label{
+    font-size:11px;
+    font-weight:600;
+    color:var(--ink-soft);
+    letter-spacing:.01em;
+    flex:0 0 auto;
+  }
+  .area-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    flex:1 1 auto;
+  }
+  .chip{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-size:12px;
+    color:var(--ink-soft);
+    background:#FCFBF8;
+    border:1px solid var(--line-strong);
+    border-radius:999px;
+    padding:4px 10px 4px 8px;
+    cursor:pointer;
+    user-select:none;
+    transition:border-color .15s ease, background .15s ease, color .15s ease;
+    line-height:1.4;
+  }
+  .chip input[type="checkbox"]{
+    margin:0;
+    width:13px;
+    height:13px;
+    accent-color:var(--green);
+    cursor:pointer;
+  }
+  .chip:has(input:checked), .chip.checked{
+    border-color:var(--green);
+    background:rgba(199,0,10,0.08);
+    color:var(--green-deep);
+    font-weight:600;
+  }
   .result-count{
     font-size:13.5px;
     color:var(--ink-soft);
@@ -310,6 +359,18 @@
         <select id="districtFilter"><option value="">すべての地区</option></select>
       </div>
     </div>
+    <div class="area-filter">
+      <span class="area-label">エリア</span>
+      <div class="area-chips" id="areaChips">
+        <label class="chip"><input type="checkbox" value="1">埼玉</label>
+        <label class="chip"><input type="checkbox" value="2">群馬</label>
+        <label class="chip"><input type="checkbox" value="3">栃木</label>
+        <label class="chip"><input type="checkbox" value="4">茨城</label>
+        <label class="chip"><input type="checkbox" value="5">千葉</label>
+        <label class="chip"><input type="checkbox" value="6">東京</label>
+        <label class="chip"><input type="checkbox" value="7">神奈川</label>
+      </div>
+    </div>
     <div class="panel-footer">
       <div class="result-count"><b id="hitCount">0</b> 件ヒット</div>
       <button class="reset" id="resetBtn" type="button">条件をリセット</button>
@@ -369,6 +430,7 @@ const emptyState = document.getElementById("emptyState");
 const hitCount = document.getElementById("hitCount");
 const totalCount = document.getElementById("totalCount");
 const resetBtn = document.getElementById("resetBtn");
+const areaCheckboxes = [...document.querySelectorAll('#areaChips input[type="checkbox"]')];
 
 totalCount.textContent = STORE_DATA.length;
 
@@ -399,6 +461,7 @@ function render(){
   const nameQ = normalize(nameInput.value);
   const centerQ = centerSelect.value;
   const districtQ = districtSelect.value;
+  const selectedAreas = new Set(areaCheckboxes.filter(cb => cb.checked).map(cb => cb.value));
 
   let filtered = STORE_DATA.filter(d => {
     if(codeQ){
@@ -410,6 +473,7 @@ function render(){
     }
     if(centerQ && d.center !== centerQ) return false;
     if(districtQ && d.district !== districtQ) return false;
+    if(selectedAreas.size > 0 && !selectedAreas.has(String(d.group))) return false;
     return true;
   });
 
@@ -456,11 +520,19 @@ function render(){
 
 [codeInput, nameInput].forEach(el => el.addEventListener("input", render));
 [centerSelect, districtSelect].forEach(el => el.addEventListener("change", render));
+areaCheckboxes.forEach(cb => cb.addEventListener("change", () => {
+  cb.closest(".chip").classList.toggle("checked", cb.checked);
+  render();
+}));
 resetBtn.addEventListener("click", () => {
   codeInput.value = "";
   nameInput.value = "";
   centerSelect.value = "";
   districtSelect.value = "";
+  areaCheckboxes.forEach(cb => {
+    cb.checked = false;
+    cb.closest(".chip").classList.remove("checked");
+  });
   render();
 });
 
