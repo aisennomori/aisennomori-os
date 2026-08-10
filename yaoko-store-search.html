@@ -98,33 +98,36 @@
     background:var(--card);
     border:1px solid var(--line);
     border-radius:14px;
-    padding:20px 20px 18px;
+    padding:14px 14px 12px;
     box-shadow:0 1px 2px rgba(31,42,36,0.04);
   }
 
   .field-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
-    gap:14px 16px;
+    gap:10px 10px;
   }
-  @media (max-width:620px){
+  @media (max-width:340px){
     .field-grid{ grid-template-columns:1fr; }
   }
 
   label{
     display:block;
-    font-size:12.5px;
+    font-size:11px;
     font-weight:600;
     color:var(--ink-soft);
-    margin-bottom:6px;
-    letter-spacing:.02em;
+    margin-bottom:4px;
+    letter-spacing:.01em;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
   input[type="text"], select{
     width:100%;
-    font-size:15px;
-    padding:10px 12px;
+    font-size:13.5px;
+    padding:7px 9px;
     border:1px solid var(--line-strong);
-    border-radius:9px;
+    border-radius:8px;
     background:#FCFBF8;
     color:var(--ink);
     font-family:inherit;
@@ -139,16 +142,17 @@
   select{ appearance:none;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235B6560' stroke-width='2.4'><path d='M6 9l6 6 6-6'/></svg>");
     background-repeat:no-repeat;
-    background-position:right 12px center;
-    padding-right:34px;
+    background-position:right 8px center;
+    padding-right:26px;
+    text-overflow:ellipsis;
   }
 
   .panel-footer{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    margin-top:16px;
-    padding-top:14px;
+    margin-top:12px;
+    padding-top:10px;
     border-top:1px dashed var(--line-strong);
     flex-wrap:wrap;
     gap:10px;
@@ -291,11 +295,11 @@
     <div class="field-grid">
       <div>
         <label for="codeSearch">店舗コードで検索</label>
-        <input type="text" id="codeSearch" class="mono" placeholder="例：099　または　1099" inputmode="numeric">
+        <input type="text" id="codeSearch" class="mono" placeholder="例：099" inputmode="numeric">
       </div>
       <div>
-        <label for="nameSearch">店名で検索（あいまい検索）</label>
-        <input type="text" id="nameSearch" placeholder="例：わかば　／　ワカバ　／　若葉">
+        <label for="nameSearch">店名（あいまい検索）</label>
+        <input type="text" id="nameSearch" placeholder="例：わかば">
       </div>
       <div>
         <label for="centerFilter">センターで絞り込み</label>
