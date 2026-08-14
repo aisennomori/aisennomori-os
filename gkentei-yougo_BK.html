@@ -248,7 +248,7 @@
     font-size:14.5px;
     margin:0 0 4px;
   }
-  .term-name mark, .term-desc mark, .exam-short mark{
+  .term-name mark, .term-desc mark{
     background:var(--amber-soft);
     color:var(--amber-deep);
     border-radius:3px;
@@ -260,145 +260,13 @@
     margin:0;
   }
 
-  .no-result{
-
-    text-align:center;
-    color:var(--muted);
-    font-size:14px;
-    padding:60px 20px;
+  /* memorize mode */
+  .term-card.quiz .term-desc{
     display:none;
   }
-  .no-result.show{display:block;}
-
-  /* ---------- Display mode toggle ---------- */
-  .mode-row{
+  .term-card.quiz .reveal-btn{
     display:flex;
-    align-items:center;
-    gap:8px;
-    margin-top:8px;
   }
-  .mode-row .mode-label{
-    font-size:11px;
-    color:#9db3d8;
-    flex-shrink:0;
-  }
-  .mode-toggle-group{
-    display:flex;
-    gap:4px;
-    background:rgba(255,255,255,.08);
-    border-radius:8px;
-    padding:2px;
-  }
-  .mode-btn{
-    font-size:11.5px;
-    font-weight:700;
-    padding:5px 10px;
-    border-radius:6px;
-    border:none;
-    background:transparent;
-    color:#b7c3da;
-    cursor:pointer;
-  }
-  .mode-btn.active{
-    background:var(--amber);
-    color:#241605;
-  }
-  .compare-entry-btn{
-    margin-left:auto;
-    font-size:11.5px;
-    font-weight:700;
-    padding:5px 10px;
-    border-radius:8px;
-    border:1px solid rgba(255,255,255,.22);
-    background:rgba(255,255,255,.08);
-    color:#dbe4f2;
-    cursor:pointer;
-    flex-shrink:0;
-  }
-  .compare-entry-btn.active{
-    background:var(--amber);
-    border-color:var(--amber);
-    color:#241605;
-  }
-
-  /* ---------- Exam-focused card layers ---------- */
-  .label-tag{
-    font-size:10px;
-    font-weight:700;
-    color:var(--muted);
-    letter-spacing:.04em;
-    margin:0 0 3px;
-  }
-  .meta-block{
-    margin-bottom:8px;
-  }
-  .exam-short{
-    font-size:14.5px;
-    font-weight:800;
-    color:var(--navy);
-    margin:0 0 8px;
-    line-height:1.55;
-  }
-  .keyword-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:5px;
-  }
-  .keyword-chip{
-    font-size:11px;
-    font-weight:700;
-    padding:3px 10px;
-    border-radius:999px;
-    background:var(--amber-soft);
-    color:var(--amber-deep);
-  }
-  .compare-box{
-    font-size:12.5px;
-    background:#eef1f6;
-    border-left:3px solid var(--navy-soft);
-    padding:7px 10px;
-    border-radius:0 7px 7px 0;
-    margin-bottom:8px;
-    color:#3a4256;
-    line-height:1.5;
-  }
-  .compare-box b{color:var(--navy);}
-  .textbook-block{
-    border-top:1px dashed var(--line);
-    padding-top:8px;
-    margin-top:2px;
-  }
-  .textbook-block .term-desc{
-    color:var(--muted);
-    font-size:13px;
-  }
-  .term-card[data-has-meta="0"] .textbook-block{
-    border-top:none;
-    padding-top:0;
-    margin-top:0;
-  }
-  .term-card[data-has-meta="0"] .term-desc{
-    color:var(--ink);
-    font-size:14px;
-  }
-  body.mode-exam .term-card[data-has-meta="1"] .textbook-block{display:none;}
-
-  /* memorize mode reveal steps (has-meta cards) */
-  .term-card.memo[data-has-meta="1"][data-reveal="0"] .meta-block,
-  .term-card.memo[data-has-meta="1"][data-reveal="0"] .compare-box,
-  .term-card.memo[data-has-meta="1"][data-reveal="0"] .textbook-block{display:none;}
-  .term-card.memo[data-has-meta="1"][data-reveal="1"] .compare-box,
-  .term-card.memo[data-has-meta="1"][data-reveal="1"] .textbook-block{display:none;}
-  .term-card.memo[data-has-meta="1"] .reveal-btn.step1{display:none;}
-  .term-card.memo[data-has-meta="1"][data-reveal="0"] .reveal-btn.step1{display:flex;}
-  .term-card.memo[data-has-meta="1"] .reveal-btn.step2{display:none;}
-  .term-card.memo[data-has-meta="1"][data-reveal="1"].has-step2 .reveal-btn.step2{display:flex;}
-
-  /* memorize mode (no-meta cards, simple 1-step) */
-  .term-card.memo[data-has-meta="0"][data-reveal="0"] .textbook-block{display:none;}
-  .term-card.memo[data-has-meta="0"] .reveal-btn.step1{display:none;}
-  .term-card.memo[data-has-meta="0"][data-reveal="0"] .reveal-btn.step1{display:flex;}
-
   .reveal-btn{
     display:none;
     width:100%;
@@ -413,35 +281,18 @@
     font-weight:600;
     padding:8px;
     cursor:pointer;
-    margin-top:4px;
   }
+  .term-card.quiz.revealed .term-desc{display:block;}
+  .term-card.quiz.revealed .reveal-btn{display:none;}
 
-  /* ---------- Comparison mode ---------- */
-  .compare-view{display:none;}
-  body.compare-active .compare-view{display:block;}
-  body.compare-active #main,
-  body.compare-active .status-bar{display:none;}
-  .compare-group{
-    margin-bottom:26px;
+  .no-result{
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    padding:60px 20px;
+    display:none;
   }
-  .compare-group-title{
-    font-size:13px;
-    font-weight:700;
-    color:#fff;
-    background:var(--navy);
-    display:inline-block;
-    padding:5px 12px;
-    border-radius:6px;
-    margin-bottom:10px;
-  }
-  .compare-member{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-left:4px solid var(--amber);
-    border-radius:var(--radius);
-    padding:12px 14px;
-    margin-bottom:8px;
-  }
+  .no-result.show{display:block;}
 
   footer{
     max-width:720px;
@@ -497,14 +348,6 @@
       <button class="label" id="memoLabel">暗記モード</button>
     </div>
   </div>
-  <div class="mode-row">
-    <span class="mode-label">表示</span>
-    <div class="mode-toggle-group">
-      <button class="mode-btn active" id="modeExamBtn">試験重視</button>
-      <button class="mode-btn" id="modeFullBtn">全情報</button>
-    </div>
-    <button class="compare-entry-btn" id="compareEntryBtn">比較モード</button>
-  </div>
   <div class="chip-row-wrap" id="chipRowWrap"><div class="chip-row" id="chipRow"></div></div>
 </header>
 
@@ -515,14 +358,11 @@
 
 <main id="main"></main>
 
-<div class="compare-view" id="compareView"></div>
-
 <p class="no-result" id="noResult">該当する用語が見つかりません。検索語を変えてお試しください。</p>
 
 <footer>
-
-  教科書の要約表を基礎資料として収録。試験用ひとこと・キーワード・区別ポイントは、G検定学習時に用語を識別しやすくするための補助情報です。原典説明と試験対策補助情報は分離して表示しています。転記の際に誤りが生じる可能性があるため、実際の学習では原典テキストと読み合わせのうえご確認ください。
-  <br><span style="opacity:.5;">build: 2026-08-14-v6（G検定 識別暗記版）</span>
+  出典：スッキリわかるG検定テキスト各章「ここだけは押さえておこう！」より作成。第1章〜第12章（付録の数理・統計入門を含む）の最重要用語一覧です。転記の際に誤りが生じる可能性があるため、実際の学習では原典テキストと読み合わせのうえご確認ください。
+  <br><span style="opacity:.5;">build: 2026-08-14-v4（ヘッダー圧縮版）</span>
 </footer>
 
 <button id="topBtn" aria-label="トップへ戻る">↑</button>
@@ -733,7 +573,7 @@ const CHAPTERS = [
         ["LASSO回帰","L1正則化を線形回帰に適用したもの"],
         ["Ridge回帰","L2正則化を線形回帰に適用したもの"],
         ["Elastic Net","LASSO回帰とRidge回帰を組み合わせた手法"],
-        ["バッチ正規化","ミニバッチ単位で層ごとに正規化を行う手法"],
+        ["バッチ正規化","ミニバッチ単位で重みを正規化する手法"],
         ["Pruning（剪定）","重要度の低い重みを消去することで計算量を減らす手法"],
         ["宝くじ仮説","ディープラーニングのネットワーク内に、初期から最適なサブネットワーク（宝くじ）が存在し、それをうまく学習させることで高性能が得られるという仮説"],
         ["Quantize（量子化）","小数点以下の精度を落とすことで計算量を減らす手法"],
@@ -895,7 +735,7 @@ const CHAPTERS = [
     sections: [
       { label: "10.1　生成モデル", terms: [
         ["生成モデル","データを生成するモデル。VAEやGANが有名"],
-        ["VAE","オートエンコーダを応用した生成モデル。VQ-VAEは、オートエンコーダに「離散的な潜在表現」を導入するためのモデル。βVAEは、通常のVAEに対して「Kullback-Leibler（KL）ダイバージェンス」の重要性を強調するためのモデル。InfoVAEは、VAEのもう一つのバリエーションで、潜在空間の情報量を最大化することを目指したモデル"],
+        ["VAE","オートエンコーダを応用した生成モデル。VQ-VAEは、オートエンコーダに「離散的な潜在表現」を導入するためのモデル。βVAEは、通常のVAEに対して「Kullback-Leibler（KL）ダイバージェンス」の重要性を強調するためのモデル。nfoVAEは、VAEのもう一つのバリエーションで、潜在空間の情報量を最大化することを目指したモデル"],
         ["GAN","敵対的生成ネットワーク。GeneratorとDiscriminatorを競わせるように学習する"],
         ["Generator","GANの内、データの生成を担当するモデル。Discriminatorを騙すように学習する"],
         ["Discriminator","実際のデータとGeneratorが生成したデータを見分ける役割を持つモデル"],
@@ -1036,357 +876,10 @@ const CHAPTERS = [
   },
 ];
 
-// ---------- STUDY_META (試験対策レイヤー。教科書説明とは別管理) ----------
-// 内容は依頼者から提供された初期データをそのまま登録。Claude側での新規追加・書き換えは行っていません。
-const STUDY_META = {
-  "AI効果": {
-    short: "仕組みが分かると「AIらしくない」と感じてしまう心理現象",
-    keywords: ["AIらしく感じなくなる","仕組みが分かる"],
-  },
-  "フレーム問題": {
-    short: "考慮すべき情報が多すぎて、必要な情報だけを選ぶことが難しい問題",
-    keywords: ["考慮対象","情報が多すぎる"],
-  },
-  "シンボルグラウンディング問題": {
-    short: "記号（シンボル）と現実世界の意味を結び付けることが難しい問題",
-    keywords: ["記号","意味","結び付け"],
-  },
-  "教師あり学習": {
-    short: "正解ラベル付きデータから入力と出力の関係を学習する手法",
-    keywords: ["正解ラベルあり","分類","回帰"],
-    compare: "教師なし学習は正解ラベルを使わない",
-  },
-  "教師なし学習": {
-    short: "正解ラベルのないデータから構造や特徴を発見する手法",
-    keywords: ["正解ラベルなし","クラスタリング","次元削減"],
-    compare: "教師あり学習は正解ラベル付きデータを利用する",
-  },
-  "強化学習": {
-    short: "エージェントが環境との相互作用を通じて、累積報酬を最大化する行動方策を学ぶ手法",
-    keywords: ["エージェント","環境","報酬","累積報酬"],
-  },
-  "回帰": {
-    short: "連続値を予測する問題",
-    keywords: ["連続値"],
-    compare: "分類は離散的なクラスを予測する",
-  },
-  "分類": {
-    short: "データがどのクラスに属するかを予測する問題",
-    keywords: ["離散値","クラス"],
-    compare: "回帰は連続値を予測する",
-  },
-  "バギング": {
-    short: "複数モデルを並列に学習させ、その結果を統合するアンサンブル手法",
-    keywords: ["並列","アンサンブル"],
-    compare: "ブースティングはモデルを逐次的に学習させる",
-  },
-  "ブースティング": {
-    short: "前のモデルの結果を踏まえて、複数モデルを逐次的に学習するアンサンブル手法",
-    keywords: ["逐次","アンサンブル"],
-    compare: "バギングは複数モデルを並列に学習させる",
-  },
-  "ランダムフォレスト": {
-    short: "複数の決定木を利用するバギング系のアンサンブル学習手法",
-    keywords: ["決定木","バギング","アンサンブル"],
-  },
-  "サポートベクトルマシン": {
-    short: "クラス間のマージンを最大化する境界を求める教師あり学習手法",
-    keywords: ["マージン最大化","カーネル法","SVM"],
-  },
-  "主成分分析": {
-    short: "データの情報をなるべく保ちながら、少ない主成分へ変換する次元削減手法",
-    keywords: ["PCA","次元削減","分散"],
-  },
-  "過学習": {
-    short: "訓練データに適応しすぎ、未知データに対する性能が低下した状態",
-    keywords: ["訓練データ","汎化性能低下"],
-  },
-  "適合率": {
-    short: "「陽性と予測したもの」の中で、実際に陽性だった割合",
-    keywords: ["Precision","予測陽性"],
-    compare: "再現率は「実際の陽性」をどれだけ拾えたか",
-  },
-  "再現率": {
-    short: "「実際に陽性のもの」の中で、陽性と予測できた割合",
-    keywords: ["Recall","実際の陽性"],
-    compare: "適合率は「陽性と予測したもの」がどれだけ正しかったか",
-  },
-  "F値": {
-    short: "適合率と再現率の調和平均",
-    keywords: ["F1","適合率","再現率","調和平均"],
-  },
-  "シグモイド関数": {
-    short: "入力を0〜1の範囲へ変換する活性化関数",
-    keywords: ["0〜1","2値分類"],
-  },
-  "ソフトマックス関数": {
-    short: "複数クラスに対する出力を確率として扱える形に変換する関数",
-    keywords: ["多クラス分類","確率"],
-  },
-  "ReLU（ランプ）関数": {
-    short: "入力が正ならその値を返し、0以下なら0を返す活性化関数",
-    keywords: ["正ならそのまま","負なら0"],
-  },
-  "AdaGrad": {
-    short: "パラメータごとに学習率を調整する最適化手法",
-    keywords: ["学習率調整","過去の勾配"],
-  },
-  "RMSprop": {
-    short: "最近の勾配をより重視しながら学習率を調整する最適化手法",
-    keywords: ["最近の勾配","学習率"],
-  },
-  "Adam": {
-    short: "Momentum系の考え方と適応的学習率を組み合わせた代表的な最適化手法",
-    keywords: ["Momentum","適応的学習率"],
-  },
-  "L1正則化": {
-    short: "重みの絶対値にペナルティを与え、不要な重みを0にしやすくする正則化",
-    keywords: ["重み0","スパース","LASSO"],
-    compare: "L2正則化は大きな重みを小さく抑える",
-  },
-  "L2正則化": {
-    short: "重みの二乗にペナルティを与え、大きな重みを抑える正則化",
-    keywords: ["大きな重みを抑える","Ridge"],
-    compare: "L1正則化は不要な重みを0にしやすい",
-  },
-  "ドロップアウト": {
-    short: "学習時に一定割合のユニットをランダムに無効化して過学習を抑える手法",
-    keywords: ["ランダム","ユニット無効化","過学習抑制"],
-    compare: "バッチ正規化とは目的・仕組みが異なる",
-  },
-  "バッチ正規化": {
-    short: "ミニバッチの統計量を利用して層の入力・活性値を正規化する手法",
-    keywords: ["ミニバッチ","正規化","Batch Normalization"],
-  },
-  "転移学習": {
-    short: "あるタスクで学習済みのモデルや知識を別のタスクに利用する手法",
-    keywords: ["学習済みモデル","別タスク"],
-  },
-  "ファインチューニング": {
-    short: "学習済みモデルを新しいデータやタスクで追加学習して微調整する手法",
-    keywords: ["学習済みモデル","追加学習","微調整"],
-    compare: "転移学習の具体的な適応方法の一つとして用いられる",
-  },
-  "Distillation（蒸留）": {
-    short: "大きな教師モデルの知識を、より小さな生徒モデルへ移すモデル圧縮手法",
-    keywords: ["教師モデル","生徒モデル","モデル圧縮"],
-  },
-  "Quantize（量子化）": {
-    short: "重みや活性値を少ないビット数で表現し、モデルサイズや計算量を削減する手法",
-    keywords: ["低ビット","モデル圧縮","計算量削減"],
-  },
-  "CNN（畳み込みニューラルネットワーク）": {
-    short: "畳み込みによって局所的な特徴を抽出するニューラルネットワーク",
-    keywords: ["畳み込み","画像","局所特徴"],
-    compare: "RNNは系列データ、TransformerはAttentionを中心に処理する",
-  },
-  "RNN（Recurrent Neural Network, 回帰結合型ニューラルネットワーク）": {
-    short: "過去の情報を内部状態として利用しながら系列データを処理するニューラルネットワーク",
-    keywords: ["系列","時系列","過去の情報"],
-    compare: "Transformerは再帰処理を使わずSelf-Attentionを中心に処理する",
-  },
-  "LSTM（Long short-term memory）": {
-    short: "長期的な情報を保持しやすくするためゲート機構を導入したRNN",
-    keywords: ["長期依存","ゲート","勾配消失対策"],
-  },
-  "GRU（Gated recurrent unit；ゲート付き回帰型ユニット）": {
-    short: "LSTMを簡略化した構造を持ち、2種類のゲートを用いるRNNの拡張モデル",
-    keywords: ["2つのゲート","RNN","LSTMより簡略"],
-  },
-  "スキップグラム": {
-    short: "中心単語から周辺単語を予測するword2vecの学習方式",
-    keywords: ["中心→周辺"],
-    compare: "CBOWは周辺単語から中心単語を予測する",
-  },
-  "CBOW": {
-    short: "周辺単語から中心単語を予測するword2vecの学習方式",
-    keywords: ["周辺→中心"],
-    compare: "Skip-gramは中心単語から周辺単語を予測する",
-  },
-  "Attention": {
-    short: "入力の各部分について、出力にとっての重要度を重み付けする仕組み",
-    keywords: ["重要度","重み付け"],
-  },
-  "Self-Attention": {
-    short: "同じ系列内の要素同士の関連度を計算するAttention",
-    keywords: ["同一系列","関連度"],
-  },
-  "Transformer": {
-    short: "Self-Attentionを中心に系列データを処理するニューラルネットワーク",
-    keywords: ["Self-Attention","Positional Encoding","並列処理"],
-    compare: "RNNのような再帰処理を必要としない",
-  },
-  "BERT": {
-    short: "TransformerのEncoderを基盤とし、文脈理解を得意とする言語モデル",
-    keywords: ["Transformer Encoder","双方向","文脈理解"],
-  },
-  "Few-shot": {
-    short: "少数の例を提示して、新しいタスクを実行・推論させる方法",
-    keywords: ["少数例","Few-shot"],
-  },
-  "セマンティックセグメンテーション": {
-    short: "画像の各ピクセルにクラスラベルを割り当てる手法",
-    keywords: ["ピクセル","クラス"],
-    compare: "インスタンスセグメンテーションは同じクラスの個体も区別する",
-  },
-  "インスタンスセグメンテーション": {
-    short: "ピクセル単位で領域を識別し、同じクラスでも個々の物体を区別する手法",
-    keywords: ["ピクセル","個体識別"],
-    compare: "Semanticは個体を区別しない",
-  },
-  "パノプティックセグメンテーション": {
-    short: "Semantic SegmentationとInstance Segmentationを統合した手法",
-    keywords: ["Semantic","Instance","統合"],
-  },
-  "AlexNet": {
-    short: "2012年ILSVRCでディープラーニングの有効性を強く示したCNN",
-    keywords: ["2012","ILSVRC","CNN"],
-  },
-  "VGG": {
-    short: "小さな畳み込みフィルタを重ね、ネットワークを深くしたCNN",
-    keywords: ["3×3","VGG16","VGG19"],
-  },
-  "GoogLeNet": {
-    short: "Inceptionモジュールを特徴とするCNN",
-    keywords: ["Inception","GAP","Auxiliary Loss"],
-  },
-  "ResNet": {
-    short: "Shortcut Connectionによる残差学習を導入したCNN",
-    keywords: ["Shortcut Connection","残差","深層化"],
-  },
-  "DenseNet": {
-    short: "各層を後続する多数の層へ直接接続するCNN",
-    keywords: ["Dense Connection","層間接続"],
-  },
-  "EfficientNet": {
-    short: "ネットワークの深さ・幅・入力解像度をバランスよく拡大するCNN",
-    keywords: ["深さ","幅","解像度","Compound Scaling"],
-  },
-  "VAE": {
-    short: "潜在変数の確率分布を学習し、そこからデータを生成する生成モデル",
-    keywords: ["潜在空間","確率分布","生成モデル"],
-    compare: "GANはGeneratorとDiscriminatorを競わせて学習する",
-  },
-  "GAN": {
-    short: "GeneratorとDiscriminatorを競わせながら学習する生成モデル",
-    keywords: ["Generator","Discriminator","敵対的学習"],
-  },
-  "Generator": {
-    short: "GANで偽のデータを生成する役割",
-    keywords: ["生成","偽物"],
-    compare: "Discriminatorは本物と生成データを識別する",
-  },
-  "Discriminator": {
-    short: "GANで実データとGeneratorの生成データを識別する役割",
-    keywords: ["識別","本物／偽物"],
-  },
-  "Diffusion Model": {
-    short: "ノイズを加える過程と除去する過程を学習し、ノイズからデータを生成するモデル",
-    keywords: ["ノイズ","逆拡散","生成モデル"],
-  },
-  "エージェント": {
-    short: "強化学習で環境を観測し、行動を選択する主体",
-    keywords: ["行動","主体"],
-  },
-  "環境": {
-    short: "エージェントの行動を受け、次の状態や報酬を返す外部の仕組み",
-    keywords: ["状態遷移","報酬"],
-    compare: "「状態」はある時点の環境の情報",
-  },
-  "報酬": {
-    short: "行動の結果として環境から与えられる数値的なフィードバック",
-    keywords: ["正負","フィードバック"],
-  },
-  "Q値（状態行動価値）": {
-    short: "ある状態である行動を取った後に得られる将来の累積報酬の期待値",
-    keywords: ["状態","行動","累積報酬"],
-  },
-  "Q学習": {
-    short: "次の状態で最大となるQ値を用いてQ値を更新するオフポリシー型の手法",
-    keywords: ["最大Q値","オフポリシー"],
-    compare: "SARSAは実際に選択した次の行動のQ値を用いるオンポリシー型",
-  },
-  "SARSA": {
-    short: "実際に選択した次の行動のQ値を用いて更新するオンポリシー型の手法",
-    keywords: ["実際の次行動","オンポリシー"],
-    compare: "Q学習は次状態の最大Q値を用いるオフポリシー型",
-  },
-  "モンテカルロ法": {
-    short: "エピソードを最後まで実行し、実際に得られたリターンから価値を推定する手法",
-    keywords: ["エピソード終了","実リターン"],
-  },
-  "DQN": {
-    short: "Q学習のQ関数をディープニューラルネットワークで近似する手法",
-    keywords: ["Q学習","DNN","Q関数"],
-  },
-  "DDQN（Double DQN）": {
-    short: "行動選択とQ値評価を分離することで、Q値の過大評価を抑えるDQNの改良手法",
-    keywords: ["Double DQN","過大評価抑制"],
-  },
-  "Actor-Critic": {
-    short: "行動を選ぶActorと、その行動方策を評価するCriticを組み合わせる強化学習手法",
-    keywords: ["Actor","Critic","方策","価値"],
-  },
-  "A3C": {
-    short: "複数のActor-Learnerを非同期に動かしてActor-Criticを学習する手法",
-    keywords: ["非同期","Actor-Critic","並列"],
-  },
-  "Rainbow": {
-    short: "複数のDQN改良技術を統合した強化学習手法",
-    keywords: ["DQN改良","統合"],
-  },
-  "マルコフ決定過程": {
-    short: "状態・行動・遷移確率・報酬などで意思決定問題を表現する枠組み",
-    keywords: ["MDP","状態","行動","遷移確率","報酬","マルコフ性"],
-  },
-  "PoC（Proof of Concept）": {
-    short: "アイデアや技術が実現可能か、小規模に検証する概念実証",
-    keywords: ["概念実証","実現可能性"],
-  },
-  "コンテンツベースフィルタリング": {
-    short: "ユーザーが好んだアイテムと属性が似たアイテムを推薦する手法",
-    keywords: ["アイテム属性","類似性"],
-    compare: "協調フィルタリングはユーザーやアイテムの行動履歴を利用する",
-  },
-  "協調フィルタリング": {
-    short: "複数ユーザーの評価・購買・閲覧履歴などを利用して推薦する手法",
-    keywords: ["行動履歴","ユーザー類似","アイテム類似"],
-    compare: "コンテンツベースはアイテムの属性を利用する",
-  },
-  "Docker": {
-    short: "アプリケーションと実行環境をコンテナとして分離・配布・実行するプラットフォーム",
-    keywords: ["コンテナ","環境"],
-  },
-  "MLOps": {
-    short: "機械学習モデルの開発・デプロイ・運用・監視を継続的に管理する考え方・仕組み",
-    keywords: ["ML","運用","デプロイ","監視"],
-  },
-};
-
-// ---------- COMPARE_GROUPS（比較モード） ----------
-const COMPARE_GROUPS = [
-  { title: "学習の種類", members: ["教師あり学習","教師なし学習","強化学習"] },
-  { title: "回帰 / 分類", members: ["回帰","分類"] },
-  { title: "評価指標", members: ["適合率","再現率","F値"] },
-  { title: "アンサンブル学習", members: ["バギング","ブースティング"] },
-  { title: "正則化", members: ["L1正則化","L2正則化"] },
-  { title: "最適化手法", members: ["AdaGrad","RMSprop","Adam"] },
-  { title: "学習済みモデルの利用", members: ["転移学習","ファインチューニング","Distillation（蒸留）"] },
-  { title: "代表的なネットワーク構造", members: ["CNN（畳み込みニューラルネットワーク）","RNN（Recurrent Neural Network, 回帰結合型ニューラルネットワーク）","Transformer"] },
-  { title: "word2vecの学習方式", members: ["CBOW","スキップグラム"] },
-  { title: "セグメンテーションの種類", members: ["セマンティックセグメンテーション","インスタンスセグメンテーション","パノプティックセグメンテーション"] },
-  { title: "強化学習の更新手法", members: ["Q学習","SARSA","モンテカルロ法"] },
-  { title: "生成モデル", members: ["VAE","GAN","Diffusion Model"] },
-  { title: "GANの構成要素", members: ["Generator","Discriminator"] },
-  { title: "レコメンド手法", members: ["コンテンツベースフィルタリング","協調フィルタリング"] },
-  { title: "代表的なCNNモデルの変遷", members: ["AlexNet","VGG","GoogLeNet","ResNet","DenseNet","EfficientNet"] },
-];
-
 // ---------- Build DOM ----------
 const main = document.getElementById('main');
 const chipRow = document.getElementById('chipRow');
 let totalTerms = 0;
-let displayMode = 'exam'; // 'exam' | 'full'
 
 CHAPTERS.forEach((ch, ci) => {
   const chNum = ci + 1;
@@ -1426,8 +919,32 @@ CHAPTERS.forEach((ch, ci) => {
     body.appendChild(label);
 
     section.terms.forEach(([term, desc]) => {
-      const meta = STUDY_META[term] || null;
-      const card = buildTermCard(term, desc, meta);
+      const card = document.createElement('div');
+      card.className = 'term-card';
+      card.dataset.term = term;
+      card.dataset.desc = desc;
+
+      const nameEl = document.createElement('p');
+      nameEl.className = 'term-name';
+      nameEl.textContent = term;
+
+      const descEl = document.createElement('p');
+      descEl.className = 'term-desc';
+      descEl.textContent = desc;
+
+      const revealBtn = document.createElement('button');
+      revealBtn.className = 'reveal-btn';
+      revealBtn.textContent = 'タップして説明を表示';
+      revealBtn.addEventListener('click', () => card.classList.add('revealed'));
+
+      card.appendChild(nameEl);
+      card.appendChild(descEl);
+      card.appendChild(revealBtn);
+      card.addEventListener('click', (e) => {
+        if(card.classList.contains('quiz') && !card.classList.contains('revealed')){
+          card.classList.add('revealed');
+        }
+      });
       body.appendChild(card);
     });
   });
@@ -1435,131 +952,6 @@ CHAPTERS.forEach((ch, ci) => {
   chapterEl.appendChild(body);
   main.appendChild(chapterEl);
 });
-
-// ---------- Card builder (shared by chapter list & search) ----------
-function buildTermCard(term, desc, meta){
-  const card = document.createElement('div');
-  card.className = 'term-card';
-  card.dataset.term = term;
-  card.dataset.desc = desc;
-  card.dataset.hasMeta = meta ? '1' : '0';
-  card.dataset.reveal = '0';
-  if(meta){
-    card.dataset.short = meta.short || '';
-    card.dataset.keywords = (meta.keywords || []).join('、');
-    card.dataset.compare = meta.compare || '';
-    if(meta.compare) card.classList.add('has-compare');
-  }
-
-  const nameEl = document.createElement('p');
-  nameEl.className = 'term-name';
-  nameEl.textContent = term;
-  card.appendChild(nameEl);
-
-  if(meta){
-    const metaBlock = document.createElement('div');
-    metaBlock.className = 'meta-block';
-
-    const shortLabel = document.createElement('p');
-    shortLabel.className = 'label-tag';
-    shortLabel.textContent = '試験用ひとこと';
-    metaBlock.appendChild(shortLabel);
-
-    const shortEl = document.createElement('p');
-    shortEl.className = 'exam-short';
-    shortEl.textContent = meta.short || '';
-    metaBlock.appendChild(shortEl);
-
-    if(meta.keywords && meta.keywords.length){
-      const kwLabel = document.createElement('p');
-      kwLabel.className = 'label-tag';
-      kwLabel.textContent = '覚えるキーワード';
-      metaBlock.appendChild(kwLabel);
-
-      const kwRow = document.createElement('div');
-      kwRow.className = 'keyword-row';
-      meta.keywords.forEach(k => {
-        const chip = document.createElement('span');
-        chip.className = 'keyword-chip';
-        chip.textContent = k;
-        kwRow.appendChild(chip);
-      });
-      metaBlock.appendChild(kwRow);
-    }
-    card.appendChild(metaBlock);
-
-    if(meta.compare){
-      const cmp = document.createElement('div');
-      cmp.className = 'compare-box';
-      const cmpLabel = document.createElement('b');
-      cmpLabel.textContent = '区別ポイント　';
-      cmp.appendChild(cmpLabel);
-      cmp.appendChild(document.createTextNode(meta.compare));
-      card.appendChild(cmp);
-    }
-  }
-
-  const textbookBlock = document.createElement('div');
-  textbookBlock.className = 'textbook-block';
-  if(meta){
-    const tbLabel = document.createElement('p');
-    tbLabel.className = 'label-tag';
-    tbLabel.textContent = '教科書の説明';
-    textbookBlock.appendChild(tbLabel);
-  }
-  const descEl = document.createElement('p');
-  descEl.className = 'term-desc';
-  descEl.textContent = desc;
-  textbookBlock.appendChild(descEl);
-  card.appendChild(textbookBlock);
-
-  // reveal buttons (memo mode)
-  const revealBtn1 = document.createElement('button');
-  revealBtn1.className = 'reveal-btn step1';
-  revealBtn1.textContent = meta ? 'タップして試験用ひとことを表示' : 'タップして説明を表示';
-  revealBtn1.addEventListener('click', (e) => { e.stopPropagation(); setReveal(card, 1); });
-  card.appendChild(revealBtn1);
-
-  if(meta){
-    const revealBtn2 = document.createElement('button');
-    revealBtn2.className = 'reveal-btn step2';
-    revealBtn2.textContent = displayMode === 'full' ? '教科書説明も見る' : '区別ポイントを見る';
-    revealBtn2.addEventListener('click', (e) => { e.stopPropagation(); setReveal(card, 2); });
-    card.appendChild(revealBtn2);
-  }
-
-  card.addEventListener('click', () => {
-    if(!card.classList.contains('memo')) return;
-    const step = card.dataset.reveal;
-    if(step === '0') setReveal(card, 1);
-  });
-
-  refreshCardStep2Applicability(card);
-  return card;
-}
-
-function refreshCardStep2Applicability(card){
-  const hasMeta = card.dataset.hasMeta === '1';
-  if(!hasMeta) return;
-  const hasCompare = card.classList.contains('has-compare');
-  const willShowDesc = displayMode === 'full';
-  const needsStep2 = hasCompare || willShowDesc;
-  card.classList.toggle('has-step2', needsStep2);
-  const btn2 = card.querySelector('.reveal-btn.step2');
-  if(btn2) btn2.textContent = displayMode === 'full' ? '教科書説明も見る' : '区別ポイントを見る';
-  // if no step2 content needed, tapping step1 reveals everything directly
-  if(!needsStep2 && card.dataset.reveal === '1'){
-    card.dataset.reveal = '2';
-  }
-}
-
-function setReveal(card, step){
-  card.dataset.reveal = String(step);
-  if(step === 1 && !card.classList.contains('has-step2')){
-    card.dataset.reveal = '2';
-  }
-}
-
 
 document.getElementById('totalCount').textContent = totalTerms;
 document.getElementById('visibleCount').textContent = totalTerms;
@@ -1590,25 +982,18 @@ function runSearch(){
     chapterEl.querySelectorAll('.term-card').forEach(card => {
       const term = card.dataset.term;
       const desc = card.dataset.desc;
-      const short = card.dataset.short || '';
-      const keywords = card.dataset.keywords || '';
-      const compare = card.dataset.compare || '';
-      const haystack = [term, desc, short, keywords, compare].join(' ').toLowerCase();
-      const match = !q || haystack.includes(q.toLowerCase());
+      const match = !q || term.toLowerCase().includes(q.toLowerCase()) || desc.toLowerCase().includes(q.toLowerCase());
       card.style.display = match ? '' : 'none';
       if(match){
         visible++;
         chapterHasMatch = true;
         card.querySelector('.term-name').innerHTML = highlight(term, q);
-        const descNode = card.querySelector('.term-desc');
-        if(descNode) descNode.innerHTML = highlight(desc, q);
-        const shortNode = card.querySelector('.exam-short');
-        if(shortNode) shortNode.innerHTML = highlight(short, q);
+        card.querySelector('.term-desc').innerHTML = highlight(desc, q);
         if(q){
-          // reveal all matches while searching, even in memo mode, so results are actually visible
-          setReveal(card, 2);
-        } else if(card.classList.contains('memo')){
-          card.dataset.reveal = '0';
+          // reveal all matches while searching, even in quiz mode, so results are actually visible
+          card.classList.add('revealed');
+        } else if(card.classList.contains('quiz')){
+          card.classList.remove('revealed');
         }
         // show the section label this card belongs to
         let labelEl = card.previousElementSibling;
@@ -1640,107 +1025,12 @@ function setMemo(on){
   memoSwitch.classList.toggle('on', on);
   memoSwitch.setAttribute('aria-checked', on);
   document.querySelectorAll('.term-card').forEach(card => {
-    card.classList.toggle('memo', on);
-    card.dataset.reveal = '0';
+    card.classList.toggle('quiz', on);
+    card.classList.remove('revealed');
   });
 }
 memoSwitch.addEventListener('click', () => setMemo(!memoOn));
 memoLabel.addEventListener('click', () => setMemo(!memoOn));
-
-// ---------- Display mode (試験重視 / 全情報) ----------
-const modeExamBtn = document.getElementById('modeExamBtn');
-const modeFullBtn = document.getElementById('modeFullBtn');
-function setDisplayMode(mode){
-  displayMode = mode;
-  document.body.classList.toggle('mode-exam', mode === 'exam');
-  document.body.classList.toggle('mode-full', mode === 'full');
-  modeExamBtn.classList.toggle('active', mode === 'exam');
-  modeFullBtn.classList.toggle('active', mode === 'full');
-  document.querySelectorAll('.term-card[data-has-meta="1"]').forEach(refreshCardStep2Applicability);
-}
-modeExamBtn.addEventListener('click', () => setDisplayMode('exam'));
-modeFullBtn.addEventListener('click', () => setDisplayMode('full'));
-setDisplayMode('exam');
-
-// ---------- Comparison mode ----------
-const compareEntryBtn = document.getElementById('compareEntryBtn');
-const compareView = document.getElementById('compareView');
-let compareBuilt = false;
-let compareOn = false;
-
-function buildCompareView(){
-  COMPARE_GROUPS.forEach(group => {
-    const groupEl = document.createElement('div');
-    groupEl.className = 'compare-group';
-
-    const titleEl = document.createElement('div');
-    titleEl.className = 'compare-group-title';
-    titleEl.textContent = group.title;
-    groupEl.appendChild(titleEl);
-
-    group.members.forEach(termName => {
-      const meta = STUDY_META[termName];
-      const memberEl = document.createElement('div');
-      memberEl.className = 'compare-member';
-
-      const nameEl = document.createElement('p');
-      nameEl.className = 'term-name';
-      nameEl.textContent = termName;
-      memberEl.appendChild(nameEl);
-
-      if(meta){
-        if(meta.short){
-          const lbl = document.createElement('p');
-          lbl.className = 'label-tag';
-          lbl.textContent = '試験用ひとこと';
-          memberEl.appendChild(lbl);
-          const shortEl = document.createElement('p');
-          shortEl.className = 'exam-short';
-          shortEl.textContent = meta.short;
-          memberEl.appendChild(shortEl);
-        }
-        if(meta.keywords && meta.keywords.length){
-          const kwRow = document.createElement('div');
-          kwRow.className = 'keyword-row';
-          meta.keywords.forEach(k => {
-            const chip = document.createElement('span');
-            chip.className = 'keyword-chip';
-            chip.textContent = k;
-            kwRow.appendChild(chip);
-          });
-          memberEl.appendChild(kwRow);
-        }
-        if(meta.compare){
-          const cmp = document.createElement('div');
-          cmp.className = 'compare-box';
-          cmp.style.marginTop = '8px';
-          const cmpLabel = document.createElement('b');
-          cmpLabel.textContent = '区別ポイント　';
-          cmp.appendChild(cmpLabel);
-          cmp.appendChild(document.createTextNode(meta.compare));
-          memberEl.appendChild(cmp);
-        }
-      } else {
-        const p = document.createElement('p');
-        p.className = 'term-desc';
-        p.textContent = '（試験用ひとこと未登録）';
-        memberEl.appendChild(p);
-      }
-      groupEl.appendChild(memberEl);
-    });
-
-    compareView.appendChild(groupEl);
-  });
-  compareBuilt = true;
-}
-
-compareEntryBtn.addEventListener('click', () => {
-  compareOn = !compareOn;
-  if(compareOn && !compareBuilt) buildCompareView();
-  document.body.classList.toggle('compare-active', compareOn);
-  compareEntryBtn.classList.toggle('active', compareOn);
-  compareEntryBtn.textContent = compareOn ? '一覧へ戻る' : '比較モード';
-});
 
 // ---------- Collapse all ----------
 const collapseAllBtn = document.getElementById('collapseAllBtn');
