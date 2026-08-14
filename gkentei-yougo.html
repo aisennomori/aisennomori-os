@@ -173,10 +173,40 @@
     font-size:12.5px;
     color:var(--muted);
     display:flex;
+    flex-wrap:wrap;
     justify-content:space-between;
     align-items:center;
+    gap:8px 14px;
   }
   .status-bar .count b{color:var(--navy);font-size:13.5px;}
+  .status-summary{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .status-summary .stat{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .status-summary .dot{
+    width:9px;height:9px;border-radius:50%;flex-shrink:0;
+  }
+  .status-summary .dot.review{background:#d64545;}
+  .status-summary .dot.memorized{background:#3f9142;}
+  .status-summary .stat.active{
+    font-weight:700;
+    color:var(--ink);
+    text-decoration:underline;
+  }
+  .status-right{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
 
   main{
     max-width:720px;
@@ -238,9 +268,55 @@
   .term-card{
     background:var(--card);
     border:1px solid var(--line);
+    border-left:4px solid transparent;
     border-radius:var(--radius);
     padding:12px 14px;
     margin-bottom:8px;
+    position:relative;
+    transition:border-left-color .15s, background .15s;
+  }
+  .term-card.status-review{
+    border-left-color:#d64545;
+    background:#fdf4f4;
+  }
+  .term-card.status-memorized{
+    border-left-color:#3f9142;
+    background:#f4f9f4;
+  }
+  .term-name-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:8px;
+  }
+  .status-dot{
+    flex-shrink:0;
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    border:2px solid #c7cdd8;
+    background:#fff;
+    cursor:pointer;
+    padding:0;
+    margin-top:1px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    line-height:1;
+    color:transparent;
+    transition:all .15s;
+  }
+  .status-dot:hover{border-color:#9aa5b8;}
+  .status-dot.review{
+    border-color:#d64545;
+    background:#d64545;
+    color:#fff;
+  }
+  .status-dot.memorized{
+    border-color:#3f9142;
+    background:#3f9142;
+    color:#fff;
   }
   .term-name{
     font-weight:800;
@@ -510,7 +586,14 @@
 
 <div class="status-bar">
   <span class="count"><b id="visibleCount">0</b> / <span id="totalCount">0</span> 語</span>
-  <span id="collapseAllBtn" style="cursor:pointer;text-decoration:underline;">すべて閉じる</span>
+  <div class="status-summary">
+    <span class="stat" id="statReview"><span class="dot review"></span>要確認 <b id="reviewCount">0</b></span>
+    <span class="stat" id="statMemorized"><span class="dot memorized"></span>記憶済 <b id="memorizedCount">0</b></span>
+    <span class="stat" id="statClearFilter" style="display:none;text-decoration:underline;cursor:pointer;">絞り込み解除</span>
+  </div>
+  <div class="status-right">
+    <span id="collapseAllBtn" style="cursor:pointer;text-decoration:underline;">すべて閉じる</span>
+  </div>
 </div>
 
 <main id="main"></main>
@@ -522,7 +605,7 @@
 <footer>
 
   教科書の要約表を基礎資料として収録。試験用ひとこと・キーワード・区別ポイントは、G検定学習時に用語を識別しやすくするための補助情報です。原典説明と試験対策補助情報は分離して表示しています。転記の際に誤りが生じる可能性があるため、実際の学習では原典テキストと読み合わせのうえご確認ください。
-  <br><span style="opacity:.5;">build: 2026-08-14-v9（STUDY_META第4弾 342語・完成版）</span>
+  <br><span style="opacity:.5;">build: 2026-08-14-v10（記憶状況チェック機能追加）</span>
 </footer>
 
 <button id="topBtn" aria-label="トップへ戻る">↑</button>
@@ -2736,6 +2819,51 @@ const chipRow = document.getElementById('chipRow');
 let totalTerms = 0;
 let displayMode = 'exam'; // 'exam' | 'full'
 
+// ---------- Check status（記憶状況チェック。端末ローカル保存） ----------
+const STATUS_KEY = 'gkentei_yougo_status_v1';
+// states: 0 = 未チェック, 1 = 要確認, 2 = 記憶済
+let statusMap = {};
+try {
+  statusMap = JSON.parse(localStorage.getItem(STATUS_KEY) || '{}');
+} catch(e) { statusMap = {}; }
+
+function saveStatusMap(){
+  try { localStorage.setItem(STATUS_KEY, JSON.stringify(statusMap)); } catch(e) {}
+}
+
+function applyStatus(term, card, dot){
+  const state = statusMap[term] || 0;
+  card.dataset.status = String(state);
+  card.classList.toggle('status-review', state === 1);
+  card.classList.toggle('status-memorized', state === 2);
+  dot.classList.toggle('review', state === 1);
+  dot.classList.toggle('memorized', state === 2);
+  dot.textContent = state === 1 ? '!' : state === 2 ? '✓' : '';
+  dot.title = state === 1 ? '要確認（タップで記憶済へ）' : state === 2 ? '記憶済（タップで解除）' : '未チェック（タップで要確認へ）';
+}
+
+function cycleStatus(term, card, dot){
+  const cur = statusMap[term] || 0;
+  const next = (cur + 1) % 3;
+  if(next === 0) delete statusMap[term];
+  else statusMap[term] = next;
+  saveStatusMap();
+  applyStatus(term, card, dot);
+  updateStatusCounts();
+  if(statusFilter) runSearch();
+}
+
+let statusFilter = null; // null | 'review' | 'memorized'
+
+function updateStatusCounts(){
+  let review = 0, memorized = 0;
+  Object.values(statusMap).forEach(v => { if(v===1) review++; else if(v===2) memorized++; });
+  const rc = document.getElementById('reviewCount');
+  const mc = document.getElementById('memorizedCount');
+  if(rc) rc.textContent = review;
+  if(mc) mc.textContent = memorized;
+}
+
 CHAPTERS.forEach((ch, ci) => {
   const chNum = ci + 1;
   ch.terms_flat = [];
@@ -2799,10 +2927,26 @@ function buildTermCard(term, desc, meta){
     if(meta.compare) card.classList.add('has-compare');
   }
 
+  const nameRow = document.createElement('div');
+  nameRow.className = 'term-name-row';
+
   const nameEl = document.createElement('p');
   nameEl.className = 'term-name';
   nameEl.textContent = term;
-  card.appendChild(nameEl);
+  nameRow.appendChild(nameEl);
+
+  const statusDot = document.createElement('button');
+  statusDot.className = 'status-dot';
+  statusDot.type = 'button';
+  statusDot.setAttribute('aria-label', '記憶状況を切り替え');
+  statusDot.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cycleStatus(term, card, statusDot);
+  });
+  nameRow.appendChild(statusDot);
+
+  card.appendChild(nameRow);
+  applyStatus(term, card, statusDot);
 
   if(meta){
     const metaBlock = document.createElement('div');
@@ -2911,6 +3055,22 @@ function setReveal(card, step){
 
 document.getElementById('totalCount').textContent = totalTerms;
 document.getElementById('visibleCount').textContent = totalTerms;
+updateStatusCounts();
+
+// ---------- Status filter buttons ----------
+const statReview = document.getElementById('statReview');
+const statMemorized = document.getElementById('statMemorized');
+const statClearFilter = document.getElementById('statClearFilter');
+function setStatusFilter(f){
+  statusFilter = (statusFilter === f) ? null : f;
+  statReview.classList.toggle('active', statusFilter === 'review');
+  statMemorized.classList.toggle('active', statusFilter === 'memorized');
+  statClearFilter.style.display = statusFilter ? 'inline' : 'none';
+  runSearch();
+}
+statReview.addEventListener('click', () => setStatusFilter('review'));
+statMemorized.addEventListener('click', () => setStatusFilter('memorized'));
+statClearFilter.addEventListener('click', () => setStatusFilter(null));
 
 // ---------- Search ----------
 const searchInput = document.getElementById('searchInput');
@@ -2930,11 +3090,12 @@ function highlight(text, query){
 function runSearch(){
   const q = searchInput.value.trim();
   clearBtn.classList.toggle('show', q.length > 0);
+  const filtering = !!q || !!statusFilter;
   let visible = 0;
 
   document.querySelectorAll('.chapter').forEach(chapterEl => {
     let chapterHasMatch = false;
-    chapterEl.querySelectorAll('.section-label').forEach(l => l.style.display = q ? 'none' : 'inline-block');
+    chapterEl.querySelectorAll('.section-label').forEach(l => l.style.display = filtering ? 'none' : 'inline-block');
     chapterEl.querySelectorAll('.term-card').forEach(card => {
       const term = card.dataset.term;
       const desc = card.dataset.desc;
@@ -2942,7 +3103,10 @@ function runSearch(){
       const keywords = card.dataset.keywords || '';
       const compare = card.dataset.compare || '';
       const haystack = [term, desc, short, keywords, compare].join(' ').toLowerCase();
-      const match = !q || haystack.includes(q.toLowerCase());
+      const textMatch = !q || haystack.includes(q.toLowerCase());
+      const cardState = card.dataset.status || '0';
+      const statusMatch = !statusFilter || (statusFilter === 'review' && cardState === '1') || (statusFilter === 'memorized' && cardState === '2');
+      const match = textMatch && statusMatch;
       card.style.display = match ? '' : 'none';
       if(match){
         visible++;
@@ -2952,8 +3116,8 @@ function runSearch(){
         if(descNode) descNode.innerHTML = highlight(desc, q);
         const shortNode = card.querySelector('.exam-short');
         if(shortNode) shortNode.innerHTML = highlight(short, q);
-        if(q){
-          // reveal all matches while searching, even in memo mode, so results are actually visible
+        if(filtering){
+          // reveal all matches while filtering, even in memo mode, so results are actually visible
           setReveal(card, 2);
         } else if(card.classList.contains('memo')){
           card.dataset.reveal = '0';
@@ -2961,11 +3125,11 @@ function runSearch(){
         // show the section label this card belongs to
         let labelEl = card.previousElementSibling;
         while(labelEl && !labelEl.classList.contains('section-label')) labelEl = labelEl.previousElementSibling;
-        if(labelEl && q) labelEl.style.display = 'inline-block';
+        if(labelEl && filtering) labelEl.style.display = 'inline-block';
       }
     });
-    chapterEl.style.display = (!q || chapterHasMatch) ? '' : 'none';
-    if(q && chapterHasMatch) chapterEl.classList.remove('collapsed');
+    chapterEl.style.display = (!filtering || chapterHasMatch) ? '' : 'none';
+    if(filtering && chapterHasMatch) chapterEl.classList.remove('collapsed');
   });
 
   document.getElementById('visibleCount').textContent = visible;
