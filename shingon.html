@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>御真言集</title>
+<style>
+  :root{
+    --paper:#F6F1E4;
+    --paper-deep:#EEE6D2;
+    --ink:#241F1B;
+    --ink-soft:#6B6152;
+    --ai:#1D2A3D;
+    --ai-deep:#121B28;
+    --ai-mist:#3C5170;
+    --vermilion:#AA3B2B;
+    --vermilion-soft:#C97A67;
+    --line:#DCD2B8;
+    --line-strong:#C9BB94;
+    --card:#FFFDF6;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",sans-serif;
+    line-height:1.7;
+    min-height:100vh;
+  }
+  .mincho{
+    font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 46px),
+      linear-gradient(180deg, var(--ai-deep) 0%, var(--ai) 100%);
+    color:#EFE9D8;
+    padding:34px 22px 26px;
+    position:relative;
+  }
+  .header-inner{
+    max-width:900px;
+    margin:0 auto;
+    position:relative;
+  }
+  .seal{
+    position:absolute;
+    right:0;
+    top:-4px;
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:2.5px solid var(--vermilion);
+    color:var(--vermilion);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    letter-spacing:.12em;
+    writing-mode:vertical-rl;
+    font-weight:700;
+    opacity:0.92;
+    background:rgba(170,59,43,0.05);
+  }
+  .eyebrow{
+    font-size:11.5px;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:#9FB0C4;
+    margin:0 0 10px;
+  }
+  h1{
+    margin:0 0 6px;
+    font-size:clamp(26px,5vw,34px);
+    font-weight:700;
+    letter-spacing:.06em;
+  }
+  .header-sub{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 16px;
+    align-items:baseline;
+    color:#C9D2DE;
+    font-size:13px;
+    margin-top:12px;
+  }
+  .count-badge{
+    display:inline-flex;
+    align-items:baseline;
+    gap:4px;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:999px;
+    padding:3px 12px;
+  }
+  .count-badge b{ font-size:14px; color:#F4EEDD; }
+
+  /* ---------- main ---------- */
+  main{
+    max-width:900px;
+    margin:0 auto;
+    padding:20px 18px 70px;
+  }
+
+  .search-wrap{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:var(--paper);
+    padding:16px 0 12px;
+    margin-bottom:4px;
+  }
+  .search-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--card);
+    border:1px solid var(--line-strong);
+    border-radius:12px;
+    padding:11px 14px;
+    box-shadow:0 1px 2px rgba(36,31,27,0.05);
+  }
+  .search-box svg{ flex:0 0 auto; color:var(--ink-soft); }
+  .search-box input{
+    flex:1;
+    border:none;
+    outline:none;
+    background:transparent;
+    font-size:16px;
+    color:var(--ink);
+    font-family:inherit;
+  }
+  .search-box input::placeholder{ color:#B3A88E; }
+  .search-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:8px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    padding:0 2px;
+  }
+  .search-meta button{
+    border:none;
+    background:none;
+    color:var(--ai-mist);
+    font-size:12.5px;
+    cursor:pointer;
+    font-family:inherit;
+    text-decoration:underline;
+    padding:0;
+  }
+
+  .section-divider{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:22px 2px 8px;
+    color:var(--ai-mist);
+  }
+  .section-divider .label{
+    font-size:12px;
+    letter-spacing:.14em;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .section-divider .rule{
+    flex:1;
+    height:1px;
+    background:var(--line-strong);
+  }
+
+  .entry-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+
+  .entry{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    transition:border-color .15s ease;
+  }
+  .entry.open{
+    border-color:var(--line-strong);
+  }
+  .entry-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:13px 16px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .entry-head:hover{ background:var(--paper-deep); }
+  .entry-titles{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+    min-width:0;
+  }
+  .entry-name{
+    font-size:16.5px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .entry-furigana{
+    font-size:12px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .entry-tag{
+    font-size:10.5px;
+    color:var(--ai-mist);
+    border:1px solid var(--line-strong);
+    border-radius:999px;
+    padding:1px 8px;
+    white-space:nowrap;
+    flex:0 0 auto;
+  }
+  .chevron{
+    flex:0 0 auto;
+    width:18px;
+    height:18px;
+    color:var(--ink-soft);
+    transition:transform .18s ease;
+  }
+  .entry.open .chevron{ transform:rotate(180deg); }
+
+  .entry-body{
+    display:none;
+    padding:2px 16px 16px;
+    border-top:1px dashed var(--line);
+  }
+  .entry.open .entry-body{ display:block; }
+
+  .entry-note{
+    font-size:13px;
+    color:var(--ink-soft);
+    margin:12px 0 10px;
+    line-height:1.8;
+  }
+  .mantra-block{
+    background:var(--paper-deep);
+    border:1px solid var(--line);
+    border-left:3px solid var(--vermilion-soft);
+    border-radius:6px;
+    padding:14px 16px;
+    font-size:15.5px;
+    line-height:2;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+
+  .empty-state{
+    text-align:center;
+    padding:56px 20px;
+    color:var(--ink-soft);
+  }
+  .empty-state .big{ font-size:26px; margin-bottom:8px; }
+
+  footer{
+    max-width:900px;
+    margin:0 auto;
+    padding:10px 18px 40px;
+    color:var(--ink-soft);
+    font-size:11.5px;
+    line-height:1.9;
+  }
+
+  @media (max-width:520px){
+    .entry-name{ font-size:15.5px; }
+    .entry-furigana{ display:block; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="seal">真言集</div>
+    <p class="eyebrow">Personal Mantra Reference</p>
+    <h1 class="mincho">御真言集</h1>
+    <div class="header-sub">
+      <span class="count-badge">全<b id="totalCount">—</b>項目</span>
+      <span>名前・フリガナで検索　／　タップで真言を表示</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="search-wrap">
+    <div class="search-box">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="名前・フリガナで検索　例：ふどう／不動明王">
+    </div>
+    <div class="search-meta">
+      <span><b id="hitCount">0</b> 件</span>
+      <button type="button" id="clearBtn">検索をクリア</button>
+    </div>
+  </div>
+
+  <div id="listArea"></div>
+
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="big">🔍</div>
+    該当する項目が見つかりませんでした。
+  </div>
+</main>
+
+<footer>
+  出典：真言Rev_12（PDF資料）より作成。原典の縦書きレイアウトを一覧・検索用にAIが書き起こしています。転記の際に誤りが生じる可能性があるため、実際の勤行でお使いの際は原典（PDF）と読み合わせのうえご確認ください。<br>
+  同じ尊格に複数の真言が記載されている場合は、判別せずそのまま並記しています。
+</footer>
+
+<script>
+const ENTRIES = [{"id":1,"name":"護身法","furigana":"ごしんほう","section":"前行","note":"","mantra":"ごぶほっしんをまほうすとおもえごぶほっしんとはかいじょえげだつげだつちけんなり"},{"id":2,"name":"浄三業","furigana":"じょうさんごう","section":"前行","note":"","mantra":"おん　そわはんば　しゅださら　ばたらま　そわはんば　しゅどかん"},{"id":3,"name":"仏部三昧耶","furigana":"ぶつぶさんまや","section":"前行","note":"","mantra":"おん　たたぎゃと　どはんばや　そわか"},{"id":4,"name":"蓮華部三昧耶","furigana":"れんげぶさんまや","section":"前行","note":"","mantra":"おん　はんどぼ　どはんばや　そわか"},{"id":5,"name":"金剛部三昧耶","furigana":"こんごうぶさんまや","section":"前行","note":"","mantra":"おん　ばぞろ　どはんばや　そわか"},{"id":6,"name":"被甲","furigana":"ひこう","section":"前行","note":"","mantra":"おん　ばざらぎに　はらち　はたや　そわか"},{"id":7,"name":"普礼真言","furigana":"ふらいしんごん","section":"前行","note":"","mantra":"おん　さらば　たたぎゃた　はんなまんなのう　きゃろみ（三回）"},{"id":8,"name":"開経偈","furigana":"かいぎょうげ","section":"前行","note":"","mantra":"無上甚深微妙法（むじょうじんじんみみょうほう）\n百千万劫難遭遇（ひゃくせんまんごうなんそうぐう）\n我今見聞得受持（がこんけんもんとくじゅじ）\n願解如来真実義（がんげにょらいしんじつぎ）"},{"id":9,"name":"懺悔文","furigana":"ざんげもん","section":"前行","note":"","mantra":"我昔所造諸悪業（がしゃくしょぞうしょあくごう）\n皆由無始貪瞋癡（かいゆうむしとんじんち）\n従身語意之所生（じゅうしんごいししょしょう）\n一切我今皆懺悔（いっさいがこんかいさんげ）"},{"id":10,"name":"三帰","furigana":"さんき","section":"前行","note":"","mantra":"弟子某甲（でしむこう）　盡未来際（じんみらいさい）\n帰依仏（きえぶつ）　帰依法（きえほう）　帰依僧（きえそう）"},{"id":11,"name":"三竟","furigana":"さんきょう","section":"前行","note":"","mantra":"弟子某甲　盡未来際\n帰依仏竟（きえぶっきょう）　帰依法竟（きえほうきょう）　帰依僧竟（きえそうきょう）"},{"id":12,"name":"十善戒","furigana":"じゅうぜんかい","section":"前行","note":"","mantra":"弟子某甲　盡未来際\n不殺生（ふせっしょう）　不偸盗（ふちゅうとう）　不邪婬（ふじゃいん）　不妄語（ふもうご）　不綺語（ふきご）\n不悪口（ふあっく）　不両舌（ふりょうぜつ）　不慳貪（ふけんどん）　不瞋恚（ふしんに）　不邪見（ふじゃけん）"},{"id":13,"name":"発菩提心真言","furigana":"はつぼだいしんごん","section":"前行","note":"","mantra":"おん　ぼうじしった　ぼだはだやみ（三回）"},{"id":14,"name":"三昧耶戒真言","furigana":"さんまやかいしんごん","section":"前行","note":"","mantra":"おん　さんまや　さとばん（三回）"},{"id":15,"name":"光明真言","furigana":"こうみょうしんごん","section":"前行","note":"","mantra":"おん　あぼきゃ　べいろしゃのう　まかぼだら　まに　はんどま　じんばら　はらばりたや　うん"},{"id":16,"name":"御宝号","furigana":"ごほうごう","section":"前行","note":"","mantra":"南無大師遍照金剛（なむだいしへんじょうこんごう）"},{"id":17,"name":"般若心経","furigana":"はんにゃしんぎょう","section":"前行","note":"仏説摩訶般若波羅蜜多心経","mantra":"観自在菩薩　行深般若波羅蜜多時（かんじざいぼさつ　ぎょうじんはんにゃはらみったじ）\n照見五蘊皆空（しょうけんごうんかいくう）　度一切苦厄（どいっさいくやく）　舎利子（しゃりし）\n色不異空（しきふいくう）　空不異色（くうふいしき）　色即是空（しきそくぜくう）　空即是色（くうそくぜしき）\n受想行識亦復如是（じゅそうぎょうしきやくぶにょぜ）　舎利子（しゃりし）\n是諸法空相（ぜしょほうくうそう）　不生不滅（ふしょうふめつ）　不垢不浄（ふくふじょう）　不増不減（ふぞうふげん）\n是故空中（ぜこくうちゅう）　無色（むしき）　無受想行識（むじゅそうぎょうしき）\n無眼耳鼻舌身意（むげんにびぜつしんい）　無色声香味触法（むしきしょうこうみそくほう）\n無眼界（むげんかい）　乃至無意識界（ないしむいしきかい）\n無無明亦（むむみょうやく）　無無明尽（むむみょうじん）　乃至無老死（ないしむろうし）　亦無老死尽（やくむろうしじん）\n無苦集滅道（むくしゅうめつどう）　無智亦無得（むちやくむとく）　以無所得故（いむしょとくこ）\n菩提薩埵（ぼだいさつた）　依般若波羅蜜多故（えはんにゃはらみったこ）　心無罣礙（しんむけいげ）\n無罣礙故（むけいげこ）　無有恐怖（むうくふ）　遠離一切顛倒夢想（おんりいっさいてんどうむそう）　究竟涅槃（くうぎょうねはん）\n三世諸仏（さんぜしょぶつ）　依般若波羅蜜多故（えはんにゃはらみったこ）　得阿耨多羅三藐三菩提（とくあのくたらさんみゃくさんぼだい）\n故知般若波羅蜜多（こちはんにゃはらみった）　是大神呪（ぜだいじんしゅ）　是大明呪（ぜだいみょうしゅ）\n是無上呪（ぜむじょうしゅ）　是無等等呪（ぜむとうどうしゅ）　能除一切苦（のうじょいっさいく）　真実不虚（しんじつふこ）\n故説般若波羅蜜多呪（こせつはんにゃはらみったしゅ）　即説呪日（そくせつしゅわつ）\n羯諦羯諦（ぎゃていぎゃてい）　波羅羯諦（はらぎゃてい）　波羅僧羯諦（はらそうぎゃてい）　菩提薩婆訶（ぼじそわか）\n般若心経（はんにゃしんぎょう）"},{"id":18,"name":"大日如来","furigana":"だいにちにょらい","section":"諸尊","note":"","mantra":"おん　あびらうんけん\nおん　あびらうんけん　ばさら　だとばん"},{"id":19,"name":"軍荼利明王","furigana":"ぐんだりみょうおう","section":"五大明王","note":"（五大明王）煩悩除去・息災延命","mantra":"おん　きりきり　ばざら　うん　はった\nおん　あみりてぃ　うん　はった"},{"id":20,"name":"善女龍王","furigana":"ぜんにょりゅうおう","section":"諸尊","note":"五穀豊穣・浄化・厄払い","mantra":"おん　めい　けしゃにえい　そわか"},{"id":21,"name":"孔雀明王","furigana":"くじゃくみょうおう","section":"諸尊","note":"健康維持・病気治癒・邪気払い・煩悩・魔除け・雨乞い","mantra":"おん　まゆら　ぎらんでい　そわか"},{"id":22,"name":"迦楼羅天","furigana":"かるらてん","section":"諸尊","note":"不動明王背後の炎（迦楼羅炎）。奇病退散・延命・雨乞い・雨止め","mantra":"おん　がるだや　そわか"},{"id":23,"name":"倶利伽羅龍王","furigana":"くりからりゅうおう","section":"諸尊","note":"（不動明王の剣・倶利伽羅剣）憎しみ・怒り・恥・貧しい心の消滅","mantra":"のうまく　しっちしっち　そ　しっちしっち　きゃららやくえんさんまんま　しっり　あじゃま　しっちそわか"},{"id":24,"name":"不動明王","furigana":"ふどうみょうおう","section":"五大明王","note":"（五大明王）厄除開運・健康長寿・商売繁盛・学業成就・立身出世","mantra":"のうまく　さんまんだ　ばさらだん　せんだ　まかろしゃだ　そわたや　うんたらた　かんまん\nなまさまんだ　ばさらなん　せんだ　まかろしゃだ　そわたや　うんたらた　かんまん"},{"id":165,"name":"不動明王","furigana":"ふどうみょうおう","section":"五大明王","note":"火界呪（かかいじゅ）。自己清浄・心願成就・煩悩","mantra":"のうまく　さらばたたぎゃていびゃく　さらばぼっけいびゃく　さらばたたらた　せんだまかろしゃだ　けんぎゃきぎゃき　さらばびぎなん　うんたらた　かんまん"},{"id":25,"name":"倶利伽羅不動","furigana":"くりからふどう","section":"諸尊","note":"","mantra":"なまさまんだ　ばさらなん　くりきゃや　きゃあら　じゃめいきゃ　せんちえい　そわか"},{"id":26,"name":"天馬","furigana":"てんま","section":"諸尊","note":"","mantra":"おん　そらそら　てんまや　そわか"},{"id":27,"name":"弁財天","furigana":"べんざいてん","section":"七福神","note":"七福神（⑦）。学問・弁舌（べんぜつ）・音楽・増益・延命","mantra":"おん　そらそばていえい　そわか"},{"id":28,"name":"毘沙門天","furigana":"びしゃもんてん","section":"七福神・四天王","note":"⑦（多聞天）。商売繁盛・金運財運・武運長久・勝運開運長久・厄除開運","mantra":"おん　べいしらまんだや　そわか\nのうまく　さんまんだ　ぼだなん　べいしらまんだや　そわか"},{"id":29,"name":"大黒天","furigana":"だいこくてん","section":"七福神","note":"⑦五穀豊穣・商売繁盛","mantra":"おん　まかきゃらや　そわか"},{"id":30,"name":"寿老人","furigana":"じゅろうじん","section":"七福神","note":"⑦延命増益（普賢菩薩延命呪と同じ真言）","mantra":"おん　ばさら　ゆせい　そわか"},{"id":31,"name":"恵比寿天","furigana":"えびすてん","section":"七福神","note":"⑦海上交通安全・漁業・水商売・情報サービス・貿易守護・安全繁盛","mantra":"おん　いんだらや　そわか"},{"id":32,"name":"福禄寿","furigana":"ふくろくじゅ","section":"七福神","note":"⑦財運招福・延命長寿・立身出世・子孫繁栄・招徳人望・富貴栄達","mantra":"おん　まかしり　そわか"},{"id":33,"name":"布袋尊","furigana":"ほていそん","section":"七福神","note":"⑦弥勒菩薩の化身。開運・子宝・良縁・夫婦円満・商売繁盛・無病息災・財運金運向上","mantra":"おん　まいたれいや　そわか"},{"id":34,"name":"吉祥天","furigana":"きっしょうてん","section":"諸尊","note":"毘沙門天の妃。財宝金銭・副材・厄除け・運気向上","mantra":"おん　まか　しりえい　そわか"},{"id":35,"name":"黒耳天","furigana":"こくにてん","section":"諸尊","note":"","mantra":"おん　からしり　そわか"},{"id":36,"name":"准胝観音","furigana":"じゅんていかんのん","section":"諸尊","note":"修道者守護・無病息災・延命安産・子供授かり","mantra":"おん　しゃれい　しゅれい　じゅんてい　そわか"},{"id":37,"name":"善膩師童子","furigana":"ぜんにしどうじ","section":"諸尊","note":"毘沙門天と吉祥天の末子。子授け・子育て・夫婦円満","mantra":"おん　ぜんにしえい　そわか"},{"id":38,"name":"毘沙門天陀羅尼","furigana":"びしゃもんてんだらに","section":"諸尊","note":"","mantra":"ありなりとなり　あなろなび　くなび"},{"id":39,"name":"真達羅大将","furigana":"しんだらたいしょう","section":"諸尊","note":"普賢菩薩の化身。衆生の願いを叶え、充足した境遇へ導く","mantra":"おん　しんだら　そわか"},{"id":40,"name":"宇賀弁財天","furigana":"うがべんざいてん","section":"諸尊","note":"金運上昇・商売繁盛・生霊払い","mantra":"おん　うがやじゃや　ぎゃらべい　そわか\n（貧転呪（ひんてんじゅ））なむ　びゃくじゃぎょう　うがやじゃや　ぎゃらべい　しんだまに　ひんでんうん　そわか"},{"id":41,"name":"鬼子母神","furigana":"きしもじん","section":"諸尊","note":"怒りの人に出会った時・盗難避け・怨敵調伏・持病治癒","mantra":"おん　どどまり　ぎゃきてぃ　そわか"},{"id":42,"name":"牛頭天王","furigana":"ごずてんのう","section":"諸尊","note":"疫病退散・厄除け・家内安全・良縁・子授かり・五穀豊穣","mantra":"おん　はられいきゃ　ごず　でいば　せいがん　ずいき　えんめい　そわか"},{"id":43,"name":"烏枢沙摩明王","furigana":"うすさまみょうおう","section":"諸尊","note":"邪気・穢れを焼き尽くす。金運・不浄除去","mantra":"おん　くろだのう　うんじゃく　そわか"},{"id":44,"name":"摩利支天","furigana":"まりしてん","section":"諸尊","note":"一切心願成就・悪事災難除去・利益増・攻撃防御・呪詛無効化","mantra":"おん　まりしえい　そわか"},{"id":45,"name":"摩利支天隠形呪","furigana":"まりしてんいんけいじゅ","section":"諸尊","note":"","mantra":"おん　あにち　まりしえい　そわか"},{"id":46,"name":"阿閦如来","furigana":"あしゅくにょらい","section":"諸尊","note":"","mantra":"おん　あきしゅびや　うん"},{"id":47,"name":"青頸観音","furigana":"しょうきょうかんのん","section":"諸尊","note":"原型はシヴァ神","mantra":"おん　はんどめい　にらけんせい　じばら　ぼろぼろ　うん"},{"id":48,"name":"金剛夜叉明王","furigana":"こんごうやしゃみょうおう","section":"五大明王","note":"（五大明王）息災健康・怨敵退散","mantra":"おん　ばざら　やきしゃうん"},{"id":49,"name":"降三世明王","furigana":"ごうざんぜみょうおう","section":"五大明王","note":"（五大明王）阿閦如来の化身。悪霊退散・怒りを抑える・煩悩欲望愚痴除去","mantra":"おん　そんば　にそんば　うん　ばざら　うんはった"},{"id":50,"name":"大威徳明王","furigana":"だいいとくみょうおう","section":"五大明王","note":"（五大明王）戦勝祈願・煩悩除去","mantra":"おん　しゅちり　きゃらろは　うんけん　そわか"},{"id":51,"name":"大元帥明王","furigana":"だいげんすいみょうおう","section":"諸尊","note":"明王の総帥。勝負事勝利・苦渋・困難・不安・病疫退散・国土防衛","mantra":"のうぼう　たりつ　たぼりつ　ばらぼりつ　しゃきんめい　しゃきんめい　たらさんだん　おえんび　そわか"},{"id":52,"name":"四天王総呪","furigana":"してんのうそうじゅ","section":"四天王","note":"持国天（東）・広目天（西）・増長天（南）・毘沙門天（多聞天・北）","mantra":"おん　ぜんばら　しゃれんだらや　そわか"},{"id":53,"name":"持国天","furigana":"じこくてん","section":"四天王","note":"国家安泰・厄除け・邪気浄化","mantra":"おん　ぢりたら　しゅたら　らら　はらば　だのう　そわか"},{"id":54,"name":"広目天","furigana":"こうもくてん","section":"四天王","note":"国家鎮護・智慧を授かる","mantra":"おん　びろばくしゃ　のうぎゃ　ぢはたえい　そわか"},{"id":55,"name":"増長天","furigana":"ぞうちょうてん","section":"四天王","note":"国家鎮護・戦勝祈願・厄払い・邪気浄化","mantra":"おん　びろだきゃ　やきしゃ　ぢはたえい　そわか"},{"id":56,"name":"五大虚空蔵菩薩","furigana":"ごだいこくうぞうぼさつ","section":"諸尊","note":"","mantra":"ばん　うん　たらく　きりく　あく"},{"id":57,"name":"一字金輪","furigana":"いちじきんりん","section":"諸尊","note":"所願成就","mantra":"のうまく　さんまんだ　ぼだなん　ぼろん"},{"id":58,"name":"水天","furigana":"すいてん","section":"諸尊","note":"アマノミナカヌシ様と繋がる","mantra":"おん　ばろだや　そわか"},{"id":59,"name":"火天","furigana":"かてん","section":"諸尊","note":"","mantra":"おん　あぎゃなえい　そわか"},{"id":60,"name":"風天","furigana":"ふうてん","section":"諸尊","note":"悩み・迷い・煩悩除去","mantra":"おん　ばやべい　そわか"},{"id":61,"name":"錫杖真言","furigana":"しゃくじょうしんごん","section":"諸尊","note":"","mantra":"おん　どなうじ　たらだ　そわか"},{"id":62,"name":"六字大明呪","furigana":"ろくじだいみょうじゅ","section":"諸尊","note":"観世音菩薩。災害・病気・盗賊・障害除去","mantra":"おん　まにぱどめい　うん"},{"id":63,"name":"地蔵菩薩","furigana":"じぞうぼさつ","section":"諸尊","note":"安産・子授け・子供守護・先祖供養","mantra":"おん　かかかび　さんまえい　そわか"},{"id":64,"name":"聖観音","furigana":"しょうかんのん","section":"諸尊","note":"","mantra":"おん　あろりきゃ　そわか"},{"id":65,"name":"八大龍王","furigana":"はちだいりゅうおう","section":"諸尊","note":"","mantra":"おん　めいぎゃ　しゃにえい　そわか"},{"id":66,"name":"馬頭観音","furigana":"ばとうかんのん","section":"諸尊","note":"無病息災・厄除け・動物救済・五穀豊穣・道中安全・旅行安全","mantra":"おん　あみりと　どはんば　うんはった　そわか"},{"id":67,"name":"閻魔天","furigana":"えんまてん","section":"諸尊","note":"延寿・災難除去・病気治癒・眼病治癒・安産","mantra":"のうまく　さんまんだ　ぼだなん　えんまや　そわか"},{"id":68,"name":"遮文荼","furigana":"しゃもんだ","section":"諸尊","note":"焔摩天（閻魔）の妃","mantra":"のうまく　さんまんだ　ぼだなん　おん　ころころ　しゃもんだえい　そわか"},{"id":69,"name":"多羅菩薩","furigana":"たらぼさつ","section":"諸尊","note":"苦しみからの救済","mantra":"のうまく　さんまんだ　ぼだなんたん　きゃろでい　どはべい　たれいたりに　そわか\nおん　たれい　とたれい　とれい　そわか"},{"id":70,"name":"梵天","furigana":"ぼんてん","section":"諸尊","note":"国土安堵・立身出世","mantra":"のうまく　さんまんだ　ぼだなん　ぼらかんまねい　そわか\nおん　もうのう　ばざら　そわか"},{"id":71,"name":"自在天","furigana":"じざいてん","section":"諸尊","note":"（シヴァ神、藤原道真、天満宮）","mantra":"おん　まけい　しばらや　そわか"},{"id":72,"name":"那羅延天","furigana":"ならえんてん","section":"諸尊","note":"ヴィシュヌ神","mantra":"おん　ばらばざら　そわか\nのうまく　さんまんだ　ぼだなん　びっしゅだびい　そわか"},{"id":73,"name":"帝釈天","furigana":"たいしゃくてん","section":"諸尊","note":"国家安泰・戦勝祈願・立身出世・蓄財","mantra":"のうまく　さんまんだ　ぼだなん　いんだらや　そわか"},{"id":74,"name":"如意輪観音","furigana":"にょいりんかんのん","section":"諸尊","note":"智慧財福・福徳授与・安産延命","mantra":"おん　はんどめい　しんだまに　じんばら　うん"},{"id":75,"name":"聖徳太子","furigana":"しょうとくたいし","section":"諸尊","note":"如意輪観音真言と同じ。商売繁盛・職務安全・金運上昇・学問諸芸","mantra":"おん　ばらだ　はんどめい　うん"},{"id":76,"name":"般若姫","furigana":"はんにゃひめ","section":"諸尊","note":"如意輪観音真言と同じ。商売繁盛・職務安全・金運上昇・学問諸芸","mantra":"おん　はんにゃひめ　そわか"},{"id":77,"name":"瀬織津姫","furigana":"せおりつひめ","section":"諸尊","note":"","mantra":"おん　はるひれ　そわか"},{"id":78,"name":"妙見菩薩","furigana":"みょうけんぼさつ","section":"諸尊","note":"アメノミナカヌシ様と繋がる。国家護持","mantra":"おん　そぢりしゅた　そわか"},{"id":79,"name":"北辰菩薩","furigana":"ほくしんぼさつ","section":"諸尊","note":"瀬織津姫","mantra":"おん　まかしりえい　ぢりべい　そわか"},{"id":80,"name":"熊野権現","furigana":"くまのごんげん","section":"諸尊","note":"（熊野神社の主神）","mantra":"おん　さんねい　さんねい　きれいぎゃれい　そわか"},{"id":81,"name":"東照大権現","furigana":"とうしょうだいごんげん","section":"諸尊","note":"（徳川家康）","mantra":"おん　びせいぜい　びせいぜい　びせいじゃ　さんぼりぎゃてい　そわか"},{"id":82,"name":"月光菩薩","furigana":"がっこうぼさつ","section":"諸尊","note":"健康長寿・病気治癒・災難除去","mantra":"おん　せんだら　はらばや　そわか"},{"id":83,"name":"日光菩薩","furigana":"にっこうぼさつ","section":"諸尊","note":"健康長寿・病気治癒・災難除去","mantra":"おん　ろぼにゅた　そわか\nのうまく　さんまんだ　ぼだなん　ろぼにゅた　そわか（清雲真言）"},{"id":84,"name":"龍樹菩薩","furigana":"りゅうじゅぼさつ","section":"諸尊","note":"空の浄化","mantra":"のうまく　さんまんだ　ぼだなん　きゃだうん　そわか\nおん　きゃだうん　はった"},{"id":85,"name":"伊舎那天","furigana":"いしゃなてん","section":"諸尊","note":"心身の浄化・免疫力の向上・精神的な安定・病気の回復を促す","mantra":"おん　いしゃなえい　そわか\nおん　ろだらや　そわか"},{"id":86,"name":"尺間大権現","furigana":"しゃくまだいごんげん","section":"諸尊","note":"（釈魔大権現）","mantra":"のうまく　さんまんだ　だいすらさつた　あずまや　てんぐすまんぎ　そわか"},{"id":87,"name":"太郎坊天狗","furigana":"たろうぼうてんぐ","section":"諸尊","note":"（愛宕山）","mantra":"おん　まかじや　そわか"},{"id":88,"name":"半僧坊大権現","furigana":"はんそうぼうだいごんげん","section":"諸尊","note":"","mantra":"おん　なんのう　ちりちり　そわか"},{"id":89,"name":"金毘羅大権現","furigana":"こんぴらだいごんげん","section":"諸尊","note":"薬師如来を守護する「薬師十二神将」の筆頭の仏「宮毘羅（くびら）大将」","mantra":"おん　くびらや　そわか\nおん　ひらひら　こんぴらこんてい　そわか"},{"id":90,"name":"飯綱権現","furigana":"いづなごんげん","section":"諸尊","note":"大天狗。戦勝祈願・招福除災","mantra":"おん　ちらちらや　そわか"},{"id":91,"name":"天狗","furigana":"てんぐ","section":"諸尊","note":"天狗呪第一。除災開運・災厄消除・招福万来","mantra":"おん　あろまや　てんぐ　すまんき　そわか"},{"id":92,"name":"秋葉権現","furigana":"あきつはごんげん","section":"諸尊","note":"天狗呪第二。大天狗","mantra":"おん　ひらひら　けん　ひらけん　のう　そわか"},{"id":93,"name":"愛宕権現","furigana":"あたごごんげん","section":"諸尊","note":"大天狗（将軍地蔵）。防火・火除け","mantra":"おん　ばさら　けいと　したら　うん　はった\nおん　かーかー　かそだと　そわか"},{"id":94,"name":"龍神","furigana":"りゅうじん","section":"五神","note":"龍神＋阿修羅王で鳳凰と繋がる","mantra":"なむ　こんごう　しんりき　そわてい　そわか\nのうまく　さんまんだ　ぼだなん　めいぎゃ　しゃにえい　そわか"},{"id":95,"name":"鳳凰","furigana":"ほうおう","section":"五神","note":"","mantra":"なむ　こんごう　しんりき　ほうおう　そわか\nのうまく　さんまんだ　ぼだなん　ほうおう　そわか（清雲真言）"},{"id":96,"name":"白虎","furigana":"びゃっこ","section":"五神","note":"","mantra":"なむ　こんごう　しんりき　びゃくてい　そわか\nのうまく　さんまんだ　ぼだなん　びゃくてい　そわか（清雲真言）"},{"id":97,"name":"玄武","furigana":"げんぶ","section":"五神","note":"","mantra":"なむ　こんごう　しんりき　げんてん　そわか\nのうまく　さんまんだ　ぼだなん　げんてん　そわか（清雲真言）"},{"id":98,"name":"麒麟","furigana":"きりん","section":"五神","note":"","mantra":"なむ　こんごう　しんりき　きりんが　そわか\nのうまく　さんまんだ　ぼだなん　きりんが　そわか（清雲真言）"},{"id":99,"name":"阿修羅王","furigana":"あしゅらおう","section":"五神","note":"","mantra":"のうまく　さんまんだ　ぼだなん　らたん　らたと　ばらんたん"},{"id":100,"name":"荼枳尼天","furigana":"だきにてん","section":"諸尊","note":"","mantra":"のうまく　さんまんだ　ぼだなん　きりか　そわか\nおん　ばさら　だきに　そわか\nおん　ぎゃち　ぎゃかにえい　そわか（強い）"},{"id":101,"name":"荼枳尼真天","furigana":"だきにしんてん","section":"諸尊","note":"","mantra":"おん　しらばった　にりうん　そわか"},{"id":102,"name":"弥勒菩薩","furigana":"みろくぼさつ","section":"諸尊","note":"","mantra":"おん　まいたれいや　そわか"},{"id":103,"name":"護法魔王尊","furigana":"ごほうまおうそん","section":"諸尊","note":"","mantra":"おん　ばさら　だるまきり　べいしらまなや　だるまはら　まそばみうん　そわか"},{"id":104,"name":"神変大菩薩","furigana":"じんべんだいぼさつ","section":"諸尊","note":"山岳信仰の第一人者。腰痛平癒・健脚祈願","mantra":"おん　ぎゃくぎゃく　えんのうばそく　あらんきゃ　そわか"},{"id":105,"name":"貪狼星","furigana":"どんろうせい","section":"諸尊","note":"","mantra":"おん　だらんじ　だらんじ　うん"},{"id":106,"name":"法起菩薩","furigana":"ほうきぼさつ","section":"諸尊","note":"役小角","mantra":"おん　だるま　うちた　そわか"},{"id":107,"name":"雷神","furigana":"らいじん","section":"諸尊","note":"","mantra":"おん　ばるな　そわか"},{"id":108,"name":"地天","furigana":"じてん","section":"諸尊","note":"","mantra":"おん　はりちべい　そわか"},{"id":109,"name":"仏眼仏母","furigana":"ぶっげんぶつも","section":"諸尊","note":"円満な人間関係・洞察力・人望が高まる","mantra":"おん　ぼだろしやに　そわか"},{"id":110,"name":"韋駄天","furigana":"いだてん","section":"諸尊","note":"修行を妨げる魔障を取り除く。足腰・心身の健康（健康・健脚向上）","mantra":"おん　いだていた　もこていた　そわか"},{"id":111,"name":"山王権現","furigana":"さんのうごんげん","section":"諸尊","note":"商売繁盛・厄除け・縁結び・夫婦円満・家内安全・開運","mantra":"おん　ここだや　そわか"},{"id":112,"name":"大山紙神","furigana":"おおやつみのかみ","section":"諸尊","note":"","mantra":"おん　やまづみ　そわか"},{"id":113,"name":"木花咲耶姫","furigana":"このはなさくやひめ","section":"諸尊","note":"","mantra":"おん　あちねいえい　そわか"},{"id":114,"name":"銀龍神","furigana":"ぎんりゅうじん","section":"諸尊","note":"","mantra":"おん　ぎゃく　なら　うん"},{"id":115,"name":"石長比売","furigana":"いわながひめ","section":"諸尊","note":"","mantra":"おん　あろりあ　そわか"},{"id":116,"name":"菊理姫","furigana":"くくりひめ","section":"諸尊","note":"白山比売神・白山神と同一。本地仏（真の姿）は十一面観音","mantra":"おん　まか　きゃろにきゃ　そわか\nおん　ろけいじんばら　きりく"},{"id":117,"name":"武甕槌神","furigana":"たけみかづちのかみ","section":"諸尊","note":"仏教では不空羂索観音（ふくうけんじゃくかんのん）","mantra":"おん　あぼきゃ　びじゃや　うん　はった"},{"id":118,"name":"布都御魂大神","furigana":"ふつのみたまのおおかみ","section":"諸尊","note":"","mantra":"おん　ふつ　みたま　えいえい　そわか"},{"id":119,"name":"御嶽山座王権現","furigana":"おんたけさんざおうごんげん","section":"諸尊","note":"","mantra":"おん　あびらうんけん　ぼろん　きりく"},{"id":120,"name":"八海山提頭羅神王","furigana":"はっかいさんていとうらしんおう","section":"諸尊","note":"水の徳","mantra":"おん　だいずら　だったりや　そわか"},{"id":121,"name":"三笠山刀利天","furigana":"みかさやまとうりてん","section":"諸尊","note":"火の徳","mantra":"おん　たけとう　りぼた　なんばく"},{"id":122,"name":"河童","furigana":"かっぱ","section":"諸尊","note":"（川・水の神）","mantra":"おん　かっぱや　そわか\nおん　かっぱや　うんけん　そわか"},{"id":123,"name":"海馬","furigana":"かいば","section":"諸尊","note":"（海の神）","mantra":"おん　かいばりあ　とりあいな　そわか"},{"id":124,"name":"水月観音","furigana":"すいげつかんのん","section":"諸尊","note":"","mantra":"おん　びしゅだ　はんどま　さとば　けいた　そわか"},{"id":125,"name":"九頭竜弁財天","furigana":"くずりゅうべんざいてん","section":"諸尊","note":"厄除け・開運招財・商売繁盛・病気平癒","mantra":"おん　そらそあていえい　そわか"},{"id":126,"name":"転法輪菩薩","furigana":"てんぽうりんぼさつ","section":"諸尊","note":"","mantra":"おん　ばざら　しゃきら　うんじゃく　うんばんこく"},{"id":127,"name":"三鬼大権現","furigana":"さんきだいごんげん","section":"諸尊","note":"追帳鬼神・福徳時眉鬼神・知恵魔羅鬼神降伏。厄除け・開運・方位除け・家内安全・商売繁昌・必勝祈願・受験合格","mantra":"おん　あらたんのう　うん　そわか"},{"id":128,"name":"金剛蔵王権現","furigana":"こんごうざおうごんげん","section":"諸尊","note":"鬼・魔・怨念退散・所願成就・家内安全","mantra":"おん　ばさら　くしゃ　あらんじゃ　うん　そわか"},{"id":129,"name":"蔵王権現","furigana":"ざおうごんげん","section":"諸尊","note":"降魔の霊神。諸災祓い・怨敵退散・所願成就・家内安全","mantra":"おん　ばきりゆ　そわか"},{"id":130,"name":"天鼓雷音如来","furigana":"てんくらいおんにょらい","section":"諸尊","note":"邪悪の除去。魔物を退ける・邪悪なものから身を守る","mantra":"のうまく　さんまんだ　ぼだなん　かん　かく　そわか"},{"id":131,"name":"摩多羅神","furigana":"またらじん","section":"諸尊","note":"北斗七星。疫病退散・悪鬼調伏・御願円満","mantra":"おん　ころころ　しゃもんだ　そわか"},{"id":132,"name":"文殊菩薩","furigana":"もんじゅぼさつ","section":"諸尊","note":"","mantra":"おん　あらはしゃのう"},{"id":133,"name":"普賢菩薩","furigana":"ふげんぼさつ","section":"諸尊","note":"","mantra":"おん　さんまや　さとばん"},{"id":134,"name":"勢至菩薩","furigana":"せいしぼさつ","section":"諸尊","note":"","mantra":"おん　さんざん　ざんさく　そわか"},{"id":135,"name":"善無畏三蔵法師","furigana":"ぜんむいさんぞうほうし","section":"諸尊","note":"","mantra":"おん　しゅだ　しゅだ"},{"id":136,"name":"釈迦如来","furigana":"しゃかにょらい","section":"諸尊","note":"","mantra":"のうまく　さんまんだ　ぼだなん　ばく"},{"id":137,"name":"宝生如来","furigana":"ほうしょうにょらい","section":"諸尊","note":"病気治癒・無病息災・滅罪","mantra":"おん　あらたんのう　さんばんば　たらく"},{"id":138,"name":"大通智勝如来","furigana":"だいつうちしょうにょらい","section":"諸尊","note":"心願成就・航海安全・縁結び","mantra":"おん　まか　びじゃに　やじゃにや　のうぴいぷう　そわか"},{"id":139,"name":"止風雨陀羅尼","furigana":"しふうだらに","section":"諸尊","note":"暴風雨の被害を最小限に抑える。怒りや嫉妬","mantra":"おん　あみりてい　うん　ちしゅた　そわか"},{"id":140,"name":"薬師如来","furigana":"やくしにょらい","section":"諸尊","note":"","mantra":"①おん　ころころ　せんだり　まとうぎ　そわか\n②おん　びせいぜい　びせいぜい　びせいじゃ　さんぼりぎゃてい　そわか"},{"id":141,"name":"薬王菩薩","furigana":"やくおうぼさつ","section":"諸尊","note":"","mantra":"おん　ばいせいじゃ　あらんじゃ　そわか"},{"id":142,"name":"薬上菩薩","furigana":"やくじょうぼさつ","section":"諸尊","note":"","mantra":"おん　びせいしゃらじゃや　そわか"},{"id":143,"name":"観自在王如来","furigana":"かんじざいおうにょらい","section":"諸尊","note":"","mantra":"おん　ろけいじんばら　あらんじゃ　きりく"},{"id":144,"name":"阿弥陀如来","furigana":"あみだにょらい","section":"諸尊","note":"","mantra":"おん　あみりた　ていせい　からうん"},{"id":145,"name":"三宝荒神","furigana":"さんぼうこうじん","section":"諸尊","note":"幸いから守り・金銭融通。家の守護神","mantra":"おん　けんばや　けんばや　そわか"},{"id":146,"name":"白衣観音","furigana":"びゃくえかんのん","section":"諸尊","note":"息災除病・子受け安産・煩悩除去・滅罪・縁結び","mantra":"おん　しべいてい　しべいてい　はんだらばしに　そわか"},{"id":147,"name":"愛染明王","furigana":"あいぜんみょうおう","section":"諸尊","note":"良縁・恋愛成就","mantra":"おん　まからぎゃ　ばぞろ　しゅにしゃ　ばざら　さとば　じゃく　うん　ばんこく"},{"id":148,"name":"両頭愛染明王","furigana":"りょうずあいぜんみょうおう","section":"諸尊","note":"良縁・恋愛成就","mantra":"うん　しっち　かんまん"},{"id":149,"name":"双身毘沙門天","furigana":"そうしんびしゃもんてん","section":"諸尊","note":"","mantra":"おん　しちろくり　そわか"},{"id":150,"name":"大隨求菩薩","furigana":"だいずいぐぼさつ","section":"諸尊","note":"観音菩薩の化身。滅罪追善","mantra":"おん　ばらばら　さんばら　さんばら　いんだりや　びしゅだねい　うんうん　ろろ　しゃれい　そわか"},{"id":151,"name":"虚空蔵菩薩","furigana":"こくうぞうぼさつ","section":"諸尊","note":"","mantra":"のうぼう　あきゃしゃきゃらばや　おんありきゃ　まりぼり　そわか\nおん　ばざら　あらたんのう　おんたらく　そわか"},{"id":152,"name":"龍頭観音","furigana":"りゅうとうかんのん","section":"諸尊","note":"","mantra":"おん　きぎ　あいいえろ　じゃじゃ　じゃくうん　そわか"},{"id":153,"name":"不空成就如来","furigana":"ふくうじょうじゅにょらい","section":"諸尊","note":"","mantra":"おん　あぼきゃ　しっでい　あく"},{"id":154,"name":"キリスト真言","furigana":"きりすとしんごん（清雲真言）","section":"諸尊","note":"","mantra":"のうまく　さんまんだ　ぼだなん　きりすと　そわか\nなむ　こんごう　しんりき　きりすと　そわか"},{"id":155,"name":"マリア真言","furigana":"まりあしんごん（清雲真言）","section":"諸尊","note":"","mantra":"のうまく　さんまんだ　ぼだなん　まりあ　そわか\nなむ　こんごう　しんりき　まりあ　そわか"},{"id":156,"name":"大聖歓喜天","furigana":"だいしょうかんきてん","section":"諸尊","note":"子宝安産・厄除け除災・病気の悩み解消・富貴栄達・財難が退く","mantra":"おん　きりく　ぎゃくうん　そわか"},{"id":157,"name":"千手観音","furigana":"せんじゅかんのん","section":"諸尊","note":"災難除け・病気平癒・夫婦円満・恋愛成就・安産・子宝成就","mantra":"おん　ばさら　たらま　きりく"},{"id":158,"name":"十一面観音","furigana":"じゅういちめんかんのん","section":"諸尊","note":"除難・病気治癒・財福・勝利・延命","mantra":"おん　まか　きゃろにきゃ　そわか\nおん　ろけいじんばら　きりく"},{"id":159,"name":"金剛力士","furigana":"こんごうりきし","section":"諸尊","note":"仁王（阿吽同時）。身体健全・健脚","mantra":"おん　うーん　そわか\n（阿形）なまさまんだば　さらなん　とらだりせい　まかろしやな　きゃなせさるばだた　あぎゃたねん　くろそわか\n（吽形）なまさまんだば　さらなん　けいあびもきゃ　まかはらせんだきゃ　なやきんじらや　さませ　さませ　まなさんまら　そわか"},{"id":160,"name":"ひふみ祝詞","furigana":"ひふみのりと","section":"後行","note":"","mantra":"ひふみ　よいむなや　こともちろらね　しきる　ゆゐつわぬ　そをたはくめか　うおえ　にさりへて　のますあせゑほれけ"},{"id":161,"name":"かたかむな（５首〜８首）","furigana":"かたかむな","section":"後行","note":"","mantra":"⑤ひふみよい　まわりてめくる　むなやこと　あうのすへしれ　かたちさき\n⑥そらにもろけせ　ゆゑぬおを　はえつゐねほん　かたかむな\n⑦まかたまの　あまのみなかぬし　たかみむすひ　かむみむすひ　みすまるの　たま\n⑧うましたかかむ　あしかひひこ　ところちまたの　ときおかし"},{"id":162,"name":"とほかみえみため","furigana":"とほかみえみため","section":"後行","note":"","mantra":"とほかみえみため　とほかみえみため（三回）"},{"id":163,"name":"十三仏真言","furigana":"じゅうさんぶつしんごん","section":"後行","note":"一）不動明王　二）釈迦如来　三）文殊菩薩　四）普賢菩薩　五）地蔵菩薩　六）弥勒菩薩　七）薬師如来\n八）聖観音　九）勢至菩薩　十）阿弥陀如来　十一）阿閦如来　十二）大日如来　十三）虚空蔵菩薩","mantra":"（一）不動明王：のうまく　さんまんだ　ばさらだん　せんだ　まかろしゃだ　そわたや　うんたらた　かんまん\n（二）釈迦如来：のうまく　さんまんだ　ぼだなん　ばく\n（三）文殊菩薩：おん　あらはしゃのう\n（四）普賢菩薩：おん　さんまや　さとばん\n（五）地蔵菩薩：おん　かかかび　さんまえい　そわか\n（六）弥勒菩薩：おん　まいたれいや　そわか\n（七）薬師如来：①おん　ころころ　せんだり　まとうぎ　そわか　②おん　びせいぜい　びせいぜい　びせいじゃ　さんぼりぎゃてい　そわか\n（八）聖観音：おん　あろりきゃ　そわか\n（九）勢至菩薩：おん　さんざん　ざんさく　そわか\n（十）阿弥陀如来：おん　あみりた　ていせい　からうん\n（十一）阿閦如来：おん　あきしゅびや　うん\n（十二）大日如来：①おん　あびらうんけん　②おん　あびらうんけん　ばさら　だとばん\n（十三）虚空蔵菩薩：のうぼう　あきゃしゃきゃらばや　おんありきゃ　まりぼり　そわか／おん　ばざら　あらたんのう　おんたらく　そわか"},{"id":164,"name":"観音経","furigana":"かんのんぎょう","section":"後行","note":"妙法蓮華経観世音菩薩普門品第二十五偈（みょうほうれんげきょうかんぜおんぼさつふもんぼんだいにじゅうごげ）","mantra":"世尊妙相具（せそんみょうそうぐ）　我今重問彼（がこんじゅうもんぴ）　仏子何因縁（ぶっしがいんねん）　名為観世音（みょういかんぜおん）\n具足妙相尊（ぐそくみょうそうそん）　偈答無盡意（げとうむじんに）　汝聴観音行（にょちょうかんのんぎょう）　善応諸方所（ぜんのうしょほうしょ）\n弘誓深如海（ぐぜいじんにょかい）　歴劫不思議（りゃくこうふしぎ）　侍多千億佛（じたせんのくぶつ）　発大清浄願（ほつだいしょうじょうがん）\n我為汝略説（がいにょりゃくせつ）　聞名及見身（もんみょうぎゅうけんしん）　心念不空過（しんねんふくうか）　能滅諸有苦（のうめつしょうく）\n仮使興害意（けしこうがいい）　推落大火坑（すいらくだいかきょう）　念彼観音力（ねんびかんのんりき）　火坑変成池（かきょうへんじょうち）\n或漂流巨海（わくひょうるこかい）　龍魚諸鬼難（りゅうぎょしょきなん）　念彼観音力（ねんびかんのんりき）　波浪不能没（はろうふのうもつ）\n或在須弥峰（わくざいしゅみぶ）　為人所推堕（いにんしょすいだ）　念彼観音力（ねんびかんのんりき）　如日虚空住（にょにちこくじゅう）\n或被悪人逐（わくひあくにんちく）　堕落金剛山（だらくこんごうせん）　念彼観音力（ねんびかんのんりき）　不能損一毛（ふのうそんいちもう）\n或値怨賊繞（わくちおんぞくにょう）　各執刀加害（かくしゅうとうかがい）　念彼観音力（ねんびかんのんりき）　咸即起慈心（げんそくきじしん）\n或遭王難苦（わくそうおうなんぐ）　臨刑欲寿終（りんぎょうよくじゅしゅう）　念彼観音力（ねんびかんのんりき）　刀尋段段壊（とうじんだんだんね）\n或囚禁枷鎖（わくしゅうきんかさ）　手足被柱械（しゅそくひちゅうかい）　念彼観音力（ねんびかんのんりき）　釈然得解脱（しゃくねんとくげだつ）\n呪詛諸毒薬（しゅうそしょどくやく）　所欲害身者（しょよくがいしんしゃ）　念彼観音力（ねんびかんのんりき）　還著於本人（げんじゃくおほんにん）\n或遇悪羅刹（わくぐうあくらせつ）　毒龍諸鬼等（どくりゅうしょきとう）　念彼観音力（ねんびかんのんりき）　時悉不敢害（じしっぷかんがい）\n若悪獣圍繞（にゃくあくじゅういにょう）　利牙爪可怖（りげそうかふ）　念彼観音力（ねんびかんのんりき）　疾走無邊方（しっそうむへんぽう）\n玩蛇及蝮蠍（がんじゃぎゅうぶっかつ）　気毒煙火燃（けどくえんかねん）　念彼観音力（ねんびかんのんりき）　尋聲自回去（じんしょうじえこ）\n雲雷鼓掣電（うんらいくせいでん）　降雹澍大雨（ごうばくじゅだいう）　念彼観音力（ねんびかんのんりき）　応時得消散（おうじとくしょうさん）\n衆生被困厄（しゅじょうひこんやく）　無量苦逼身（むりょうくひっしん）　観音妙智力（かんのんみょうちりき）　能救世間苦（のうぐせけんく）\n具足神通力（ぐそくじんずうりき）　廣修智方便（こうしゅちほうべん）　十方諸国土（じっぽうしょこくど）　無刹不現身（むせつふげんしん）\n種種諸悪趣（しゅじゅしょあくしゅ）　地獄鬼畜生（じごくきちくしょう）　生老病死苦（しょうろうびょうしく）　以漸悉令滅（いぜんしつりょうめつ）\n真観清浄観（しんかんしょうじょうかん）　廣大智慧観（こうだいちえかん）　悲観及慈観（ひかんぎゅうじかん）　常願常瞻仰（じょうがんじょうせんごう）\n無垢清浄光（むくしょうじょうこう）　慧日破諸闇（えにちはしょあん）　能伏災風火（のうぶくさいふうか）　普明照世間（ふみょうしょうせけん）\n悲體戒雷震（ひたいかいらいしん）　慈意妙大雲（じいみょうだいうん）　澍甘露法雨（じゅかんろほうう）　滅除煩悩焔（めつじょぼんのうえん）\n諍訟経官処（じょうしょうきょうかんしょ）　怖畏軍陣中（ふいぐんじんちゅう）　念彼観音力（ねんびかんのんりき）　衆怨悉退散（しゅうおんしつたいさん）\n妙音観世音（みょうおんかんぜおん）　梵音海潮音（ぼんのんかいちょうおん）　勝彼世間音（しょうひせけんのん）　是故須常念（ぜこしゅじょうねん）\n念念勿生疑（ねんねんもつしょうぎ）　観世音浄聖（かんぜおんじょうしょう）　於苦悩死厄（おくのうしやく）　能為作依怙（のういさえこ）\n具一切功徳（ぐいつさいくどく）　慈眼視衆生（じげんじしゅじょう）　福聚海無量（ふくじゅかいむりょう）　是故応頂礼（ぜこおうちょうらい）\n【結び】\n爾時持地菩薩（にじじじぼさつ）　即従座起（そくじゅうざき）　前白佛言（ぜんびゃくぶつごん）　世尊（せそん）\n若有衆生（にゃくうしゅじょう）　聞是観世音菩薩品（もんぜかんぜおんぼさつほん）　自在之業（じざいしごう）　普門示現（ふもんじげん）　神通力者（じんずうりきしゃ）\n当知是人（とうちぜにん）　功徳不少（くどくふしょう）　佛説是普門品時（ぶつせつぜふもんぼんじ）\n衆中八萬四千衆生（しゅうじゅうはちまんしせんしゅじょう）　皆発無等等阿耨多羅三藐三菩提心（かいほつむとうどうあのくたらさんみゃくさんぼだいしん）"}];
+
+const SECTION_LABELS = {
+  "前行": "前行（護身法〜般若心経）",
+  "諸尊": "諸尊の真言",
+  "五大明王": "五大明王",
+  "四天王": "四天王",
+  "七福神": "七福神",
+  "七福神・四天王": "七福神・四天王",
+  "五神": "五神",
+  "後行": "後行（回向〜観音経）",
+};
+
+function normalize(str){
+  if(!str) return "";
+  let s = str.normalize("NFKC");
+  s = s.replace(/[\u30a1-\u30f6]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+  s = s.toLowerCase().replace(/[\s　]/g, "");
+  return s;
+}
+
+function escapeHtml(str){
+  return (str ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+const listArea = document.getElementById("listArea");
+const emptyState = document.getElementById("emptyState");
+const searchInput = document.getElementById("searchInput");
+const hitCount = document.getElementById("hitCount");
+const totalCount = document.getElementById("totalCount");
+const clearBtn = document.getElementById("clearBtn");
+
+totalCount.textContent = ENTRIES.length;
+
+const openIds = new Set();
+
+function render(){
+  const raw = searchInput.value;
+  const q = normalize(raw);
+
+  let filtered = ENTRIES;
+  if(q){
+    filtered = ENTRIES.filter(e => {
+      const furiHit = normalize(e.furigana).includes(q);
+      const nameHit = e.name.includes(raw) || normalize(e.name).includes(q);
+      return furiHit || nameHit;
+    });
+    // furigana matches first (reading-priority search)
+    filtered = [...filtered].sort((a, b) => {
+      const aF = normalize(a.furigana).includes(q) ? 0 : 1;
+      const bF = normalize(b.furigana).includes(q) ? 0 : 1;
+      return aF - bF;
+    });
+  }
+
+  hitCount.textContent = filtered.length;
+
+  if(filtered.length === 0){
+    listArea.innerHTML = "";
+    emptyState.style.display = "block";
+    return;
+  }
+  emptyState.style.display = "none";
+
+  let html = "";
+  let lastSection = null;
+  const groupBySection = !q; // only show section dividers in default (unfiltered) order
+
+  filtered.forEach(e => {
+    if(groupBySection && e.section !== lastSection){
+      const label = SECTION_LABELS[e.section] || e.section;
+      html += `<div class="section-divider"><span class="label">${escapeHtml(label)}</span><span class="rule"></span></div>`;
+      lastSection = e.section;
+      html += `<div class="entry-list" data-sec="${escapeHtml(e.section)}">`;
+    } else if(!groupBySection && lastSection === null){
+      html += `<div class="entry-list">`;
+      lastSection = "flat";
+    }
+
+    const isOpen = openIds.has(e.id);
+    html += `
+      <div class="entry${isOpen ? " open" : ""}" data-id="${e.id}">
+        <div class="entry-head" data-toggle="${e.id}">
+          <div class="entry-titles">
+            <span class="entry-name">${escapeHtml(e.name)}</span>
+            <span class="entry-furigana">${escapeHtml(e.furigana)}</span>
+          </div>
+          <svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="entry-body">
+          ${e.note ? `<div class="entry-note">${escapeHtml(e.note)}</div>` : ""}
+          <div class="mantra-block">${escapeHtml(e.mantra)}</div>
+        </div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+
+  listArea.innerHTML = html;
+
+  listArea.querySelectorAll("[data-toggle]").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = parseInt(el.getAttribute("data-toggle"));
+      const card = el.closest(".entry");
+      if(openIds.has(id)){
+        openIds.delete(id);
+        card.classList.remove("open");
+      } else {
+        openIds.add(id);
+        card.classList.add("open");
+      }
+    });
+  });
+}
+
+searchInput.addEventListener("input", render);
+clearBtn.addEventListener("click", () => {
+  searchInput.value = "";
+  render();
+  searchInput.focus();
+});
+
+render();
+</script>
+</body>
+</html>
