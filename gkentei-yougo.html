@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>ここだけは押さえておこう｜G検定 重要用語（第1〜5章）</title>
+<style>
+  :root{
+    --navy-deep:#101b30;
+    --navy:#1f3864;
+    --navy-soft:#2c4a82;
+    --paper:#f6f3ec;
+    --card:#ffffff;
+    --ink:#20242c;
+    --muted:#68707c;
+    --line:#e2ddd0;
+    --amber:#c1893a;
+    --amber-soft:#f4e3c8;
+    --amber-deep:#8a5f24;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","YuGothic","Noto Sans JP",system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+    padding-bottom:64px;
+  }
+  a{color:inherit;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky;
+    top:0;
+    z-index:40;
+    background:linear-gradient(180deg,var(--navy-deep),var(--navy));
+    color:#fff;
+    padding:14px 16px 12px;
+    box-shadow:0 4px 16px rgba(16,27,48,.28);
+  }
+  .eyebrow{
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#9db3d8;
+    font-weight:700;
+    margin:0 0 4px;
+  }
+  h1{
+    font-size:20px;
+    margin:0 0 12px;
+    font-weight:800;
+    letter-spacing:.01em;
+  }
+  .search-row{
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+  .search-box{
+    position:relative;
+    flex:1;
+  }
+  .search-box svg{
+    position:absolute;
+    left:12px;
+    top:50%;
+    transform:translateY(-50%);
+    opacity:.55;
+    pointer-events:none;
+  }
+  #searchInput{
+    width:100%;
+    padding:10px 12px 10px 36px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.10);
+    color:#fff;
+    font-size:15px;
+    outline:none;
+  }
+  #searchInput::placeholder{color:#b7c3da;}
+  #searchInput:focus{
+    background:rgba(255,255,255,.16);
+    border-color:#9db3d8;
+  }
+  .clear-btn{
+    display:none;
+    background:none;
+    border:none;
+    color:#cdd8ec;
+    font-size:20px;
+    line-height:1;
+    padding:6px;
+    cursor:pointer;
+  }
+  .clear-btn.show{display:block;}
+
+  .memo-toggle{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:10px;
+    font-size:12.5px;
+    color:#cdd8ec;
+  }
+  .switch{
+    position:relative;
+    width:38px;
+    height:22px;
+    background:rgba(255,255,255,.22);
+    border-radius:999px;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:background .2s;
+    border:none;
+    padding:0;
+  }
+  .switch.on{background:var(--amber);}
+  .switch::after{
+    content:"";
+    position:absolute;
+    top:2px;
+    left:2px;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    background:#fff;
+    transition:transform .2s;
+  }
+  .switch.on::after{transform:translateX(16px);}
+  .memo-toggle button.label{
+    background:none;border:none;color:inherit;font:inherit;padding:0;cursor:pointer;
+  }
+
+  .chip-row{
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    margin-top:10px;
+    padding-bottom:2px;
+    scrollbar-width:none;
+  }
+  .chip-row::-webkit-scrollbar{display:none;}
+  .chip{
+    flex-shrink:0;
+    font-size:12.5px;
+    font-weight:600;
+    padding:6px 12px;
+    border-radius:999px;
+    background:rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.16);
+    color:#dbe4f2;
+    white-space:nowrap;
+    cursor:pointer;
+  }
+  .chip.active{
+    background:var(--amber);
+    border-color:var(--amber);
+    color:#241605;
+  }
+
+  .status-bar{
+    max-width:720px;
+    margin:0 auto;
+    padding:12px 16px 0;
+    font-size:12.5px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .status-bar .count b{color:var(--navy);font-size:13.5px;}
+
+  main{
+    max-width:720px;
+    margin:0 auto;
+    padding:8px 16px 0;
+  }
+
+  /* ---------- Chapter blocks ---------- */
+  .chapter{
+    margin-top:26px;
+  }
+  .chapter-head{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    cursor:pointer;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--navy);
+    -webkit-tap-highlight-color:transparent;
+  }
+  .chapter-num{
+    font-size:26px;
+    font-weight:800;
+    color:var(--amber);
+    font-variant-numeric:tabular-nums;
+    line-height:1;
+  }
+  .chapter-title{
+    font-size:17px;
+    font-weight:800;
+    color:var(--navy);
+    flex:1;
+  }
+  .chapter-toggle-icon{
+    color:var(--navy);
+    font-size:13px;
+    transition:transform .2s;
+    flex-shrink:0;
+  }
+  .chapter.collapsed .chapter-toggle-icon{transform:rotate(-90deg);}
+  .chapter-body{
+    overflow:hidden;
+  }
+  .chapter.collapsed .chapter-body{display:none;}
+
+  .section-label{
+    font-size:13px;
+    font-weight:700;
+    color:#fff;
+    background:var(--navy-soft);
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:6px;
+    margin:18px 0 10px;
+  }
+  .section-label:first-of-type{margin-top:16px;}
+
+  /* ---------- Term cards ---------- */
+  .term-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:12px 14px;
+    margin-bottom:8px;
+  }
+  .term-name{
+    font-weight:800;
+    color:var(--navy);
+    font-size:14.5px;
+    margin:0 0 4px;
+  }
+  .term-name mark, .term-desc mark{
+    background:var(--amber-soft);
+    color:var(--amber-deep);
+    border-radius:3px;
+    padding:0 2px;
+  }
+  .term-desc{
+    font-size:14px;
+    color:var(--ink);
+    margin:0;
+  }
+
+  /* memorize mode */
+  .term-card.quiz .term-desc{
+    display:none;
+  }
+  .term-card.quiz .reveal-btn{
+    display:flex;
+  }
+  .reveal-btn{
+    display:none;
+    width:100%;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    background:var(--paper);
+    border:1px dashed #c8b98f;
+    border-radius:10px;
+    color:var(--amber-deep);
+    font-size:12.5px;
+    font-weight:600;
+    padding:8px;
+    cursor:pointer;
+  }
+  .term-card.quiz.revealed .term-desc{display:block;}
+  .term-card.quiz.revealed .reveal-btn{display:none;}
+
+  .no-result{
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    padding:60px 20px;
+    display:none;
+  }
+  .no-result.show{display:block;}
+
+  footer{
+    max-width:720px;
+    margin:36px auto 0;
+    padding:16px;
+    font-size:11.5px;
+    color:var(--muted);
+    border-top:1px solid var(--line);
+    line-height:1.7;
+  }
+
+  /* back to top */
+  #topBtn{
+    position:fixed;
+    right:16px;
+    bottom:16px;
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:var(--navy);
+    color:#fff;
+    border:none;
+    font-size:18px;
+    box-shadow:0 4px 14px rgba(16,27,48,.35);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:30;
+  }
+  #topBtn.show{display:flex;}
+
+  @media (min-width:600px){
+    h1{font-size:22px;}
+    .term-desc{font-size:14.5px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">G検定 対策 &middot; Super Summary</p>
+  <h1>ここだけは押さえておこう！</h1>
+  <div class="search-row">
+    <div class="search-box">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="用語・説明で検索（例: 過学習）" autocomplete="off">
+    </div>
+    <button class="clear-btn" id="clearBtn" aria-label="検索をクリア">&times;</button>
+  </div>
+  <div class="memo-toggle">
+    <button class="switch" id="memoSwitch" role="switch" aria-checked="false"></button>
+    <button class="label" id="memoLabel">暗記モード（説明をタップして表示）</button>
+  </div>
+  <div class="chip-row" id="chipRow"></div>
+</header>
+
+<div class="status-bar">
+  <span class="count"><b id="visibleCount">0</b> / <span id="totalCount">0</span> 語</span>
+  <span id="collapseAllBtn" style="cursor:pointer;text-decoration:underline;">すべて閉じる</span>
+</div>
+
+<main id="main"></main>
+
+<p class="no-result" id="noResult">該当する用語が見つかりません。検索語を変えてお試しください。</p>
+
+<footer>
+  出典：スッキリわかるG検定テキスト各章「ここだけは押さえておこう！」より作成。第1章〜第5章の最重要用語一覧です。転記の際に誤りが生じる可能性があるため、実際の学習では原典テキストと読み合わせのうえご確認ください。
+</footer>
+
+<button id="topBtn" aria-label="トップへ戻る">↑</button>
+
+<script>
+const CHAPTERS = [
+  {
+    title: "人工知能（AI）とは",
+    sections: [
+      { label: "1.1　AIの定義", terms: [
+        ["AI","Artificial Intelligenceの略で、日本語訳は人工知能。定義については専門家の間でも意見が分かれている"],
+        ["チューリングテスト","アラン・チューリングが考案した、機械が人間と近いアウトプットをできるかを問う試験"],
+        ["ローブナーコンテスト","人工知能が最も人間に近い回答ができることを競うコンテスト"],
+        ["人工知能とロボット","人工知能と呼ばれるものが実体があるものである必要はない"],
+        ["AI効果","かつてAIと呼ばれていたものでも、仕組みがわかってしまうと、人間が行うような知能があるとは見なされなくなる心理現象"],
+        ["機械学習","データから統計的に法則を導く手法"],
+        ["ディープラーニング","機械学習の一手法。従来の機械学習では、データの注目すべき部分を人間が指定していたのに対して、ディープラーニングではそれも自動的に判定する（特徴抽出）"],
+      ]},
+    ],
+  },
+  {
+    title: "人工知能をめぐる動向",
+    sections: [
+      { label: "2.1　第一次AIブーム", terms: [
+        ["探索木","木構造を用いてゴールまでの道筋を割り出す手法。深さ優先探索や幅優先探索などがある"],
+        ["トイ・プロブレム（おもちゃの問題）","単純なルールで、簡単な問題は解けるが、複雑な問題は解けなかった。当時のAIはトイ・プロブレムしか解けなかった"],
+        ["ディープブルー","幅優先探索によりチェスの世界チャンピオンに勝利した"],
+        ["Mini-Max法","囲碁等で盤面に点数付けをし、相手の点数を最小、自分の点数を最大になるように差し手を選択する手法"],
+        ["αβ法","Mini-Max法から、一定以上点数の悪い手は計算を行わないことで計算量を削減する手法"],
+      ]},
+      { label: "2.2　第二次AIブーム", terms: [
+        ["エキスパートシステム","専門知識をプログラミングしたAI。ELIZAやMYCIN、Watsonなどが有名。イライザ効果という言葉も生まれた"],
+        ["知識表現","知識（概念）をどのように整理していくかという研究分野"],
+        ["意味ネットワーク","知識表現研究の産物。概念同士をリンクして知識を表現する"],
+        ["オントロジー","概念同士をis-a関係、part-of関係などで表す考え方。間違いがないようにつくり込んでいくヘビーウェイト・オントロジーと、機械によって自動的につくるライトウェイト・オントロジーがある"],
+      ]},
+      { label: "2.3　第三次AIブーム", terms: [
+        ["形式知","人間が説明できる知識"],
+        ["暗黙知","人間が説明できない知識"],
+        ["ウェブマイニング","データから必要な情報を抽出するデータマイニングを、Web上の情報に対して行うこと"],
+        ["セマンティックWeb","Webサイトにメタデータを付与することによって、コンピュータがWebサイトの情報を解析しやすくする"],
+        ["機械学習","大量のデータから統計的に回帰や分類を行う手法"],
+        ["強化学習","AIの判断に点数をつけて高得点を目指させる手法。AlphaGoやPonanzaで用いられる"],
+        ["AlphaGo","強化学習にディープラーニングを応用したAI。囲碁の世界チャンピオンに勝利した"],
+        ["ニューラルネットワーク","機械学習の一手法。人間の脳神経回路をプログラムで模倣"],
+        ["ディープラーニング","ニューラルネットワークの隠れ層を深くしたもの。2012年のILSVRCで圧勝し、一躍有名に。自動的に特徴抽出を行う"],
+        ["統計的自然言語処理","人間が自然な会話の中で使用する言語を統計的に意味解析する"],
+        ["特徴抽出","推論に必要なデータの特徴量を抽出すること"],
+        ["過学習","訓練用データに過適応してしまい、未知のデータに対応できない状態"],
+        ["次元の呪い","データが複雑になると学習に必要なデータが指数関数的に増えてしまうこと"],
+        ["インタビューシステム","AIが質問を繰り返し、回答を収集していくシステム"],
+        ["LLM","膨大なデータセットを用いて訓練されたAIモデルで、人間の言語を理解し生成する能力を持つ。GPT-4などのモデルがこれに該当"],
+      ]},
+    ],
+  },
+  {
+    title: "人工知能の問題点",
+    sections: [
+      { label: "3.1　強いAIと弱いAI", terms: [
+        ["強いAI","あらゆる状況で適切な判断、行動ができるAIのこと。ドラえもんなど"],
+        ["弱いAI","ある特定の仕事のみを行えるAIのこと。AlphaGo（碁）やPonanza（将棋）、AlexNet（画像認識）など"],
+      ]},
+      { label: "3.2　人工知能に関する諸問題", terms: [
+        ["フレーム問題","人間であれば、無意識に不要と判断している情報でも、コンピュータの場合はメモリを割いて考える必要があり、計算が追いつかない問題"],
+        ["シンボルグラウンディング問題","コンピュータにはシンボルと意味が結びつけられない問題。言葉をただの記号として扱うため、応用が効かない"],
+        ["身体性","言葉の意味を理解するには、現実世界に身体が必要であるという考え。見て、触って初めて理解できる"],
+        ["シンギュラリティ","技術的特異点。人工知能が自分より賢いAIを作るようになると無限に賢くなる"],
+      ]},
+    ],
+  },
+  {
+    title: "機械学習の具体的な手法",
+    sections: [
+      { label: "4.1　学習の種類", terms: [
+        ["教師あり学習","データと正解ラベルをセットにして学習する手法"],
+        ["教師なし学習","正解ラベルはなく、データのみを使用して学習する手法"],
+        ["半教師あり学習","一部の少量のデータに対してのみ正解ラベルをセットにして学習する手法"],
+        ["強化学習","エージェントと呼ばれる学習の主体が、行動の結果として得られる報酬が最大化するように行動方針を学習する手法"],
+        ["回帰","連続値である値Yを関連する別の値Xから予測すること"],
+        ["単回帰","1つの説明変数を用いた回帰"],
+        ["重回帰","複数の説明変数を用いた回帰"],
+        ["分類","離散値である値Yを関連する別の値Xから予測すること"],
+        ["2値分類","確率を元にデータを2種類に分類すること"],
+        ["多クラス分類","確率を元にデータを複数の種類に分類すること"],
+        ["クラスタリング","データを似た特徴ごとにグループ分けすること"],
+        ["樹形図（デンドログラム）","データがグループ化される様子を表した図。階層型クラスタリングにより作成される"],
+        ["ウォード法","隣接するクラスタの分散を求め、分散が小さいクラスタ同士をまとめていく手法"],
+      ]},
+      { label: "4.2　代表的なアルゴリズム（教師あり学習）", terms: [
+        ["線形回帰","回帰問題に用いられるアルゴリズム"],
+        ["ロジスティック回帰","分類問題に用いられるアルゴリズム"],
+        ["シグモイド関数","ロジスティック回帰と組み合わせて2値分類をするのに用いられる関数"],
+        ["ソフトマックス関数","ロジスティック回帰と組み合わせて多クラス分類をするのに用いられる関数"],
+        ["決定木","木構造を用いて回帰、分類を行うアルゴリズム"],
+        ["ランダムフォレスト","複数の決定木を作成し、それぞれの出力結果から多数決で最終的な出力を決定するアルゴリズム"],
+        ["アンサンブル学習","複数のモデルで学習させる手法"],
+        ["バギング","アンサンブル学習の一種で、全データから一部のデータを取り出し、複数のモデルで並列的に学習する方法"],
+        ["ブースティング","アンサンブル学習の一種で、複数のモデルを用いて逐次的に学習する方法"],
+        ["サポートベクトルマシン","マージン最大化やカーネル法に用いて、高い精度の学習ができるアルゴリズム"],
+      ]},
+      { label: "4.3　代表的なアルゴリズム（教師なし学習）", terms: [
+        ["マージン最大化","サポートベクトルマシンにおいて、境界と境界に最も近いデータとの距離を大きくして線を引くという考え方"],
+        ["カーネル法","線形分離可能でないデータを高次元空間に移すことで、線形分離を可能にする手法"],
+        ["カーネル関数","カーネル法において、高次元空間で学習して適切な境界線を得ることができる関数"],
+        ["ニューラルネットワーク","人間の脳神経回路の仕組みを模倣し、入力層、隠れ層、出力層の3層で構成されるアルゴリズム"],
+        ["単純パーセプトロン","ニューラルネットワークの原形で、入力層と出力層で構成されるモデル"],
+        ["多層パーセプトロン","単純パーセプトロンに隠れ層を追加したモデル"],
+        ["誤差逆伝播法","モデルの予測値と実際の正解との誤差を、ネットワークにフィードバックする手法"],
+        ["k-means法（k平均法）","最も代表的なクラスタリングアルゴリズム"],
+        ["主成分分析","膨大なデータの中から不要なものを削減（次元削減）するアルゴリズム"],
+        ["特異値分解","データを3つの行列に分解して、重要でないデータを削減（次元削減）するアルゴリズム"],
+        ["t-SNE","確率分布を基に高次元のデータを低次元に圧縮することで、データの可視化をするアルゴリズム"],
+        ["多次元尺度構成法","次元削減の手法の一種で、データ同士の類似度を距離で表し、これらの距離をもとに関係性を低次元空間に表現する"],
+      ]},
+      { label: "4.4　学習済みモデルの評価", terms: [
+        ["訓練データ","全体のデータから学習用のデータとして切り出したデータ部"],
+        ["テストデータ","全体のデータから評価用のデータとして切り出したデータ部"],
+        ["過学習","モデルが訓練データに最適化されすぎて、未知のデータに対する予測能力が低下する事象"],
+        ["未学習（学習不足）","モデルが訓練データにもテストデータにも最適化されていない状態"],
+        ["ホールドアウト検証","データの一部を訓練データに、残りをテストデータに割り当てて検証する手法"],
+        ["k-分割交差検証","訓練データとテストデータの分割を複数回行って検証する手法"],
+        ["混同行列","分類結果と正解の組み合わせを表現した表"],
+        ["正解率","全データの中で予測が当たった割合"],
+        ["適合率","真と予測した中で、正解した（実際に真であった）割合"],
+        ["再現率","結果が真のデータの中で、正解した（真だと予測できた）割合"],
+        ["F値","適合率と再現率の調和平均"],
+        ["ROC曲線","横軸に偽陽性率、縦軸に真陽性率を置いてプロットしたグラフ"],
+        ["AUC","ROC曲線の内側の領域で、1に近いほどモデルの性能が高いことを示す"],
+      ]},
+    ],
+  },
+  {
+    title: "ディープラーニングの概要",
+    sections: [
+      { label: "5.1　ディープラーニングとは", terms: [
+        ["ディープラーニング","人間の学習過程をコンピュータで表現したディープニューラルネットワークを使用した学習"],
+        ["ニューラルネットワーク","人間の脳の中の構造を表現したアルゴリズム。パーセプトロンから構成される"],
+        ["パーセプトロン","人間の脳の中の神経回路を数式的に表現したアルゴリズム"],
+      ]},
+      { label: "5.2　ディープラーニングの手法", terms: [
+        ["多層パーセプトロン","単純パーセプトロンに隠れ層を追加したもの。非線形分類を行うことが可能"],
+        ["ディープニューラルネットワーク","ニューラルネットワークの仕組みを応用した、ディープラーニングの手法。ニューラルネットワークにさらに隠れ層を追加"],
+        ["誤差逆伝播法","誤差をネットワークの逆向きに伝播しながら重みを最適化する手法"],
+        ["信用割当問題","各パラメータの予測結果に対する影響度がわからず、調整が最後まで困難になる問題"],
+        ["勾配消失問題","誤差逆伝播法で、誤差が最後まで正しく反映されない問題"],
+      ]},
+      { label: "5.3　ディープラーニングの計算デバイスとデータ量", terms: [
+        ["積層オートエンコーダ","オートエンコーダを積み重ねたもの。より効率的に特徴量を獲得することができる"],
+        ["事前学習","積層オートエンコーダにおいて、初期パラメータを取得するための手法"],
+        ["ファインチューニング","学習済みのモデルの初期値を再度学習し微調整する手法。積層オートエンコーダにおいては、最終的な重みの調整を行い教師が行う学習を実現させるために使用する"],
+        ["CPU","コンピュータ全体の計算を担う演算処理装置。膨大な種類の作業を順番に処理する能力に長けている"],
+        ["GPU","3Dグラフィックや画像処理などの演算を行う演算処理装置。並列処理を行うことができる"],
+        ["GPGPU","並列処理を行うことができるGPUを、画像処理以外の目的で使用する技術"],
+        ["データリーケージ","学習データに「推論時に未確定の情報」を含んでしまい、正しく推論できないこと"],
+      ]},
+    ],
+  },
+];
+
+// ---------- Build DOM ----------
+const main = document.getElementById('main');
+const chipRow = document.getElementById('chipRow');
+let totalTerms = 0;
+
+CHAPTERS.forEach((ch, ci) => {
+  const chNum = ci + 1;
+  ch.terms_flat = [];
+  ch.sections.forEach(s => s.terms.forEach(t => ch.terms_flat.push(t)));
+  totalTerms += ch.terms_flat.length;
+
+  // chip nav
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.textContent = `第${chNum}章`;
+  chip.addEventListener('click', () => {
+    document.getElementById('chapter-' + chNum).scrollIntoView({behavior:'smooth', block:'start'});
+  });
+  chipRow.appendChild(chip);
+
+  // chapter block
+  const chapterEl = document.createElement('section');
+  chapterEl.className = 'chapter';
+  chapterEl.id = 'chapter-' + chNum;
+
+  const head = document.createElement('div');
+  head.className = 'chapter-head';
+  head.innerHTML = `<span class="chapter-num">${String(chNum).padStart(2,'0')}</span><span class="chapter-title">${ch.title}</span><span class="chapter-toggle-icon">▼</span>`;
+  head.addEventListener('click', () => {
+    chapterEl.classList.toggle('collapsed');
+  });
+  chapterEl.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'chapter-body';
+
+  ch.sections.forEach(section => {
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.textContent = section.label;
+    body.appendChild(label);
+
+    section.terms.forEach(([term, desc]) => {
+      const card = document.createElement('div');
+      card.className = 'term-card';
+      card.dataset.term = term;
+      card.dataset.desc = desc;
+
+      const nameEl = document.createElement('p');
+      nameEl.className = 'term-name';
+      nameEl.textContent = term;
+
+      const descEl = document.createElement('p');
+      descEl.className = 'term-desc';
+      descEl.textContent = desc;
+
+      const revealBtn = document.createElement('button');
+      revealBtn.className = 'reveal-btn';
+      revealBtn.textContent = 'タップして説明を表示';
+      revealBtn.addEventListener('click', () => card.classList.add('revealed'));
+
+      card.appendChild(nameEl);
+      card.appendChild(descEl);
+      card.appendChild(revealBtn);
+      card.addEventListener('click', (e) => {
+        if(card.classList.contains('quiz') && !card.classList.contains('revealed')){
+          card.classList.add('revealed');
+        }
+      });
+      body.appendChild(card);
+    });
+  });
+
+  chapterEl.appendChild(body);
+  main.appendChild(chapterEl);
+});
+
+document.getElementById('totalCount').textContent = totalTerms;
+document.getElementById('visibleCount').textContent = totalTerms;
+
+// ---------- Search ----------
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearBtn');
+const noResult = document.getElementById('noResult');
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function highlight(text, query){
+  if(!query) return escapeHtml(text);
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if(idx === -1) return escapeHtml(text);
+  return escapeHtml(text.slice(0,idx)) + '<mark>' + escapeHtml(text.slice(idx, idx+query.length)) + '</mark>' + escapeHtml(text.slice(idx+query.length));
+}
+
+function runSearch(){
+  const q = searchInput.value.trim();
+  clearBtn.classList.toggle('show', q.length > 0);
+  let visible = 0;
+
+  document.querySelectorAll('.chapter').forEach(chapterEl => {
+    let chapterHasMatch = false;
+    chapterEl.querySelectorAll('.section-label').forEach(l => l.style.display = q ? 'none' : 'inline-block');
+    chapterEl.querySelectorAll('.term-card').forEach(card => {
+      const term = card.dataset.term;
+      const desc = card.dataset.desc;
+      const match = !q || term.toLowerCase().includes(q.toLowerCase()) || desc.toLowerCase().includes(q.toLowerCase());
+      card.style.display = match ? '' : 'none';
+      if(match){
+        visible++;
+        chapterHasMatch = true;
+        card.querySelector('.term-name').innerHTML = highlight(term, q);
+        card.querySelector('.term-desc').innerHTML = highlight(desc, q);
+        if(q){
+          // reveal all matches while searching, even in quiz mode, so results are actually visible
+          card.classList.add('revealed');
+        } else if(card.classList.contains('quiz')){
+          card.classList.remove('revealed');
+        }
+        // show the section label this card belongs to
+        let labelEl = card.previousElementSibling;
+        while(labelEl && !labelEl.classList.contains('section-label')) labelEl = labelEl.previousElementSibling;
+        if(labelEl && q) labelEl.style.display = 'inline-block';
+      }
+    });
+    chapterEl.style.display = (!q || chapterHasMatch) ? '' : 'none';
+    if(q && chapterHasMatch) chapterEl.classList.remove('collapsed');
+  });
+
+  document.getElementById('visibleCount').textContent = visible;
+  noResult.classList.toggle('show', visible === 0);
+}
+
+searchInput.addEventListener('input', runSearch);
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  runSearch();
+  searchInput.focus();
+});
+
+// ---------- Memorize mode ----------
+const memoSwitch = document.getElementById('memoSwitch');
+const memoLabel = document.getElementById('memoLabel');
+let memoOn = false;
+function setMemo(on){
+  memoOn = on;
+  memoSwitch.classList.toggle('on', on);
+  memoSwitch.setAttribute('aria-checked', on);
+  document.querySelectorAll('.term-card').forEach(card => {
+    card.classList.toggle('quiz', on);
+    card.classList.remove('revealed');
+  });
+}
+memoSwitch.addEventListener('click', () => setMemo(!memoOn));
+memoLabel.addEventListener('click', () => setMemo(!memoOn));
+
+// ---------- Collapse all ----------
+const collapseAllBtn = document.getElementById('collapseAllBtn');
+let allCollapsed = false;
+collapseAllBtn.addEventListener('click', () => {
+  allCollapsed = !allCollapsed;
+  document.querySelectorAll('.chapter').forEach(c => c.classList.toggle('collapsed', allCollapsed));
+  collapseAllBtn.textContent = allCollapsed ? 'すべて開く' : 'すべて閉じる';
+});
+
+// ---------- Back to top ----------
+const topBtn = document.getElementById('topBtn');
+window.addEventListener('scroll', () => {
+  topBtn.classList.toggle('show', window.scrollY > 500);
+});
+topBtn.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
+</script>
+</body>
+</html>
