@@ -136,15 +136,40 @@
     background:none;border:none;color:inherit;font:inherit;padding:0;cursor:pointer;
   }
 
+  .chip-row-wrap{
+    position:relative;
+    margin-top:10px;
+  }
   .chip-row{
     display:flex;
     gap:6px;
     overflow-x:auto;
-    margin-top:10px;
     padding-bottom:2px;
     scrollbar-width:none;
   }
   .chip-row::-webkit-scrollbar{display:none;}
+  .chip-row-wrap::before,
+  .chip-row-wrap::after{
+    content:"";
+    position:absolute;
+    top:0;
+    bottom:2px;
+    width:28px;
+    pointer-events:none;
+    z-index:2;
+    opacity:0;
+    transition:opacity .15s;
+  }
+  .chip-row-wrap::before{
+    left:0;
+    background:linear-gradient(90deg, var(--navy), transparent);
+  }
+  .chip-row-wrap::after{
+    right:0;
+    background:linear-gradient(270deg, var(--navy), transparent);
+  }
+  .chip-row-wrap.show-left::before{opacity:1;}
+  .chip-row-wrap.show-right::after{opacity:1;}
   .chip{
     flex-shrink:0;
     font-size:12.5px;
@@ -344,7 +369,7 @@
     <button class="switch" id="memoSwitch" role="switch" aria-checked="false"></button>
     <button class="label" id="memoLabel">暗記モード（説明をタップして表示）</button>
   </div>
-  <div class="chip-row" id="chipRow"></div>
+  <div class="chip-row-wrap" id="chipRowWrap"><div class="chip-row" id="chipRow"></div></div>
 </header>
 
 <div class="status-bar">
@@ -950,6 +975,17 @@ CHAPTERS.forEach((ch, ci) => {
 
 document.getElementById('totalCount').textContent = totalTerms;
 document.getElementById('visibleCount').textContent = totalTerms;
+
+// ---------- Chip row scroll fade ----------
+const chipRowWrap = document.getElementById('chipRowWrap');
+function updateChipFade(){
+  const maxScroll = chipRow.scrollWidth - chipRow.clientWidth;
+  chipRowWrap.classList.toggle('show-left', chipRow.scrollLeft > 4);
+  chipRowWrap.classList.toggle('show-right', chipRow.scrollLeft < maxScroll - 4);
+}
+chipRow.addEventListener('scroll', updateChipFade);
+window.addEventListener('resize', updateChipFade);
+updateChipFade();
 
 // ---------- Search ----------
 const searchInput = document.getElementById('searchInput');
