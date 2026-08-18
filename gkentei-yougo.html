@@ -31,6 +31,12 @@
   }
   a{color:inherit;}
 
+  /* ---------- シラバス補完レイヤー ---------- */
+  .chip-extra{ background:var(--amber-soft); color:var(--amber-deep); font-weight:800; }
+  .chapter-extra .chapter-num{ background:var(--amber); }
+  .extra-note{ font-size:12px; color:var(--muted); margin:2px 0 10px; line-height:1.5; }
+  .term-card.from-syllabus{ border-left:3px solid var(--amber); }
+
   /* ---------- Header ---------- */
   header{
     position:sticky;
@@ -2811,7 +2817,233 @@ const COMPARE_GROUPS = [
   { title: "GANの構成要素", members: ["Generator","Discriminator"] },
   { title: "レコメンド手法", members: ["コンテンツベースフィルタリング","協調フィルタリング"] },
   { title: "代表的なCNNモデルの変遷", members: ["AlexNet","VGG","GoogLeNet","ResNet","DenseNet","EfficientNet"] },
+  // ---- 以下、シラバス補完（SYLLABUS_EXTRA）に対応する比較グループ ----
+  { title: "規範の種類（ハードロー / ソフトロー）", members: ["ハードロー","ソフトロー"] },
+  { title: "AI倫理 / AIガバナンス", members: ["AI倫理","AIガバナンス"] },
+  { title: "著作権：段階の区別", members: ["AI開発・学習段階","AI生成・利用段階"] },
+  { title: "著作権：法律上 / 契約上", members: ["著作権法30条の4","利用規約"] },
+  { title: "著作物性 / 著作権侵害", members: ["創作性","著作権侵害"] },
+  { title: "特許の要件（新規性 / 進歩性）", members: ["新規性","進歩性"] },
+  { title: "知的財産の3制度", members: ["著作権","特許権","営業秘密の三要件"] },
+  { title: "営業秘密 / 限定提供データ", members: ["営業秘密","限定提供データ"] },
+  { title: "独占禁止法の判断軸", members: ["競争制限","公正競争阻害性"] },
 ];
+
+// ---------- シラバス補完データ（JDLA公式シラバス第1.4版） ----------
+const SYLLABUS_EXTRA = {
+  title: "シラバス補完",
+  label: "補",
+  note: "教科書には無いが、JDLA公式シラバス第1.4版に明記された重要語",
+  sections: [
+
+    /* ===== L08 国内外のガイドライン ［P0］ 6語（compare 5語） ===== */
+    { label: "補.1　国内外のガイドライン（L08）", terms: [
+      { term: "ハードロー", syllabusId: "L08", source: "JDLAシラバス第1.4版",
+        desc: "法律・規則など、国家が強制力をもって執行する規範。違反には罰則や制裁が科される。実効性が高い一方、技術の変化に追随しにくく、過剰規制がイノベーションを阻害する懸念がある。",
+        meta: { short: "法律や規則など、国家が強制力をもって執行する規範",
+                keywords: ["法的拘束力あり", "罰則", "国家が執行"],
+                compare: "ソフトローは法的拘束力を持たない。EU AI Actがハードローの代表例" } },
+      { term: "ソフトロー", syllabusId: "L08", source: "JDLAシラバス第1.4版",
+        desc: "ガイドライン・行動規範・業界自主規制など、法的拘束力を持たない規範。柔軟で迅速に更新できる一方、遵守が任意であるため実効性を担保しにくい。",
+        meta: { short: "ガイドラインや行動規範など、法的拘束力を持たない規範",
+                keywords: ["拘束力なし", "ガイドライン", "自主的遵守"],
+                compare: "ハードローは強制力を持つ。日本のAI事業者ガイドラインがソフトローの代表例" } },
+      { term: "リスクベースアプローチ", syllabusId: "L08", source: "JDLAシラバス第1.4版",
+        desc: "AIのリスクの大きさに応じて規制の強度を変える考え方。限られた規制資源を高リスク領域に集中でき、低リスク用途の萎縮を避けられる。一方でリスク分類の線引きそのものが難しい。",
+        meta: { short: "リスクの大きさに応じて規制の強度を変える考え方",
+                keywords: ["リスクに応じた規制", "段階的", "一律ではない"],
+                compare: "一律規制は用途を問わず同じ規制をかけるため、低リスク用途まで萎縮させる" } },
+      { term: "AI倫理", syllabusId: "L08", source: "JDLAシラバス第1.4版",
+        desc: "AIが社会にもたらす価値や害について、何が望ましいかを問う規範的な考え方。公平性・透明性・人間中心といった価値をどう位置づけるかを扱う。",
+        meta: { short: "AIについて何が望ましいかを問う規範的な考え方",
+                keywords: ["望ましさ", "価値判断", "何をすべきか"],
+                compare: "AIガバナンスは、その倫理を組織として実現するための体制・仕組み" } },
+      { term: "AIガバナンス", syllabusId: "L08", source: "JDLAシラバス第1.4版",
+        desc: "AI倫理を実現するために、組織が方針・体制・手続・監査を整備して継続的に運用すること。倫理が「何が正しいか」を問うのに対し、ガバナンスは「どう実行し続けるか」を扱う。",
+        meta: { short: "AI倫理を実現するために、組織が体制・手続・監査を整備して運用すること",
+                keywords: ["組織体制", "手続", "監査", "実現手段"],
+                compare: "AI倫理が「何が正しいか」であるのに対し、AIガバナンスは「どう実行するか」" } },
+      { term: "価値原則", syllabusId: "L08", source: "JDLAシラバス第1.4版",
+        desc: "各国・各機関のAIガイドラインに共通して掲げられる基本的な価値。人間中心、公平性、透明性、説明可能性、プライバシー保護、安全性などが繰り返し登場する。個別のガイドラインは国ごとに異なるが、この水準では国際的な共通性が高い。",
+        meta: { short: "各国のAIガイドラインに共通して掲げられる基本的な価値（人間中心、公平性、透明性など）",
+                keywords: ["人間中心", "共通して掲げられる", "基本的価値"] } },
+    ]},
+
+    /* ===== L05 独占禁止法 ［P0］ 2語（compare 2語） ===== */
+    { label: "補.2　独占禁止法（L05）", terms: [
+      { term: "競争制限", syllabusId: "L05", source: "JDLAシラバス第1.4版",
+        desc: "市場における競争を実質的に制限すること。AIの文脈では、複数の事業者が同一の価格アルゴリズムを利用した結果、明示的な合意がなくても価格が協調的に決まる事態が論点となる。",
+        meta: { short: "市場における競争を実質的に制限すること。AIでは価格アルゴリズムの協調が論点",
+                keywords: ["市場の競争を制限", "価格アルゴリズム", "カルテル"],
+                compare: "公正競争阻害性は、競争を実質的に制限するまでには至らない不公正な取引方法を問題にする" } },
+      { term: "公正競争阻害性", syllabusId: "L05", source: "JDLAシラバス第1.4版",
+        desc: "不公正な取引方法にあたるかを判断する軸。AIの文脈では、大量のデータを保有する事業者によるデータの囲い込みや、プラットフォーム事業者による自社サービスの優遇が論点となる。",
+        meta: { short: "不公正な取引方法にあたるかの判断軸。AIではデータの囲い込みや自社優遇が論点",
+                keywords: ["不公正な取引方法", "データの囲い込み", "自社優遇"],
+                compare: "競争制限は、市場全体の競争が実質的に制限されるかを問題にする" } },
+    ]},
+
+    /* ===== L15 環境保護 ［P0］ 2語（compare 0語） ===== */
+    { label: "補.3　環境保護（L15）", terms: [
+      { term: "モデル学習の電力消費", syllabusId: "L15", source: "JDLAシラバス第1.4版",
+        desc: "大規模モデルの学習には膨大な計算資源と電力を要し、相応のCO2排出につながる。モデルの巨大化に伴い、環境負荷が無視できない規模になっている点が論点。",
+        meta: { short: "大規模モデルの学習は膨大な電力を要し、CO2排出につながる。AIの環境負荷そのものが論点",
+                keywords: ["大規模モデル", "膨大な電力", "CO2排出"] } },
+      { term: "気候変動", syllabusId: "L15", source: "JDLAシラバス第1.4版",
+        desc: "AIと環境をめぐる議論の中心。AI自体が環境負荷を生むという側面と、電力需要予測やエネルギー最適化などAIが気候変動対策に貢献する側面の、双方が議論される。",
+        meta: { short: "AIは環境負荷を生む一方、気候変動対策にも貢献する。負と正の両面が議論される",
+                keywords: ["環境負荷", "対策への貢献", "両面"] } },
+    ]},
+
+    /* ===== L16 労働政策 ［P0］ 3語（compare 0語） ===== */
+    { label: "補.4　労働政策（L16）", terms: [
+      { term: "AIとの協働", syllabusId: "L16", source: "JDLAシラバス第1.4版",
+        desc: "AIが人間の仕事を代替するのではなく、人間の能力を補完・拡張する関係を目指す考え方。定型的な処理をAIが担い、判断や対人業務を人間が担うという役割分担が想定される。",
+        meta: { short: "AIが人間の仕事を奪うのではなく、能力を補完・拡張する関係を目指す考え方",
+                keywords: ["補完", "拡張", "代替ではない"] } },
+      { term: "スキルの喪失", syllabusId: "L16", source: "JDLAシラバス第1.4版",
+        desc: "AIへの依存によって、人間が本来持っていた技能や判断力が徐々に失われていく問題。AI導入の便益と引き換えに生じる負の側面として議論される。",
+        meta: { short: "AIへの依存によって、人間の技能や判断力が失われていくという負の影響",
+                keywords: ["依存", "技能の低下", "判断力"] } },
+      { term: "労働力不足", syllabusId: "L16", source: "JDLAシラバス第1.4版",
+        desc: "少子高齢化などによって生じる人手不足を、AIの活用によって補うという社会的要請。日本におけるAI導入の主要な動機のひとつとして位置づけられる。",
+        meta: { short: "少子高齢化による人手不足をAIで補うという社会的要請。AI導入の主要な動機",
+                keywords: ["少子高齢化", "人手不足", "AI活用の動機"] } },
+    ]},
+
+    /* ===== L17 その他の重要な価値 ［P0］ 4語（compare 2語） ===== */
+    { label: "補.5　その他の重要な価値（L17）", terms: [
+      { term: "インクルージョン", syllabusId: "L17", source: "JDLAシラバス第1.4版",
+        desc: "障害・言語・地域・経済状況などにかかわらず、誰もがAIの便益から排除されないようにすること。モデルの出力の偏りだけでなく、そもそも利用できるかというアクセスの問題を含む。",
+        meta: { short: "誰もがAIの便益から排除されないようにすること",
+                keywords: ["排除しない", "誰もが使える", "便益の公平な分配"],
+                compare: "公平性はモデルの出力の偏りを問題にするが、インクルージョンは便益へのアクセス自体を問題にする" } },
+      { term: "軍事利用", syllabusId: "L17", source: "JDLAシラバス第1.4版",
+        desc: "AIの軍事転用をめぐる議論。人間の関与なしに攻撃目標を選定・攻撃する自律型致死兵器システム（LAWS）の是非が国際的な論点となっている。",
+        meta: { short: "自律型致死兵器システム（LAWS）など、AIの軍事転用をめぐる国際的な議論",
+                keywords: ["LAWS", "自律型致死兵器", "国際的議論"] } },
+      { term: "死者への敬意", syllabusId: "L17", source: "JDLAシラバス第1.4版",
+        desc: "故人の声や姿をAIで再現することの是非。本人からの同意が得られないこと、遺族の感情、商業利用の可否などが論点となる。",
+        meta: { short: "故人をAIで再現することの是非。本人の同意が得られない点が論点",
+                keywords: ["故人の再現", "同意が得られない", "遺族の感情"] } },
+      { term: "人間の自律性", syllabusId: "L17", source: "JDLAシラバス第1.4版",
+        desc: "推薦アルゴリズムやナッジによって、人間が自分で決めているつもりの意思決定が実は誘導されているという問題。自分で決める権利をどう守るかが論点。",
+        meta: { short: "推薦やナッジによって、自分で決めているつもりの意思決定が誘導される問題",
+                keywords: ["ナッジ", "意思決定の誘導", "自分で決める権利"],
+                compare: "フィルターバブルは情報環境の偏りを問題にするが、人間の自律性は意思決定そのものへの介入を問題にする" } },
+    ]},
+
+    /* ===== L02 著作権法 ［P1］ 8語（compare 8語） ===== */
+    { label: "補.6　著作権法（L02）", terms: [
+      { term: "著作権法30条の4", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "思想または感情の享受を目的としない利用（情報解析等）については、原則として著作権者の許諾なく著作物を利用できるとする権利制限規定。AIの学習段階を支える根拠となる。",
+        meta: { short: "非享受目的の利用（情報解析等）は許諾なく行えるとする権利制限規定",
+                keywords: ["非享受目的", "情報解析", "学習段階", "許諾不要"],
+                compare: "適用されるのは学習段階のみ。生成・利用段階の侵害判断には及ばない" } },
+      { term: "30条の4の例外", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "非享受目的の利用であっても、著作権者の利益を不当に害することとなる場合は権利制限の対象外となる。学習目的であれば何でも自由になるわけではない。作風の模倣を目的とした学習や、著作物の市場と競合する利用などが議論される。",
+        meta: { short: "非享受目的の利用であっても、著作権者の利益を不当に害することとなる場合は権利制限の対象外となる",
+                keywords: ["利益を不当に害する", "適用外", "何でも自由ではない"],
+                compare: "30条の4は原則許諾不要とするが、この例外に当たる場合は許諾が必要になる" } },
+      { term: "AI開発・学習段階", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "AIに著作物を学習させる段階。著作権法30条の4により、非享受目的であれば原則として許諾なく利用できる。著作権をめぐる議論では、この段階と生成・利用段階を必ず分けて考える。",
+        meta: { short: "AIに学習させる段階。30条の4により原則として許諾なく著作物を利用できる",
+                keywords: ["学習させる段階", "30条の4", "原則許諾不要"],
+                compare: "生成・利用段階は類似性と依拠性で侵害を判断する。30条の4は及ばない" } },
+      { term: "AI生成・利用段階", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "AIが出力したものを使う段階。人間が作成した場合とまったく同じ基準、すなわち既存著作物との類似性と依拠性によって著作権侵害を判断する。",
+        meta: { short: "AIの出力を使う段階。人間が作った場合と同じ基準で侵害を判断する",
+                keywords: ["類似性", "依拠性", "人間と同じ基準"],
+                compare: "学習段階は30条の4の適用対象で、判断枠組みが異なる" } },
+      { term: "AI生成物", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "AIが出力したもの。著作権に関しては、それ自体が著作物として保護されるか（著作物性）と、既存の著作物を侵害していないか（著作権侵害）という、性質の異なる二つの論点がある。",
+        meta: { short: "AIの出力物。「著作物になるか」と「侵害していないか」は別の論点",
+                keywords: ["著作物性", "著作権侵害", "二つの論点"],
+                compare: "著作物性は創作的寄与で判断し、侵害は類似性と依拠性で判断する。混同しやすい" } },
+      { term: "創作性", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "著作物と認められるための要件。AI生成物の場合は、人間の創作的意図と創作的寄与がどの程度あったかによって著作物性が判断される。",
+        meta: { short: "著作物と認められるための要件。AI生成物では人間の創作的寄与の有無が問われる",
+                keywords: ["著作物の要件", "創作的寄与", "人間の関与"],
+                compare: "簡単なプロンプト入力だけでは創作的寄与が認められず、著作物にならない" } },
+      { term: "著作権侵害", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "既存の著作物との「類似性」と「依拠性」の両方が認められる場合に成立する。片方だけでは侵害にならず、偶然に似ただけであれば侵害とはならない。",
+        meta: { short: "既存の著作物との「類似性」と「依拠性」の両方が認められる場合に成立する",
+                keywords: ["類似性", "依拠性", "両方必要"],
+                compare: "類似していても依拠していなければ侵害にならない（独自創作の抗弁）" } },
+      { term: "利用規約", syllabusId: "L02", source: "JDLAシラバス第1.4版",
+        desc: "データセットやAIサービスの提供者が定める契約条件。著作権法上は適法な利用であっても、利用規約で用途が制限されていれば契約違反となる。法律と契約は別のレイヤーとして判断する必要がある。",
+        meta: { short: "著作権法上は適法でも、利用規約で制限されていれば契約違反になる",
+                keywords: ["契約条件", "法律とは別", "契約違反"],
+                compare: "30条の4は法律上利用できるかの話。利用規約は契約上利用できるかの話で、両方を満たす必要がある" } },
+    ]},
+
+    /* ===== L03 特許法 ［P1］ 5語（compare 5語） ===== */
+    { label: "補.7　特許法（L03）", terms: [
+      { term: "特許権", syllabusId: "L03", source: "JDLAシラバス第1.4版",
+        desc: "出願・審査・登録を経て発生し、技術的思想（アイデア）を保護する権利。存続期間は出願から20年。出願内容は公開されるため、公開の代償として独占権を得る制度といえる。",
+        meta: { short: "出願・審査・登録を経て発生し、技術的思想（アイデア）を保護する権利",
+                keywords: ["出願と登録が必要", "アイデアを保護", "出願から20年"],
+                compare: "著作権は創作と同時に発生し表現を保護する。営業秘密は登録不要だが秘密管理が必要" } },
+      { term: "発明", syllabusId: "L03", source: "JDLAシラバス第1.4版",
+        desc: "自然法則を利用した技術的思想の創作のうち高度のもの。単なる発見や自然法則そのもの、人為的な取り決めは発明にあたらない。発明者は自然人に限られる。",
+        meta: { short: "自然法則を利用した技術的思想の創作のうち高度のもの",
+                keywords: ["自然法則の利用", "技術的思想", "高度"],
+                compare: "著作物は思想または感情を創作的に表現したもの。アイデアを守るか表現を守るかが違う" } },
+      { term: "新規性", syllabusId: "L03", source: "JDLAシラバス第1.4版",
+        desc: "特許を受けるための要件のひとつで、出願前に公然と知られていないこと。学会発表やWeb公開によって失われるが、一定の条件下では新規性喪失の例外規定が適用される。",
+        meta: { short: "出願前に公然と知られていないこと。学会発表やWeb公開で失われる",
+                keywords: ["出願前に未公開", "公表で失われる", "例外規定あり"],
+                compare: "進歩性は「知られていないか」ではなく「容易に思いつくか」を問う" } },
+      { term: "進歩性", syllabusId: "L03", source: "JDLAシラバス第1.4版",
+        desc: "特許を受けるための要件のひとつで、その分野の通常の知識を持つ者（当業者）が容易に発明できたものでないこと。新規であっても、容易に思いつくものは特許にならない。",
+        meta: { short: "当業者が容易に発明できたものでないこと",
+                keywords: ["容易に発明できない", "当業者基準"],
+                compare: "新規性は公知かどうか、進歩性は容易かどうかを判断する" } },
+      { term: "職務発明", syllabusId: "L03", source: "JDLAシラバス第1.4版",
+        desc: "従業者が職務上行った発明。契約や勤務規則等にあらかじめ定めておけば、特許を受ける権利を使用者に原始帰属させることができる。その場合、従業者は相当の利益を受ける権利を持つ。",
+        meta: { short: "従業者が職務上行った発明。定めがあれば権利を使用者に原始帰属させられる",
+                keywords: ["職務上の発明", "使用者への原始帰属", "相当の利益"],
+                compare: "権利が使用者に帰属する場合でも発明者は従業者であり、相当の利益を受ける権利を持つ" } },
+    ]},
+
+    /* ===== L04 不正競争防止法 ［P1］ 2語（compare 2語） ===== */
+    { label: "補.8　不正競争防止法（L04）", terms: [
+      { term: "営業秘密の三要件", syllabusId: "L04", source: "JDLAシラバス第1.4版",
+        desc: "営業秘密として保護されるための成立要件。実務上もっとも争われるのは秘密管理性で、事業上重要な情報であっても秘密として管理されていなければ保護されない。",
+        meta: { short: "営業秘密として保護されるには、秘密管理性・有用性・非公知性の3要件を満たす必要がある",
+                keywords: ["秘密管理性", "有用性", "非公知性"],
+                compare: "限定提供データは非公知性を要しない。特許は公開の代償として独占権を得る" } },
+      { term: "限定提供データ", syllabusId: "L04", source: "JDLAシラバス第1.4版",
+        desc: "特定の相手に反復継続して提供されるデータを保護する制度。ビッグデータの流通促進が制度趣旨。要件は限定提供性・相当蓄積性・電磁的管理性。",
+        meta: { short: "特定の相手に反復継続して提供されるデータを保護する制度。ビッグデータ流通の促進が趣旨",
+                keywords: ["限定提供性", "相当蓄積性", "電磁的管理性"],
+                compare: "営業秘密と違い非公知性を要しない点が最大の差異" } },
+    ]},
+
+    /* ===== T31 転移学習・ファインチューニング ［P1］ 1語（compare 1語） ===== */
+    { label: "補.9　転移学習・ファインチューニング（T31）", terms: [
+      { term: "破滅的忘却", syllabusId: "T31", source: "JDLAシラバス第1.4版",
+        desc: "新しいタスクを学習した結果、以前に学習した知識や能力が失われてしまう現象。ファインチューニングの副作用として生じる。シラバス第1.4版で表記が改められ、現在はこの語が正式表記。",
+        meta: { short: "新しいタスクを学習した結果、以前に学習した知識や能力が失われてしまう現象",
+                keywords: ["新タスク学習", "過去の知識が失われる"],
+                compare: "転移学習は過去の学習を活かす手法だが、破滅的忘却はその過去の学習が失われる副作用" } },
+    ]},
+
+  ],
+};
+
+
+// ---------- シラバス補完レイヤー（CHAPTERSとは分離。教科書原文は不変） ----------
+const SYLLABUS_EXTRA_META = (() => {
+  const m = {};
+  SYLLABUS_EXTRA.sections.forEach(s => s.terms.forEach(t => { m[t.term] = t.meta; }));
+  return m;
+})();
+
+// 通常描画・比較モード双方から参照する共通リゾルバ
+function getTermMeta(term){
+  return STUDY_META[term] || SYLLABUS_EXTRA_META[term] || null;
+}
 
 // ---------- Build DOM ----------
 const main = document.getElementById('main');
@@ -2902,7 +3134,7 @@ CHAPTERS.forEach((ch, ci) => {
     body.appendChild(label);
 
     section.terms.forEach(([term, desc]) => {
-      const meta = STUDY_META[term] || null;
+      const meta = getTermMeta(term);
       const card = buildTermCard(term, desc, meta);
       body.appendChild(card);
     });
@@ -2911,6 +3143,60 @@ CHAPTERS.forEach((ch, ci) => {
   chapterEl.appendChild(body);
   main.appendChild(chapterEl);
 });
+
+// ---------- シラバス補完章の描画（CHAPTERSと同一のカード構造で生成） ----------
+function renderSyllabusExtra(){
+  const chip = document.createElement('div');
+  chip.className = 'chip chip-extra';
+  chip.textContent = SYLLABUS_EXTRA.label;
+  chip.title = SYLLABUS_EXTRA.note;
+  chip.addEventListener('click', () => {
+    document.getElementById('chapter-extra').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+  chipRow.appendChild(chip);
+
+  const chapterEl = document.createElement('section');
+  chapterEl.className = 'chapter chapter-extra';
+  chapterEl.id = 'chapter-extra';
+
+  const head = document.createElement('div');
+  head.className = 'chapter-head';
+  head.innerHTML = '<span class="chapter-num">補</span>'
+    + '<span class="chapter-title">' + SYLLABUS_EXTRA.title + '</span>'
+    + '<span class="chapter-toggle-icon">▼</span>';
+  head.addEventListener('click', () => { chapterEl.classList.toggle('collapsed'); });
+  chapterEl.appendChild(head);
+
+  const body = document.createElement('div');
+  body.className = 'chapter-body';
+
+  const note = document.createElement('div');
+  note.className = 'extra-note';
+  note.textContent = SYLLABUS_EXTRA.note;
+  body.appendChild(note);
+
+  SYLLABUS_EXTRA.sections.forEach(section => {
+    const label = document.createElement('div');
+    label.className = 'section-label';
+    label.textContent = section.label;
+    body.appendChild(label);
+
+    section.terms.forEach(t => {
+      const card = buildTermCard(t.term, t.desc, getTermMeta(t.term));
+      card.dataset.source = t.source;
+      card.dataset.syllabusId = t.syllabusId;
+      card.classList.add('from-syllabus');
+      body.appendChild(card);
+    });
+  });
+
+  chapterEl.appendChild(body);
+  main.appendChild(chapterEl);
+
+  // 総用語数へ補完語を加算（totalCount / visibleCount の反映より前に実行される）
+  totalTerms += SYLLABUS_EXTRA.sections.reduce((a, s) => a + s.terms.length, 0);
+}
+renderSyllabusExtra();
 
 // ---------- Card builder (shared by chapter list & search) ----------
 function buildTermCard(term, desc, meta){
@@ -3191,7 +3477,7 @@ function buildCompareView(){
     groupEl.appendChild(titleEl);
 
     group.members.forEach(termName => {
-      const meta = STUDY_META[termName];
+      const meta = getTermMeta(termName);
       const memberEl = document.createElement('div');
       memberEl.className = 'compare-member';
 
