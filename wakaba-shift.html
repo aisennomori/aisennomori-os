@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ワカバウォーク 日別勤務表</title>
+<style>
+:root{
+  --brand:#C7000A;
+  --ink:#16191d;
+  --ink2:#5c6672;
+  --ink3:#8b95a1;
+  --line:#dde2e8;
+  --line2:#eef1f5;
+  --paper:#f2f4f7;
+  --panel:#ffffff;
+
+  --work:#1f6feb;
+  --work-bg:#e8f1fe;
+  --ko-bg:#eef1f4;      --ko-fg:#69737f;
+  --shin-bg:#fdf0e0;    --shin-fg:#a96410;
+  --shu-bg:#ede9f9;     --shu-fg:#5843a5;
+  --kyu-bg:#e3e7ea;     --kyu-fg:#465059;
+  --rev-bg:#fdeaea;     --rev-fg:#c62828;
+
+  --namew:112px;
+  --rowh:36px;
+  --trackmin:820px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI","Meiryo",sans-serif;
+  font-size:14px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+  font-variant-numeric:tabular-nums;
+}
+.wrap{max-width:1360px;margin:0 auto;padding:0 12px 56px}
+
+/* ---------- header ---------- */
+.top{
+  background:var(--panel);
+  border-bottom:3px solid var(--brand);
+  padding:10px 12px 8px;
+  position:sticky;top:0;z-index:40;
+}
+.top-in{max-width:1360px;margin:0 auto;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.top h1{font-size:16px;margin:0;letter-spacing:.02em;font-weight:700}
+.top .meta{font-size:11.5px;color:var(--ink3)}
+
+/* ---------- date bar ---------- */
+.datebar{
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  margin-top:12px;padding:10px 12px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+}
+.datebar .today{font-size:20px;font-weight:700;letter-spacing:.01em;min-width:9.5em}
+.datebar .today .dow{font-size:14px;color:var(--ink2);margin-left:4px}
+button.nav{
+  appearance:none;border:1px solid var(--line);background:#fff;color:var(--ink);
+  width:40px;height:36px;border-radius:8px;font-size:15px;cursor:pointer;
+}
+button.nav:hover{background:var(--line2)}
+button.nav:disabled{opacity:.35;cursor:default}
+button.nav:focus-visible,select:focus-visible,input:focus-visible,.namecell button:focus-visible{
+  outline:2px solid var(--work);outline-offset:1px}
+select,input[type=date]{
+  font:inherit;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);
+}
+.spacer{flex:1 1 auto}
+
+/* ---------- summary ---------- */
+.sum{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;
+  padding:6px 10px;font-size:12px;display:flex;align-items:baseline;gap:6px;
+}
+.chip b{font-size:16px;font-weight:700}
+.chip .sw{width:9px;height:9px;border-radius:2px;display:inline-block}
+.chip.zero{opacity:.45}
+
+/* ---------- board ---------- */
+.board{
+  margin-top:12px;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;
+}
+.grid{min-width:calc(var(--namew) + var(--trackmin));}
+.row{display:flex;border-top:1px solid var(--line2)}
+.row:first-child{border-top:0}
+.namecell{
+  position:sticky;left:0;z-index:2;flex:0 0 var(--namew);width:var(--namew);
+  background:var(--panel);border-right:1px solid var(--line);
+  display:flex;align-items:center;padding:0 8px;
+}
+.namecell button{
+  appearance:none;background:none;border:0;padding:0;margin:0;font:inherit;color:inherit;
+  text-align:left;cursor:pointer;font-size:13px;font-weight:600;letter-spacing:-.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;border-radius:4px;
+}
+.namecell button:hover{color:var(--work);text-decoration:underline}
+.track{position:relative;flex:1 1 auto;height:var(--rowh)}
+
+/* header row */
+.row.head{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
+.row.head .namecell{z-index:6;font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.06em}
+.row.head .track{height:26px}
+.hourlab{position:absolute;top:5px;font-size:11px;color:var(--ink2);font-weight:600}
+.hourlab.odd{display:none}
+
+/* gridlines */
+.gl{position:absolute;inset:0;pointer-events:none;
+  background-image:repeating-linear-gradient(to right,var(--line) 0 1px,transparent 1px 6.25%);}
+.gl15{position:absolute;inset:0;pointer-events:none;display:none;
+  background-image:repeating-linear-gradient(to right,var(--line2) 0 1px,transparent 1px 1.5625%);}
+
+/* bars */
+.bar{
+  position:absolute;top:5px;bottom:5px;background:var(--work);border-radius:4px;
+  display:flex;align-items:center;padding:0 6px;gap:6px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(0,0,0,.06);
+}
+.bar .t{color:#fff;font-size:11.5px;font-weight:600;white-space:nowrap;letter-spacing:.01em}
+.bar .ot{
+  background:#ffffff;color:var(--work);font-size:10.5px;font-weight:700;
+  border-radius:3px;padding:0 4px;white-space:nowrap;
+}
+.bar.out .t{color:var(--work)}
+.badge{
+  position:absolute;top:6px;bottom:6px;left:0;display:flex;align-items:center;
+  padding:0 10px;border-radius:4px;font-size:11.5px;font-weight:700;white-space:nowrap;
+}
+.badge.ko{background:var(--ko-bg);color:var(--ko-fg)}
+.badge.shin{background:var(--shin-bg);color:var(--shin-fg)}
+.badge.shu{background:var(--shu-bg);color:var(--shu-fg);border:1px dashed #a394d8}
+.badge.kyu{background:var(--kyu-bg);color:var(--kyu-fg);border:1px dashed #97a1ab}
+.badge.rev{background:var(--rev-bg);color:var(--rev-fg);border:1.5px solid var(--rev-fg)}
+.row.off .track{background:#fbfcfd}
+
+/* count row */
+.row.countrow{border-top:2px solid var(--line);background:#fafbfc}
+.row.countrow .namecell{background:#fafbfc;font-size:11px;font-weight:700;color:var(--ink2);letter-spacing:.02em}
+.row.countrow .track{height:60px}
+.cbin{position:absolute;bottom:16px;width:1.5625%;background:#bcd3f5;border-top:2px solid var(--work)}
+.cbin.zero{background:transparent;border-top:0}
+.cnum{position:absolute;bottom:0;font-size:10.5px;color:var(--ink2);font-weight:600;transform:translateX(-50%)}
+.cnum.edge0{transform:none}
+.cnum.edge1{transform:translateX(-100%)}
+.cmax{position:absolute;top:2px;left:4px;font-size:10.5px;color:var(--ink3)}
+
+/* ---------- staffing check ---------- */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-top:12px;padding:12px}
+.panel h2{font-size:12px;margin:0 0 8px;letter-spacing:.08em;color:var(--ink3);font-weight:700}
+table.chk{border-collapse:collapse;width:100%;font-size:13px}
+table.chk th,table.chk td{border-bottom:1px solid var(--line2);padding:7px 8px;text-align:left}
+table.chk th{font-size:11px;color:var(--ink3);font-weight:700;letter-spacing:.04em}
+table.chk td.n{text-align:right;font-weight:600;width:5.5em}
+.ok{color:#177245;font-weight:700}
+.diff{color:var(--shin-fg);font-weight:700}
+.note{font-size:12px;color:var(--ink2);margin-top:8px;line-height:1.6}
+
+/* ---------- legend ---------- */
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin-top:10px;padding:0 2px}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+
+/* ---------- modal ---------- */
+.ov{position:fixed;inset:0;background:rgba(16,20,26,.45);display:none;z-index:60;padding:16px}
+.ov.on{display:flex;align-items:flex-start;justify-content:center}
+.modal{
+  background:var(--panel);border-radius:12px;max-width:520px;width:100%;margin-top:5vh;
+  max-height:86vh;display:flex;flex-direction:column;overflow:hidden;
+}
+.modal header{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.modal header h3{margin:0;font-size:15px;flex:1}
+.modal .body{overflow:auto;padding:4px 0 12px}
+.modal table{width:100%;border-collapse:collapse;font-size:13px}
+.modal td{padding:6px 16px;border-bottom:1px solid var(--line2)}
+.modal td.d{width:4.5em;color:var(--ink2)}
+.modal td.d.sun{color:#c62828}
+.modal td.d.sat{color:#1f6feb}
+.modal td.otc{text-align:right;color:var(--shin-fg);font-size:12px;font-weight:600;white-space:nowrap}
+.modal .foot{padding:10px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--ink2)}
+.x{appearance:none;border:1px solid var(--line);background:#fff;border-radius:8px;width:32px;height:32px;font-size:16px;cursor:pointer}
+
+@media (min-width:760px){
+  :root{--namew:132px;--rowh:38px}
+  .hourlab.odd{display:block}
+  .gl15{display:block}
+  .top h1{font-size:18px}
+}
+@media (max-width:759px){
+  .datebar .today{font-size:18px;min-width:0}
+  .wrap{padding:0 8px 48px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .bar,.badge{transition:opacity .12s ease}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <h1>ワカバウォーク 日別勤務表</h1>
+    <div class="meta" id="meta"></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="datebar">
+    <select id="monthSel" aria-label="月を選ぶ"></select>
+    <button class="nav" id="prev" aria-label="前日">◀</button>
+    <div class="today"><span id="dLabel"></span><span class="dow" id="dDow"></span></div>
+    <button class="nav" id="next" aria-label="翌日">▶</button>
+    <input type="date" id="dPick" aria-label="日付を選ぶ">
+    <span class="spacer"></span>
+    <span class="meta" id="srcLabel"></span>
+  </div>
+
+  <div class="sum" id="sum"></div>
+
+  <div class="board">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="legend">
+    <span><i style="background:var(--work)"></i>勤務</span>
+    <span><i style="background:var(--ko-bg);border:1px solid #cfd6dd"></i>公休</span>
+    <span><i style="background:var(--shin-bg);border:1px solid #e6c79a"></i>申請休</span>
+    <span><i style="background:var(--shu-bg);border:1px dashed #a394d8"></i>出張</span>
+    <span><i style="background:var(--kyu-bg);border:1px dashed #97a1ab"></i>休職</span>
+    <span><i style="background:var(--rev-bg);border:1.5px solid var(--rev-fg)"></i>要確認</span>
+  </div>
+
+  <div class="panel">
+    <h2>PDF公式人員との照合</h2>
+    <table class="chk">
+      <thead><tr><th>時間帯</th><th class="n">PDF</th><th class="n">アプリ</th><th>判定</th></tr></thead>
+      <tbody id="chkBody"></tbody>
+    </table>
+    <div class="note" id="chkNote"></div>
+  </div>
+
+</div>
+
+<div class="ov" id="ov">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <header><h3 id="mTitle"></h3><button class="x" id="mClose" aria-label="閉じる">×</button></header>
+    <div class="body"><table><tbody id="mBody"></tbody></table></div>
+    <div class="foot" id="mFoot"></div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ワカバウォーク 日別勤務表 v1.0
+   1099 ワカバウォーク / 014 惣菜
+
+   月次更新は MONTHLY_UPDATE_RULES.md に従い、
+   SHIFT_DATA へ "YYYY-MM" キーを追加するだけでよい。
+   表示ロジックはデータから自動導出するため変更不要。
+   ============================================================ */
+
+const SHIFT_DATA = {
+  "2026-09": {
+    "source": "202609シフト.pdf",
+    "store": "1099 ワカバウォーク",
+    "dept": "014 惣菜",
+    "createdAt": "2026-08-17 16:59",
+    "verified": true,
+    "employees": [
+      {"no":1,"name":"鈴木　崇也","type":"正契","contract":{"start":"09:00","end":"17:45","hours":"7.45"},"monthTotal":"178.30","monthOvertime":"23.30"},
+      {"no":2,"name":"細野　麻維","type":"正契","contract":{"start":"07:00","end":"15:45","hours":"7.45"},"monthTotal":"176.00","monthOvertime":"21.00"},
+      {"no":3,"name":"山本　真衣","type":"正契","contract":{"start":"07:00","end":"15:45","hours":"7.45"},"monthTotal":"159.30","monthOvertime":"20.00"},
+      {"no":4,"name":"野澤　美恵子","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"176.00","monthOvertime":"0.00"},
+      {"no":5,"name":"東條　ちか子","type":"A","contract":{"start":"07:00","end":"11:30","hours":"4.30"},"monthTotal":"76.30","monthOvertime":"0.00"},
+      {"no":6,"name":"板垣　由妃子","type":"PH","contract":{"start":"06:30","end":"12:20","hours":"5.50"},"monthTotal":"93.20","monthOvertime":"0.00"},
+      {"no":7,"name":"吉川　悦子","type":"A","contract":{"start":"06:30","end":"11:30","hours":"5.00"},"monthTotal":"90.00","monthOvertime":"0.00"},
+      {"no":8,"name":"諸隈　弘美","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"168.00","monthOvertime":"0.00"},
+      {"no":9,"name":"加藤　由紀","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"164.50","monthOvertime":"4.50"},
+      {"no":10,"name":"吉田　いずみ","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"161.20","monthOvertime":"1.20"},
+      {"no":11,"name":"伊藤　正枝","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"175.00","monthOvertime":"7.00"},
+      {"no":12,"name":"西田　真弓","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"160.00","monthOvertime":"0.00"},
+      {"no":13,"name":"木村　千加","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"160.00","monthOvertime":"0.00"},
+      {"no":14,"name":"渡辺　さや","type":"PH","contract":{"start":"08:30","end":"13:00","hours":"4.30"},"monthTotal":"58.30","monthOvertime":"0.00"},
+      {"no":15,"name":"辻口　恵美","type":"PH","contract":{"start":"08:00","end":"12:30","hours":"4.30"},"monthTotal":"54.00","monthOvertime":"0.00"},
+      {"no":16,"name":"鈴木　弥生","type":"PH","contract":{"start":"08:00","end":"12:00","hours":"4.00"},"monthTotal":"52.00","monthOvertime":"0.00"},
+      {"no":17,"name":"大塚　美智子","type":"PH","contract":{"start":"07:00","end":"16:00","hours":"8.00"},"monthTotal":"0.00","monthOvertime":"0.00"},
+      {"no":18,"name":"玉木　里美","type":"PH","contract":{"start":"07:30","end":"15:30","hours":"7.00"},"monthTotal":"126.00","monthOvertime":"0.00"},
+      {"no":19,"name":"石原　律子","type":"PH","contract":{"start":"07:30","end":"16:30","hours":"8.00"},"monthTotal":"136.00","monthOvertime":"0.00"},
+      {"no":20,"name":"寺田　弘子","type":"PH","contract":{"start":"08:00","end":"16:00","hours":"7.00"},"monthTotal":"147.00","monthOvertime":"0.00"},
+      {"no":21,"name":"長内　瞳","type":"PH","contract":{"start":"08:30","end":"17:30","hours":"8.00"},"monthTotal":"144.00","monthOvertime":"0.00"},
+      {"no":22,"name":"綿谷　佳子","type":"PH","contract":{"start":"08:00","end":"17:00","hours":"8.00"},"monthTotal":"168.00","monthOvertime":"0.00"},
+      {"no":23,"name":"木村　瞳","type":"PH","contract":{"start":"08:00","end":"17:00","hours":"8.00"},"monthTotal":"168.00","monthOvertime":"0.00"},
+      {"no":24,"name":"石井　美津子","type":"PH","contract":{"start":"13:00","end":"22:00","hours":"8.00"},"monthTotal":"97.00","monthOvertime":"0.00"},
+      {"no":25,"name":"北村　瑠菜","type":"PH","contract":{"start":"17:00","end":"22:00","hours":"5.00"},"monthTotal":"65.00","monthOvertime":"0.00"},
+      {"no":26,"name":"林　藤雄","type":"A","contract":{"start":"17:30","end":"22:00","hours":"4.30"},"monthTotal":"58.30","monthOvertime":"0.00"},
+      {"no":27,"name":"武藤　明穂美","type":"A","contract":{"start":"18:00","end":"22:00","hours":"4.00"},"monthTotal":"44.00","monthOvertime":"0.00"},
+      {"no":28,"name":"小海　珠実","type":"PH","contract":{"start":"18:00","end":"22:00","hours":"4.00"},"monthTotal":"64.00","monthOvertime":"0.00"},
+      {"no":29,"name":"宮﨑　洋代","type":"A","contract":{"start":"18:00","end":"22:00","hours":"4.00"},"monthTotal":"20.00","monthOvertime":"0.00"},
+      {"no":30,"name":"和田　柊之介","type":"A","contract":{"start":"18:00","end":"22:00","hours":"4.00"},"monthTotal":"32.00","monthOvertime":"0.00"},
+      {"no":31,"name":"長岡　佑真","type":"A","contract":{"start":"18:00","end":"22:00","hours":"4.00"},"monthTotal":"44.00","monthOvertime":"0.00"},
+      {"no":32,"name":"常盤　穂ノ花","type":"A","contract":{"start":"18:00","end":"22:00","hours":"4.00"},"monthTotal":"24.00","monthOvertime":"0.00"},
+      {"no":33,"name":"岩田　直美","type":"PH","contract":{"start":"12:00","end":"21:00","hours":"8.00"},"monthTotal":"168.00","monthOvertime":"0.00"}
+    ],
+    "staffing": {
+      "2026-09-01": {"morning":14,"afternoon":10,"night":3},
+      "2026-09-02": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-03": {"morning":14,"afternoon":13,"night":3},
+      "2026-09-04": {"morning":13,"afternoon":12,"night":3},
+      "2026-09-05": {"morning":15,"afternoon":12,"night":4},
+      "2026-09-06": {"morning":15,"afternoon":14,"night":4},
+      "2026-09-07": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-08": {"morning":14,"afternoon":11,"night":3},
+      "2026-09-09": {"morning":13,"afternoon":12,"night":3},
+      "2026-09-10": {"morning":13,"afternoon":12,"night":3},
+      "2026-09-11": {"morning":14,"afternoon":11,"night":3},
+      "2026-09-12": {"morning":15,"afternoon":13,"night":4},
+      "2026-09-13": {"morning":15,"afternoon":13,"night":4},
+      "2026-09-14": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-15": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-16": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-17": {"morning":13,"afternoon":12,"night":3},
+      "2026-09-18": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-19": {"morning":16,"afternoon":12,"night":4},
+      "2026-09-20": {"morning":16,"afternoon":13,"night":4},
+      "2026-09-21": {"morning":15,"afternoon":12,"night":3},
+      "2026-09-22": {"morning":15,"afternoon":12,"night":3},
+      "2026-09-23": {"morning":15,"afternoon":13,"night":3},
+      "2026-09-24": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-25": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-26": {"morning":15,"afternoon":13,"night":4},
+      "2026-09-27": {"morning":15,"afternoon":15,"night":4},
+      "2026-09-28": {"morning":13,"afternoon":11,"night":3},
+      "2026-09-29": {"morning":13,"afternoon":11,"night":2},
+      "2026-09-30": {"morning":13,"afternoon":11,"night":3}
+    },
+    "days": {
+      "2026-09-01": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"public_holiday"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":11,"name":"伊藤　正枝","status":"public_holiday"},
+        {"no":12,"name":"西田　真弓","status":"requested_leave"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"requested_leave"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"public_holiday"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"work","start":"18:00","end":"22:00"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"18:00","end":"22:00"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-02": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"public_holiday"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"public_holiday"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"public_holiday"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"requested_leave"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"requested_leave"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ],
+      "2026-09-03": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"business_trip"},
+        {"no":4,"name":"野澤　美恵子","status":"public_holiday"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"requested_leave"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"public_holiday"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"18:00","end":"22:00"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-04": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":2,"name":"細野　麻維","status":"requested_leave"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"requested_leave"},
+        {"no":7,"name":"吉川　悦子","status":"requested_leave"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"public_holiday"},
+        {"no":10,"name":"吉田　いずみ","status":"requested_leave"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"requested_leave"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:00","end":"16:00"},
+        {"no":20,"name":"寺田　弘子","status":"requested_leave"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"public_holiday"},
+        {"no":30,"name":"和田　柊之介","status":"public_holiday"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-05": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"08:00","end":"16:45"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"requested_leave"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"public_holiday"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"requested_leave"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"public_holiday"},
+        {"no":23,"name":"木村　瞳","status":"requested_leave"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"22:00"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"18:00","end":"22:00"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-06": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"08:00","end":"16:45"},
+        {"no":3,"name":"山本　真衣","status":"public_holiday"},
+        {"no":4,"name":"野澤　美恵子","status":"requested_leave"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"22:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"public_holiday"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ],
+      "2026-09-07": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"public_holiday"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"requested_leave"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"public_holiday"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"public_holiday"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"requested_leave"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:00","end":"16:00"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-08": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"business_trip"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"requested_leave"},
+        {"no":9,"name":"加藤　由紀","status":"public_holiday"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"06:40","end":"15:40"},
+        {"no":11,"name":"伊藤　正枝","status":"public_holiday"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"requested_leave"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:00","end":"16:00"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"public_holiday"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"work","start":"18:00","end":"22:00"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-09": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"public_holiday"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"requested_leave"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"requested_leave"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"requested_leave"},
+        {"no":20,"name":"寺田　弘子","status":"requested_leave"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"requested_leave"},
+        {"no":32,"name":"常盤　穂ノ花","status":"work","start":"18:00","end":"22:00"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ],
+      "2026-09-10": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"public_holiday"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"requested_leave"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"public_holiday"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"public_holiday"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"18:00","end":"22:00"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-11": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":2,"name":"細野　麻維","status":"requested_leave"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"requested_leave"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"requested_leave"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"requested_leave"},
+        {"no":23,"name":"木村　瞳","status":"requested_leave"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-12": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"08:00","end":"16:45"},
+        {"no":2,"name":"細野　麻維","status":"requested_leave"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"public_holiday"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"public_holiday"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"public_holiday"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-13": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"18:45","overtime":"03:00"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"08:00","end":"16:45"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"public_holiday"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:40","end":"15:40"},
+        {"no":10,"name":"吉田　いずみ","status":"requested_leave"},
+        {"no":11,"name":"伊藤　正枝","status":"public_holiday"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"18:00","end":"22:00"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ],
+      "2026-09-14": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"06:30","end":"18:45","overtime":"03:30"},
+        {"no":2,"name":"細野　麻維","status":"public_holiday"},
+        {"no":3,"name":"山本　真衣","status":"requested_leave"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"public_holiday"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"public_holiday"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"work","start":"18:00","end":"22:00"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-15": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"requested_leave"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"requested_leave"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"public_holiday"},
+        {"no":23,"name":"木村　瞳","status":"public_holiday"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"public_holiday"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-16": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"public_holiday"},
+        {"no":3,"name":"山本　真衣","status":"requested_leave"},
+        {"no":4,"name":"野澤　美恵子","status":"public_holiday"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"public_holiday"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"requested_leave"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"requested_leave"},
+        {"no":19,"name":"石原　律子","status":"requested_leave"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"work","start":"18:00","end":"22:00"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"requested_leave"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ],
+      "2026-09-17": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"requested_leave"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"public_holiday"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"public_holiday"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"public_holiday"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"requested_leave"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"public_holiday"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"requested_leave"}
+      ],
+      "2026-09-18": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"requested_leave"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"requested_leave"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":11,"name":"伊藤　正枝","status":"requested_leave"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"requested_leave"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"public_holiday"},
+        {"no":30,"name":"和田　柊之介","status":"public_holiday"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"work","start":"18:00","end":"22:00"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-19": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"08:00","end":"16:45"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"07:00","end":"15:45"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"requested_leave"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"requested_leave"},
+        {"no":12,"name":"西田　真弓","status":"public_holiday"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"public_holiday"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"22:00"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"18:00","end":"22:00"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-20": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":2,"name":"細野　麻維","status":"public_holiday"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"08:00","end":"16:45"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"public_holiday"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"public_holiday"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"public_holiday"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"work","start":"18:00","end":"22:00"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-21": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":2,"name":"細野　麻維","status":"public_holiday"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"public_holiday"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"public_holiday"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"public_holiday"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"work","start":"18:00","end":"22:00"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"17:00","end":"21:00"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-22": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"08:00","end":"16:45"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"public_holiday"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":11,"name":"伊藤　正枝","status":"public_holiday"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"public_holiday"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"public_holiday"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"work","start":"18:00","end":"22:00"},
+        {"no":30,"name":"和田　柊之介","status":"public_holiday"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"work","start":"18:00","end":"22:00"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-23": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"08:00","end":"16:45"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"public_holiday"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"public_holiday"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"public_holiday"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"public_holiday"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"public_holiday"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ],
+      "2026-09-24": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"public_holiday"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"public_holiday"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"public_holiday"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"public_holiday"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"requested_leave"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"work","start":"18:00","end":"22:00"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-25": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"public_holiday"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"public_holiday"},
+        {"no":7,"name":"吉川　悦子","status":"requested_leave"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":11,"name":"伊藤　正枝","status":"public_holiday"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"requested_leave"},
+        {"no":19,"name":"石原　律子","status":"requested_leave"},
+        {"no":20,"name":"寺田　弘子","status":"requested_leave"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"public_holiday"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-26": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"public_holiday"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"public_holiday"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"public_holiday"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"requested_leave"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"22:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"07:00","end":"16:00"}
+      ],
+      "2026-09-27": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"08:00","end":"16:45"},
+        {"no":4,"name":"野澤　美恵子","status":"requested_leave"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"07:00","end":"16:00"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"public_holiday"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"work","start":"18:00","end":"22:00"},
+        {"no":32,"name":"常盤　穂ノ花","status":"work","start":"18:00","end":"22:00"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ],
+      "2026-09-28": [
+        {"no":1,"name":"鈴木　崇也","status":"public_holiday"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":3,"name":"山本　真衣","status":"public_holiday"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"public_holiday"},
+        {"no":6,"name":"板垣　由妃子","status":"requested_leave"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"06:30","end":"11:30"},
+        {"no":8,"name":"諸隈　弘美","status":"public_holiday"},
+        {"no":9,"name":"加藤　由紀","status":"work","start":"06:30","end":"16:00","overtime":"00:30"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"requested_leave"},
+        {"no":12,"name":"西田　真弓","status":"work","start":"07:00","end":"16:00"},
+        {"no":13,"name":"木村　千加","status":"work","start":"07:00","end":"16:00"},
+        {"no":14,"name":"渡辺　さや","status":"work","start":"08:30","end":"13:00"},
+        {"no":15,"name":"辻口　恵美","status":"work","start":"08:00","end":"12:30"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"requested_leave"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"public_holiday"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"public_holiday"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"public_holiday"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"public_holiday"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-29": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"16:45","overtime":"01:00"},
+        {"no":2,"name":"細野　麻維","status":"public_holiday"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"work","start":"07:00","end":"12:00"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"requested_leave"},
+        {"no":10,"name":"吉田　いずみ","status":"work","start":"07:00","end":"16:00"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"requested_leave"},
+        {"no":13,"name":"木村　千加","status":"requested_leave"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"public_holiday"},
+        {"no":16,"name":"鈴木　弥生","status":"public_holiday"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"work","start":"07:30","end":"16:30"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"requested_leave"},
+        {"no":22,"name":"綿谷　佳子","status":"work","start":"08:00","end":"17:00"},
+        {"no":23,"name":"木村　瞳","status":"public_holiday"},
+        {"no":24,"name":"石井　美津子","status":"requested_leave"},
+        {"no":25,"name":"北村　瑠菜","status":"requested_leave"},
+        {"no":26,"name":"林　藤雄","status":"requested_leave"},
+        {"no":27,"name":"武藤　明穂美","status":"requested_leave"},
+        {"no":28,"name":"小海　珠実","status":"work","start":"18:00","end":"22:00"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"requested_leave"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"work","start":"12:00","end":"21:00"}
+      ],
+      "2026-09-30": [
+        {"no":1,"name":"鈴木　崇也","status":"work","start":"07:00","end":"17:45","overtime":"02:00"},
+        {"no":2,"name":"細野　麻維","status":"work","start":"08:00","end":"16:45"},
+        {"no":3,"name":"山本　真衣","status":"work","start":"06:30","end":"16:45","overtime":"01:30"},
+        {"no":4,"name":"野澤　美恵子","status":"work","start":"07:00","end":"16:00"},
+        {"no":5,"name":"東條　ちか子","status":"work","start":"07:00","end":"11:30"},
+        {"no":6,"name":"板垣　由妃子","status":"work","start":"06:30","end":"12:20"},
+        {"no":7,"name":"吉川　悦子","status":"public_holiday"},
+        {"no":8,"name":"諸隈　弘美","status":"work","start":"07:00","end":"16:00"},
+        {"no":9,"name":"加藤　由紀","status":"requested_leave"},
+        {"no":10,"name":"吉田　いずみ","status":"public_holiday"},
+        {"no":11,"name":"伊藤　正枝","status":"work","start":"06:40","end":"16:00","overtime":"00:20"},
+        {"no":12,"name":"西田　真弓","status":"requested_leave"},
+        {"no":13,"name":"木村　千加","status":"requested_leave"},
+        {"no":14,"name":"渡辺　さや","status":"public_holiday"},
+        {"no":15,"name":"辻口　恵美","status":"requested_leave"},
+        {"no":16,"name":"鈴木　弥生","status":"work","start":"08:00","end":"12:00"},
+        {"no":17,"name":"大塚　美智子","status":"public_holiday"},
+        {"no":18,"name":"玉木　里美","status":"work","start":"07:30","end":"15:30"},
+        {"no":19,"name":"石原　律子","status":"public_holiday"},
+        {"no":20,"name":"寺田　弘子","status":"work","start":"08:00","end":"16:00"},
+        {"no":21,"name":"長内　瞳","status":"work","start":"08:30","end":"17:30"},
+        {"no":22,"name":"綿谷　佳子","status":"public_holiday"},
+        {"no":23,"name":"木村　瞳","status":"work","start":"08:00","end":"17:00"},
+        {"no":24,"name":"石井　美津子","status":"work","start":"13:00","end":"18:00"},
+        {"no":25,"name":"北村　瑠菜","status":"work","start":"17:00","end":"22:00"},
+        {"no":26,"name":"林　藤雄","status":"work","start":"17:30","end":"22:00"},
+        {"no":27,"name":"武藤　明穂美","status":"work","start":"18:00","end":"22:00"},
+        {"no":28,"name":"小海　珠実","status":"requested_leave"},
+        {"no":29,"name":"宮﨑　洋代","status":"requested_leave"},
+        {"no":30,"name":"和田　柊之介","status":"requested_leave"},
+        {"no":31,"name":"長岡　佑真","status":"requested_leave"},
+        {"no":32,"name":"常盤　穂ノ花","status":"requested_leave"},
+        {"no":33,"name":"岩田　直美","status":"public_holiday"}
+      ]
+    }
+  }
+};
+
+/* ---- 時間軸定数 ---- */
+const T0 = 6 * 60;          // 06:00
+const T1 = 22 * 60;         // 22:00
+const SPAN = T1 - T0;       // 960分
+const BIN = 15;             // 人数集計の刻み（分）
+const NBIN = SPAN / BIN;    // 64
+
+/* ---- 区分定義 ---- */
+const STATUS = {
+  work:             { label:"勤務",   cls:null,   counted:true  },
+  public_holiday:   { label:"公休",   cls:"ko",   counted:false },
+  requested_leave:  { label:"申請休", cls:"shin", counted:false },
+  business_trip:    { label:"出張",   cls:"shu",  counted:false },
+  leave_of_absence: { label:"休職",   cls:"kyu",  counted:false },
+  needs_review:     { label:"要確認", cls:"rev",  counted:false }
+};
+const ORDER = ["work","public_holiday","requested_leave","business_trip","leave_of_absence","needs_review"];
+const DOW = ["日","月","火","水","木","金","土"];
+const BANDS = [
+  { key:"morning",   label:"午前 8:00–10:00",  lo:8*60,  hi:10*60 },
+  { key:"afternoon", label:"午後 14:00–16:00", lo:14*60, hi:16*60 },
+  { key:"night",     label:"夜 19:00–21:00",   lo:19*60, hi:21*60 }
+];
+
+/* ---- 汎用 ---- */
+const $ = id => document.getElementById(id);
+function toMin(hhmm){ const p = String(hhmm).split(":"); return (+p[0])*60 + (+p[1]); }
+function pct(min){ return ((min - T0) / SPAN) * 100; }
+function ymd(d){
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+}
+function parseYmd(s){ const p = s.split("-"); return new Date(+p[0], +p[1]-1, +p[2]); }
+function contractMin(hhmm){ return toMin(hhmm); }
+
+/* ---- 状態 ---- */
+let curMonth = null;
+let curDate  = null;
+
+/* ---- 月・日のインデックス ---- */
+function months(){ return Object.keys(SHIFT_DATA).sort(); }
+function monthDays(m){ return Object.keys(SHIFT_DATA[m].days).sort(); }
+function employeesOf(m){ return SHIFT_DATA[m].employees.slice().sort((a,b) => a.no - b.no); }
+function recordsOf(m, date){ return SHIFT_DATA[m].days[date] || []; }
+
+/* ---- 集計 ---- */
+function tally(recs){
+  const t = {};
+  ORDER.forEach(k => t[k] = 0);
+  recs.forEach(r => { if (t[r.status] === undefined) t[r.status] = 0; t[r.status]++; });
+  return t;
+}
+function binCounts(recs){
+  const a = new Array(NBIN).fill(0);
+  recs.forEach(r => {
+    if (r.status !== "work" || !r.start || !r.end) return;
+    const s = toMin(r.start), e = toMin(r.end);
+    for (let i = 0; i < NBIN; i++){
+      const lo = T0 + i*BIN, hi = lo + BIN;
+      if (s < hi && e > lo) a[i]++;
+    }
+  });
+  return a;
+}
+function bandCount(recs, lo, hi){
+  let n = 0;
+  recs.forEach(r => {
+    if (r.status !== "work" || !r.start || !r.end) return;
+    if (toMin(r.start) < hi && toMin(r.end) > lo) n++;
+  });
+  return n;
+}
+/* 出張者のうち、基本契約時間がその時間帯に掛かる人数（定義差の説明用） */
+function tripOverlap(m, recs, lo, hi){
+  const emp = {};
+  SHIFT_DATA[m].employees.forEach(e => emp[e.no] = e);
+  let n = 0;
+  recs.forEach(r => {
+    if (r.status !== "business_trip") return;
+    const e = emp[r.no];
+    if (!e || !e.contract) return;
+    if (contractMin(e.contract.start) < hi && contractMin(e.contract.end) > lo) n++;
+  });
+  return n;
+}
+
+/* ---- 描画：メイン表 ---- */
+function renderGrid(){
+  const recs = recordsOf(curMonth, curDate);
+  const emps = employeesOf(curMonth);
+  const byNo = {};
+  recs.forEach(r => byNo[r.no] = r);
+  const g = $("grid");
+  g.textContent = "";
+
+  /* 見出し行 */
+  const head = document.createElement("div");
+  head.className = "row head";
+  head.appendChild(nameCell("社員", null));
+  const ht = document.createElement("div");
+  ht.className = "track";
+  ht.appendChild(el("div","gl"));
+  for (let h = 6; h <= 22; h++){
+    const L = el("div", "hourlab" + (h % 2 ? " odd" : ""));
+    L.textContent = h;
+    const p = pct(h*60);
+    L.style.left = p + "%";
+    if (h === 6) L.style.transform = "translateX(0)";
+    else if (h === 22) L.style.transform = "translateX(-100%)";
+    else L.style.transform = "translateX(-50%)";
+    ht.appendChild(L);
+  }
+  head.appendChild(ht);
+  g.appendChild(head);
+
+  /* 社員行（PDF掲載順） */
+  emps.forEach(e => {
+    const r = byNo[e.no];
+    const row = el("div","row");
+    row.appendChild(nameCell(e.name, e));
+    const tr = el("div","track");
+    tr.appendChild(el("div","gl"));
+    tr.appendChild(el("div","gl15"));
+
+    if (!r){
+      row.classList.add("off");
+      tr.appendChild(badge("rev", "データなし"));
+    } else if (r.status === "work" && r.start && r.end){
+      tr.appendChild(workBar(r));
+    } else {
+      row.classList.add("off");
+      const s = STATUS[r.status] || STATUS.needs_review;
+      const b = badge(s.cls || "rev", s.label + (r.raw ? "（" + r.raw + "）" : ""));
+      tr.appendChild(b);
+    }
+    row.appendChild(tr);
+    g.appendChild(row);
+  });
+
+  /* 時間帯別勤務人数 */
+  g.appendChild(countRow(recs));
+}
+
+function el(tag, cls){ const d = document.createElement(tag === "div" ? "div" : tag); if (cls) d.className = cls; return d; }
+
+function nameCell(text, emp){
+  const c = el("div","namecell");
+  if (emp){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = text;
+    b.title = emp.name + "  基本契約 " + emp.contract.start + "–" + emp.contract.end + "（" + emp.type + "）";
+    b.addEventListener("click", () => openEmp(emp));
+    c.appendChild(b);
+  } else {
+    c.textContent = text;
+  }
+  return c;
+}
+
+function workBar(r){
+  const s = toMin(r.start), e = toMin(r.end);
+  const left = Math.max(0, pct(s));
+  const right = Math.min(100, pct(e));
+  const b = el("div","bar");
+  b.style.left = left + "%";
+  b.style.width = Math.max(0.4, right - left) + "%";
+  const t = el("span","t");
+  t.textContent = r.start + " – " + r.end;
+  b.appendChild(t);
+  if (r.overtime){
+    const o = el("span","ot");
+    o.textContent = "残業 " + r.overtime;
+    b.appendChild(o);
+  }
+  b.title = r.name + "  " + r.start + "–" + r.end + (r.overtime ? "  残業 " + r.overtime : "");
+  return b;
+}
+
+function badge(cls, text){
+  const b = el("div","badge " + cls);
+  b.textContent = text;
+  return b;
+}
+
+function countRow(recs){
+  const counts = binCounts(recs);
+  const max = Math.max(1, ...counts);
+  const row = el("div","row countrow");
+  row.appendChild(nameCell("勤務人数", null));
+  const tr = el("div","track");
+  tr.appendChild(el("div","gl"));
+
+  const cm = el("div","cmax");
+  cm.textContent = "最大 " + max + "名 / 15分刻み";
+  tr.appendChild(cm);
+
+  counts.forEach((n, i) => {
+    const b = el("div","cbin" + (n === 0 ? " zero" : ""));
+    b.style.left = (i * (100 / NBIN)) + "%";
+    b.style.height = (n === 0 ? 0 : 4 + (n / max) * 26) + "px";
+    b.title = fmtMin(T0 + i*BIN) + "–" + fmtMin(T0 + (i+1)*BIN) + "  " + n + "名";
+    tr.appendChild(b);
+  });
+
+  for (let h = 6; h <= 22; h += 2){
+    const i = (h*60 - T0) / BIN;
+    const n = (h === 22) ? counts[NBIN-1] : counts[i];
+    const L = el("div","cnum" + (h === 6 ? " edge0" : h === 22 ? " edge1" : ""));
+    L.textContent = n;
+    L.style.left = pct(h*60) + "%";
+    tr.appendChild(L);
+  }
+  row.appendChild(tr);
+  return row;
+}
+
+function fmtMin(m){ return String(Math.floor(m/60)).padStart(2,"0") + ":" + String(m%60).padStart(2,"0"); }
+
+/* ---- 描画：サマリー ---- */
+function renderSummary(){
+  const recs = recordsOf(curMonth, curDate);
+  const t = tally(recs);
+  const sw = { work:"var(--work)", public_holiday:"var(--ko-bg)", requested_leave:"var(--shin-bg)",
+               business_trip:"var(--shu-bg)", leave_of_absence:"var(--kyu-bg)", needs_review:"var(--rev-bg)" };
+  const box = $("sum");
+  box.textContent = "";
+  ORDER.forEach(k => {
+    const n = t[k] || 0;
+    const c = el("div","chip" + (n === 0 ? " zero" : ""));
+    const i = el("span","sw");
+    i.style.background = sw[k];
+    if (k !== "work") i.style.border = "1px solid rgba(0,0,0,.18)";
+    c.appendChild(i);
+    c.appendChild(document.createTextNode(STATUS[k].label));
+    const b = document.createElement("b");
+    b.textContent = n;
+    c.appendChild(b);
+    c.appendChild(document.createTextNode("名"));
+    box.appendChild(c);
+  });
+  const tot = el("div","chip");
+  tot.innerHTML = "在籍 <b>" + recs.length + "</b>名";
+  box.appendChild(tot);
+}
+
+/* ---- 描画：PDF公式人員照合 ---- */
+function renderCheck(){
+  const recs = recordsOf(curMonth, curDate);
+  const official = (SHIFT_DATA[curMonth].staffing || {})[curDate];
+  const tb = $("chkBody");
+  tb.textContent = "";
+  const notes = [];
+
+  BANDS.forEach(b => {
+    const app = bandCount(recs, b.lo, b.hi);
+    const pdf = official ? official[b.key] : null;
+    const tr = document.createElement("tr");
+    const c1 = document.createElement("td"); c1.textContent = b.label;
+    const c2 = document.createElement("td"); c2.className = "n"; c2.textContent = (pdf === null || pdf === undefined) ? "—" : pdf + "名";
+    const c3 = document.createElement("td"); c3.className = "n"; c3.textContent = app + "名";
+    const c4 = document.createElement("td");
+    if (pdf === null || pdf === undefined){
+      c4.textContent = "PDF値なし";
+    } else if (pdf === app){
+      c4.className = "ok"; c4.textContent = "一致";
+    } else {
+      c4.className = "diff";
+      const d = pdf - app;
+      c4.textContent = "差 " + (d > 0 ? "+" : "") + d + "名";
+      const trip = tripOverlap(curMonth, recs, b.lo, b.hi);
+      if (d > 0 && trip > 0 && d === trip){
+        notes.push(b.label + "：出張" + trip + "名を除くため差異あり（定義差／誤読ではありません）");
+      } else {
+        notes.push(b.label + "：PDF " + pdf + "名 に対しアプリ " + app + "名。要確認。");
+      }
+    }
+    [c1,c2,c3,c4].forEach(c => tr.appendChild(c));
+    tb.appendChild(tr);
+  });
+
+  $("chkNote").textContent = notes.length
+    ? notes.join("　/　")
+    : "アプリ集計は勤務時刻が明記された通常勤務のみを算入します（公休・申請休・出張・休職・要確認は除外）。";
+}
+
+/* ---- 社員別 当月一覧 ---- */
+function openEmp(emp){
+  const days = monthDays(curMonth);
+  $("mTitle").textContent = emp.name + "　" + curMonth.slice(0,4) + "年" + (+curMonth.slice(5,7)) + "月";
+  const tb = $("mBody");
+  tb.textContent = "";
+  let workDays = 0;
+  days.forEach(d => {
+    const r = (recordsOf(curMonth, d) || []).find(x => x.no === emp.no);
+    const dt = parseYmd(d);
+    const tr = document.createElement("tr");
+    const c1 = document.createElement("td");
+    c1.className = "d" + (dt.getDay() === 0 ? " sun" : dt.getDay() === 6 ? " sat" : "");
+    c1.textContent = (dt.getMonth()+1) + "/" + dt.getDate() + "(" + DOW[dt.getDay()] + ")";
+    const c2 = document.createElement("td");
+    const c3 = document.createElement("td"); c3.className = "otc";
+    if (!r){
+      c2.textContent = "—";
+    } else if (r.status === "work" && r.start && r.end){
+      c2.textContent = r.start + " – " + r.end;
+      if (r.overtime) c3.textContent = "残業 " + r.overtime;
+      workDays++;
+    } else {
+      c2.textContent = (STATUS[r.status] || STATUS.needs_review).label;
+      c2.style.color = "var(--ink2)";
+    }
+    if (d === curDate) tr.style.background = "var(--work-bg)";
+    tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3);
+    tb.appendChild(tr);
+  });
+  $("mFoot").textContent =
+    "基本契約 " + emp.contract.start + "–" + emp.contract.end + "（" + emp.contract.hours + "）／"
+    + emp.type + "　勤務 " + workDays + "日　PDF月計 " + emp.monthTotal
+    + "　残業月計 " + emp.monthOvertime;
+  $("ov").classList.add("on");
+  $("mClose").focus();
+}
+function closeEmp(){ $("ov").classList.remove("on"); }
+
+/* ---- 日付移動 ---- */
+function setDate(date){
+  const m = date.slice(0,7);
+  if (!SHIFT_DATA[m] || !SHIFT_DATA[m].days[date]) return;
+  curMonth = m; curDate = date;
+  render();
+}
+function stepDay(n){
+  const days = monthDays(curMonth);
+  const i = days.indexOf(curDate);
+  if (i < 0) return;
+  const j = i + n;
+  if (j >= 0 && j < days.length){ setDate(days[j]); return; }
+  const ms = months();
+  const k = ms.indexOf(curMonth) + n;
+  if (k < 0 || k >= ms.length) return;
+  const nd = monthDays(ms[k]);
+  setDate(n > 0 ? nd[0] : nd[nd.length-1]);
+}
+
+/* ---- 全体描画 ---- */
+function render(){
+  const d = parseYmd(curDate);
+  $("dLabel").textContent = (d.getMonth()+1) + "月" + d.getDate() + "日";
+  $("dDow").textContent = "（" + DOW[d.getDay()] + "）";
+  $("monthSel").value = curMonth;
+  const days = monthDays(curMonth);
+  const pick = $("dPick");
+  pick.min = days[0]; pick.max = days[days.length-1]; pick.value = curDate;
+
+  const md = SHIFT_DATA[curMonth];
+  $("meta").textContent = md.store + "　" + md.dept;
+  $("srcLabel").textContent = "出典 " + md.source + (md.verified ? "（照合済）" : "（未照合）");
+
+  const ms = months();
+  const i = ms.indexOf(curMonth), j = days.indexOf(curDate);
+  $("prev").disabled = (i === 0 && j === 0);
+  $("next").disabled = (i === ms.length-1 && j === days.length-1);
+
+  renderSummary();
+  renderGrid();
+  renderCheck();
+}
+
+/* ---- 初期化 ---- */
+function init(){
+  const ms = months();
+  const sel = $("monthSel");
+  sel.textContent = "";
+  ms.forEach(m => {
+    const o = document.createElement("option");
+    o.value = m;
+    o.textContent = m.slice(0,4) + "年" + (+m.slice(5,7)) + "月";
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change", () => { const d = monthDays(sel.value); setDate(d[0]); });
+  $("prev").addEventListener("click", () => stepDay(-1));
+  $("next").addEventListener("click", () => stepDay(1));
+  $("dPick").addEventListener("change", e => { if (e.target.value) setDate(e.target.value); });
+  $("mClose").addEventListener("click", closeEmp);
+  $("ov").addEventListener("click", e => { if (e.target === $("ov")) closeEmp(); });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeEmp();
+    if ($("ov").classList.contains("on")) return;
+    if (e.target && /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (e.key === "ArrowLeft") stepDay(-1);
+    if (e.key === "ArrowRight") stepDay(1);
+  });
+
+  const first = ms[0];
+  setDate(monthDays(first)[0]);
+}
+init();
+</script>
+</body>
+</html>
