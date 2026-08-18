@@ -468,7 +468,7 @@ function vQuiz(){
     <div class="card">
       <div><span class="qno">問${q.id}</span>
         ${q.syllabusIds.map(s => `<span class="badge">${s}</span>`).join('')}</div>
-      <div class="qtitle">${esc(q.title)}</div>
+      ${done ? `<div class="qtitle">${esc(q.title)}</div>` : ''}
       <div class="qtext">${q.questionHtml}</div>
       <div id="choices">${choices}</div>
     </div>
@@ -490,6 +490,7 @@ function vQuiz(){
   if(done){
     after.innerHTML = `
       <div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'不正解'}
+        <span class="sm">${esc(q.title)}${q.syllabusIds.map(s=>`【${s}】`).join('')}</span>
         ${ok?'':`<span class="sm">正解は ${q.answer}：${q.choices[q.answer-1]}</span>`}</div>
       ${shown ? `<div class="exp">${q.explanationHtml}</div>`
               : `<button class="btn sub wide" id="expBtn" type="button">解説を見る</button>`}`;
