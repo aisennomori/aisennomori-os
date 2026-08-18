@@ -1598,11 +1598,13 @@ function countRow(recs){
     tr.appendChild(b);
   });
 
-  for (let h = 6; h <= 22; h += 2){
+  /* 22:00位置には数字を出さない。
+     ヒストグラム最終ビンは 21:45–22:00 の人数であり、
+     22:00 時点の在席人数（0名）と誤認されるため。 */
+  for (let h = 6; h <= 20; h += 2){
     const i = (h*60 - T0) / BIN;
-    const n = (h === 22) ? counts[NBIN-1] : counts[i];
-    const L = el("div","cnum" + (h === 6 ? " edge0" : h === 22 ? " edge1" : ""));
-    L.textContent = n;
+    const L = el("div","cnum" + (h === 6 ? " edge0" : ""));
+    L.textContent = counts[i];
     L.style.left = pct(h*60) + "%";
     tr.appendChild(L);
   }
