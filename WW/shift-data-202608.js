@@ -6827,7 +6827,7 @@ SHIFT_DATA["2026-08"] = {
       {
         "no": 18,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "requested_leave"
       },
       {
         "no": 19,
