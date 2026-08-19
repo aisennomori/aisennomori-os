@@ -125,6 +125,8 @@
   .verdict.ng{background:var(--ng-bg); color:var(--ng); border:1.5px solid var(--ng);}
   .verdict .sm{display:block; font-weight:600; font-size:14px; margin-top:5px; color:var(--ink);}
 
+  .testnote{background:#eef3fb; border:1px solid #cddcf2; border-radius:11px;
+    padding:12px 14px; font-size:14.5px; color:#28456f; line-height:1.6;}
   .star-btn{background:none; border:1.5px solid var(--line); border-radius:9px;
     padding:8px 12px; cursor:pointer; font-size:13.5px; font-weight:700;
     color:var(--muted); font-family:inherit; min-height:40px;}
@@ -236,7 +238,7 @@ const SYL_NAMES = {"T01":"人工知能の定義","T02":"人工知能分野で議
    localStorage（他アプリと完全分離）
    ============================================================ */
 const LS_KEY = 'gkentei_100q_v1';
-let STORE = {version:1, history:{}, settings:{order:'seq', shuffleChoices:false}};
+let STORE = {version:1, history:{}, settings:{order:'seq', judge:'instant', shuffleChoices:false}};
 
 function loadStore(){
   try{
@@ -296,7 +298,8 @@ function startSession(ids, label){
   if(!ids.length){ alert('該当する問題がありません。'); return; }
   let list = ids.slice();
   if(STORE.settings.order === 'random') list = shuffled(list);   // 同一セッション中は重複なし
-  session = {ids:list, cur:0, picks:{}, graded:{}, revealed:{}, label:label||''};
+  session = {ids:list, cur:0, picks:{}, graded:{}, revealed:{}, label:label||'',
+             testMode: STORE.settings.judge === 'test', submitted:false};
   render('quiz');
 }
 
@@ -344,6 +347,7 @@ function vHome(){
   const techIds   = QUESTIONS.filter(isTech).map(q => q.id);
   const lawIds    = QUESTIONS.filter(isLaw).map(q => q.id);
   const ord = STORE.settings.order;
+  const jud = STORE.settings.judge;
 
   app.innerHTML = `
     <div class="hero">
@@ -364,6 +368,15 @@ function vHome(){
       <button type="button" data-ord="random" class="${ord==='random'?'on':''}">ランダム</button>
     </div>
 
+    <h2 class="sec">採点方式</h2>
+    <div class="seg" id="judSeg">
+      <button type="button" data-jud="instant" class="${jud==='instant'?'on':''}">1問ずつ採点</button>
+      <button type="button" data-jud="test" class="${jud==='test'?'on':''}">テストモード</button>
+    </div>
+    <p class="muted" style="margin:7px 0 0">${jud==='test'
+      ? 'テストモード：解答中は正誤も解説も表示しません。全問終えてから、まとめて採点と解答確認を行います。'
+      : '1問ずつ採点：「回答する」を押すたびに正誤と解説を確認できます。'}</p>
+
     <h2 class="sec">学習モード</h2>
     <div class="grid" id="modeGrid">
       <button class="mode" data-n="10"><b>10問</b><small>短時間で回す</small></button>
@@ -381,6 +394,10 @@ function vHome(){
   $('#ordSeg').onclick = e => {
     const b = e.target.closest('[data-ord]'); if(!b) return;
     STORE.settings.order = b.dataset.ord; saveStore(); render('home');
+  };
+  $('#judSeg').onclick = e => {
+    const b = e.target.closest('[data-jud]'); if(!b) return;
+    STORE.settings.judge = b.dataset.jud; saveStore(); render('home');
   };
   $('#modeGrid').onclick = e => {
     const b = e.target.closest('.mode'); if(!b || b.disabled) return;
@@ -445,6 +462,8 @@ function vQuiz(){
   const done = session.graded[id] !== undefined;   // 採点済みか
   const ok = done && session.graded[id];
   const shown = !!session.revealed[id];
+  const testing = session.testMode && !session.submitted;   // 解答中（未採点）
+  const nPicked = session.ids.filter(i => session.picks[i]).length;
   const pct = Math.round((session.cur+1)/session.ids.length*100);
 
   const choices = q.choices.map((c,i) => {
@@ -461,6 +480,7 @@ function vQuiz(){
   app.innerHTML = `
     <div class="qbar">
       <span class="idx">${session.cur+1} / ${session.ids.length}</span>
+      ${testing ? `<span class="muted" style="font-size:12px">解答済み ${nPicked}</span>` : ''}
       <div class="qprog"><div class="bar"><span style="width:${pct}%"></span></div></div>
       <button class="btn ghost sm" id="quitBtn" type="button">中断</button>
     </div>
@@ -482,8 +502,9 @@ function vQuiz(){
 
     <div class="navbtns">
       <button class="btn ghost" id="prevBtn" ${session.cur===0?'disabled':''} type="button">← 前へ</button>
-      <button class="btn ${done?'':'sub'}" id="nextBtn" type="button">
-        ${session.cur === session.ids.length-1 ? '結果を見る' : '次の問題へ →'}</button>
+      <button class="btn ${done||testing?'':'sub'}" id="nextBtn" type="button">
+        ${session.cur === session.ids.length-1
+          ? (testing ? '採点する' : '結果を見る') : '次の問題へ →'}</button>
     </div>`;
 
   const after = $('#afterArea');
@@ -496,6 +517,11 @@ function vQuiz(){
               : `<button class="btn sub wide" id="expBtn" type="button">解説を見る</button>`}`;
     const eb = $('#expBtn');
     if(eb) eb.onclick = () => { session.revealed[id] = true; vQuiz(); };
+  } else if(testing){
+    after.innerHTML = `<div class="testnote">${pick
+      ? `解答 <b>${pick}</b> を記録しました。選び直せます。`
+      : '選択肢をタップして解答してください。'}<br>
+      <span class="muted">テストモードです。採点と解説は全問終了後に表示します。</span></div>`;
   } else {
     after.innerHTML = `<button class="btn wide" id="ansBtn" type="button" ${pick?'':'disabled'}>回答する</button>`;
     $('#ansBtn').onclick = () => grade(id, pick);
@@ -512,10 +538,16 @@ function vQuiz(){
   };
   $('#prevBtn').onclick = () => { if(session.cur>0){ session.cur--; vQuiz(); } };
   $('#nextBtn').onclick = () => {
-    if(session.cur === session.ids.length-1) render('result');
-    else { session.cur++; vQuiz(); }
+    if(session.cur === session.ids.length-1){
+      if(testing) submitTest(); else render('result');
+    } else { session.cur++; vQuiz(); }
   };
-  $('#quitBtn').onclick = () => { if(confirm('セッションを中断してホームへ戻りますか？')){ session=null; render('home'); } };
+  $('#quitBtn').onclick = () => {
+    const msg = testing
+      ? '中断すると、テストモードの解答は採点されずに破棄されます。よろしいですか？'
+      : 'セッションを中断してホームへ戻りますか？';
+    if(confirm(msg)){ session=null; render('home'); }
+  };
 }
 
 function grade(id, pick){
@@ -529,6 +561,25 @@ function grade(id, pick){
   session.graded[id] = ok;
   saveStore();
   vQuiz();
+}
+
+/* ---------- テストモードの一括採点 ---------- */
+function submitTest(){
+  const un = session.ids.filter(i => !session.picks[i]).length;
+  if(un && !confirm(`未回答が${un}問あります。このまま採点しますか？`)) return;
+  const now = new Date().toISOString();
+  session.ids.forEach(id => {
+    const p = session.picks[id];
+    if(!p) return;
+    const q = byId(id), r = rec(id), ok = (p === q.answer);
+    if(ok) r.correct++; else r.incorrect++;
+    r.lastResult = ok ? 'o' : 'x';
+    r.last = now;
+    session.graded[id] = ok;
+  });
+  session.submitted = true;
+  saveStore();
+  render('result');
 }
 
 /* ---------- 結果 ---------- */
@@ -550,13 +601,26 @@ function vResult(){
         ? `<div class="muted" style="margin-top:10px">未回答 ${session.ids.length-answeredIds.length}問</div>` : ''}
     </div>
 
-    ${ngIds.length ? `<h2 class="sec">間違えた問題</h2>
+    ${session.testMode ? `<h2 class="sec">解答一覧</h2>
+      <p class="muted">行をタップすると、その問題の解説を開けます。</p>
+      <div class="card" style="padding:4px 12px">
+        ${session.ids.map(i => { const q = byId(i); const gv = g[i];
+          const m = gv === undefined ? ['n','－'] : gv ? ['o','✓'] : ['x','×'];
+          const mine = session.picks[i] ? `あなたの解答 ${session.picks[i]}` : '未回答';
+          return `<div class="qrow" data-goto="${i}"><span class="mark ${m[0]}">${m[1]}</span>
+            <span class="nm">問${q.id}　${esc(q.title)}
+              <small>正解 ${q.answer}　／　${mine}　／　${q.syllabusIds.join('・')}</small></span></div>`;
+        }).join('')}
+      </div>
+      <button class="btn wide sub" id="reviewAllBtn" type="button">1問目から解答・解説を見る</button>` : ''}
+
+    ${ngIds.length ? `${session.testMode ? '' : `<h2 class="sec">間違えた問題</h2>
       <div class="card" style="padding:4px 12px">
         ${ngIds.map(i => { const q = byId(i); return `
           <div class="qrow" data-goto="${i}"><span class="mark x">×</span>
             <span class="nm">問${q.id}　${esc(q.title)}<small>${q.syllabusIds.join('・')}</small></span></div>`;}).join('')}
-      </div>
-      <button class="btn wide" id="reviewBtn" type="button">間違えた問題だけ復習</button>` : ''}
+      </div>`}
+      <button class="btn wide" id="reviewBtn" type="button">間違えた問題だけ復習（${ngIds.length}問）</button>` : ''}
 
     <div class="navbtns">
       <button class="btn ghost" id="homeBtn2" type="button">ホームへ戻る</button>
@@ -564,6 +628,8 @@ function vResult(){
 
   const rb = $('#reviewBtn');
   if(rb) rb.onclick = () => startSession(ngIds, '間違えた問題の復習');
+  const ra = $('#reviewAllBtn');
+  if(ra) ra.onclick = () => { session.cur = 0; render('quiz'); };
   $('#homeBtn2').onclick = () => { session = null; render('home'); };
   app.querySelectorAll('[data-goto]').forEach(el => el.onclick = () => {
     const i = session.ids.indexOf(+el.dataset.goto);
@@ -680,6 +746,11 @@ function vSettings(){
       <b>学習履歴</b>
       <div class="muted" style="margin:6px 0 0">回答済み ${done}問 ／ 苦手登録 ${weak}問</div>
       <div class="muted">保存先：この端末のブラウザ（localStorage：${LS_KEY}）</div>
+    </div>
+    <div class="card">
+      <b>採点方式</b>
+      <div class="muted" style="margin:6px 0 0">現在：${STORE.settings.judge==='test'
+        ? 'テストモード（全問終了後にまとめて採点）' : '1問ずつ採点'}　※ホーム画面で切り替えます</div>
     </div>
     <div class="card">
       <b>選択肢のシャッフル</b>
