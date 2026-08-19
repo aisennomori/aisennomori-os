@@ -352,36 +352,66 @@
   }
   .no-result.show{display:block;}
 
-  /* ---------- Web検索フォールバック ---------- */
-  .webfb{
-    display:none; margin:18px auto 34px; max-width:760px;
-    border:1px solid var(--line); border-top:3px solid var(--navy);
-    border-radius:var(--radius); background:var(--card); padding:14px 16px 16px;
-    box-shadow:0 1px 3px rgba(16,27,48,.06);
+  /* ---------- クイック検索結果（複数語・スコア順） ---------- */
+  .quick-results{display:none; max-width:760px; margin:0 auto;}
+  .quick-results.show{display:block;}
+  .quick-head{
+    font-size:12px; font-weight:800; color:var(--navy); letter-spacing:.04em;
+    margin:4px 0 10px; padding-left:9px; border-left:3px solid var(--amber);
   }
-  .webfb.show{display:block;}
-  .webfb.strong{border-top-color:var(--amber);}
-  .webfb-head{font-size:13px; font-weight:800; color:var(--navy); margin-bottom:6px;}
-  .webfb.strong .webfb-head{color:var(--amber-deep);}
-  .webfb-msg{font-size:13.5px; line-height:1.75; color:var(--ink); margin:0 0 10px;}
-  .webfb-q{
-    font-size:13px; color:var(--muted); background:var(--paper);
-    border-radius:8px; padding:9px 11px; margin:0 0 12px;
-    word-break:break-all; overflow-wrap:anywhere;
-  }
-  .webfb-btns{display:flex; flex-wrap:wrap; gap:9px;}
+
+  /* ---------- Web検索ボタン（検索欄と同じ行） ---------- */
+  .webfb-inline{display:none; gap:6px; flex:0 0 auto;}
+  .webfb-inline.show{display:flex;}
   .webfb-btn{
-    display:inline-flex; align-items:center; justify-content:center; gap:6px;
-    min-height:48px; padding:12px 18px; border-radius:10px;
-    font-size:15px; font-weight:800; text-decoration:none; cursor:pointer;
-    background:var(--navy); color:#fff; border:0; flex:1 1 auto; min-width:150px;
-    line-height:1.4;
+    display:inline-flex; align-items:center; justify-content:center; gap:5px;
+    min-height:44px; padding:9px 13px; border-radius:9px;
+    font-size:13.5px; font-weight:800; text-decoration:none; cursor:pointer;
+    background:#fff; color:var(--navy); border:0; white-space:nowrap; line-height:1.3;
   }
-  .webfb-btn:active{background:var(--navy-deep);}
-  .webfb-btn.official{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
-  .webfb-btn.official:active{background:var(--paper);}
-  .webfb-note{font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.65;}
-  .webfb-off{color:var(--amber-deep); font-weight:700;}
+  .webfb-btn:active{background:var(--paper);}
+  .webfb-btn.official{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.6);}
+  .webfb-btn.official:active{background:rgba(255,255,255,.14);}
+
+  /* 説明ブロックは0件・一部一致のときだけ、1行で出す */
+  .webfb{display:none; margin:6px 0 0;}
+  .webfb.show{display:block;}
+  .webfb-msg{font-size:12px; line-height:1.5; color:#f4e3c8; margin:0; font-weight:700;}
+  .webfb-q, .webfb-note{display:none;}
+  .webfb-off{color:#f4e3c8; font-weight:700;}
+
+  /* 検索中の件数バッジ（ステータスバーの代わり） */
+  .hit-count{
+    display:none; flex:0 0 auto; align-self:center;
+    font-size:12.5px; font-weight:800; color:rgba(255,255,255,.9);
+    white-space:nowrap; padding:0 2px;
+  }
+  body.searching .hit-count{display:inline-block;}
+
+  /* ---------- コンパクト検索モード（検索中だけヘッダーを圧縮） ---------- */
+  body.searching header{padding-top:8px; padding-bottom:8px;}
+  body.searching header h1{font-size:14px; margin-bottom:7px; letter-spacing:.02em;}
+  body.searching .mode-row{display:none;}
+  body.searching .chip-row-wrap{display:none;}
+  body.searching .controls-row{margin-bottom:0;}
+  /* ステータスバーは、絞り込み中だけ細く残す（解除操作のため） */
+  body.searching .status-bar{display:none;}
+  body.searching.filtering .status-bar{display:flex; padding-top:3px; padding-bottom:3px; font-size:11.5px;}
+  body.searching main{padding-top:4px;}
+  body.searching .quick-head{display:none;}
+
+  /* スマホでは同一行に詰め込まず、検索欄の下へ折り返す */
+  @media(max-width:560px){
+    .controls-row{flex-wrap:wrap; row-gap:8px;}
+    .search-row{flex-wrap:wrap; row-gap:7px; width:100%; order:2;}
+    .memo-toggle{order:1; margin-left:auto;}
+    .search-box{flex:1 1 100%; min-width:0;}
+    .clear-btn{order:3;}
+    .hit-count{order:1; margin-right:auto;}
+    .webfb-inline{order:2;}
+    body.searching header h1{font-size:13px; margin-bottom:6px;}
+    .webfb-btn{min-height:44px; padding:9px 14px;}
+  }
 
   /* ---------- Display mode toggle ---------- */
   .mode-row{
@@ -601,15 +631,23 @@
     <div class="search-row">
       <div class="search-box">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="searchInput" type="text" placeholder="用語・説明で検索" autocomplete="off">
+        <input id="searchInput" type="text" placeholder="用語検索 / 迷った2語はスペース区切り" autocomplete="off">
       </div>
       <button class="clear-btn" id="clearBtn" aria-label="検索をクリア">&times;</button>
+      <span class="hit-count" id="hitCount"></span>
+      <div class="webfb-inline" id="webfbBtns"></div>
     </div>
     <div class="memo-toggle">
       <button class="switch" id="memoSwitch" role="switch" aria-checked="false"></button>
       <button class="label" id="memoLabel">暗記モード</button>
     </div>
   </div>
+  <section class="webfb" id="webFallback" aria-live="polite">
+    <p class="webfb-msg" id="webfbMsg"></p>
+    <p class="webfb-q">検索語：<span id="webfbQuery"></span></p>
+    <p class="webfb-note" id="webfbNote"></p>
+  </section>
+
   <div class="mode-row">
     <span class="mode-label">表示</span>
     <div class="mode-toggle-group">
@@ -639,13 +677,6 @@
 
 <p class="no-result" id="noResult">該当する用語が見つかりません。検索語を変えてお試しください。</p>
 
-<section class="webfb" id="webFallback" aria-live="polite">
-  <div class="webfb-head">もっと調べる（ローカル教材の外）</div>
-  <p class="webfb-msg" id="webfbMsg"></p>
-  <p class="webfb-q">検索語：<span id="webfbQuery"></span></p>
-  <div class="webfb-btns" id="webfbBtns"></div>
-  <p class="webfb-note" id="webfbNote"></p>
-</section>
 
 <footer>
 
@@ -3253,6 +3284,38 @@ function renderSyllabusExtra(){
 }
 renderSyllabusExtra();
 
+/* ============================================================
+   クイック検索（複数語）用：元の並び位置を記録し、復元できるようにする
+   ============================================================ */
+const quickResults = document.createElement('section');
+quickResults.className = 'quick-results';
+quickResults.id = 'quickResults';
+main.appendChild(quickResults);
+
+(function snapshotHome(){
+  document.querySelectorAll('.chapter-body').forEach(body => {
+    [...body.children].forEach((el, i) => {
+      el.dataset.origIdx = i;
+      if(el.classList.contains('term-card')) el._home = body;
+    });
+  });
+})();
+
+/* クイック表示から元の章へ戻す */
+function restoreCards(){
+  const moved = [...quickResults.querySelectorAll('.term-card')];
+  if(!moved.length){ quickResults.classList.remove('show'); return; }
+  const touched = new Set();
+  moved.forEach(c => { if(c._home){ c._home.appendChild(c); touched.add(c._home); } });
+  touched.forEach(p => {
+    [...p.children]
+      .sort((a,b) => (+a.dataset.origIdx || 0) - (+b.dataset.origIdx || 0))
+      .forEach(k => p.appendChild(k));
+  });
+  quickResults.textContent = '';
+  quickResults.classList.remove('show');
+}
+
 // ---------- Card builder (shared by chapter list & search) ----------
 function buildTermCard(term, desc, meta){
   const card = document.createElement('div');
@@ -3456,15 +3519,38 @@ function splitTerms(q){
 }
 /* 一致フィールドごとの重み。用語名 > keywords > short > compare > desc */
 const FIELD_WEIGHT = {term:16, keywords:8, short:4, compare:2, desc:1};
+
+/* 表記ゆれの吸収（複数語クイック検索でのみ使用）。
+   1語検索の挙動は変えないため、scoreCard の中でしか参照しない。
+   教材データ側は一切書き換えず、検索時に別表記も照合するだけ。 */
+const SEARCH_SYNONYMS = [
+  ['画素', 'ピクセル'],
+  ['個体', 'インスタンス'],
+  ['誰', '話者'],
+  ['見逃し', '偽陰性'],
+  ['誤検知', '偽陽性'],
+];
+function expandTerm(t){
+  const lt = t.toLowerCase();
+  const out = [lt];
+  SEARCH_SYNONYMS.forEach(pair => {
+    pair.forEach((wd, i) => {
+      if(lt.includes(wd.toLowerCase())) out.push(pair[1-i].toLowerCase());
+    });
+  });
+  return out;
+}
+
 /* カード1枚に対する、語ごとの一致情報を返す */
 function scoreCard(fields, terms){
   let hitCount = 0, weight = 0;
   const hitTerms = [];
   terms.forEach(t => {
-    const lt = t.toLowerCase();
+    const variants = expandTerm(t);
     let best = 0;
     for(const k in FIELD_WEIGHT){
-      if(fields[k] && fields[k].includes(lt)) best = Math.max(best, FIELD_WEIGHT[k]);
+      if(!fields[k]) continue;
+      if(variants.some(v => fields[k].includes(v))) best = Math.max(best, FIELD_WEIGHT[k]);
     }
     if(best > 0){ hitCount++; weight += best; hitTerms.push(t); }
   });
@@ -3472,6 +3558,7 @@ function scoreCard(fields, terms){
 }
 
 function runSearch(){
+  restoreCards();                       // 前回のクイック表示を元に戻してから走査する
   const q = searchInput.value.trim();
   clearBtn.classList.toggle('show', q.length > 0);
   const filtering = !!q || !!statusFilter;
@@ -3542,24 +3629,29 @@ function runSearch(){
     if(filtering && chapterHasMatch) chapterEl.classList.remove('collapsed');
   });
 
-  /* 複数語検索は「一致語数 → 重み → 元の並び」で順位付けし、章内で並べ替える。
-     章をまたぐ移動はしない（教科書の章構成を壊さないため）。 */
+  /* 複数語クイック検索は、章をまたいで全候補をスコア順に並べる。
+     「一致語数 → 重み（用語名16 / keywords8 / short4 / compare2 / desc1）→ 元の章順」で順位付け。
+     CHAPTERS の順番そのものは変えず、表示順だけを差し替える。 */
   if(multi && ranked.length){
-    ranked.forEach((r,i) => { r.i = i; });
-    const byParent = new Map();
-    ranked.forEach(r => {
-      const p = r.card.parentNode;
-      if(!byParent.has(p)) byParent.set(p, []);
-      byParent.get(p).push(r);
-    });
-    byParent.forEach((list, p) => {
-      list.sort((a,b) => (b.sc.hitCount - a.sc.hitCount) || (b.sc.weight - a.sc.weight) || (a.i - b.i));
-      list.forEach(r => p.appendChild(r.card));
-    });
+    ranked.forEach((r,i) => { r.i = i; });            // 元の走査順＝章順をタイブレークに使う
+    ranked.sort((a,b) => (b.sc.hitCount - a.sc.hitCount)
+                      || (b.sc.weight   - a.sc.weight)
+                      || (a.i - b.i));
+    const head = document.createElement('div');
+    head.className = 'quick-head';
+    head.textContent = '一致度の高い順（' + ranked.length + '件）';
+    quickResults.appendChild(head);
+    ranked.forEach(r => quickResults.appendChild(r.card));
+    quickResults.classList.add('show');
+    document.querySelectorAll('.chapter').forEach(c => { c.style.display = 'none'; });
   }
 
   document.getElementById('visibleCount').textContent = visible;
   noResult.classList.toggle('show', visible === 0);
+  /* 検索中は件数を検索行に出し、ステータスバーを畳む */
+  const hc = document.getElementById('hitCount');
+  hc.textContent = q ? (visible + '件' + (multi ? '・一致度順' : '')) : '';
+  document.body.classList.toggle('filtering', !!statusFilter);
   updateWebFallback(q, terms, multi, visible, termNameHit, foundTerms);
 }
 
@@ -3601,7 +3693,13 @@ const webfbBtns   = document.getElementById('webfbBtns');
 const webfbNote   = document.getElementById('webfbNote');
 
 function updateWebFallback(q, terms, multi, visible, termNameHit, foundTerms){
-  if(!q){ webFallback.classList.remove('show','strong'); return; }
+  /* 検索中はヘッダーを圧縮する（章ボタン・表示切替・比較モードを隠す） */
+  document.body.classList.toggle('searching', !!q);
+  if(!q){
+    webFallback.classList.remove('show','strong');
+    webfbBtns.classList.remove('show');
+    return;
+  }
 
   /* 一致の強さを判定する
      none    … 1語も拾えていない
@@ -3626,40 +3724,38 @@ function updateWebFallback(q, terms, multi, visible, termNameHit, foundTerms){
     weak:    'ローカル教材に用語名の一致はありません。説明文への部分一致のみです。',
     ok:      '上の結果で足りない場合は、Webでも調べられます。'
   };
-  webfbMsg.textContent = MSG[level];                       // textContent で挿入（HTMLは入れない）
-  webFallback.classList.toggle('strong', level === 'none' || level === 'partial');
+  /* 説明は冗長になるため、0件と一部一致のときだけ1行で出す */
+  const needMsg = (level === 'none' || level === 'partial');
+  webfbMsg.textContent = needMsg ? MSG[level] : '';        // textContent で挿入（HTMLは入れない）
+  webFallback.classList.toggle('strong', needMsg);
+  webFallback.classList.toggle('show', needMsg);
 
   const query = WEB_PREFIX + ' ' + q;
   webfbQuery.textContent = query;
 
   /* ボタンを組み立て直す（innerHTMLに検索語を入れない） */
   webfbBtns.textContent = '';
-  const mk = (label, url, cls) => {
+  const mk = (label, url, cls, tip) => {
     const a = document.createElement('a');
     a.className = 'webfb-btn' + (cls ? ' ' + cls : '');
     a.href = url;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
     a.textContent = label;
+    if(tip) a.title = tip;                                 // title属性も textContent 相当で安全
     return a;
   };
-  webfbBtns.appendChild(mk('🌐 Webで検索', searchUrl(query)));
-  detectOfficial(q).slice(0,3).forEach(o => {
-    webfbBtns.appendChild(mk('🏛 ' + o.name, searchUrl(query + ' site:' + o.site), 'official'));
+  webfbBtns.appendChild(mk('🌐 Web', searchUrl(query), '', query + ' をWebで検索'));
+  detectOfficial(q).slice(0,2).forEach(o => {
+    webfbBtns.appendChild(mk('公式', searchUrl(query + ' site:' + o.site), 'official', o.name + 'を検索'));
   });
+  webfbBtns.classList.add('show');
 
   const offline = (typeof navigator !== 'undefined' && navigator.onLine === false);
-  webfbNote.textContent = '';
   if(offline){
-    const b = document.createElement('span');
-    b.className = 'webfb-off';
-    b.textContent = '現在オフラインのためWeb検索は利用できません。';
-    webfbNote.appendChild(b);
-  } else {
-    webfbNote.textContent = 'ここから先はローカル教材の外です。検索結果は' + totalTerms + '語の教材には含まれていません。';
+    webfbMsg.textContent = '現在オフラインのためWeb検索は利用できません。';
+    webFallback.classList.add('show','strong');
   }
-
-  webFallback.classList.add('show');
 }
 
 searchInput.addEventListener('input', runSearch);
