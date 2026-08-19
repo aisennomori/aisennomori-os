@@ -142,6 +142,19 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .sylrow .sv{flex:0 0 92px; text-align:right; font-weight:700;}
   .sylrow.weak .sv{color:var(--ng);}
+  /* ---------- 誤答復習 ---------- */
+  .wbadge{display:inline-block; border-radius:6px; padding:2px 7px; font-size:11.5px;
+    font-weight:800; margin-right:5px; white-space:nowrap;}
+  .wb-red{background:var(--ng-bg); color:var(--ng);}
+  .wb-org{background:#fdf0e3; color:#a35a12;}
+  .wb-grn{background:var(--ok-bg); color:var(--ok);}
+  .wb-gry{background:#eef1f6; color:#5b6472;}
+  .wb-set{background:var(--navy-l); color:var(--navy-d);}
+  .wrow{padding:11px 4px; border-bottom:1px solid var(--line); cursor:pointer;}
+  .wrow:active{background:var(--navy-l);}
+  .wrow .wt{font-size:14.5px; font-weight:700;}
+  .wrow .ws{color:var(--muted); font-size:11.5px; margin-top:2px;}
+  .wrow .wm{margin-top:5px;}
   .testnote{background:#eef3fb; border:1px solid #cddcf2; border-radius:11px;
     padding:12px 14px; font-size:14.5px; color:#28456f; line-height:1.6;}
   .star-btn{background:none; border:1.5px solid var(--line); border-radius:9px;
@@ -332,9 +345,11 @@ function pRec(id){
 /* 初見の消費：問題を初めて表示した時点で firstSeenAt を記録する */
 function pMarkSeen(id){
   const r = pRec(id);
-  if(!r.firstSeenAt){ r.firstSeenAt = new Date().toISOString(); pSave(); }
+  if(!r.firstSeenAt && !r.firstResult){ r.firstSeenAt = new Date().toISOString(); pSave(); }
 }
-function pSeen(id){ const r = PSTORE.history[id]; return !!(r && r.firstSeenAt); }
+/* firstSeenAt が無くても firstResult があれば「出題済み」とみなす（復元データ対応） */
+function pSeen(id){ const r = PSTORE.history[id]; return !!(r && (r.firstSeenAt || r.firstResult)); }
+const WEAK_THRESHOLD = 2;   // 誤答何回以上を「重点復習」とするか
 /* items 省略時は全セット合計 */
 function pFirstStats(items){
   const src  = items || P_ALL;
@@ -403,7 +418,8 @@ function render(v){
     b.classList.toggle('on', b.dataset.nav === view));
   ({home:vHome, quiz:vQuiz, result:vResult, list:vList, search:vSearch,
     syllabus:vSyllabus, exps:vExps, settings:vSettings,
-    practical:vPractical, pquiz:vPQuiz, presult:vPResult, preview:vPReview}[view] || vHome)();
+    practical:vPractical, pquiz:vPQuiz, presult:vPResult, preview:vPReview,
+    wrongList:vWrongList, wrongDetail:vWrongDetail}[view] || vHome)();
 }
 
 /* ---------- ホーム ---------- */
@@ -894,8 +910,11 @@ function vPractical(){
       </div>
       <h2 class="sec">セットを選ぶ</h2>
       <div class="grid" style="grid-template-columns:1fr">${cards}</div>
+      <h2 class="sec">復習</h2>
+      <button class="btn sub wide" id="wrongBtn" type="button">間違えた問題を見返す（${wrongIds().length}問）</button>
       <div class="navbtns"><button class="btn ghost" id="pBack2" type="button">ホームへ戻る</button></div>`;
     app.querySelectorAll('[data-set]').forEach(b => b.onclick = () => { pSetKey = b.dataset.set; render('practical'); });
+    $('#wrongBtn').onclick = () => render('wrongList');
     $('#pBack2').onclick = () => render('home');
     return;
   }
@@ -1086,6 +1105,7 @@ function pSubmit(){
     const q = pById(id), r = pRec(id), ok = (pick === q.answer);
     if(ok) r.correct++; else r.incorrect++;
     r.lastResult = ok ? 'o' : 'x';
+    r.lastAnswer = pick;                        // 元の選択肢添字（1〜4）
     r.last = now;
     r.answerCount = (r.answerCount||0) + 1;
     r.totalTimeMs = (r.totalTimeMs||0) + (pSession.timeMs[id]||0);
@@ -1219,6 +1239,205 @@ function vPReview(){
   $('#rBack').onclick = () => render('presult');
 }
 
+/* ============================================================
+   誤答復習（弱点復習画面）
+   ============================================================ */
+let wFilter = 'all';      // all / current / past / first / set1 / set2 / tech / law
+let wSort   = 'recent';   // recent / id / count
+let wCurId  = null;
+
+/* 一度でも間違えた問題（履歴がある問題のみ。未受験は絶対に含めない） */
+function wrongIds(){
+  return P_ALL.filter(q => {
+    const r = PSTORE.history[q.id];
+    return r && ((r.incorrect || 0) > 0 || r.firstResult === 'incorrect');
+  }).map(q => q.id);
+}
+function wState(id){
+  const r = PSTORE.history[id] || {};
+  return {
+    inc: r.incorrect || 0,
+    cor: r.correct || 0,
+    lastResult: r.lastResult || null,
+    lastAnswer: (r.lastAnswer === undefined || r.lastAnswer === null) ? null : r.lastAnswer,
+    last: r.last || null,
+    first: r.firstResult || null,
+    restored: !!r.firstResultSource
+  };
+}
+function wFiltered(){
+  let ids = wrongIds();
+  const f = wFilter;
+  if(f === 'current') ids = ids.filter(i => wState(i).lastResult === 'x');
+  else if(f === 'past') ids = ids.filter(i => wState(i).lastResult === 'o');
+  else if(f === 'first') ids = ids.filter(i => wState(i).first === 'incorrect');
+  else if(f === 'set1' || f === 'set2') ids = ids.filter(i => setOf(i).key === f);
+  else if(f === 'tech') ids = ids.filter(i => pById(i).syllabus.some(x => x[0] === 'T'));
+  else if(f === 'law')  ids = ids.filter(i => pById(i).syllabus.some(x => x[0] === 'L'));
+  if(wSort === 'id') ids.sort();
+  else if(wSort === 'count') ids.sort((a,b) => wState(b).inc - wState(a).inc || a.localeCompare(b));
+  else ids.sort((a,b) => String(wState(b).last||'').localeCompare(String(wState(a).last||'')) || a.localeCompare(b));
+  return ids;
+}
+function wMarks(id){
+  const s = wState(id);
+  const out = [];
+  if(s.lastResult === 'x') out.push('<span class="wbadge wb-red">最終 不正解</span>');
+  else if(s.lastResult === 'o') out.push('<span class="wbadge wb-grn">現在は正解</span>');
+  if(s.inc >= WEAK_THRESHOLD) out.push(`<span class="wbadge wb-org">重点復習 誤答${s.inc}回</span>`);
+  else if(s.inc > 0) out.push(`<span class="wbadge wb-gry">誤答${s.inc}回</span>`);
+  if(s.first === 'incorrect') out.push('<span class="wbadge wb-gry">初見で誤答</span>');
+  if(s.lastAnswer === null) out.push('<span class="wbadge wb-gry">回答番号 記録なし</span>');
+  return out.join('');
+}
+
+function vWrongList(){
+  pStopTimer();
+  const ids = wFiltered();
+  const all = wrongIds();
+  const cntSet = k => all.filter(i => setOf(i).key === k).length;
+
+  /* シラバス別の誤答集計 */
+  const agg = {};
+  all.forEach(i => pById(i).syllabus.forEach(sid => { agg[sid] = (agg[sid]||0) + 1; }));
+  const sylRows = Object.keys(agg).sort((a,b) => agg[b]-agg[a] || a.localeCompare(b)).map(sid =>
+    `<div class="sylrow"><span class="sid">${sid}</span>
+      <span class="sn">${esc(SYL_NAMES[sid]||'')}</span>
+      <span class="sv">${agg[sid]}問</span></div>`).join('');
+
+  const chip = (k,l) => `<button class="chip ${wFilter===k?'on':''}" data-wf="${k}">${l}</button>`;
+  const sc   = (k,l) => `<button class="chip ${wSort===k?'on':''}" data-ws="${k}">${l}</button>`;
+
+  app.innerHTML = `
+    <h2 class="sec">間違えた問題</h2>
+    ${all.length ? `<p class="muted">一度でも間違えた問題を蓄積して表示します。閲覧しても履歴は変わりません。</p>
+
+    <div class="prac-stat" style="margin:0 0 10px">
+      <div style="background:var(--navy-l); color:var(--navy-d)">全セット ${all.length}問</div>
+      ${PRACTICE_SETS.map(st => `<div style="background:var(--navy-l); color:var(--navy-d)">${st.name} ${cntSet(st.key)}問</div>`).join('')}
+    </div>
+
+    <div class="chips">${chip('all','すべて')}${chip('current','現在も不正解')}${chip('past','過去に誤答あり')}${chip('first','初見誤答のみ')}</div>
+    <div class="chips">${chip('set1','第1セット')}${chip('set2','第2セット')}${chip('tech','技術')}${chip('law','法律・倫理')}</div>
+    <div class="chips" style="margin-top:2px">並び順　${sc('recent','最近間違えた順')}${sc('id','問題番号順')}${sc('count','誤答回数順')}</div>
+
+    <div class="muted" style="margin:8px 0 4px">${ids.length}問</div>
+    <div class="card" style="padding:4px 12px">
+      ${ids.length ? ids.map(id => { const q = pById(id), s = wState(id);
+        return `<div class="wrow" data-wid="${id}">
+          <div class="wt">${id}　${esc(q.topic)}</div>
+          <div class="ws">${q.syllabus.join('・')}　／　${setOf(id).name}　／　誤答 ${s.inc}回・正解 ${s.cor}回${
+            s.last ? '　／　最終 ' + s.last.slice(0,10) : ''}</div>
+          <div class="wm">${wMarks(id)}</div>
+        </div>`; }).join('')
+        : '<div class="empty">この条件に該当する問題はありません</div>'}
+    </div>
+
+    ${ids.length ? `<button class="btn prac wide" id="wRetest" type="button">この${ids.length}問を再テスト</button>` : ''}
+
+    ${sylRows ? `<h2 class="sec">誤答が多いシラバス項目</h2>
+      <div class="card" style="padding:4px 12px">${sylRows}</div>` : ''}`
+    : '<div class="empty">まだ間違えた問題がありません。<br>実戦テストを受けると、ここに蓄積されます。</div>'}
+
+    <div class="navbtns"><button class="btn ghost" id="wBack" type="button">実戦テストへ戻る</button></div>`;
+
+  app.querySelectorAll('[data-wf]').forEach(b => b.onclick = () => { wFilter = b.dataset.wf; render('wrongList'); });
+  app.querySelectorAll('[data-ws]').forEach(b => b.onclick = () => { wSort   = b.dataset.ws; render('wrongList'); });
+  app.querySelectorAll('[data-wid]').forEach(b => b.onclick = () => { wCurId = b.dataset.wid; render('wrongDetail'); });
+  const rt = $('#wRetest');
+  if(rt) rt.onclick = () => { pSetKey = null; pStart(ids.slice(), '間違えた問題の再テスト'); };
+  $('#wBack').onclick = () => { pSetKey = null; render('practical'); };
+}
+
+/* ---------- 誤答の復習詳細（元の選択肢順で表示） ---------- */
+function vWrongDetail(){
+  const q = pById(wCurId);
+  if(!q){ render('wrongList'); return; }
+  const s = wState(wCurId);
+  const list = wFiltered();
+  const pos = list.indexOf(wCurId);
+
+  app.innerHTML = `
+    <h2 class="sec">誤答の復習</h2>
+    <div class="card">
+      <div><span class="qno">${q.id}</span>
+        ${q.syllabus.map(x => `<span class="badge">${x}</span>`).join('')}
+        <span class="wbadge wb-set">${setOf(q.id).name}</span></div>
+      <div class="qtitle">${esc(q.topic)}</div>
+      <div class="wm" style="margin-bottom:8px">${wMarks(q.id)}</div>
+      <div class="qtext">${esc(q.question).replace(/\n/g,'<br>')}</div>
+      <div>${q.choices.map((c,i) => {
+        const n = i+1;
+        const cls = n === q.answer ? 'correct' : (s.lastAnswer === n ? 'wrong' : '');
+        return `<div class="choice ${cls}"><span class="num">${n}</span><span>${esc(c)}</span></div>`;
+      }).join('')}</div>
+    </div>
+
+    <div class="verdict ${s.lastResult === 'o' ? 'ok' : 'ng'}">
+      ${s.lastResult === 'o' ? '直近の解答は正解' : '直近の解答は不正解'}
+      <span class="sm">あなたの回答：${s.lastAnswer !== null ? s.lastAnswer + '　' + esc(q.choices[s.lastAnswer-1]) : '記録なし'}</span>
+      <span class="sm">正解：${q.answer}　${esc(q.choices[q.answer-1])}</span>
+      <span class="sm">誤答 ${s.inc}回 ／ 正解 ${s.cor}回${s.first ? '　／　初見は' + (s.first === 'correct' ? '正解' : '不正解') : ''}</span>
+    </div>
+
+    <div class="exp"><p>${esc(q.explanation).replace(/／/g,'</p><p>')}</p></div>
+
+    <button class="btn prac wide" id="wRetry" type="button">この問題をもう一度解く</button>
+    ${q.relatedQuestions.length ? `<button class="btn sub wide" id="wRel" type="button" style="margin-top:8px">関連する基礎問題を復習（問${q.relatedQuestions.join('・問')}）</button>` : ''}
+
+    <div class="navbtns">
+      <button class="btn ghost" id="wPrev" ${pos<=0?'disabled':''} type="button">← 前の誤答</button>
+      <button class="btn ghost" id="wNext" ${pos<0||pos>=list.length-1?'disabled':''} type="button">次の誤答 →</button>
+    </div>
+    <button class="btn ghost wide" id="wToList" type="button">一覧へ戻る</button>`;
+
+  $('#wRetry').onclick = () => { pSetKey = null; pStart([q.id], q.id + ' の再挑戦'); };
+  const rl = $('#wRel');
+  if(rl) rl.onclick = () => { const rel = q.relatedQuestions.slice(); pSession = null; startSession(rel, '基礎問題の復習'); };
+  $('#wPrev').onclick = () => { if(pos>0){ wCurId = list[pos-1]; vWrongDetail(); } };
+  $('#wNext').onclick = () => { if(pos>=0 && pos<list.length-1){ wCurId = list[pos+1]; vWrongDetail(); } };
+  $('#wToList').onclick = () => render('wrongList');
+}
+
+/* ============================================================
+   第1セット初回受験履歴の復元（欠落時のみ・手動実行・一度きり）
+   ============================================================ */
+const SET1_FIRST_RESULT = {
+  incorrect: ['P001','P005','P007','P008','P009','P011','P012','P014','P017','P022','P024','P026'],
+  correct:   ['P002','P003','P004','P006','P010','P013','P015','P016','P018','P019','P020','P021',
+              'P023','P025','P027','P028','P029','P030']
+};
+/* 復元が必要か（第1セットで firstResult が欠けている問題があるか） */
+function needsRestore(){
+  if(PSTORE.settings.set1Restored) return false;      // 一度実行したら再提案しない
+  return PRACTICE_QUESTIONS.some(q => {
+    const r = PSTORE.history[q.id];
+    return !r || !r.firstResult;
+  });
+}
+function restoreSet1(){
+  let n = 0;
+  const apply = (ids, res) => ids.forEach(id => {
+    const r = pRec(id);
+    if(r.firstResult) return;                          // 既存値は絶対に上書きしない
+    r.firstResult = res;
+    r.firstResultSource = 'manual_restore';
+    r.restoredAt = new Date().toISOString();
+    if(!r.lastResult){ r.lastResult = (res === 'correct') ? 'o' : 'x'; }
+    if(!r.correct && !r.incorrect){
+      r.correct   = (res === 'correct') ? 1 : 0;
+      r.incorrect = (res === 'correct') ? 0 : 1;
+      r.answerCount = 1;
+    }
+    n++;
+  });
+  apply(SET1_FIRST_RESULT.incorrect, 'incorrect');
+  apply(SET1_FIRST_RESULT.correct,   'correct');
+  PSTORE.settings.set1Restored = true;
+  pSave();
+  return n;
+}
+
 /* ---------- 設定 ---------- */
 function vSettings(){
   const done = QUESTIONS.filter(q => answered(q.id)).length;
@@ -1247,6 +1466,11 @@ function vSettings(){
       }).join('')}
       <div class="muted" style="margin-top:6px">保存先：localStorage：${P_LS_KEY}（既存100問とは別キー）</div>
     </div>
+    ${needsRestore() ? `<div class="card">
+      <b>第1セットの初回受験履歴を復元</b>
+      <div class="muted" style="margin:6px 0 10px">第1セットの初見結果が記録されていない問題があります。記録済みの結果（30問中18問正解）から、欠けている分だけを補完できます。既存の記録は上書きしません。選択した選択肢番号・回答時刻は推測せず、復元しません。</div>
+      <button class="btn sub wide" id="restoreBtn" type="button">初回受験履歴を復元する</button>
+    </div>` : ''}
     <div class="card">
       <b>学習履歴をリセット</b>
       <div class="muted" style="margin:6px 0 10px">2種類の履歴は別々にリセットできます。いずれも取り消せません。</div>
@@ -1260,6 +1484,14 @@ function vSettings(){
         シラバスIDはJDLA公式シラバス2024 第1.4版の55項目に対応します（T11は該当問題なし）。<br>
         実戦問題（${PRACTICE_SETS.map(st=>st.name+' '+st.items.length+'問').join(' / ')}）は、既存100問の論点を応用形式で問い直すために別途作成したもので、既存100問とは独立したデータです。</div>
     </div>`;
+  const rb2 = $('#restoreBtn');
+  if(rb2) rb2.onclick = () => {
+    if(confirm('第1セットの初回受験履歴を復元しますか？\n記録が欠けている問題にだけ、初見の正誤（18問正解・12問不正解）を書き込みます。\n既存の記録は上書きされません。')){
+      const n = restoreSet1();
+      alert(`${n}問の初回結果を復元しました。`);
+      render('settings');
+    }
+  };
   $('#resetBtn').onclick = () => {
     if(confirm('本当にリセットしますか？\n既存100問の回答履歴・苦手登録がすべて消去され、元に戻せません。\n（実戦問題の履歴は残ります）')){
       STORE.history = {}; saveStore(); alert('既存100問の学習履歴をリセットしました。'); render('home');
