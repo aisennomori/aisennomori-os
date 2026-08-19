@@ -852,6 +852,7 @@ function pTick(){
 /* 表示していた問題の滞在時間を積む */
 function pLeave(){
   if(!pSession || !pSession.shownAt) return;
+  if(pSession.submitted){ pSession.shownAt = 0; return; }   // 採点後の閲覧時間は加算しない
   const id = pSession.ids[pSession.cur];
   pSession.timeMs[id] = (pSession.timeMs[id] || 0) + (Date.now() - pSession.shownAt);
   pSession.shownAt = 0;
@@ -937,7 +938,11 @@ function vPQuiz(){
   const testing = !pSession.submitted;
 
   if(testing) pMarkSeen(id);                       // 初見はここで消費する
-  pSession.shownAt = Date.now();
+
+  // 【時間計測】選択肢タップ等で再描画される前に、直前までの滞在時間を確定させる。
+  // pNext/pPrev から来た場合は既に pLeave 済み（shownAt=0）なので二重計上されない。
+  pLeave();
+  pSession.shownAt = testing ? Date.now() : 0;     // 採点後の閲覧時間は計測しない
 
   const pickOrig = pSession.picks[id] || null;     // 元の添字ベース（1〜4）
   const done = pSession.graded[id] !== undefined;
@@ -1065,6 +1070,7 @@ function vPResult(){
   const unIds = pSession.ids.filter(i => g[i] === undefined);
   const rate = ansIds.length ? Math.round(okIds.length/ansIds.length*100) : 0;
   const avg = pSession.ids.length ? pSession.elapsedMs/pSession.ids.length : 0;
+  const sumMs = pSession.ids.reduce((a,id) => a + (pSession.timeMs[id]||0), 0);
 
   const agg = {};
   pSession.ids.forEach(id => {
@@ -1093,6 +1099,8 @@ function vPResult(){
       </div>
       <div class="muted" style="margin-top:12px">
         所要時間 ${fmtMs(pSession.elapsedMs)}　／　平均 ${(avg/1000).toFixed(1)}秒 / 問</div>
+      <div class="muted" style="margin-top:4px; font-size:12px">
+        問題別の合計 ${fmtMs(sumMs)}（差 ${fmtMs(Math.max(0, pSession.elapsedMs - sumMs))} は採点確認などの時間）</div>
     </div>
 
     ${sylRows ? `<h2 class="sec">シラバス別の正答率</h2>
