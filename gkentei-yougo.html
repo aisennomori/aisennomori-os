@@ -3594,12 +3594,14 @@ function runSearch(){
         if(textMatch){
           foundTerms.add(terms[0]);
           if(term.toLowerCase().includes(q.toLowerCase())) termNameHit++;
+          /* 1語検索でも、重複排除の代表を選ぶためにフィールド重みだけ算出する
+             （並び順は従来どおり章順のまま。スコアは代表選びにしか使わない） */
+          const f1 = {term:term.toLowerCase(), desc:desc.toLowerCase(), short:short.toLowerCase(),
+                      keywords:keywords.toLowerCase(), compare:compare.toLowerCase()};
+          sc = scoreCard(f1, terms);
         }
       }
-      if(multi && textMatch){
-        if(terms.some(t => term.toLowerCase().includes(t.toLowerCase()))) termNameHit++;
-        ranked.push({card, sc});
-      }
+      if(multi && textMatch && terms.some(t => term.toLowerCase().includes(t.toLowerCase()))) termNameHit++;
       const cardState = card.dataset.status || '0';
       const statusMatch = !statusFilter || (statusFilter === 'review' && cardState === '1') || (statusFilter === 'memorized' && cardState === '2');
       const match = textMatch && statusMatch;
@@ -3607,6 +3609,7 @@ function runSearch(){
       if(match){
         visible++;
         chapterHasMatch = true;
+        if(q) ranked.push({card, sc, idx: ranked.length});
         const hq = multi ? (sc && sc.hitTerms.length ? sc.hitTerms : []) : q;
         card.querySelector('.term-name').innerHTML = highlight(term, hq);
         const descNode = card.querySelector('.term-desc');
@@ -3629,19 +3632,41 @@ function runSearch(){
     if(filtering && chapterHasMatch) chapterEl.classList.remove('collapsed');
   });
 
-  /* 複数語クイック検索は、章をまたいで全候補をスコア順に並べる。
-     「一致語数 → 重み（用語名16 / keywords8 / short4 / compare2 / desc1）→ 元の章順」で順位付け。
-     CHAPTERS の順番そのものは変えず、表示順だけを差し替える。 */
-  if(multi && ranked.length){
-    ranked.forEach((r,i) => { r.i = i; });            // 元の走査順＝章順をタイブレークに使う
-    ranked.sort((a,b) => (b.sc.hitCount - a.sc.hitCount)
+  /* 検索中は「教材閲覧」ではなく「検索結果一覧」として扱う。
+     ・章見出し・節見出しは章ごと非表示にする
+     ・同じ用語名のカードが複数章にある場合は、最高スコアの代表1枚だけ残す
+     ・複数語は一致度順、1語は従来どおり章順（元の走査順）で並べる
+     CHAPTERS の順番やカードデータ自体は一切変更しない。 */
+  if(q && ranked.length){
+    /* 同一 data-term の重複を、最高スコアの1枚へまとめる */
+    const best = new Map();
+    ranked.forEach(r => {
+      const t = r.card.dataset.term;
+      const cur = best.get(t);
+      const better = !cur
+        || (r.sc && cur.sc && (r.sc.hitCount > cur.sc.hitCount
+            || (r.sc.hitCount === cur.sc.hitCount && r.sc.weight > cur.sc.weight)));
+      if(better) best.set(t, r);
+    });
+    let kept = [];
+    ranked.forEach(r => {
+      if(best.get(r.card.dataset.term) === r){ kept.push(r); }
+      else { r.card.style.display = 'none'; visible--; }   // 重複は結果から除く
+    });
+
+    if(multi){
+      kept.sort((a,b) => (b.sc.hitCount - a.sc.hitCount)
                       || (b.sc.weight   - a.sc.weight)
-                      || (a.i - b.i));
+                      || (a.idx - b.idx));
+    } else {
+      kept.sort((a,b) => a.idx - b.idx);                   // 1語は章順を維持
+    }
+
     const head = document.createElement('div');
     head.className = 'quick-head';
-    head.textContent = '一致度の高い順（' + ranked.length + '件）';
+    head.textContent = (multi ? '一致度の高い順（' : '検索結果（') + kept.length + '件）';
     quickResults.appendChild(head);
-    ranked.forEach(r => quickResults.appendChild(r.card));
+    kept.forEach(r => quickResults.appendChild(r.card));
     quickResults.classList.add('show');
     document.querySelectorAll('.chapter').forEach(c => { c.style.display = 'none'; });
   }
