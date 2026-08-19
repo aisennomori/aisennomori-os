@@ -370,6 +370,8 @@
     background:#fff; color:var(--navy); border:0; white-space:nowrap; line-height:1.3;
   }
   .webfb-btn:active{background:var(--paper);}
+  .webfb-btn.ai{background:var(--amber-soft); color:var(--amber-deep);}
+  .webfb-btn.ai:active{background:#e8d3ae;}
   .webfb-btn.official{background:transparent; color:#fff; border:1.5px solid rgba(255,255,255,.6);}
   .webfb-btn.official:active{background:rgba(255,255,255,.14);}
 
@@ -3707,8 +3709,14 @@ function detectOfficial(q){
   const lq = q.toLowerCase();
   return OFFICIAL_SOURCES.filter(o => o.keys.some(k => lq.includes(k.toLowerCase())));
 }
-function searchUrl(query){
-  return 'https://www.google.com/search?q=' + encodeURIComponent(query);
+/* GoogleのAIモードは非公式パラメータ udm=50 で指定される。
+   将来Google側の仕様が変わった場合に備え、ここ1箇所だけを直せばよい形にしておく。
+   万一無効になっても通常のGoogle検索へフォールバックするだけで、リンクは壊れない。 */
+const GOOGLE_AI_MODE_UDM = '50';
+
+function searchUrl(query, aiMode){
+  return 'https://www.google.com/search?q=' + encodeURIComponent(query)
+       + (aiMode ? '&udm=' + GOOGLE_AI_MODE_UDM : '');
 }
 
 const webFallback = document.getElementById('webFallback');
@@ -3770,10 +3778,26 @@ function updateWebFallback(q, terms, multi, visible, termNameHit, foundTerms){
     if(tip) a.title = tip;                                 // title属性も textContent 相当で安全
     return a;
   };
+  /* 優先順位：🌐 Web → ✨ AI → 公式（該当時のみ最大1つ）
+     公式ボタンで検索欄を圧迫しないよう、候補が複数でも1つに絞る。
+     判定が同率で一意に決められない場合は公式を出さない。 */
   webfbBtns.appendChild(mk('🌐 Web', searchUrl(query), '', query + ' をWebで検索'));
-  detectOfficial(q).slice(0,2).forEach(o => {
-    webfbBtns.appendChild(mk('公式', searchUrl(query + ' site:' + o.site), 'official', o.name + 'を検索'));
-  });
+  webfbBtns.appendChild(mk('✨ AI', searchUrl(query, true), 'ai',
+                           query + ' をGoogle AIモードで開く'));
+  const off = detectOfficial(q);
+  if(off.length === 1){
+    webfbBtns.appendChild(mk('公式', searchUrl(query + ' site:' + off[0].site), 'official',
+                             off[0].name + 'を検索'));
+  } else if(off.length > 1){
+    /* 入力語との一致数が最も多い1機関だけを採用。同率なら表示しない */
+    const lq = q.toLowerCase();
+    const scored = off.map(o => ({o, n: o.keys.filter(k => lq.includes(k.toLowerCase())).length}))
+                      .sort((a,b) => b.n - a.n);
+    if(scored[0].n > scored[1].n){
+      webfbBtns.appendChild(mk('公式', searchUrl(query + ' site:' + scored[0].o.site), 'official',
+                               scored[0].o.name + 'を検索'));
+    }
+  }
   webfbBtns.classList.add('show');
 
   const offline = (typeof navigator !== 'undefined' && navigator.onLine === false);
