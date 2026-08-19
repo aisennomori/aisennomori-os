@@ -352,6 +352,37 @@
   }
   .no-result.show{display:block;}
 
+  /* ---------- Web検索フォールバック ---------- */
+  .webfb{
+    display:none; margin:18px auto 34px; max-width:760px;
+    border:1px solid var(--line); border-top:3px solid var(--navy);
+    border-radius:var(--radius); background:var(--card); padding:14px 16px 16px;
+    box-shadow:0 1px 3px rgba(16,27,48,.06);
+  }
+  .webfb.show{display:block;}
+  .webfb.strong{border-top-color:var(--amber);}
+  .webfb-head{font-size:13px; font-weight:800; color:var(--navy); margin-bottom:6px;}
+  .webfb.strong .webfb-head{color:var(--amber-deep);}
+  .webfb-msg{font-size:13.5px; line-height:1.75; color:var(--ink); margin:0 0 10px;}
+  .webfb-q{
+    font-size:13px; color:var(--muted); background:var(--paper);
+    border-radius:8px; padding:9px 11px; margin:0 0 12px;
+    word-break:break-all; overflow-wrap:anywhere;
+  }
+  .webfb-btns{display:flex; flex-wrap:wrap; gap:9px;}
+  .webfb-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    min-height:48px; padding:12px 18px; border-radius:10px;
+    font-size:15px; font-weight:800; text-decoration:none; cursor:pointer;
+    background:var(--navy); color:#fff; border:0; flex:1 1 auto; min-width:150px;
+    line-height:1.4;
+  }
+  .webfb-btn:active{background:var(--navy-deep);}
+  .webfb-btn.official{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
+  .webfb-btn.official:active{background:var(--paper);}
+  .webfb-note{font-size:12px; color:var(--muted); margin:10px 0 0; line-height:1.65;}
+  .webfb-off{color:var(--amber-deep); font-weight:700;}
+
   /* ---------- Display mode toggle ---------- */
   .mode-row{
     display:flex;
@@ -607,6 +638,14 @@
 <div class="compare-view" id="compareView"></div>
 
 <p class="no-result" id="noResult">該当する用語が見つかりません。検索語を変えてお試しください。</p>
+
+<section class="webfb" id="webFallback" aria-live="polite">
+  <div class="webfb-head">もっと調べる（ローカル教材の外）</div>
+  <p class="webfb-msg" id="webfbMsg"></p>
+  <p class="webfb-q">検索語：<span id="webfbQuery"></span></p>
+  <div class="webfb-btns" id="webfbBtns"></div>
+  <p class="webfb-note" id="webfbNote"></p>
+</section>
 
 <footer>
 
@@ -3367,10 +3406,53 @@ function escapeHtml(s){
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function highlight(text, query){
+  /* query は文字列（1語検索）または配列（複数語検索） */
+  if(Array.isArray(query)){
+    if(!query.length) return escapeHtml(text);
+    let out = '', rest = text;
+    let guard = 0;
+    while(guard++ < 200){
+      let best = -1, bestLen = 0;
+      query.forEach(t => {
+        if(!t) return;
+        const i = rest.toLowerCase().indexOf(t.toLowerCase());
+        if(i !== -1 && (best === -1 || i < best)){ best = i; bestLen = t.length; }
+      });
+      if(best === -1) break;
+      out += escapeHtml(rest.slice(0,best)) + '<mark>' + escapeHtml(rest.slice(best, best+bestLen)) + '</mark>';
+      rest = rest.slice(best + bestLen);
+    }
+    return out + escapeHtml(rest);
+  }
   if(!query) return escapeHtml(text);
   const idx = text.toLowerCase().indexOf(query.toLowerCase());
   if(idx === -1) return escapeHtml(text);
   return escapeHtml(text.slice(0,idx)) + '<mark>' + escapeHtml(text.slice(idx, idx+query.length)) + '</mark>' + escapeHtml(text.slice(idx+query.length));
+}
+
+/* ============================================================
+   複数語検索（OR＋ランキング）
+   1語のときは従来どおり includes() のまま。2語以上のときだけ拡張する。
+   ============================================================ */
+/* 全角スペースも区切りとして扱う */
+function splitTerms(q){
+  return q.split(/[\s\u3000]+/).filter(Boolean);
+}
+/* 一致フィールドごとの重み。用語名 > keywords > short > compare > desc */
+const FIELD_WEIGHT = {term:16, keywords:8, short:4, compare:2, desc:1};
+/* カード1枚に対する、語ごとの一致情報を返す */
+function scoreCard(fields, terms){
+  let hitCount = 0, weight = 0;
+  const hitTerms = [];
+  terms.forEach(t => {
+    const lt = t.toLowerCase();
+    let best = 0;
+    for(const k in FIELD_WEIGHT){
+      if(fields[k] && fields[k].includes(lt)) best = Math.max(best, FIELD_WEIGHT[k]);
+    }
+    if(best > 0){ hitCount++; weight += best; hitTerms.push(t); }
+  });
+  return {hitCount, weight, hitTerms};
 }
 
 function runSearch(){
@@ -3378,6 +3460,12 @@ function runSearch(){
   clearBtn.classList.toggle('show', q.length > 0);
   const filtering = !!q || !!statusFilter;
   let visible = 0;
+
+  const terms = splitTerms(q);
+  const multi = terms.length >= 2;          // 2語以上のときだけOR検索へ
+  const foundTerms = new Set();             // ローカルで拾えた語
+  let termNameHit = 0;                      // 用語名に一致したカード数
+  const ranked = [];                        // 複数語検索時の並べ替え用
 
   document.querySelectorAll('.chapter').forEach(chapterEl => {
     let chapterHasMatch = false;
@@ -3389,7 +3477,26 @@ function runSearch(){
       const keywords = card.dataset.keywords || '';
       const compare = card.dataset.compare || '';
       const haystack = [term, desc, short, keywords, compare].join(' ').toLowerCase();
-      const textMatch = !q || haystack.includes(q.toLowerCase());
+      let textMatch, sc = null;
+      if(!q){
+        textMatch = true;
+      } else if(multi){
+        const fields = {term:term.toLowerCase(), desc:desc.toLowerCase(), short:short.toLowerCase(),
+                        keywords:keywords.toLowerCase(), compare:compare.toLowerCase()};
+        sc = scoreCard(fields, terms);
+        textMatch = sc.hitCount > 0;
+        if(textMatch) sc.hitTerms.forEach(t => foundTerms.add(t));
+      } else {
+        textMatch = haystack.includes(q.toLowerCase());
+        if(textMatch){
+          foundTerms.add(terms[0]);
+          if(term.toLowerCase().includes(q.toLowerCase())) termNameHit++;
+        }
+      }
+      if(multi && textMatch){
+        if(terms.some(t => term.toLowerCase().includes(t.toLowerCase()))) termNameHit++;
+        ranked.push({card, sc});
+      }
       const cardState = card.dataset.status || '0';
       const statusMatch = !statusFilter || (statusFilter === 'review' && cardState === '1') || (statusFilter === 'memorized' && cardState === '2');
       const match = textMatch && statusMatch;
@@ -3397,11 +3504,12 @@ function runSearch(){
       if(match){
         visible++;
         chapterHasMatch = true;
-        card.querySelector('.term-name').innerHTML = highlight(term, q);
+        const hq = multi ? (sc && sc.hitTerms.length ? sc.hitTerms : []) : q;
+        card.querySelector('.term-name').innerHTML = highlight(term, hq);
         const descNode = card.querySelector('.term-desc');
-        if(descNode) descNode.innerHTML = highlight(desc, q);
+        if(descNode) descNode.innerHTML = highlight(desc, hq);
         const shortNode = card.querySelector('.exam-short');
-        if(shortNode) shortNode.innerHTML = highlight(short, q);
+        if(shortNode) shortNode.innerHTML = highlight(short, hq);
         if(filtering){
           // reveal all matches while filtering, even in memo mode, so results are actually visible
           setReveal(card, 2);
@@ -3418,8 +3526,124 @@ function runSearch(){
     if(filtering && chapterHasMatch) chapterEl.classList.remove('collapsed');
   });
 
+  /* 複数語検索は「一致語数 → 重み → 元の並び」で順位付けし、章内で並べ替える。
+     章をまたぐ移動はしない（教科書の章構成を壊さないため）。 */
+  if(multi && ranked.length){
+    ranked.forEach((r,i) => { r.i = i; });
+    const byParent = new Map();
+    ranked.forEach(r => {
+      const p = r.card.parentNode;
+      if(!byParent.has(p)) byParent.set(p, []);
+      byParent.get(p).push(r);
+    });
+    byParent.forEach((list, p) => {
+      list.sort((a,b) => (b.sc.hitCount - a.sc.hitCount) || (b.sc.weight - a.sc.weight) || (a.i - b.i));
+      list.forEach(r => p.appendChild(r.card));
+    });
+  }
+
   document.getElementById('visibleCount').textContent = visible;
   noResult.classList.toggle('show', visible === 0);
+  updateWebFallback(q, terms, multi, visible, termNameHit, foundTerms);
+}
+
+/* ============================================================
+   Webフォールバック（ローカル教材の補助。教材とは明確に分離して表示）
+   ・APIは使わない。検索URLを組み立てて新しいタブで開くだけ
+   ・APIキー等は一切保持しない
+   ============================================================ */
+const WEB_PREFIX = 'G検定';
+
+/* 公式情報の判定表。ここに挙げた語が含まれるときだけ「公式情報を検索」を出す。
+   推測で誤ったサイトへ誘導しないよう、明示キーワードのみで判定する。 */
+const OFFICIAL_SOURCES = [
+  { name:'個人情報保護委員会', site:'ppc.go.jp',
+    keys:['個人情報','個人データ','保有個人データ','匿名加工','仮名加工','要配慮','個人識別符号','第三者提供','共同利用','個人関連情報','gdpr','GDPR'] },
+  { name:'文化庁（著作権）', site:'bunka.go.jp',
+    keys:['著作権','著作物','著作者','創作性','30条の4','三十条の四','ai生成物','AI生成物','依拠性','類似性','利用規約'] },
+  { name:'特許庁', site:'jpo.go.jp',
+    keys:['特許','発明','新規性','進歩性','職務発明','知的財産','実用新案','意匠','商標'] },
+  { name:'経済産業省', site:'meti.go.jp',
+    keys:['営業秘密','限定提供データ','不正競争','契約ガイドライン','ai事業者ガイドライン','AI事業者ガイドライン','poc','PoC','準委任','請負'] },
+  { name:'総務省', site:'soumu.go.jp',
+    keys:['ガイドライン','ソフトロー','ハードロー','リスクベース','aiガバナンス','AIガバナンス','ai倫理','AI倫理'] },
+  { name:'公正取引委員会', site:'jftc.go.jp',
+    keys:['独占禁止','競争制限','公正競争阻害','カルテル','アルゴリズム'] },
+];
+function detectOfficial(q){
+  const lq = q.toLowerCase();
+  return OFFICIAL_SOURCES.filter(o => o.keys.some(k => lq.includes(k.toLowerCase())));
+}
+function searchUrl(query){
+  return 'https://www.google.com/search?q=' + encodeURIComponent(query);
+}
+
+const webFallback = document.getElementById('webFallback');
+const webfbMsg    = document.getElementById('webfbMsg');
+const webfbQuery  = document.getElementById('webfbQuery');
+const webfbBtns   = document.getElementById('webfbBtns');
+const webfbNote   = document.getElementById('webfbNote');
+
+function updateWebFallback(q, terms, multi, visible, termNameHit, foundTerms){
+  if(!q){ webFallback.classList.remove('show','strong'); return; }
+
+  /* 一致の強さを判定する
+     none    … 1語も拾えていない
+     partial … 複数語のうち一部しか拾えていない
+     weak    … 結果はあるが用語名に一致がない（説明文への弱い一致のみ）
+     ok      … 十分に拾えている */
+  let level;
+  if(visible === 0){
+    level = 'none';
+  } else if(multi && terms.some(t => !foundTerms.has(t))){
+    level = 'partial';
+  } else if(termNameHit === 0){
+    level = 'weak';
+  } else {
+    level = 'ok';
+  }
+
+  const missing = multi ? terms.filter(t => !foundTerms.has(t)) : [];
+  const MSG = {
+    none:    'ローカル教材では該当する項目が見つかりませんでした。',
+    partial: 'ローカル教材では一部の語しか一致しませんでした（未一致：' + missing.join('、') + '）。',
+    weak:    'ローカル教材に用語名の一致はありません。説明文への部分一致のみです。',
+    ok:      '上の結果で足りない場合は、Webでも調べられます。'
+  };
+  webfbMsg.textContent = MSG[level];                       // textContent で挿入（HTMLは入れない）
+  webFallback.classList.toggle('strong', level === 'none' || level === 'partial');
+
+  const query = WEB_PREFIX + ' ' + q;
+  webfbQuery.textContent = query;
+
+  /* ボタンを組み立て直す（innerHTMLに検索語を入れない） */
+  webfbBtns.textContent = '';
+  const mk = (label, url, cls) => {
+    const a = document.createElement('a');
+    a.className = 'webfb-btn' + (cls ? ' ' + cls : '');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = label;
+    return a;
+  };
+  webfbBtns.appendChild(mk('🌐 Webで検索', searchUrl(query)));
+  detectOfficial(q).slice(0,3).forEach(o => {
+    webfbBtns.appendChild(mk('🏛 ' + o.name, searchUrl(query + ' site:' + o.site), 'official'));
+  });
+
+  const offline = (typeof navigator !== 'undefined' && navigator.onLine === false);
+  webfbNote.textContent = '';
+  if(offline){
+    const b = document.createElement('span');
+    b.className = 'webfb-off';
+    b.textContent = '現在オフラインのためWeb検索は利用できません。';
+    webfbNote.appendChild(b);
+  } else {
+    webfbNote.textContent = 'ここから先はローカル教材の外です。検索結果は428語の教材には含まれていません。';
+  }
+
+  webFallback.classList.add('show');
 }
 
 searchInput.addEventListener('input', runSearch);
