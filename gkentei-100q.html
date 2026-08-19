@@ -125,6 +125,23 @@
   .verdict.ng{background:var(--ng-bg); color:var(--ng); border:1.5px solid var(--ng);}
   .verdict .sm{display:block; font-weight:600; font-size:14px; margin-top:5px; color:var(--ink);}
 
+  /* ---------- 実戦テスト ---------- */
+  .prac-hero{background:linear-gradient(135deg,#5b4ba8,#7a5cc4); color:#fff;
+    border-radius:14px; padding:16px 18px; margin:12px 0 4px;}
+  .prac-hero h3{margin:0 0 4px; font-size:17px;}
+  .prac-hero p{margin:0; font-size:12.5px; opacity:.92;}
+  .prac-stat{display:flex; gap:9px; flex-wrap:wrap; margin-top:12px;}
+  .prac-stat div{background:rgba(255,255,255,.18); border-radius:9px; padding:7px 12px; font-size:13px; font-weight:700;}
+  .btn.prac{background:#5b4ba8;} .btn.prac:active{background:#48397f;}
+  .seg.prac{border-color:#5b4ba8;} .seg.prac button{color:#5b4ba8;}
+  .seg.prac button.on{background:#5b4ba8; color:#fff;}
+  .timer{font-variant-numeric:tabular-nums; font-weight:800; font-size:14px; color:#5b4ba8;}
+  .sylrow{display:flex; align-items:center; gap:9px; padding:8px 2px; border-bottom:1px solid var(--line); font-size:13.5px;}
+  .sylrow .sid{flex:0 0 42px; font-weight:800; color:var(--navy);}
+  .sylrow .sn{flex:1; min-width:0; color:var(--muted); font-size:12.5px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .sylrow .sv{flex:0 0 92px; text-align:right; font-weight:700;}
+  .sylrow.weak .sv{color:var(--ng);}
   .testnote{background:#eef3fb; border:1px solid #cddcf2; border-radius:11px;
     padding:12px 14px; font-size:14.5px; color:#28456f; line-height:1.6;}
   .star-btn{background:none; border:1.5px solid var(--line); border-radius:9px;
@@ -235,6 +252,12 @@ const QUESTIONS = [{"id":1,"title":"シンボルグラウンディング問題",
 const SYL_NAMES = {"T01":"人工知能の定義","T02":"人工知能分野で議論される問題","T03":"探索・推論","T04":"知識表現とエキスパートシステム","T05":"機械学習","T06":"ディープラーニング","T07":"教師あり学習","T08":"教師なし学習","T09":"強化学習","T10":"モデルの選択・評価","T11":"ニューラルネットワークとディープラーニング","T12":"活性化関数","T13":"誤差関数","T14":"正則化","T15":"誤差逆伝播法","T16":"最適化手法","T17":"全結合層","T18":"畳み込み層","T19":"正規化層","T20":"プーリング層","T21":"スキップ結合","T22":"回帰結合層","T23":"Attention","T24":"オートエンコーダ","T25":"データ拡張","T26":"画像認識","T27":"自然言語処理","T28":"音声処理","T29":"深層強化学習","T30":"データ生成","T31":"転移学習・ファインチューニング","T32":"マルチモーダル","T33":"モデルの解釈性","T34":"モデルの軽量化","T35":"AIプロジェクトの進め方","T36":"データの収集・加工・分析・学習","T37":"AIに必要な数理・統計知識","L01":"個人情報保護法","L02":"著作権法","L03":"特許法","L04":"不正競争防止法","L05":"独占禁止法","L06":"AI開発委託契約","L07":"AIサービス提供契約","L08":"国内外のガイドライン","L09":"プライバシー","L10":"公平性","L11":"安全性とセキュリティ","L12":"悪用","L13":"透明性","L14":"民主主義","L15":"環境保護","L16":"労働政策","L17":"その他の重要な価値","L18":"AIガバナンス"};
 
 /* ============================================================
+   PRACTICE_QUESTIONS ── 実戦問題（既存100問とは別データ）
+   既存 QUESTIONS には一切影響しない独立レイヤー
+   ============================================================ */
+const PRACTICE_QUESTIONS = [{"id":"P001","topic":"適合率の計算","type":"calculation","syllabus":["T10"],"relatedQuestions":[5,6,7],"question":"ある疾患のスクリーニングAIを検証した。検証データに含まれる実際の陽性は150件である。このAIが陽性と判定したのは120件で、そのうち実際に陽性だったのは90件だった。このモデルの適合率として最も適切なものはどれか。","choices":["80%","60%","75%","45%"],"answer":3,"explanation":"適合率は「陽性と予測したもののうち、実際に陽性だった割合」なので、90 ÷ 120 = 0.75、すなわち75%です。／誤答を切るポイント：60%は 90 ÷ 150 で、これは再現率です。実際の陽性150件という数値は再現率を計算させるための情報で、適合率には使いません。80%と45%はいずれの定義にも対応しません。／混同ポイント：適合率の分母は「予測した陽性の数」、再現率の分母は「実際の陽性の数」。問題文に両方の数値が出てきたときは、どちらを分母にするかで答えが変わります。／試験ポイント：分母が「予測」なら適合率、「実際」なら再現率。"},{"id":"P002","topic":"見逃しコストと指標選択","type":"scenario","syllabus":["T10"],"relatedQuestions":[5,6,7],"question":"がんの一次スクリーニングを行うAIを改善したい。このシステムでは、陽性と判定された人は後日必ず精密検査を受けるため、誤って陽性と判定しても精密検査で覆すことができる。一方、陰性と判定された人はそのまま経過観察となる。この状況で優先的に改善すべき指標として最も適切なものはどれか。","choices":["再現率を上げる","適合率を上げる","正解率を上げる","偽陽性率を下げる"],"answer":1,"explanation":"このシステムでは、誤って陽性としても精密検査で救済されますが、誤って陰性とすると見逃しがそのまま放置されます。見逃し（偽陰性）を減らすことが最優先なので、実際の陽性をどれだけ拾えたかを表す再現率を上げるべきです。／誤答を切るポイント：適合率を上げる、偽陽性率を下げるは、いずれも誤った陽性を減らす方向で、このケースでは救済可能なコストを減らそうとしていることになります。正解率は陰性が大多数を占める場面では見逃しがあっても高い値になりやすく、指標として適切ではありません。／混同ポイント：どちらを優先するかは指標の性能ではなく、誤りのコストの非対称性で決まります。／試験ポイント：見逃しが致命的なら再現率、誤検知のコストが高いなら適合率。"},{"id":"P003","topic":"シンボルグラウンディング問題とフレーム問題の区別","type":"comparison","syllabus":["T02"],"relatedQuestions":[1,2],"question":"家庭用ロボットの開発中に、次の2つの現象が観察された。\n\n（ア）「コップを取って」と指示すると、目の前の物体のどれがコップに該当するのかを結びつけられない。\n（イ）「部屋を掃除して」と指示すると、考慮すべき事柄が際限なく広がり、どこまで考えれば行動してよいのか決められない。\n\n（ア）と（イ）に対応する問題の組み合わせとして最も適切なものはどれか。","choices":["（ア）フレーム問題　（イ）シンボルグラウンディング問題","（ア）トイ・プロブレム　（イ）知識獲得のボトルネック","（ア）シンボルグラウンディング問題　（イ）中国語の部屋","（ア）シンボルグラウンディング問題　（イ）フレーム問題"],"answer":4,"explanation":"（ア）は「コップ」という記号を現実世界の対象に結びつけられない現象なので、シンボルグラウンディング問題です。（イ）は考慮すべき事柄の範囲を限定できない現象なので、フレーム問題です。／誤答を切るポイント：トイ・プロブレムは現実より単純化された問題設定を指し、この場面には当てはまりません。知識獲得のボトルネックは専門知識をシステムへ取り込む困難さのことです。中国語の部屋は、記号操作ができることと意味を理解していることは別だという思考実験で、（イ）の説明にはなりません。／混同ポイント：記号と意味の結びつきがシンボルグラウンディング、考慮範囲の限定がフレーム問題。／試験ポイント：「意味が分からない」ならシンボルグラウンディング、「どこまで考えるか決まらない」ならフレーム問題。"},{"id":"P004","topic":"学習の種類の判別","type":"scenario","syllabus":["T07","T08","T09"],"relatedQuestions":[65,66,76],"question":"ある小売企業が次の3つの案件をAIで扱おうとしている。\n\n（ア）過去の来店客データから、事前にラベル付けをせずに顧客をいくつかのグループに分けたい。\n（イ）倉庫内を走行するロボットが、試行錯誤しながら衝突を避けて最短で荷物を運ぶ動きを身につけるようにしたい。\n（ウ）過去の販売実績と気温から、翌日の売上金額を予測したい。\n\n（ア）（イ）（ウ）に対応する学習の種類の組み合わせとして最も適切なものはどれか。","choices":["（ア）教師あり学習　（イ）強化学習　（ウ）教師なし学習","（ア）教師なし学習　（イ）強化学習　（ウ）教師あり学習","（ア）教師なし学習　（イ）教師あり学習　（ウ）強化学習","（ア）強化学習　（イ）教師なし学習　（ウ）教師あり学習"],"answer":2,"explanation":"（ア）は正解ラベルを与えずに構造を見つける作業なのでクラスタリング、すなわち教師なし学習です。（イ）は行動の結果として得られる報酬をもとに試行錯誤で方策を獲得するので強化学習です。（ウ）は過去の実績という正解付きデータから連続値を予測するので教師あり学習の回帰問題です。／誤答を切るポイント：他の選択肢はいずれか1つ以上の対応が入れ替わっています。（ウ）の売上金額のように正解の数値が過去データとして存在する場合は教師あり学習であり、教師なし学習ではありません。／混同ポイント：判別の鍵は「正解ラベルがあるか」「報酬による試行錯誤があるか」の2点です。／試験ポイント：ラベルあり→教師あり、ラベルなし→教師なし、報酬と試行錯誤→強化学習。"},{"id":"P005","topic":"活性化関数の使い分け","type":"application","syllabus":["T12"],"relatedQuestions":[67,77],"question":"画像を10種類のカテゴリのいずれか1つに分類するディープラーニングモデルを設計している。中間層と出力層に用いる活性化関数の組み合わせとして最も適切なものはどれか。","choices":["中間層：ReLU関数　出力層：ソフトマックス関数","中間層：ソフトマックス関数　出力層：シグモイド関数","中間層：シグモイド関数　出力層：ReLU関数","中間層：ReLU関数　出力層：ReLU関数"],"answer":1,"explanation":"中間層には勾配消失が起きにくいReLU関数が広く用いられます。出力層は10クラスから1つを選ぶ多クラス分類なので、各クラスの確率の総和が1になるソフトマックス関数が適切です。／誤答を切るポイント：出力層にReLUを使うと出力が確率になりません。シグモイドを中間層に多用すると勾配消失が起きやすくなります。出力層にシグモイドを使うのは2値分類や、複数ラベルを同時に取りうる多ラベル分類の場合です。／混同ポイント：多クラス分類（1つだけ選ぶ）はソフトマックス、多ラベル分類（複数該当しうる）は各出力にシグモイド。／試験ポイント：中間層はReLU、排他的な多クラス出力はソフトマックス。"},{"id":"P006","topic":"画像認識タスクの選択","type":"scenario","syllabus":["T26"],"relatedQuestions":[69,78],"question":"工場のベルトコンベア上を流れる複数の部品について、1枚の画像から「同じ種類の部品が何個あるか」を数え、さらに個々の部品の輪郭を画素単位で切り出して寸法を測定したい。この目的に最も適した画像認識タスクはどれか。","choices":["画像分類","セマンティックセグメンテーション","インスタンスセグメンテーション","物体検出"],"answer":3,"explanation":"個体を1つずつ区別して数えたうえで、輪郭を画素単位で取得する必要があるため、インスタンスセグメンテーションが適切です。／誤答を切るポイント：画像分類は画像全体に1つのラベルを付けるだけで、個数も位置も分かりません。物体検出は矩形で位置と個数は分かりますが、画素単位の輪郭は得られません。セマンティックセグメンテーションは画素単位で領域を塗り分けますが、同じ種類の部品どうしを個体として区別しないため、個数を数えられません。／混同ポイント：「個体を区別するか」がセマンティックとインスタンスの分かれ目、「画素単位か矩形か」が物体検出との分かれ目です。／試験ポイント：個体の区別＋画素単位＝インスタンスセグメンテーション。"},{"id":"P007","topic":"音声の特徴表現とタスクの対応","type":"cross_topic","syllabus":["T28","T27"],"relatedQuestions":[71,13,70],"question":"会議の録音データから、（1）発言内容を文字に起こす機能と、（2）その発言が参加者A・B・Cのうち誰のものかを判別する機能の2つを実装する。両方の機能に共通して用いられる音声の特徴表現と、（2）に対応するタスク名の組み合わせとして最も適切なものはどれか。","choices":["特徴表現：ワンホットベクトル　　タスク：話者識別","特徴表現：メル周波数ケプストラム係数（MFCC）　　タスク：話者識別","特徴表現：メル周波数ケプストラム係数（MFCC）　　タスク：音声認識","特徴表現：TF-IDF　　タスク：感情分析"],"answer":2,"explanation":"MFCCは人間の聴覚特性に基づいて音声の周波数特性を表す特徴量で、音声認識にも話者識別にも共通して用いられます。（2）の「誰が話しているか」を判別するタスクは話者識別です。／誤答を切るポイント：ワンホットベクトルとTF-IDFはいずれも自然言語処理で単語や文書を表す手法であり、音声波形の特徴表現ではありません。タスク名について、音声認識は「何を言ったか」を扱うので（2）には対応せず、感情分析は話者の同定をしません。／混同ポイント：特徴表現とタスクは別の階層の概念です。同じ特徴量から、音声認識・話者識別・感情分析という異なるタスクが構築されます。／試験ポイント：MFCCは音声処理の共通特徴量。Whatが音声認識、Whoが話者識別。"},{"id":"P008","topic":"過学習の兆候と対策","type":"error_detection","syllabus":["T10","T14"],"relatedQuestions":[4,40],"question":"画像分類モデルの学習中、訓練データに対する正解率は99%まで上昇し続けたが、検証データに対する正解率は途中から低下し始めた。この状況への対応として最も適切でないものはどれか。","choices":["ドロップアウトを導入する","データ拡張によって学習データを水増しする","早期終了によって学習を打ち切る","モデルの層をさらに深くして表現力を高める"],"answer":4,"explanation":"訓練データの性能だけが上がり検証データの性能が下がるのは過学習の典型的な兆候です。この状況でモデルの表現力をさらに高めると過学習は悪化します。したがって最も適切でない対応です。／誤答を切るポイント：ドロップアウトは一部のユニットを確率的に無効化する正則化、データ拡張は学習データの多様性を増やす手法、早期終了は検証誤差が悪化した時点で学習を止める手法で、いずれも過学習を抑える方向に働きます。／混同ポイント：この設問は「適切でないもの」を選ばせています。過学習と未学習では取るべき対策が正反対になる点に注意が必要です。／試験ポイント：訓練だけ良く検証が悪い＝過学習。表現力を上げるのは未学習への対策。"},{"id":"P009","topic":"混同行列からの指標算出","type":"calculation","syllabus":["T10"],"relatedQuestions":[5,6,7],"question":"ある2値分類モデルを検証したところ、真陽性が40件、偽陽性が10件、偽陰性が20件、真陰性が130件であった。このモデルの再現率として最も適切なものはどれか。","choices":["85%","80%","約67%","約31%"],"answer":3,"explanation":"再現率は「実際に陽性のもののうち、陽性と予測できた割合」なので、真陽性 ÷（真陽性＋偽陰性）＝ 40 ÷（40＋20）＝ 約66.7%、すなわち約67%です。／誤答を切るポイント：80%は 40 ÷（40＋10）で適合率です。85%は（40＋130）÷ 200 で正解率です。約31%はいずれの定義にも対応しません。／混同ポイント：偽陰性は「実際は陽性なのに陰性と予測したもの」で、再現率の分母に含まれます。適合率の分母に入るのは偽陽性です。／試験ポイント：再現率の分母は TP＋FN、適合率の分母は TP＋FP。"},{"id":"P010","topic":"データリーケージの発見","type":"error_detection","syllabus":["T36","T10"],"relatedQuestions":[49],"question":"顧客の解約を予測するモデルを構築したところ、検証データでも99%という極めて高い正解率が得られた。しかし実運用に投入すると精度が大きく低下した。原因として最も疑わしいものはどれか。","choices":["予測時点では取得できないはずの情報が特徴量に含まれていた","学習に用いたデータの件数が不足しており、汎化していなかった","検証データの件数が多すぎて、評価が楽観的になっていた","中間層の活性化関数の選択が不適切で、表現力が不足していた"],"answer":1,"explanation":"検証時には高性能なのに運用で崩れる典型的な原因はデータリーケージです。たとえば「解約手続きの受付日」のように、予測したい時点ではまだ得られない情報が特徴量に混入していると、検証段階では不自然に高い精度が出ます。／誤答を切るポイント：学習データ不足であれば検証データでも精度は上がりません。検証データが多いことは精度低下の原因になりません。活性化関数の不適切さは検証段階から精度に表れます。／混同ポイント：過学習は「訓練は良いが検証が悪い」、リーケージは「検証まで良いのに運用で悪い」という現れ方の違いがあります。／試験ポイント：検証まで異常に高精度なら、まずリーケージを疑う。"},{"id":"P011","topic":"事前学習・転移学習・破滅的忘却の関係","type":"cross_topic","syllabus":["T31"],"relatedQuestions":[41,42,64],"question":"大規模モデルの開発と活用の過程で、次の3つの事象があった。\n\n（ア）ラベルの付いていない大量のテキストについて、文中の一部を隠して当てさせる方式で汎用的な表現を獲得させた。\n（イ）こうして得られたモデルを、自社の製品分類という別のタスクへ流用したところ、少量のデータで高い精度が得られた。\n（ウ）その後さらに別のタスクを追加で学習させたところ、（イ）で獲得していた製品分類の精度が大きく低下した。\n\n（ア）（イ）（ウ）に対応する用語の組み合わせとして最も適切なものはどれか。","choices":["（ア）半教師あり学習　（イ）転移学習　（ウ）過学習","（ア）自己教師あり学習　（イ）転移学習　（ウ）破滅的忘却","（ア）自己教師あり学習　（イ）事前学習　（ウ）勾配消失問題","（ア）半教師あり学習　（イ）ファインチューニング　（ウ）破滅的忘却"],"answer":2,"explanation":"（ア）はラベルなしデータから疑似的な正解を作り出して学習する自己教師あり学習です。（イ）は事前学習で得た知識を別タスクへ活かしているので転移学習です。（ウ）は新しいタスクの学習によって以前の能力が失われる破滅的忘却です。／誤答を切るポイント：半教師あり学習はラベル付きとラベルなしのデータを併用する手法で、（ア）のようにラベルを一切使わない方式とは異なります。（イ）を事前学習とすると、事前学習はむしろ（ア）の段階を指すため対応がずれます。（ウ）は訓練データへの適合しすぎではないので過学習ではなく、勾配が伝わらない現象でもありません。／混同ポイント：自己教師あり学習と半教師あり学習、事前学習と転移学習は、いずれも似た文脈で登場するため取り違えやすい組み合わせです。／試験ポイント：ラベルなしから疑似ラベルを作るのが自己教師あり、別タスクへ活かすのが転移学習、旧タスクを忘れるのが破滅的忘却。"},{"id":"P012","topic":"勾配消失の原因と対策","type":"cross_topic","syllabus":["T12","T15","T21"],"relatedQuestions":[33,39,67],"question":"層を深く積んだニューラルネットワークで、出力層から遠い層のパラメータがほとんど更新されなくなった。この問題への対策として適切でないものはどれか。","choices":["中間層の活性化関数をシグモイド関数からReLU関数へ変更する","スキップ結合を導入する","学習率を極端に小さくする","バッチ正規化を導入する"],"answer":3,"explanation":"出力層から遠い層が更新されないのは勾配消失問題です。学習率をさらに小さくすると更新量はいっそう小さくなり、問題は改善しません。したがって適切でない対策です。／誤答を切るポイント：シグモイド関数は微分値の最大が0.25程度で、層を重ねると勾配が急速に小さくなります。ReLUへの変更は有効です。スキップ結合は勾配が浅い層まで直接伝わる経路を作るため有効です。バッチ正規化も各層の入力分布を安定させ、勾配消失の緩和に寄与します。／混同ポイント：勾配消失と勾配爆発は原因も対策も異なります。勾配爆発には勾配クリッピングが用いられます。／試験ポイント：勾配消失の主な対策はReLU、スキップ結合、正規化層。"},{"id":"P013","topic":"検証方法の選択","type":"application","syllabus":["T10"],"relatedQuestions":[5,73],"question":"収集できたデータが200件しかない状況で、モデルの汎化性能をできるだけ安定して見積もりたい。検証方法として最も適切なものはどれか。","choices":["検証を行わず訓練誤差のみで判断する","データを1回だけ8対2に分けるホールドアウト検証","学習データ全件でそのまま評価する","k-分割交差検証"],"answer":4,"explanation":"データが少ない場合、1回だけの分割では分け方の偶然によって評価結果が大きく振れます。k-分割交差検証は分割を変えながら複数回評価して平均をとるため、限られたデータでも安定した推定が得られます。／誤答を切るポイント：ホールドアウト検証は手軽ですが、少量データでは推定のばらつきが大きくなります。学習データで評価すると過学習を検出できません。訓練誤差だけでは汎化性能を測れません。／混同ポイント：交差検証は計算コストが増える代わりに推定が安定します。データが十分に多い場合はホールドアウトでも問題ありません。／試験ポイント：データが少ないときは k-分割交差検証。"},{"id":"P014","topic":"制約条件に応じた軽量化手法の選択","type":"scenario","syllabus":["T34"],"relatedQuestions":[47,34],"question":"高精度だが大規模なモデルを、計算資源の限られたエッジ端末で動かしたい。次の2つの状況について、それぞれ適した軽量化手法を検討している。\n\n（ア）再学習を行うだけの計算資源が確保できず、モデルの構造も変更したくない。\n（イ）再学習の計算資源は確保できており、より小さな別構造のモデルを新たに用意してもよい。\n\n（ア）（イ）に適した手法の組み合わせとして最も適切なものはどれか。","choices":["（ア）量子化　（イ）蒸留","（ア）量子化　（イ）プルーニング","（ア）プルーニング　（イ）データ拡張","（ア）蒸留　（イ）量子化"],"answer":1,"explanation":"（ア）はモデルの構造を変えず、パラメータを低いビット数で表現するだけでサイズと計算量を減らせる量子化が適します。（イ）は教師となる大きなモデルの出力を用いて、別に用意した小さなモデルを学習させる蒸留が適します。／誤答を切るポイント：蒸留は生徒モデルの学習が必要なので、再学習の資源がない（ア）には使えません。プルーニングは重要度の低い結合やユニットを削除するため構造が変わり、通常は再学習を伴うので（ア）に適しません。データ拡張は学習データを水増しする手法であり、軽量化の手法ではありません。／混同ポイント：量子化とプルーニングは既存モデルを小さくする方向、蒸留は小さなモデルを別途学習させる方向です。再学習の要否と構造変更の要否が選択の分かれ目になります。／試験ポイント：構造を変えず再学習も不要なら量子化、別の小型モデルを育てるなら蒸留。"},{"id":"P015","topic":"データ形式に応じた解釈性手法の選択","type":"scenario","syllabus":["T33"],"relatedQuestions":[45,46],"question":"社内の2つのAIについて、判断根拠を示すよう求められた。\n\n（ア）畳み込みニューラルネットワークによる医用画像の判定について、画像のどの領域を見て判断したのかを示したい。\n（イ）表形式データを用いた与信審査モデルについて、個々の申込みごとに、どの特徴量がどの向きにどれだけ寄与したのかを示したい。\n\n（ア）（イ）に適した手法の組み合わせとして最も適切なものはどれか。","choices":["（ア）SHAP　（イ）Grad-CAM","（ア）Grad-CAM　（イ）Permutation Importance","（ア）Grad-CAM　（イ）SHAP","（ア）Permutation Importance　（イ）SHAP"],"answer":3,"explanation":"（ア）は畳み込みニューラルネットワークが注目した画像領域をヒートマップで可視化するGrad-CAMが適します。（イ）は個々の予測に対する各特徴量の寄与を符号つきで算出できるSHAPが適します。／誤答を切るポイント：Permutation Importanceは特徴量を並べ替えたときの性能低下からモデル全体としての重要度を測る手法で、1件ごとの予測理由を説明するものではありません。SHAPは表形式データの寄与度説明に向き、画像の注目領域を直接示す用途ではGrad-CAMが一般的です。／混同ポイント：説明の対象が「モデル全体」か「個々の予測」か、扱うデータが画像か表形式かで、適した手法が変わります。／試験ポイント：画像の注目領域はGrad-CAM、個別予測への特徴量の寄与はSHAP、全体の重要度はPermutation Importance。"},{"id":"P016","topic":"個人情報・個人データ・保有個人データの区別","type":"legal_case","syllabus":["L01"],"relatedQuestions":[81],"question":"ある企業が、取引先の担当者からもらった名刺を1枚受け取り、まだどこにも登録せず机上に置いている。翌日、その名刺の情報を検索可能な顧客管理システムへ登録した。登録前と登録後の位置づけとして最も適切なものはどれか。","choices":["登録前は個人情報にあたらず、登録後に初めて個人情報となる","登録前後を通じて個人情報であり、登録後は個人データにもあたる","登録前から個人データであり、登録後に保有個人データとなる","登録の有無にかかわらず、いずれも匿名加工情報として扱われる"],"answer":2,"explanation":"名刺は特定の個人を識別できる情報なので、登録前から個人情報にあたります。検索可能な形で体系的に整理されたデータベース等を構成すると、それは個人データにもあたります。／誤答を切るポイント：個人情報かどうかは識別可能性で決まり、データベース化の有無では決まりません。個人データは体系的に整理されて初めて成立するため、登録前から個人データとするのは誤りです。匿名加工情報は特定の個人を識別できないよう加工したもので、名刺は該当しません。／混同ポイント：個人情報は「識別できるか」、個人データは「データベース等を構成するか」、保有個人データは「開示・訂正等の権限を持つか」で区別します。／試験ポイント：個人情報 ⊃ 個人データ ⊃ 保有個人データ の入れ子関係。"},{"id":"P017","topic":"匿名加工情報と仮名加工情報の使い分け","type":"legal_case","syllabus":["L01"],"relatedQuestions":[17],"question":"小売企業が保有する購買履歴を、社内の分析部門だけで利用目的の範囲内で分析したいと考えている。外部へ提供する予定はなく、必要に応じて元の情報と照合できる状態を保っておきたい。この目的に最も適した制度はどれか。","choices":["個人関連情報として第三者へ提供する","匿名加工情報として加工する","要配慮個人情報として管理する","仮名加工情報として加工する"],"answer":4,"explanation":"仮名加工情報は、他の情報と照合しない限り特定の個人を識別できないように加工したもので、事業者内部での分析に用いることが想定されています。外部提供の予定がなく、必要に応じて照合できる状態を残したいという条件に合致します。／誤答を切るポイント：匿名加工情報は復元できないように加工するため、元情報との照合はできません。外部提供やデータ流通にも利用しやすい制度です。要配慮個人情報は病歴や信条など取得に原則同意が必要な情報の類型であり、加工の制度ではありません。個人関連情報は今回の目的と関係しません。／混同ポイント：復元可能性と第三者提供の可否が2つの制度の分かれ目です。／試験ポイント：照合を残して内部分析するなら仮名加工情報、復元できない形にして流通させやすくするなら匿名加工情報。用途によって使い分けるものであり、どちらか一方に決まる絶対のルールではありません。"},{"id":"P018","topic":"第三者提供と委託の区別","type":"legal_case","syllabus":["L01"],"relatedQuestions":[83],"question":"A社が保有する顧客の個人データを、AIモデルの開発を依頼したベンダーB社へ渡す。B社はA社の指示の範囲内でのみそのデータを取り扱い、自社の目的には利用しない。この取扱いについて最も適切なものはどれか。","choices":["委託にあたるため本人の同意は不要だが、A社にはB社を監督する義務がある","第三者提供にあたるため、本人の同意が必要である","委託にあたるため、A社はB社の取扱いについて一切責任を負わない","オプトアウトの手続きをとれば、同意も監督も不要となる"],"answer":1,"explanation":"利用目的の達成に必要な範囲内で取扱いを委託する場合、委託先は「第三者」に該当しないため、本人の同意は不要です。ただし委託元には委託先を監督する義務が課されます。／誤答を切るポイント：委託・事業承継・共同利用は第三者に該当しない3類型なので、同意が必要とするのは誤りです。監督義務は残るため、責任を一切負わないとするのも誤りです。オプトアウトは要配慮個人情報には使えず、また監督義務を免れる制度でもありません。／混同ポイント：同意が不要になることと、責任がなくなることは別問題です。／試験ポイント：第三者に該当しない3類型＝委託・事業承継・共同利用。同意不要でも監督義務は残る。"},{"id":"P019","topic":"著作権法30条の4の適用範囲","type":"legal_case","syllabus":["L02"],"relatedQuestions":[20,85],"question":"ある事業者が、インターネット上で公開されている大量のイラストを収集して画像生成AIを学習させ、そのAIを用いて生成した画像を商品として販売した。著作権法上の整理として最も適切なものはどれか。","choices":["学習も生成物の販売も、30条の4によって一律に適法となる","学習段階から常に著作権者の許諾を得る必要があり、例外は認められない","学習段階は30条の4の対象となりうるが、生成物の販売は類似性と依拠性で判断される","AIの生成物であるため、既存の著作物との類似性は問題にならない"],"answer":3,"explanation":"30条の4は、思想または感情の享受を目的としない利用について権利制限を認める規定で、学習段階を支える根拠になります。一方、生成された画像を利用する段階は、人間が作成した場合と同じく既存著作物との類似性と依拠性によって侵害が判断されます。／誤答を切るポイント：30条の4は生成・利用段階にまで及びません。また学習段階が常に許諾を要するわけでもありません。生成物であることを理由に類似性の判断を免れることはありません。／混同ポイント：学習段階と生成・利用段階を分けて考えるのが基本の枠組みです。30条の4にも、著作権者の利益を不当に害する場合という例外があります。／試験ポイント：学習＝30条の4、生成・利用＝類似性＋依拠性。"},{"id":"P020","topic":"著作物性と著作権侵害の区別","type":"legal_case","syllabus":["L02"],"relatedQuestions":[19],"question":"利用者が生成AIに「かわいい猫のイラスト」とだけ入力して画像を得た。この画像は、既存のいかなる著作物にも似ていなかった。この画像に関する説明として最も適切なものはどれか。","choices":["著作物として保護され、かつ著作権侵害にもあたる","著作物として保護される可能性は低いが、著作権侵害にもあたらない","著作物として保護されるが、著作権侵害の有無は判断できない","著作物として保護されず、そのため誰も利用できない"],"answer":2,"explanation":"簡単なプロンプトを入力しただけでは人間の創作的寄与が認められにくく、著作物として保護される可能性は低いと考えられます。一方で既存著作物に類似していない以上、類似性の要件を満たさないため著作権侵害にもあたりません。／誤答を切るポイント：著作物性と侵害の有無は別々に判断される論点です。著作物として保護されないことと、誰も利用できないことは結びつきません。／混同ポイント：AI生成物には「それ自体が著作物か」と「他人の権利を侵害していないか」という2つの独立した論点があります。／試験ポイント：著作物性は創作的寄与、侵害は類似性＋依拠性で判断する。"},{"id":"P021","topic":"新規性と進歩性の区別","type":"legal_case","syllabus":["L03"],"relatedQuestions":[22],"question":"ある研究者が新しい学習アルゴリズムを考案し、特許出願の前に学会で口頭発表を行った。その後、特許を出願した。この場合に最も問題となりうる特許要件はどれか。","choices":["新規性","進歩性","職務発明の要件","営業秘密の秘密管理性"],"answer":1,"explanation":"出願前に公然と知られた発明は新規性を失います。学会発表はその典型例です。ただし一定の要件のもとで新規性喪失の例外規定が適用される場合があります。／誤答を切るポイント：進歩性は「当業者が容易に発明できたものでないか」を問う要件であり、公表の有無とは別の論点です。職務発明は権利の帰属に関する制度です。営業秘密の秘密管理性は不正競争防止法の要件で、特許要件ではありません。／混同ポイント：新規性は「知られていないか」、進歩性は「容易に思いつくか」。公表によって直ちに失われるのは新規性です。／試験ポイント：出願前の公表で問題になるのは新規性。"},{"id":"P022","topic":"知的財産制度の選択","type":"scenario","syllabus":["L02","L03","L04"],"relatedQuestions":[80],"question":"自社で開発した独自の前処理アルゴリズムについて、内容を公開せずに社内で秘匿したまま長期にわたって保護したいと考えている。最も適した保護のあり方はどれか。","choices":["特許出願を行い、特許権として保護する","限定提供データとして外部へ反復提供する","著作権として登録し、表現を保護する","営業秘密として管理し、不正競争防止法による保護を受ける"],"answer":4,"explanation":"内容を公開したくない場合は、秘密として管理したまま保護を受けられる営業秘密が適しています。秘密管理性・有用性・非公知性の三要件を満たす必要があります。／誤答を切るポイント：特許は出願内容が公開されることが前提で、公開の代償として一定期間の独占権を得る制度です。存続期間も出願から20年に限られます。著作権は表現を保護するもので、アルゴリズムという技術的思想そのものは保護対象になりません。また日本の著作権は登録なしに発生します。限定提供データは特定の相手へ反復継続して提供するデータを保護する制度で、秘匿し続ける今回の方針とは合いません。／混同ポイント：公開するか秘匿するかが特許と営業秘密の分岐点です。／試験ポイント：公開の代償に独占権なら特許、秘匿したまま守るなら営業秘密。"},{"id":"P023","topic":"営業秘密と限定提供データの区別","type":"legal_case","syllabus":["L04"],"relatedQuestions":[87],"question":"あるデータ事業者が、会員企業に対して有償で継続的に提供している大規模な走行データがある。このデータは会員企業の間では共有されており、業界内では内容が知られている。このデータの保護について最も適切なものはどれか。","choices":["営業秘密の三要件を満たすため、営業秘密として保護される","非公知性を欠くため、いかなる保護も受けられない","非公知性を欠くため営業秘密としての保護は難しいが、限定提供データとして保護されうる","著作権法上の著作物として当然に保護される"],"answer":3,"explanation":"会員企業の間で共有され業界内で知られている以上、営業秘密の要件のうち非公知性を満たしません。一方、限定提供データは非公知性を要件としないため、限定提供性・相当蓄積性・電磁的管理性を満たせば保護されうります。／誤答を切るポイント：非公知性を欠くからといって保護が一切ないわけではなく、そのために設けられたのが限定提供データの制度です。営業秘密の三要件を満たすとする選択肢は前提が誤っています。データが当然に著作物になるわけでもありません。／混同ポイント：非公知性を要するかどうかが、営業秘密と限定提供データの決定的な違いです。／試験ポイント：限定提供データは非公知性を要しない。"},{"id":"P024","topic":"AI開発契約の類型と精度保証","type":"legal_case","syllabus":["L06"],"relatedQuestions":[26,27,90],"question":"ユーザー企業がベンダーへAI開発を委託するにあたり、検証段階（PoC）の契約について「正解率95%以上を達成できなければ報酬を支払わない」という条項を求めた。この要求に対する評価として最も適切なものはどれか。","choices":["PoC段階でも成果を明確にすべきであり、請負契約として完成義務を課すのが望ましい","AIの性能は学習データに依存し事前に確約できないため、PoC段階での精度保証の要求は適切でない","精度保証は法律で義務づけられているため、条項の有無にかかわらず当然に成立する","PoC段階では契約を締結せず、口頭合意で進めるのが一般的である"],"answer":2,"explanation":"AIの性能は学習データの質と量に依存し、開発前に到達精度を確約することは困難です。そのためPoC段階では準委任型の契約が適する場合が多く、精度保証や完成義務を課さない形が検討されます。／誤答を切るポイント：請負契約は仕事の完成義務を伴うため、成果が事前に確定できないAI開発の検証段階には馴染みません。精度保証を法律が義務づけている事実はありません。契約を締結せずに進めるのは、知的財産の帰属や秘密保持の面で危険です。／混同ポイント：請負は完成義務、準委任は善管注意義務。義務の性質が異なります。／試験ポイント：成果や精度が事前に確定しにくいPoCでは準委任型が選択されることがある。安易な精度保証の要求は適切でない。"},{"id":"P025","topic":"SLAの可用性とAI精度保証の区別","type":"legal_case","syllabus":["L07"],"relatedQuestions":[91,52],"question":"SaaS型のAIサービスの契約書に「稼働率99.9%を保証する」と記載されていた。利用開始後、サービスは常時稼働していたが、判定結果の精度が期待を下回った。この状況の評価として最も適切なものはどれか。","choices":["稼働率が保証されている以上、利用者は精度について一切主張できない","稼働率の保証には判定精度の保証も含まれるため、契約違反である","SaaS型では精度保証が法律上義務づけられているため、当然に契約違反となる","稼働率はサービスが利用できる状態にあることの保証であり、判定精度の保証とは別のものである"],"answer":4,"explanation":"SLAにおける稼働率はサービスが利用可能な状態にあることを示す指標であり、出力の正しさを保証するものではありません。両者は別個の論点です。／誤答を切るポイント：稼働率に精度保証が含まれるとする理解は誤りです。SaaS型で精度保証が法律上義務づけられている事実もありません。一方で、精度について契約上どのような合意があるかは別途問題になりうるため、一切主張できないとするのも言い過ぎです。／混同ポイント：可用性（使えるか）と精度（正しいか）を分けて考えることが重要です。／試験ポイント：SLAの稼働率と AI の精度保証は別物。"},{"id":"P026","topic":"規範の種類とリスクベースアプローチ","type":"scenario","syllabus":["L08"],"relatedQuestions":[79,92],"question":"ある国が、AIの用途を危険度に応じて段階分けし、生命や基本的人権に関わる用途には厳格な義務を課す一方、影響の小さい用途には規制を課さない法制度を導入した。この制度の性格として最も適切なものはどれか。","choices":["ハードローであり、リスクベースアプローチを採用している","ソフトローであり、リスクベースアプローチを採用している","ハードローであり、すべての用途へ一律の規制を課している","ソフトローであり、すべての用途へ一律の規制を課している"],"answer":1,"explanation":"法律として制定され義務を課す以上、強制力を伴うハードローです。また危険度に応じて規制の強度を変えているので、リスクベースアプローチにあたります。／誤答を切るポイント：ソフトローはガイドラインや行動規範のように法的拘束力を持たない規範を指すため、この制度には当てはまりません。危険度に応じて分けている以上、一律規制でもありません。／混同ポイント：ハードローかソフトローかは「強制力の有無」、リスクベースかどうかは「規制の強度を変えるか」で、独立した2つの軸です。／試験ポイント：規制資源を高リスク領域へ集中させ、低リスク用途の萎縮を避けるのがリスクベースアプローチの狙い。"},{"id":"P027","topic":"バイ・デザインの2類型の区別","type":"comparison","syllabus":["L09","L11"],"relatedQuestions":[74,94],"question":"AIサービスの設計段階で、次の2つの方針を採用した。\n\n（ア）取得する個人データを必要最小限にとどめ、初期設定を最もプライバシー保護的な状態にする。\n（イ）学習データや推論APIへの不正アクセスを防ぐ仕組みを、開発の初期から組み込む。\n\n（ア）（イ）に対応する概念の組み合わせとして最も適切なものはどれか。","choices":["（ア）セキュリティ・バイ・デザイン　（イ）プライバシー・バイ・デザイン","（ア）プライバシー・バイ・デザイン　（イ）プライバシー・バイ・デザイン","（ア）プライバシー・バイ・デザイン　（イ）セキュリティ・バイ・デザイン","（ア）人間中心の原則　（イ）トレーサビリティ"],"answer":3,"explanation":"（ア）は個人データの取得と初期設定に関する方針なのでプライバシー・バイ・デザイン、（イ）は不正アクセス対策に関する方針なのでセキュリティ・バイ・デザインです。／誤答を切るポイント：2つの概念は対になっていますが、守る対象が異なります。人間中心の原則は AI が人間の尊厳を損なわないという価値原則、トレーサビリティは履歴を追跡できることで、いずれもこの場面の説明にはなりません。／混同ポイント：どちらも「設計段階から組み込む」点は共通で、対象がプライバシーかセキュリティかで区別します。／試験ポイント：事後対応ではなく事前の設計に組み込むという発想が両者に共通する。"},{"id":"P028","topic":"AIへの攻撃類型の区別","type":"scenario","syllabus":["L11"],"relatedQuestions":[29,30,95],"question":"公開している画像判定APIについて、次の2つの被害が確認された。\n\n（ア）人間には判別できないごく小さなノイズを加えた画像を送られ、判定を誤らせられた。\n（イ）大量の問い合わせと出力の観察を繰り返され、ほぼ同等の性能を持つモデルを外部で再現された。\n\n（ア）（イ）に対応する攻撃の組み合わせとして最も適切なものはどれか。","choices":["（ア）データ汚染　（イ）モデル窃取","（ア）Adversarial Attack　（イ）データ汚染","（ア）モデル窃取　（イ）Adversarial Attack","（ア）Adversarial Attack　（イ）モデル窃取"],"answer":4,"explanation":"（ア）は入力に微小な摂動を加えて誤分類させるAdversarial Attackです。（イ）はAPIへの問い合わせと出力からモデルを複製するモデル窃取です。／誤答を切るポイント：データ汚染は学習データへ悪意あるデータを混入させ、モデルの挙動そのものを歪める攻撃で、いずれの被害の説明にもなりません。／混同ポイント：攻撃される段階が異なります。データ汚染は学習段階、Adversarial Attack は推論段階の入力、モデル窃取は推論段階の出力を狙います。／試験ポイント：学習データを汚すのがデータ汚染、入力を細工するのがAdversarial Attack、出力から複製するのがモデル窃取。"},{"id":"P029","topic":"フィルターバブルとエコーチェンバーの区別","type":"comparison","syllabus":["L14"],"relatedQuestions":[57,97],"question":"SNSで次の2つの現象が観察された。\n\n（ア）推薦アルゴリズムが利用者の関心に合う情報ばかりを表示し、それ以外の情報に触れにくくなった。\n（イ）似た意見を持つ利用者どうしが集まって発言を繰り返し、その意見がいっそう強固になった。\n\n（ア）（イ）に対応する概念の組み合わせとして最も適切なものはどれか。","choices":["（ア）フィルターバブル　（イ）エコーチェンバー","（ア）エコーチェンバー　（イ）フィルターバブル","（ア）ディープフェイク　（イ）エコーチェンバー","（ア）フィルターバブル　（イ）フェイクニュース"],"answer":1,"explanation":"（ア）はアルゴリズムによる情報の選別で利用者が泡の中に閉じ込められる現象なのでフィルターバブル、（イ）は同質な意見が反響し合って増幅される現象なのでエコーチェンバーです。／誤答を切るポイント：ディープフェイクは生成技術による偽の映像や音声を指し、情報環境の偏りとは別の論点です。／混同ポイント：フィルターバブルはアルゴリズムが主因、エコーチェンバーは似た者どうしが集まる人間側の力学が主因という違いがあります。／試験ポイント：アルゴリズムが囲い込むのがフィルターバブル、同質な意見が反響するのがエコーチェンバー。"},{"id":"P030","topic":"AIガバナンスの手法の区別","type":"cross_topic","syllabus":["L18"],"relatedQuestions":[98,99,100],"question":"金融機関が与信審査AIを導入するにあたり、次の対応をとった。\n\n（ア）導入前に、差別的な結果が生じないかを組織として評価する手続きを実施した。\n（イ）運用開始後も、入力データの分布の変化による性能劣化を継続的に監視した。\n（ウ）どのデータで学習し、どの版のモデルがどの判断を行ったかを後から追跡できるよう記録を残した。\n\n（ア）（イ）（ウ）に対応する概念の組み合わせとして最も適切なものはどれか。","choices":["（ア）モニタリング　（イ）倫理アセスメント　（ウ）再現性","（ア）倫理アセスメント　（イ）モニタリング　（ウ）トレーサビリティ","（ア）倫理アセスメント　（イ）トレーサビリティ　（ウ）モニタリング","（ア）人間の関与　（イ）モニタリング　（ウ）再現性"],"answer":2,"explanation":"（ア）は導入前の事前評価なので倫理アセスメント、（イ）は運用後の継続監視なのでモニタリング、（ウ）は履歴を追跡できるようにする取り組みなのでトレーサビリティです。／誤答を切るポイント：再現性は同じ入力と条件で同じ結果が得られることを指し、履歴の追跡そのものではありません。人間の関与は重要な判断に人間が介在する設計を指し、（ア）の事前評価の説明としては不正確です。／混同ポイント：倫理アセスメントは事前、モニタリングは事後という時間軸の違いがあります。再現性とトレーサビリティは、前者が結果の一致、後者が経緯の追跡です。／試験ポイント：事前＝倫理アセスメント、運用後＝モニタリング、経緯の追跡＝トレーサビリティ。"}];
+
+/* ============================================================
    localStorage（他アプリと完全分離）
    ============================================================ */
 const LS_KEY = 'gkentei_100q_v1';
@@ -264,6 +287,55 @@ function rec(id){
 function answered(id){ const r = STORE.history[String(id)]; return !!(r && r.lastResult); }
 function isWeak(id){ const r = STORE.history[String(id)]; return !!(r && r.weak); }
 function lastResult(id){ const r = STORE.history[String(id)]; return r ? r.lastResult : null; }
+
+/* ============================================================
+   実戦問題の学習履歴（既存キーとは完全分離）
+   ============================================================ */
+const P_LS_KEY = 'gkentei_practical_v1';
+let PSTORE = {version:1, history:{}, settings:{count:10, unseenOnly:false}};
+
+function pLoad(){
+  try{
+    const raw = localStorage.getItem(P_LS_KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      if(o && typeof o === 'object'){
+        PSTORE.history  = o.history  || {};
+        PSTORE.settings = Object.assign(PSTORE.settings, o.settings || {});
+      }
+    }
+  }catch(e){ console.warn('practical load failed', e); }
+}
+function pSave(){
+  try{ localStorage.setItem(P_LS_KEY, JSON.stringify(PSTORE)); }
+  catch(e){ console.warn('practical save failed', e); }
+}
+function pRec(id){
+  if(!PSTORE.history[id]) PSTORE.history[id] = {
+    correct:0, incorrect:0, weak:false, last:null, lastResult:null,
+    firstSeenAt:null, firstAnsweredAt:null, firstResult:null,
+    answerCount:0, totalTimeMs:0
+  };
+  return PSTORE.history[id];
+}
+/* 初見の消費：問題を初めて表示した時点で firstSeenAt を記録する */
+function pMarkSeen(id){
+  const r = pRec(id);
+  if(!r.firstSeenAt){ r.firstSeenAt = new Date().toISOString(); pSave(); }
+}
+function pSeen(id){ const r = PSTORE.history[id]; return !!(r && r.firstSeenAt); }
+function pFirstStats(){
+  const seen = PRACTICE_QUESTIONS.filter(q => pSeen(q.id));
+  const ans  = seen.filter(q => PSTORE.history[q.id].firstResult);
+  const ok   = ans.filter(q => PSTORE.history[q.id].firstResult === 'correct');
+  return {seen:seen.length, answered:ans.length, ok:ok.length,
+          rate: ans.length ? Math.round(ok.length/ans.length*100) : 0};
+}
+const pById = id => PRACTICE_QUESTIONS.find(q => q.id === id);
+function fmtMs(ms){
+  const s = Math.max(0, Math.round(ms/1000));
+  return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+}
 
 /* ============================================================
    共通ユーティリティ
@@ -317,7 +389,8 @@ function render(v){
   document.querySelectorAll('.fnav button').forEach(b =>
     b.classList.toggle('on', b.dataset.nav === view));
   ({home:vHome, quiz:vQuiz, result:vResult, list:vList, search:vSearch,
-    syllabus:vSyllabus, exps:vExps, settings:vSettings}[view] || vHome)();
+    syllabus:vSyllabus, exps:vExps, settings:vSettings,
+    practical:vPractical, pquiz:vPQuiz, presult:vPResult, preview:vPReview}[view] || vHome)();
 }
 
 /* ---------- ホーム ---------- */
@@ -348,6 +421,7 @@ function vHome(){
   const lawIds    = QUESTIONS.filter(isLaw).map(q => q.id);
   const ord = STORE.settings.order;
   const jud = STORE.settings.judge;
+  const fs  = pFirstStats();
 
   app.innerHTML = `
     <div class="hero">
@@ -361,6 +435,17 @@ function vHome(){
       ${progBlock('技術分野', QUESTIONS.filter(isTech), 'tech')}
       ${progBlock('法律・倫理分野', QUESTIONS.filter(isLaw), 'law')}
     </div>
+
+    <h2 class="sec">実戦テスト</h2>
+    <div class="prac-hero">
+      <h3>初見の問題で理解度を測る</h3>
+      <p>既存100問とは別の応用問題${PRACTICE_QUESTIONS.length}問。選択肢と出題順をシャッフルし、全問終えてからまとめて採点します。</p>
+      <div class="prac-stat">
+        <div>初見 ${fs.answered} / ${PRACTICE_QUESTIONS.length}問 解答済み</div>
+        <div>初見正答率 ${fs.answered ? fs.rate + '%' : '—'}</div>
+      </div>
+    </div>
+    <button class="btn prac wide" id="pracBtn" type="button" style="margin-top:9px">実戦テストへ</button>
 
     <h2 class="sec">出題順</h2>
     <div class="seg" id="ordSeg">
@@ -395,6 +480,7 @@ function vHome(){
     const b = e.target.closest('[data-ord]'); if(!b) return;
     STORE.settings.order = b.dataset.ord; saveStore(); render('home');
   };
+  $('#pracBtn').onclick = () => render('practical');
   $('#judSeg').onclick = e => {
     const b = e.target.closest('[data-jud]'); if(!b) return;
     STORE.settings.judge = b.dataset.jud; saveStore(); render('home');
@@ -736,10 +822,359 @@ function vExps(){
   };
 }
 
+/* ============================================================
+   実戦テスト
+   ============================================================ */
+let pSession = null;   // {ids, order{}, cur, picks{}, graded{}, submitted,
+                       //  startedAt, elapsedMs, shownAt, timeMs{}, reviewIds, rcur}
+let pTimerId = null;
+
+/* 選択肢の並び替え表：order[i] = 表示i番目に出す「元の」選択肢の添字
+   ユーザーの選択は必ず元の添字へ戻してから記録・採点する */
+function makeOrder(){ return shuffled([0,1,2,3]); }
+
+function pStart(ids, label){
+  if(!ids.length){ alert('該当する問題がありません。'); return; }
+  const list = shuffled(ids);                    // 出題順もシャッフル・重複なし
+  const order = {};
+  list.forEach(id => { order[id] = makeOrder(); });
+  pSession = {ids:list, order, cur:0, picks:{}, graded:{}, submitted:false,
+              label:label||'', startedAt:Date.now(), elapsedMs:0,
+              shownAt:0, timeMs:{}, reviewIds:[], rcur:0};
+  render('pquiz');
+}
+function pStopTimer(){ if(pTimerId){ clearInterval(pTimerId); pTimerId = null; } }
+function pTick(){
+  const el = document.getElementById('pTimer');
+  if(!el || !pSession || pSession.submitted){ pStopTimer(); return; }
+  el.textContent = fmtMs(Date.now() - pSession.startedAt);
+}
+/* 表示していた問題の滞在時間を積む */
+function pLeave(){
+  if(!pSession || !pSession.shownAt) return;
+  const id = pSession.ids[pSession.cur];
+  pSession.timeMs[id] = (pSession.timeMs[id] || 0) + (Date.now() - pSession.shownAt);
+  pSession.shownAt = 0;
+}
+
+/* ---------- 実戦テスト トップ ---------- */
+function vPractical(){
+  pStopTimer();
+  const fs = pFirstStats();
+  const unseen = PRACTICE_QUESTIONS.filter(q => !pSeen(q.id));
+  const cnt = PSTORE.settings.count;
+  const only = PSTORE.settings.unseenOnly;
+  const pool = only ? unseen : PRACTICE_QUESTIONS;
+  const maxN = pool.length;
+
+  /* シラバス別の正答率（実戦問題のみ集計） */
+  const agg = {};
+  PRACTICE_QUESTIONS.forEach(q => {
+    const r = PSTORE.history[q.id];
+    if(!r || !r.lastResult) return;
+    q.syllabus.forEach(sid => {
+      agg[sid] = agg[sid] || {n:0, ok:0};
+      agg[sid].n++; if(r.lastResult === 'o') agg[sid].ok++;
+    });
+  });
+  const rows = Object.keys(agg).sort().map(sid => {
+    const a = agg[sid], rate = Math.round(a.ok/a.n*100);
+    return `<div class="sylrow ${rate<60?'weak':''}"><span class="sid">${sid}</span>
+      <span class="sn">${esc(SYL_NAMES[sid]||'')}</span>
+      <span class="sv">${a.ok} / ${a.n}　${rate}%</span></div>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="prac-hero">
+      <h3>実戦テスト</h3>
+      <p>選択肢と出題順をシャッフルし、テスト中は正誤も解説も表示しません。全問終えてからまとめて採点します。</p>
+      <div class="prac-stat">
+        <div>初見で解答 ${fs.answered} / ${PRACTICE_QUESTIONS.length}問</div>
+        <div>初見正答率 ${fs.answered ? fs.rate + '%' : '—'}</div>
+        <div>未出題 ${unseen.length}問</div>
+      </div>
+    </div>
+
+    <h2 class="sec">出題数</h2>
+    <div class="seg prac" id="pCntSeg">
+      ${[10,20,30].map(n => `<button type="button" data-n="${n}" class="${cnt===n?'on':''}">${n}問</button>`).join('')}
+    </div>
+
+    <h2 class="sec">出題範囲</h2>
+    <div class="seg prac" id="pOnlySeg">
+      <button type="button" data-only="0" class="${only?'':'on'}">すべての問題</button>
+      <button type="button" data-only="1" class="${only?'on':''}">未出題だけ</button>
+    </div>
+    <p class="muted" style="margin:7px 0 0">${only
+      ? `一度も表示していない問題だけを出題します（現在 ${unseen.length}問）。`
+      : `全${PRACTICE_QUESTIONS.length}問から出題します。一度表示した問題は初見ではなくなります。`}</p>
+
+    <button class="btn prac wide" id="pStartBtn" type="button" style="margin-top:14px"
+      ${maxN ? '' : 'disabled'}>テストを開始（${Math.min(cnt, maxN)}問）</button>
+    ${maxN===0 ? '<p class="muted" style="margin-top:8px">未出題の問題がありません。「すべての問題」に切り替えてください。</p>' : ''}
+
+    ${rows ? `<h2 class="sec">シラバス別の正答率</h2>
+      <p class="muted">最新の解答結果で集計しています。60%未満は赤字で表示します。</p>
+      <div class="card" style="padding:4px 12px">${rows}</div>` : ''}
+
+    <div class="navbtns"><button class="btn ghost" id="pBack" type="button">ホームへ戻る</button></div>`;
+
+  $('#pCntSeg').onclick = e => { const b = e.target.closest('[data-n]'); if(!b) return;
+    PSTORE.settings.count = +b.dataset.n; pSave(); render('practical'); };
+  $('#pOnlySeg').onclick = e => { const b = e.target.closest('[data-only]'); if(!b) return;
+    PSTORE.settings.unseenOnly = b.dataset.only === '1'; pSave(); render('practical'); };
+  $('#pBack').onclick = () => render('home');
+  const sb = $('#pStartBtn');
+  if(sb) sb.onclick = () => pStart(shuffled(pool.map(q => q.id)).slice(0, cnt), only ? '未出題' : '実戦テスト');
+}
+
+/* ---------- 実戦テスト 出題 ---------- */
+function vPQuiz(){
+  if(!pSession){ render('practical'); return; }
+  const id = pSession.ids[pSession.cur];
+  const q = pById(id);
+  const ord = pSession.order[id];
+  const testing = !pSession.submitted;
+
+  if(testing) pMarkSeen(id);                       // 初見はここで消費する
+  pSession.shownAt = Date.now();
+
+  const pickOrig = pSession.picks[id] || null;     // 元の添字ベース（1〜4）
+  const done = pSession.graded[id] !== undefined;
+  const ok = done && pSession.graded[id];
+  const shown = !!pSession.revealed;
+  const nPicked = pSession.ids.filter(i => pSession.picks[i]).length;
+  const pct = Math.round((pSession.cur+1)/pSession.ids.length*100);
+  const correctPos = ord.indexOf(q.answer-1) + 1;  // 表示上の正解位置
+
+  const choices = ord.map((origIdx, i) => {
+    const dispNo = i+1;
+    let cls = '';
+    if(done){
+      if(dispNo === correctPos) cls = 'correct';
+      else if(origIdx+1 === pickOrig) cls = 'wrong';
+    } else if(origIdx+1 === pickOrig) cls = 'sel';
+    return `<button class="choice ${cls}" data-o="${origIdx+1}" ${done?'disabled':''} type="button">
+      <span class="num">${dispNo}</span><span>${esc(q.choices[origIdx])}</span></button>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="qbar">
+      <span class="idx">${pSession.cur+1} / ${pSession.ids.length}</span>
+      ${testing ? `<span class="timer" id="pTimer">${fmtMs(Date.now()-pSession.startedAt)}</span>
+        <span class="muted" style="font-size:12px">解答済み ${nPicked}</span>` : ''}
+      <div class="qprog"><div class="bar"><span style="width:${pct}%"></span></div></div>
+      <button class="btn ghost sm" id="pQuit" type="button">中断</button>
+    </div>
+
+    <div class="card">
+      ${done ? `<div><span class="qno">${q.id}</span>
+          ${q.syllabus.map(x => `<span class="badge">${x}</span>`).join('')}</div>
+        <div class="qtitle">${esc(q.topic)}</div>` : ''}
+      <div class="qtext">${esc(q.question).replace(/\n/g,'<br>')}</div>
+      <div id="pChoices">${choices}</div>
+    </div>
+
+    <div id="pAfter"></div>
+
+    <div class="navbtns">
+      <button class="btn ghost" id="pPrev" ${pSession.cur===0?'disabled':''} type="button">← 前へ</button>
+      <button class="btn" id="pNext" type="button">${
+        pSession.cur === pSession.ids.length-1
+          ? (testing ? '採点する' : '結果へ戻る') : '次の問題へ →'}</button>
+    </div>`;
+
+  const after = $('#pAfter');
+  if(done){
+    after.innerHTML = `
+      <div class="verdict ${ok?'ok':'ng'}">${ok?'正解！':'不正解'}
+        <span class="sm">${esc(q.topic)}${q.syllabus.map(x=>`【${x}】`).join('')}</span>
+        ${ok?'':`<span class="sm">正解は ${correctPos}：${esc(q.choices[q.answer-1])}</span>`}</div>
+      <div class="exp"><p>${esc(q.explanation).replace(/／/g,'</p><p>')}</p></div>
+      <button class="btn sub wide" id="pRelated" type="button">関連する基礎問題を復習（問${q.relatedQuestions.join('・問')}）</button>`;
+    $('#pRelated').onclick = () => {
+      pStopTimer(); pSession = null;
+      startSession(q.relatedQuestions.slice(), '基礎問題の復習');
+    };
+  } else {
+    after.innerHTML = `<div class="testnote">${pickOrig
+      ? '解答を記録しました。選び直せます。'
+      : '選択肢をタップして解答してください。'}<br>
+      <span class="muted">実戦テストです。採点と解説は全問終了後に表示します。</span></div>`;
+  }
+
+  $('#pChoices').onclick = e => {
+    const b = e.target.closest('.choice'); if(!b || b.disabled) return;
+    pSession.picks[id] = +b.dataset.o;      // 元の添字で保存
+    vPQuiz();
+  };
+  $('#pPrev').onclick = () => { if(pSession.cur>0){ pLeave(); pSession.cur--; vPQuiz(); } };
+  $('#pNext').onclick = () => {
+    pLeave();
+    if(pSession.cur === pSession.ids.length-1){
+      if(testing) pSubmit(); else render('presult');
+    } else { pSession.cur++; vPQuiz(); }
+  };
+  $('#pQuit').onclick = () => {
+    const msg = testing
+      ? '中断すると、この回の解答は採点されずに破棄されます。\n（表示した問題は初見として消費済みです）'
+      : 'テストを終了してホームへ戻りますか？';
+    if(confirm(msg)){ pLeave(); pStopTimer(); pSession = null; render('home'); }
+  };
+
+  pStopTimer();
+  if(testing) pTimerId = setInterval(pTick, 1000);
+}
+
+/* ---------- 一括採点 ---------- */
+function pSubmit(){
+  const un = pSession.ids.filter(i => !pSession.picks[i]).length;
+  if(un && !confirm(`未回答が${un}問あります。このまま採点しますか？`)) return;
+  pLeave();
+  pStopTimer();
+  pSession.elapsedMs = Date.now() - pSession.startedAt;
+  const now = new Date().toISOString();
+  pSession.ids.forEach(id => {
+    const pick = pSession.picks[id];
+    if(!pick) return;
+    const q = pById(id), r = pRec(id), ok = (pick === q.answer);
+    if(ok) r.correct++; else r.incorrect++;
+    r.lastResult = ok ? 'o' : 'x';
+    r.last = now;
+    r.answerCount = (r.answerCount||0) + 1;
+    r.totalTimeMs = (r.totalTimeMs||0) + (pSession.timeMs[id]||0);
+    if(!r.firstAnsweredAt){                       // 初回解答は上書きしない
+      r.firstAnsweredAt = now;
+      r.firstResult = ok ? 'correct' : 'incorrect';
+    }
+    pSession.graded[id] = ok;
+  });
+  pSession.submitted = true;
+  pSave();
+  render('presult');
+}
+
+/* ---------- 実戦テスト 結果 ---------- */
+function vPResult(){
+  if(!pSession){ render('practical'); return; }
+  pStopTimer();
+  const g = pSession.graded;
+  const ansIds = pSession.ids.filter(i => g[i] !== undefined);
+  const okIds = ansIds.filter(i => g[i]);
+  const ngIds = ansIds.filter(i => !g[i]);
+  const unIds = pSession.ids.filter(i => g[i] === undefined);
+  const rate = ansIds.length ? Math.round(okIds.length/ansIds.length*100) : 0;
+  const avg = pSession.ids.length ? pSession.elapsedMs/pSession.ids.length : 0;
+
+  const agg = {};
+  pSession.ids.forEach(id => {
+    if(g[id] === undefined) return;
+    pById(id).syllabus.forEach(sid => {
+      agg[sid] = agg[sid] || {n:0, ok:0};
+      agg[sid].n++; if(g[id]) agg[sid].ok++;
+    });
+  });
+  const sylRows = Object.keys(agg).sort().map(sid => {
+    const a = agg[sid], r = Math.round(a.ok/a.n*100);
+    return `<div class="sylrow ${r<60?'weak':''}"><span class="sid">${sid}</span>
+      <span class="sn">${esc(SYL_NAMES[sid]||'')}</span>
+      <span class="sv">${a.ok} / ${a.n}　${r}%</span></div>`;
+  }).join('');
+
+  app.innerHTML = `
+    <h2 class="sec">実戦テスト結果</h2>
+    <div class="card score">
+      <div class="big">${ansIds.length}問中 ${okIds.length}問正解</div>
+      <div class="rate">正答率 ${rate}%</div>
+      <div class="tally">
+        <div class="c">正解 ${okIds.length}</div>
+        <div class="w">不正解 ${ngIds.length}</div>
+        ${unIds.length ? `<div style="background:#eef1f6;color:#4b5563">未回答 ${unIds.length}</div>` : ''}
+      </div>
+      <div class="muted" style="margin-top:12px">
+        所要時間 ${fmtMs(pSession.elapsedMs)}　／　平均 ${(avg/1000).toFixed(1)}秒 / 問</div>
+    </div>
+
+    ${sylRows ? `<h2 class="sec">シラバス別の正答率</h2>
+      <div class="card" style="padding:4px 12px">${sylRows}</div>` : ''}
+
+    <h2 class="sec">解答一覧</h2>
+    <p class="muted">行をタップすると、その問題の解説を開けます。</p>
+    <div class="card" style="padding:4px 12px">
+      ${pSession.ids.map((id,i) => { const q = pById(id); const gv = g[id];
+        const m = gv === undefined ? ['n','－'] : gv ? ['o','✓'] : ['x','×'];
+        return `<div class="qrow" data-pgo="${i}"><span class="mark ${m[0]}">${m[1]}</span>
+          <span class="nm">${q.id}　${esc(q.topic)}
+            <small>${q.syllabus.join('・')}　／　${fmtMs(pSession.timeMs[id]||0)}</small></span></div>`;
+      }).join('')}
+    </div>
+
+    ${ngIds.length ? `<button class="btn prac wide" id="pReviewBtn" type="button">間違えた問題を確認（${ngIds.length}問）</button>` : ''}
+    <button class="btn sub wide" id="pAllBtn" type="button" style="margin-top:8px">1問目から解説を見る</button>
+    <div class="navbtns">
+      <button class="btn ghost" id="pHome" type="button">実戦テストトップへ</button>
+    </div>`;
+
+  app.querySelectorAll('[data-pgo]').forEach(el => el.onclick = () => {
+    pSession.cur = +el.dataset.pgo; render('pquiz');
+  });
+  const rb = $('#pReviewBtn');
+  if(rb) rb.onclick = () => { pSession.reviewIds = ngIds.slice(); pSession.rcur = 0; render('preview'); };
+  $('#pAllBtn').onclick = () => { pSession.cur = 0; render('pquiz'); };
+  $('#pHome').onclick = () => { pSession = null; render('practical'); };
+}
+
+/* ---------- 間違えた問題の確認 ---------- */
+function vPReview(){
+  if(!pSession || !pSession.reviewIds.length){ render('presult'); return; }
+  const id = pSession.reviewIds[pSession.rcur];
+  const q = pById(id);
+  const ord = pSession.order[id];
+  const pickOrig = pSession.picks[id] || null;
+  const correctPos = ord.indexOf(q.answer-1) + 1;
+
+  app.innerHTML = `
+    <h2 class="sec">間違えた問題の確認</h2>
+    <div class="qbar"><span class="idx">${pSession.rcur+1} / ${pSession.reviewIds.length}</span></div>
+
+    <div class="card">
+      <div><span class="qno">${q.id}</span>
+        ${q.syllabus.map(x => `<span class="badge">${x}</span>`).join('')}</div>
+      <div class="qtitle">${esc(q.topic)}</div>
+      <div class="qtext">${esc(q.question).replace(/\n/g,'<br>')}</div>
+      <div>${ord.map((origIdx,i) => {
+        const dispNo = i+1;
+        const cls = dispNo === correctPos ? 'correct' : (origIdx+1 === pickOrig ? 'wrong' : '');
+        return `<div class="choice ${cls}"><span class="num">${dispNo}</span>
+          <span>${esc(q.choices[origIdx])}</span></div>`;
+      }).join('')}</div>
+    </div>
+
+    <div class="verdict ng">不正解
+      <span class="sm">あなたの解答 ${pickOrig ? ord.indexOf(pickOrig-1)+1 : '未回答'}　／　正解 ${correctPos}：${esc(q.choices[q.answer-1])}</span></div>
+
+    <div class="exp"><p>${esc(q.explanation).replace(/／/g,'</p><p>')}</p></div>
+
+    <button class="btn sub wide" id="pRel" type="button">基礎問題を復習（問${q.relatedQuestions.join('・問')}）</button>
+
+    <div class="navbtns">
+      <button class="btn ghost" id="rPrev" ${pSession.rcur===0?'disabled':''} type="button">← 前へ</button>
+      <button class="btn ghost" id="rNext" ${pSession.rcur===pSession.reviewIds.length-1?'disabled':''} type="button">次へ →</button>
+    </div>
+    <button class="btn ghost wide" id="rBack" type="button">結果へ戻る</button>`;
+
+  $('#pRel').onclick = () => { const rel = q.relatedQuestions.slice(); pSession = null;
+    startSession(rel, '基礎問題の復習'); };
+  $('#rPrev').onclick = () => { if(pSession.rcur>0){ pSession.rcur--; vPReview(); } };
+  $('#rNext').onclick = () => { if(pSession.rcur<pSession.reviewIds.length-1){ pSession.rcur++; vPReview(); } };
+  $('#rBack').onclick = () => render('presult');
+}
+
 /* ---------- 設定 ---------- */
 function vSettings(){
   const done = QUESTIONS.filter(q => answered(q.id)).length;
   const weak = QUESTIONS.filter(q => isWeak(q.id)).length;
+  const pf = pFirstStats();
   app.innerHTML = `
     <h2 class="sec">設定</h2>
     <div class="card">
@@ -757,19 +1192,31 @@ function vSettings(){
       <div class="muted" style="margin:6px 0 0">初期版ではOFF固定です。正本HTMLの正解番号との整合性を優先しています。</div>
     </div>
     <div class="card">
+      <b>実戦問題の履歴</b>
+      <div class="muted" style="margin:6px 0 0">初見で解答 ${pf.answered} / ${PRACTICE_QUESTIONS.length}問　／　初見正答率 ${pf.answered?pf.rate+'%':'—'}</div>
+      <div class="muted">保存先：localStorage：${P_LS_KEY}（既存100問とは別キー）</div>
+    </div>
+    <div class="card">
       <b>学習履歴をリセット</b>
-      <div class="muted" style="margin:6px 0 10px">回答履歴・正誤回数・苦手フラグをすべて消去します。取り消せません。</div>
-      <button class="btn" id="resetBtn" style="background:var(--ng)" type="button">学習履歴をリセット</button>
+      <div class="muted" style="margin:6px 0 10px">2種類の履歴は別々にリセットできます。いずれも取り消せません。</div>
+      <button class="btn wide" id="resetBtn" style="background:var(--ng)" type="button">既存100問の履歴をリセット</button>
+      <button class="btn wide" id="pResetBtn" style="background:var(--ng); margin-top:8px" type="button">実戦問題の履歴をリセット</button>
     </div>
     <div class="card">
       <b>データについて</b>
       <div class="muted" style="margin:6px 0 0">
         問題・選択肢・正解・解説は「G検定_v1.4_厳選良問100問_統合完成版.html」から機械抽出したもので、原文を一切改変していません。
-        シラバスIDはJDLA公式シラバス2024 第1.4版の55項目に対応します（T11は該当問題なし）。</div>
+        シラバスIDはJDLA公式シラバス2024 第1.4版の55項目に対応します（T11は該当問題なし）。<br>
+        実戦問題${PRACTICE_QUESTIONS.length}問は、既存100問の論点を応用形式で問い直すために別途作成したもので、既存100問とは独立したデータです。</div>
     </div>`;
   $('#resetBtn').onclick = () => {
-    if(confirm('本当にリセットしますか？\n回答履歴・苦手登録がすべて消去され、元に戻せません。')){
-      STORE.history = {}; saveStore(); alert('学習履歴をリセットしました。'); render('home');
+    if(confirm('本当にリセットしますか？\n既存100問の回答履歴・苦手登録がすべて消去され、元に戻せません。\n（実戦問題の履歴は残ります）')){
+      STORE.history = {}; saveStore(); alert('既存100問の学習履歴をリセットしました。'); render('home');
+    }
+  };
+  $('#pResetBtn').onclick = () => {
+    if(confirm('本当にリセットしますか？\n実戦問題の履歴（初見正答率を含む）がすべて消去され、元に戻せません。\n（既存100問の履歴は残ります）')){
+      PSTORE.history = {}; pSave(); alert('実戦問題の履歴をリセットしました。'); render('home');
     }
   };
 }
@@ -779,11 +1226,14 @@ function vSettings(){
    ============================================================ */
 document.getElementById('fnav').onclick = e => {
   const b = e.target.closest('[data-nav]'); if(!b) return;
-  session = null; render(b.dataset.nav);
+  session = null; pStopTimer(); pSession = null; render(b.dataset.nav);
 };
-document.getElementById('homeBtn').onclick = () => { session = null; render('home'); };
+document.getElementById('homeBtn').onclick = () => {
+  session = null; pStopTimer(); pSession = null; render('home');
+};
 
 loadStore();
+pLoad();
 render('home');
 </script>
 </body>
