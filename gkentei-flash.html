@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1f3864">
+<title>G検定 瞬殺トレーニング</title>
+<style>
+  :root{
+    --navy-deep:#101b30; --navy:#1f3864; --navy-soft:#2c4a82;
+    --paper:#f6f3ec; --card:#ffffff; --ink:#20242c; --muted:#68707c; --line:#e2ddd0;
+    --amber:#c1893a; --amber-soft:#f4e3c8; --amber-deep:#8a5f24;
+    --ok:#1a7f4b; --ok-bg:#e8f6ee; --ng:#c0392b; --ng-bg:#fdecea;
+    --radius:14px; --maxw:900px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Yu Gothic","Hiragino Sans","Meiryo",sans-serif;
+    background:var(--paper); color:var(--ink); line-height:1.7; font-size:16px; overflow-x:hidden;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 14px 60px;}
+
+  header{
+    background:var(--navy); color:#fff; position:sticky; top:0; z-index:50;
+    padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;
+  }
+  .hd{max-width:var(--maxw); margin:0 auto; display:flex; align-items:center; gap:10px;}
+  .hd h1{margin:0; font-size:15px; font-weight:800; letter-spacing:.02em; flex:1;}
+  .hd .sub{font-size:11px; opacity:.8; font-weight:400;}
+  .hd-btn{background:rgba(255,255,255,.15); color:#fff; border:0; border-radius:9px;
+    padding:9px 13px; font-size:13px; font-weight:800; cursor:pointer; font-family:inherit;
+    min-height:40px; white-space:nowrap;}
+  .hd-btn:active{background:rgba(255,255,255,.3);}
+
+  h2.sec{font-size:16px; margin:24px 0 10px; padding-left:9px; border-left:4px solid var(--navy);}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:15px; margin:11px 0;}
+  .muted{color:var(--muted); font-size:13px;}
+  .btn{display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    background:var(--navy); color:#fff; border:0; border-radius:10px; padding:13px 18px;
+    font-size:15px; font-weight:800; cursor:pointer; min-height:48px; font-family:inherit;}
+  .btn:active{background:var(--navy-deep);}
+  .btn[disabled]{opacity:.4; cursor:default;}
+  .btn.sub{background:#fff; color:var(--navy); border:1.5px solid var(--navy);}
+  .btn.ghost{background:#eceadf; color:#3b4250; border:1px solid var(--line);}
+  .btn.wide{width:100%;}
+  .btn.amber{background:var(--amber);} .btn.amber:active{background:var(--amber-deep);}
+  .row{display:flex; gap:9px; flex-wrap:wrap;}
+
+  .hero{background:linear-gradient(135deg,var(--navy),var(--navy-soft)); color:#fff;
+    border-radius:var(--radius); padding:17px; margin:13px 0 4px;}
+  .hero h3{margin:0 0 4px; font-size:18px;}
+  .hero p{margin:0; font-size:12.5px; opacity:.9;}
+  .stat{display:flex; gap:9px; flex-wrap:wrap; margin-top:12px;}
+  .stat div{background:rgba(255,255,255,.17); border-radius:9px; padding:7px 12px;
+    font-size:13px; font-weight:800;}
+
+  .seg{display:inline-flex; border:1.5px solid var(--navy); border-radius:9px; overflow:hidden;}
+  .seg button{background:#fff; color:var(--navy); border:0; padding:9px 15px;
+    font-size:13.5px; font-weight:800; cursor:pointer; font-family:inherit; min-height:42px;}
+  .seg button.on{background:var(--navy); color:#fff;}
+
+  /* ---------- 出題 ---------- */
+  .qbar{display:flex; align-items:center; gap:10px; margin:14px 0 10px; flex-wrap:wrap;}
+  .qbar .idx{font-weight:800; font-size:14px; color:var(--navy);}
+  .timer{font-variant-numeric:tabular-nums; font-weight:800; font-size:15px; color:var(--amber-deep);}
+  .tag{background:var(--amber-soft); color:var(--amber-deep); border-radius:6px;
+    padding:2px 9px; font-size:11.5px; font-weight:800;}
+  .tag.weak{background:var(--ng-bg); color:var(--ng);}
+  .tag.fix{background:var(--ok-bg); color:var(--ok);}
+  .bar{height:8px; background:#e6e1d4; border-radius:5px; overflow:hidden; flex:1; min-width:100px;}
+  .bar>span{display:block; height:100%; background:var(--navy); border-radius:5px; transition:width .25s;}
+
+  .prompt{font-size:19px; font-weight:800; margin:4px 0 16px; line-height:1.55;}
+  .prompt .em{color:var(--amber-deep);}
+  .opts{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .opt{
+    background:#fff; border:1.5px solid var(--line); border-radius:12px;
+    padding:18px 12px; min-height:74px; font-size:16px; font-weight:700;
+    cursor:pointer; font-family:inherit; color:var(--ink); line-height:1.45;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+  }
+  .opt:active{background:var(--paper);}
+  .opt.correct{border-color:var(--ok); background:var(--ok-bg); color:var(--ok);}
+  .opt.wrong{border-color:var(--ng); background:var(--ng-bg); color:var(--ng);}
+  .opt[disabled]{cursor:default;}
+  @media(max-width:380px){ .opts{grid-template-columns:1fr;} .opt{min-height:58px; padding:14px 12px;} }
+
+  .verdict{border-radius:12px; padding:14px 16px; margin:14px 0 10px;}
+  .verdict.ok{background:var(--ok-bg); border:1.5px solid var(--ok);}
+  .verdict.ng{background:var(--ng-bg); border:1.5px solid var(--ng);}
+  .verdict .top{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .verdict .mark{font-size:17px; font-weight:800;}
+  .verdict.ok .mark{color:var(--ok);} .verdict.ng .mark{color:var(--ng);}
+  .verdict .sec{font-size:13px; color:var(--muted); font-weight:700;}
+  .verdict .key{margin-top:9px; font-size:15.5px; font-weight:800; line-height:1.6;}
+  .verdict .link{margin-top:10px;}
+  .link-a{display:inline-flex; align-items:center; gap:5px; min-height:44px; padding:10px 14px;
+    background:#fff; color:var(--navy); border:1.5px solid var(--navy); border-radius:9px;
+    font-size:13.5px; font-weight:800; text-decoration:none;}
+
+  .navbtns{display:flex; gap:9px; margin:14px 0 8px;}
+  .navbtns .btn{flex:1;}
+
+  /* ---------- 結果 ---------- */
+  .score{text-align:center; padding:20px 14px;}
+  .score .big{font-size:40px; font-weight:800; color:var(--navy); line-height:1.15;}
+  .score .rate{font-size:18px; font-weight:800; margin-top:4px;}
+  .tally{display:flex; gap:9px; justify-content:center; margin-top:13px; flex-wrap:wrap;}
+  .tally div{border-radius:10px; padding:9px 16px; font-weight:800; font-size:13.5px;}
+  .tally .c{background:var(--ok-bg); color:var(--ok);}
+  .tally .w{background:var(--ng-bg); color:var(--ng);}
+  .tally .s{background:var(--amber-soft); color:var(--amber-deep);}
+
+  .lrow{display:flex; gap:10px; align-items:flex-start; padding:10px 3px;
+    border-bottom:1px solid var(--line); font-size:14px;}
+  .lrow .m{flex:0 0 20px; text-align:center; font-weight:800;}
+  .lrow .m.o{color:var(--ok);} .lrow .m.x{color:var(--ng);}
+  .lrow .t{flex:1; min-width:0;}
+  .lrow .t small{display:block; color:var(--muted); font-size:11.5px;}
+  .lrow .sec2{flex:0 0 60px; text-align:right; font-weight:800;
+    font-variant-numeric:tabular-nums; font-size:13px;}
+  .lrow .sec2.slow{color:var(--amber-deep);}
+
+  .empty{text-align:center; color:var(--muted); padding:32px 14px; font-size:14.5px;}
+
+  /* ---------- 印刷シート ---------- */
+  .sheet{display:none;}
+  .sheet.show{display:block;}
+  .sheet-page{background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+    padding:18px 20px; margin:12px 0;}
+  .sheet-page h3{margin:0 0 4px; font-size:15px; color:var(--navy);
+    border-bottom:2px solid var(--navy); padding-bottom:5px;}
+  .sheet-page .pg{font-size:11px; color:var(--muted); margin:0 0 12px;}
+  .grp{margin:0 0 13px; break-inside:avoid;}
+  .grp .gt{font-size:13px; font-weight:800; color:var(--amber-deep); margin-bottom:3px;}
+  .grp .ln{display:flex; gap:8px; font-size:12.5px; line-height:1.75; align-items:baseline;}
+  .grp .ln .l{flex:0 0 42%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .grp .ln .dot{flex:1; border-bottom:1px dotted #c9c3b4; transform:translateY(-4px);}
+  .grp .ln .r{flex:0 0 50%; text-align:left;}
+  .grp .ln .r b{font-weight:800;}
+  .grp .ln .star{color:#000; font-weight:800;}
+
+  @media print{
+    @page{ size:A4 portrait; margin:9mm 10mm; }
+    body{background:#fff; font-size:9pt; line-height:1.35;}
+    header,.no-print{display:none !important;}
+    .wrap{max-width:none; padding:0;}
+    .sheet{display:block !important;}
+    .sheet-page{border:0; border-radius:0; padding:0; margin:0;
+      page-break-after:always; break-after:page;}
+    .sheet-page:last-child{page-break-after:auto; break-after:auto;}
+    .sheet-page h3{font-size:11pt; margin:0 0 1mm; padding-bottom:1mm;}
+    .sheet-page .pg{margin:0 0 2mm; font-size:7.5pt;}
+    .grp{margin-bottom:2.4mm;}
+    .grp .gt{font-size:9pt; margin-bottom:0.4mm;}
+    .grp .ln{font-size:8.2pt; line-height:1.38;}
+    .grp .ln .l{flex:0 0 38%;}
+    .grp .ln .r{flex:0 0 56%;}
+    .grp .ln .dot{transform:translateY(-3px);}
+  }
+</style>
+</head>
+<body>
+
+<header class="no-print">
+  <div class="hd">
+    <h1>G検定 瞬殺トレーニング<span class="sub"> ／ 26論点</span></h1>
+    <button class="hd-btn" id="homeBtn" type="button">ホーム</button>
+  </div>
+</header>
+
+<div class="wrap" id="app"></div>
+
+<script>
+/* ============================================================
+   CARDS ── 26論点
+   ・items[].home に所属を持たせ、odd / pair / trio の3用途へ展開する
+   ・誤答肢は同カテゴリの他カードから自動生成し、必要なら decoys で上書きする
+   ============================================================ */
+const CARDS = [
+/* ---------- 技術 20 ---------- */
+{ id:"T01", type:"odd", cat:"最適化", weight:3,
+  items:[{term:"AdaGrad",home:"最適化"},{term:"RMSprop",home:"最適化"},
+         {term:"AdaBoost",home:"アンサンブル"},{term:"Momentum",home:"最適化"}],
+  answer:3, key:"Boost が付くのはアンサンブル。他は最適化", look:"バギング ブースティング" },
+
+{ id:"T02", type:"pair", cat:"勾配", weight:3,
+  items:[{term:"勾配消失",home:"ReLU・スキップ結合・ゲート機構"},
+         {term:"勾配爆発",home:"勾配クリッピング"}],
+  key:"停滞なら消失、発散なら爆発。学習率を下げるのは消失の対策にならない",
+  decoys:["ドロップアウト","データ拡張"], look:"勾配消失 勾配爆発" },
+
+{ id:"T03", type:"pair", cat:"出力層", weight:3,
+  items:[{term:"多クラス分類（1つだけ選ぶ）",home:"ソフトマックス"},
+         {term:"多ラベル分類（複数同時）",home:"各出力にシグモイド"}],
+  key:"排他的ならソフトマックス、同時に成立しうるなら各出力にシグモイド",
+  decoys:["ReLU","tanh"], look:"多クラス 多ラベル" },
+
+{ id:"T04", type:"pair", cat:"正則化", weight:3,
+  items:[{term:"L1正則化",home:"重みが0になる（特徴量選択）"},
+         {term:"L2正則化",home:"0にはならず全体を抑える"}],
+  key:"ちょうど0になるのがL1。絞り込みたいならL1、ラッソがL1・リッジがL2",
+  decoys:["学習が速くなる","勾配爆発を防ぐ"], look:"L1 L2" },
+
+{ id:"T05", type:"trio", cat:"生成モデル", weight:3,
+  items:[{term:"GAN",home:"生成器と識別器を競わせる"},
+         {term:"VAE",home:"潜在変数の確率分布へ写像する"},
+         {term:"拡散モデル",home:"ノイズを加える過程の逆をたどる"}],
+  key:"競わせる＝GAN、確率分布＝VAE、ノイズの逆＝拡散モデル",
+  decoys:["系列を変換する"], look:"GAN VAE 拡散モデル" },
+
+{ id:"T06", type:"pair", cat:"評価指標", weight:3,
+  items:[{term:"適合率",home:"分母は予測した陽性"},
+         {term:"再現率",home:"分母は実際の陽性"}],
+  key:"見逃しを減らしたいなら再現率、誤検知を減らしたいなら適合率",
+  decoys:["分母は全件","分母は真陰性"], look:"適合率 再現率" },
+
+{ id:"T07", type:"odd", cat:"画像", weight:2,
+  items:[{term:"YOLO",home:"物体検出"},{term:"SSD",home:"物体検出"},
+         {term:"U-Net",home:"セグメンテーション"},{term:"Faster R-CNN",home:"物体検出"}],
+  answer:3, key:"U-Netだけ画素単位。他は矩形で位置を出す", look:"U-Net YOLO" },
+
+{ id:"T08", type:"pair", cat:"画像", weight:2,
+  items:[{term:"セマンティックセグメンテーション",home:"個体を区別しない"},
+         {term:"インスタンスセグメンテーション",home:"個体を1つずつ区別する"}],
+  key:"同種の物体を1つずつ数えるならインスタンス",
+  decoys:["矩形で囲む","画像全体に1ラベル"], look:"セマンティック インスタンス" },
+
+{ id:"T09", type:"pair", cat:"RNN", weight:2,
+  items:[{term:"LSTM",home:"入力・出力・忘却の3ゲート＋CEC"},
+         {term:"GRU",home:"リセット・更新の2ゲート"}],
+  key:"忘却ゲートはLSTM、更新ゲートはGRU",
+  decoys:["ゲートを持たない","Attentionのみ"], look:"LSTM GRU" },
+
+{ id:"T10", type:"trio", cat:"転移学習", weight:3,
+  items:[{term:"事前学習",home:"汎用的な表現を先に獲得する"},
+         {term:"転移学習",home:"別のタスクへ流用する"},
+         {term:"破滅的忘却",home:"以前の能力が失われる"}],
+  key:"活かすのが転移学習、失うのが破滅的忘却",
+  decoys:["訓練データに適合しすぎる"], look:"転移学習 破滅的忘却" },
+
+{ id:"T11", type:"trio", cat:"軽量化", weight:3,
+  items:[{term:"量子化",home:"ビット数を下げる（構造は変えない）"},
+         {term:"プルーニング",home:"重要度の低い結合を削除する"},
+         {term:"蒸留",home:"教師モデルから生徒モデルを学習する"}],
+  key:"再学習が要らないのは量子化、別の小型モデルを育てるのが蒸留",
+  decoys:["学習データを水増しする"], look:"量子化 蒸留" },
+
+{ id:"T12", type:"trio", cat:"解釈性", weight:2,
+  items:[{term:"Grad-CAM",home:"画像の注目領域を示す"},
+         {term:"SHAP",home:"個々の予測への寄与を示す"},
+         {term:"Permutation Importance",home:"モデル全体の重要度を示す"}],
+  key:"画像ならGrad-CAM、1件ごとならSHAP、全体ならPermutation Importance",
+  decoys:["過学習を抑える"], look:"Grad-CAM SHAP" },
+
+{ id:"T13", type:"pair", cat:"アンサンブル", weight:2,
+  items:[{term:"バギング",home:"並列に学習する（ランダムフォレスト）"},
+         {term:"ブースティング",home:"順番に誤りを補正する（AdaBoost）"}],
+  key:"並列がバギング、直列がブースティング",
+  decoys:["次元を削減する","報酬で学習する"], look:"バギング ブースティング" },
+
+{ id:"T14", type:"odd", cat:"学習の種類", weight:2,
+  items:[{term:"ロジスティック回帰",home:"教師あり"},{term:"サポートベクトルマシン",home:"教師あり"},
+         {term:"k-means",home:"教師なし"},{term:"決定木",home:"教師あり"}],
+  answer:3, key:"ラベルなしで分けるのがk-means。他は正解ラベルが要る", look:"教師あり 教師なし" },
+
+{ id:"T15", type:"pair", cat:"強化学習", weight:2,
+  items:[{term:"価値ベース",home:"Q学習・SARSA・DQN"},
+         {term:"方策ベース",home:"REINFORCE・方策勾配法"}],
+  key:"Q値を学ぶのが価値ベース、方策を直接学ぶのが方策ベース。Actor-Criticは両方",
+  decoys:["k-means・PCA","BERT・GPT"], look:"Q学習 REINFORCE" },
+
+{ id:"T16", type:"odd", cat:"正則化", weight:2,
+  items:[{term:"L1正則化",home:"正則化"},{term:"L2正則化",home:"正則化"},
+         {term:"ドロップアウト",home:"正則化"},{term:"バッチ正規化",home:"正規化層"}],
+  answer:4, key:"バッチ正規化は学習の安定化が目的。過学習対策が主目的ではない",
+  look:"正則化 バッチ正規化" },
+
+{ id:"T17", type:"pair", cat:"自然言語処理", weight:2,
+  items:[{term:"word2vec",home:"1語につき1ベクトルで固定"},
+         {term:"BERT",home:"文脈に応じて表現が変わる"}],
+  key:"多義語を文脈で区別できるのがBERT",
+  decoys:["出現回数だけを数える","語順を保持しない"], look:"word2vec BERT" },
+
+{ id:"T18", type:"pair", cat:"音声", weight:3,
+  items:[{term:"音声認識",home:"何を言ったか"},
+         {term:"話者識別",home:"誰が言ったか"}],
+  key:"WhatとWho。同じMFCCから別々に処理される",
+  decoys:["どんな感情か","どこで話したか"], look:"話者 音声認識" },
+
+{ id:"T19", type:"trio", cat:"活性化関数", weight:2,
+  items:[{term:"シグモイド関数",home:"(0, 1)"},
+         {term:"tanh関数",home:"(-1, 1)"},
+         {term:"ReLU関数",home:"[0, ∞)"}],
+  key:"微分値が1未満の関数を重ねると勾配消失。中間層はReLU",
+  decoys:["(-∞, ∞)"], look:"シグモイド ReLU" },
+
+{ id:"T20", type:"odd", cat:"教師なし学習", weight:2,
+  items:[{term:"主成分分析",home:"次元削減"},{term:"t-SNE",home:"次元削減"},
+         {term:"ウォード法",home:"クラスタリング"},{term:"特異値分解",home:"次元削減"}],
+  answer:3, key:"特徴量を減らすのが次元削減、データを分けるのがクラスタリング",
+  look:"主成分分析 ウォード法" },
+
+/* ---------- 法務・倫理 6 ---------- */
+{ id:"L01", type:"trio", cat:"個人情報", weight:3,
+  items:[{term:"個人情報",home:"特定の個人を識別できる"},
+         {term:"個人データ",home:"データベース等を構成する"},
+         {term:"保有個人データ",home:"開示・訂正等の権限を持つ"}],
+  key:"個人情報 ⊃ 個人データ ⊃ 保有個人データ の入れ子",
+  decoys:["復元できないよう加工した"], look:"個人情報 個人データ" },
+
+{ id:"L02", type:"pair", cat:"個人情報", weight:3,
+  items:[{term:"匿名加工情報",home:"復元不可・第三者提供できる"},
+         {term:"仮名加工情報",home:"照合すれば識別できる・原則提供できない"}],
+  key:"外部へ出すなら匿名加工、内部分析なら仮名加工",
+  decoys:["取得に本人同意が必要","単体では個人情報でない"], look:"匿名加工 仮名加工" },
+
+{ id:"L03", type:"pair", cat:"著作権", weight:3,
+  items:[{term:"AI開発・学習段階",home:"30条の4（非享受目的なら原則許諾不要）"},
+         {term:"AI生成・利用段階",home:"類似性と依拠性で判断する"}],
+  key:"30条の4は学習段階まで。生成物には及ばない",
+  decoys:["出願と登録が必要","秘密管理性が要る"], look:"30条の4 著作権侵害" },
+
+{ id:"L04", type:"trio", cat:"知的財産", weight:3,
+  items:[{term:"著作権",home:"創作と同時に発生・表現を保護"},
+         {term:"特許権",home:"出願と登録が必要・アイデアを保護"},
+         {term:"営業秘密",home:"登録不要・秘匿したまま保護"}],
+  key:"公開の代償に独占が特許、秘匿したまま守るのが営業秘密",
+  decoys:["非公知性を要しない"], look:"著作権 特許権 営業秘密" },
+
+{ id:"L05", type:"pair", cat:"契約", weight:3,
+  items:[{term:"請負契約",home:"仕事の完成義務"},
+         {term:"準委任契約",home:"善管注意義務（完成義務なし）"}],
+  key:"AI開発は成果が事前に確定しにくいため、準委任型が適する場合がある",
+  decoys:["秘密保持のみを定める","著作権を移転する"], look:"請負 準委任" },
+
+{ id:"L06", type:"trio", cat:"規範", weight:3,
+  items:[{term:"ハードロー",home:"法律・強制力あり"},
+         {term:"ソフトロー",home:"ガイドライン・拘束力なし"},
+         {term:"リスクベースアプローチ",home:"危険度で規制の強度を変える"}],
+  key:"強制力の有無がハード/ソフト、一律か段階的かがリスクベース。独立した2軸",
+  decoys:["用途を問わず一律に規制する"], look:"ハードロー ソフトロー" },
+];
+
+/* ============================================================
+   定数・localStorage
+   ============================================================ */
+const LS_KEY = 'gkentei_flash_v1';
+const FAST_MS = 3000;          // 3秒以内の正解を「瞬殺」とみなす
+const STREAK_FIX = 2;          // 連続2回の瞬殺で「定着」
+const SESSION_N = 20;
+const YOUGO_URL = 'gkentei-yougo.html';
+
+let STORE = {version:1, history:{}, settings:{mode:'all'}};
+
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      if(o && typeof o === 'object'){
+        STORE.history  = o.history  || {};
+        STORE.settings = Object.assign(STORE.settings, o.settings || {});
+      }
+    }
+  }catch(e){ console.warn('load failed', e); }
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(STORE)); }
+  catch(e){ console.warn('save failed', e); }
+}
+function rec(id){
+  if(!STORE.history[id]) STORE.history[id] = {ok:0, ng:0, streak:0, last:null, bestMs:null};
+  return STORE.history[id];
+}
+/* 状態：未回答→要反射 ／ streak>=2→定着 ／ それ以外→弱点 */
+function stateOf(id){
+  const r = STORE.history[id];
+  if(!r || (r.ok + r.ng) === 0) return 'new';
+  if(r.streak >= STREAK_FIX) return 'fixed';
+  return 'weak';
+}
+const STATE_LABEL = {new:'要反射', weak:'弱点', fixed:'定着'};
+const STATE_CLS   = {new:'', weak:'weak', fixed:'fix'};
+const byId = id => CARDS.find(c => c.id === id);
+
+/* ============================================================
+   共通
+   ============================================================ */
+const app = document.getElementById('app');
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function shuffled(a){
+  const x = a.slice();
+  for(let i=x.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; }
+  return x;
+}
+const fmtSec = ms => (ms/1000).toFixed(1) + '秒';
+
+/* ============================================================
+   出題の生成
+   pair / trio … items から1つ選び、その home を答えさせる
+   odd         … home が1つだけ違うものを選ばせる
+   誤答肢は decoys → 同カテゴリの他カードの home → 全カードの home の順に補う
+   ============================================================ */
+function poolHomes(card){
+  const mine = new Set(card.items.map(i => i.home));
+  const same = CARDS.filter(c => c.cat === card.cat && c.id !== card.id);
+  const other = CARDS.filter(c => c.cat !== card.cat);
+  const pick = list => list.reduce((a,c) => a.concat(c.items.map(i => i.home)), []);
+  return (card.decoys || [])
+    .concat(pick(same), pick(other))
+    .filter(h => !mine.has(h))
+    .filter((h,i,arr) => arr.indexOf(h) === i);
+}
+function buildQuestion(card){
+  if(card.type === 'odd'){
+    /* answer で指定された1件だけを正解にする */
+    const ansTerm = card.items[card.answer-1].term;
+    const opts = shuffled(card.items.map(i => ({label:i.term, ok:i.term === ansTerm})));
+    return {prompt:'仲間外れは？', opts, sub:card.cat};
+  }
+  const target = card.items[Math.floor(Math.random()*card.items.length)];
+  const decoys = poolHomes(card).slice(0, 3);
+  const wrong  = shuffled(card.items.filter(i => i !== target).map(i => i.home).concat(decoys)).slice(0, 3);
+  const opts = shuffled([{label:target.home, ok:true}].concat(wrong.map(w => ({label:w, ok:false}))));
+  return {prompt:target.term, opts, sub:card.cat, isHome:true};
+}
+
+/* ============================================================
+   セッション
+   ============================================================ */
+let S = null;      // {ids, cur, q, results[], startedAt, shownAt, answered}
+let timerId = null;
+
+function startSession(mode){
+  let pool = CARDS.slice();
+  if(mode === 'weak') pool = pool.filter(c => stateOf(c.id) !== 'fixed');
+  if(!pool.length){ alert('該当するカードがありません。'); return; }
+  /* weight の大きいカードを優先しつつ、順序はランダム */
+  const w = shuffled(pool).sort((a,b) => (b.weight||1) - (a.weight||1));
+  const ids = shuffled(w.slice(0, Math.min(SESSION_N, w.length))).map(c => c.id);
+  S = {ids, cur:0, q:null, results:[], startedAt:Date.now(), shownAt:0, answered:false, mode};
+  render('quiz');
+}
+function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
+function tick(){
+  const el = document.getElementById('tm');
+  if(!el || !S || S.answered){ return; }
+  el.textContent = fmtSec(Date.now() - S.shownAt);
+}
+
+/* ============================================================
+   画面
+   ============================================================ */
+let view = 'home';
+function render(v){
+  if(v) view = v;
+  window.scrollTo(0,0);
+  ({home:vHome, quiz:vQuiz, result:vResult, sheet:vSheet}[view] || vHome)();
+}
+
+function counts(){
+  const c = {new:0, weak:0, fixed:0};
+  CARDS.forEach(x => c[stateOf(x.id)]++);
+  return c;
+}
+
+function vHome(){
+  stopTimer();
+  const c = counts();
+  const done = CARDS.length - c.new;
+  app.innerHTML = `
+    <div class="hero">
+      <h3>瞬殺トレーニング</h3>
+      <p>4択を${(FAST_MS/1000)}秒以内で切る反射をつくる。26論点・1回${SESSION_N}問。</p>
+      <div class="stat">
+        <div>要反射 ${c.new}</div>
+        <div>弱点 ${c.weak}</div>
+        <div>定着 ${c.fixed}</div>
+      </div>
+    </div>
+
+    <h2 class="sec">トレーニング</h2>
+    <div class="row">
+      <button class="btn amber" id="allBtn" type="button" style="flex:1">全カード（${CARDS.length}）</button>
+      <button class="btn sub" id="weakBtn" type="button" style="flex:1" ${c.weak+c.new?'':'disabled'}>
+        弱点だけ（${c.weak + c.new}）</button>
+    </div>
+    <p class="muted" style="margin-top:8px">
+      ${(FAST_MS/1000)}秒以内で正解すると瞬殺。${STREAK_FIX}回続けて瞬殺できたカードが「定着」になります。</p>
+
+    <h2 class="sec">カード一覧</h2>
+    <div class="card" style="padding:4px 13px">
+      ${CARDS.map(x => {
+        const st = stateOf(x.id), r = STORE.history[x.id];
+        return `<div class="lrow">
+          <span class="m">${st==='fixed'?'✓':st==='weak'?'×':'－'}</span>
+          <span class="t">${esc(x.items.map(i=>i.term).slice(0,3).join(' / '))}
+            <small>${x.id}　${esc(x.cat)}　${x.type}　重要度${x.weight}</small></span>
+          <span class="sec2 ${r&&r.bestMs&&r.bestMs>FAST_MS?'slow':''}">${
+            r&&r.bestMs!=null ? fmtSec(r.bestMs) : '—'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <h2 class="sec">印刷</h2>
+    <button class="btn ghost wide" id="sheetBtn" type="button">A4瞬殺シートを表示</button>
+    <p class="muted" style="margin-top:8px">同じカードデータから3ページのシートを生成します。</p>`;
+
+  $('#allBtn').onclick  = () => startSession('all');
+  $('#weakBtn').onclick = () => startSession('weak');
+  $('#sheetBtn').onclick = () => render('sheet');
+}
+
+function vQuiz(){
+  if(!S){ render('home'); return; }
+  const card = byId(S.ids[S.cur]);
+  if(!S.q) S.q = buildQuestion(card);
+  const q = S.q;
+  const st = stateOf(card.id);
+  const pct = Math.round((S.cur+1)/S.ids.length*100);
+
+  app.innerHTML = `
+    <div class="qbar">
+      <span class="idx">${S.cur+1} / ${S.ids.length}</span>
+      <span class="timer" id="tm">0.0秒</span>
+      <div class="bar"><span style="width:${pct}%"></span></div>
+      <span class="tag ${STATE_CLS[st]}">${esc(card.cat)}｜${STATE_LABEL[st]}</span>
+    </div>
+
+    <div class="card">
+      <div class="prompt">${q.isHome
+        ? `<span class="em">${esc(q.prompt)}</span> の所属は？`
+        : esc(q.prompt)}</div>
+      <div class="opts" id="opts">
+        ${q.opts.map((o,i) => `<button class="opt" data-i="${i}" type="button">${esc(o.label)}</button>`).join('')}
+      </div>
+    </div>
+
+    <div id="after"></div>
+
+    <div class="navbtns">
+      <button class="btn ghost" id="quit" type="button">中断</button>
+    </div>`;
+
+  $('#opts').onclick = e => {
+    const b = e.target.closest('.opt');
+    if(!b || S.answered) return;
+    answer(+b.dataset.i);
+  };
+  $('#quit').onclick = () => {
+    if(confirm('中断してホームへ戻りますか？\n（採点済みの結果は保存されています）')){
+      stopTimer(); S = null; render('home');
+    }
+  };
+
+  S.answered = false;
+  S.shownAt = Date.now();
+  stopTimer();
+  timerId = setInterval(tick, 100);
+}
+
+function answer(i){
+  const card = byId(S.ids[S.cur]);
+  const q = S.q;
+  const ms = Date.now() - S.shownAt;
+  const ok = !!q.opts[i].ok;
+  S.answered = true;
+  stopTimer();
+
+  const r = rec(card.id);
+  if(ok) r.ok++; else r.ng++;
+  const fast = ok && ms <= FAST_MS;
+  r.streak = fast ? r.streak + 1 : 0;          // 瞬殺できたときだけ連続を伸ばす
+  if(ok && (r.bestMs === null || ms < r.bestMs)) r.bestMs = ms;
+  r.last = new Date().toISOString();
+  save();
+
+  S.results.push({id:card.id, ok, ms, fast});
+
+  document.querySelectorAll('.opt').forEach((b, idx) => {
+    b.disabled = true;
+    if(q.opts[idx].ok) b.classList.add('correct');
+    else if(idx === i) b.classList.add('wrong');
+  });
+
+  const last = S.cur === S.ids.length - 1;
+  $('#after').innerHTML = `
+    <div class="verdict ${ok?'ok':'ng'}">
+      <div class="top">
+        <span class="mark">${ok ? (fast ? '瞬殺' : '正解') : '不正解'}</span>
+        <span class="sec">${fmtSec(ms)}${ok && !fast ? `　（${FAST_MS/1000}秒超）` : ''}</span>
+      </div>
+      <div class="key">${esc(card.key)}</div>
+      <div class="link">
+        <a class="link-a" href="${YOUGO_URL}?q=${encodeURIComponent(card.look)}"
+           target="_blank" rel="noopener noreferrer">用語集で「${esc(card.look)}」を見る</a>
+      </div>
+    </div>
+    <button class="btn wide" id="next" type="button">${last ? '結果を見る' : '次へ'}</button>`;
+
+  $('#next').onclick = () => {
+    if(last){ render('result'); }
+    else { S.cur++; S.q = null; vQuiz(); }
+  };
+  $('#next').focus();
+}
+
+function vResult(){
+  if(!S){ render('home'); return; }
+  stopTimer();
+  const n = S.results.length;
+  const ok = S.results.filter(r => r.ok).length;
+  const fast = S.results.filter(r => r.fast).length;
+  const rate = n ? Math.round(ok/n*100) : 0;
+  const avg = n ? S.results.reduce((a,r) => a + r.ms, 0)/n : 0;
+  const slow = S.results.filter(r => r.ok && !r.fast);
+  const ng = S.results.filter(r => !r.ok);
+
+  app.innerHTML = `
+    <h2 class="sec">結果</h2>
+    <div class="card score">
+      <div class="big">${n}問中 ${ok}問正解</div>
+      <div class="rate">正答率 ${rate}%</div>
+      <div class="tally">
+        <div class="c">正解 ${ok}</div>
+        <div class="w">不正解 ${n-ok}</div>
+        <div class="s">瞬殺 ${fast}</div>
+      </div>
+      <div class="muted" style="margin-top:12px">平均 ${fmtSec(avg)} / 問</div>
+    </div>
+
+    ${ng.length ? `<h2 class="sec">間違えたカード</h2>
+      <div class="card" style="padding:4px 13px">
+        ${ng.map(r => { const c = byId(r.id); return `<div class="lrow">
+          <span class="m x">×</span>
+          <span class="t">${esc(c.key)}<small>${c.id}　${esc(c.cat)}</small></span>
+          <span class="sec2">${fmtSec(r.ms)}</span></div>`; }).join('')}
+      </div>` : ''}
+
+    ${slow.length ? `<h2 class="sec">正解したが${FAST_MS/1000}秒を超えたカード</h2>
+      <p class="muted">知ってはいるが反射になっていない論点です。</p>
+      <div class="card" style="padding:4px 13px">
+        ${slow.map(r => { const c = byId(r.id); return `<div class="lrow">
+          <span class="m o">✓</span>
+          <span class="t">${esc(c.key)}<small>${c.id}　${esc(c.cat)}</small></span>
+          <span class="sec2 slow">${fmtSec(r.ms)}</span></div>`; }).join('')}
+      </div>` : ''}
+
+    ${!ng.length && !slow.length ? '<div class="empty">全問を瞬殺しました。</div>' : ''}
+
+    <div class="navbtns">
+      <button class="btn" id="again" type="button">もう1セット</button>
+      <button class="btn ghost" id="home2" type="button">ホームへ</button>
+    </div>`;
+
+  $('#again').onclick = () => startSession(S.mode);
+  $('#home2').onclick = () => { S = null; render('home'); };
+}
+
+/* ============================================================
+   A4瞬殺シート（同じCARDSから生成）
+   ============================================================ */
+const SHEET_PAGES = [
+  {title:'1. 技術：所属（住所）', ids:['T01','T07','T14','T15','T16','T20','T13','T12','T09','T17']},
+  {title:'2. 技術：比較（決定打）', ids:['T02','T03','T04','T05','T06','T08','T10','T11','T18','T19']},
+  {title:'3. 法務・倫理', ids:['L01','L02','L03','L04','L05','L06']},
+];
+/* シートに全カードが載っているかを起動時に自己検査する */
+(function checkSheet(){
+  const listed = SHEET_PAGES.reduce((a,p) => a.concat(p.ids), []);
+  const miss = CARDS.filter(c => !listed.includes(c.id)).map(c => c.id);
+  const dup  = listed.filter((x,i) => listed.indexOf(x) !== i);
+  if(miss.length) console.warn('シート未掲載:', miss);
+  if(dup.length)  console.warn('シート重複:', dup);
+})();
+
+function sheetGroup(c){
+  const lines = c.items.map(i => {
+    const odd = c.type === 'odd' && i.term === c.items[c.answer-1].term;
+    return `<div class="ln"><span class="l">${odd?'<span class="star">★</span>':''}${esc(i.term)}</span>
+      <span class="dot"></span><span class="r">${esc(i.home)}</span></div>`;
+  }).join('');
+  return `<div class="grp"><div class="gt">${esc(c.cat)}　${esc(c.id)}</div>${lines}
+    <div class="ln"><span class="l"></span><span class="r"><b>→ ${esc(c.key)}</b></span></div></div>`;
+}
+function vSheet(){
+  stopTimer();
+  app.innerHTML = `
+    <div class="no-print">
+      <h2 class="sec">A4瞬殺シート</h2>
+      <p class="muted">白黒印刷を想定しています。★＝仲間外れ、太字＝決定打。</p>
+      <div class="row" style="margin-bottom:10px">
+        <button class="btn" id="print" type="button">印刷する</button>
+        <button class="btn ghost" id="back" type="button">ホームへ</button>
+      </div>
+    </div>
+    <div class="sheet show">
+      ${SHEET_PAGES.map((p,i) => `<section class="sheet-page">
+        <h3>G検定 瞬殺シート　${esc(p.title)}</h3>
+        <p class="pg">${i+1} / ${SHEET_PAGES.length}</p>
+        ${p.ids.map(id => sheetGroup(byId(id))).join('')}
+      </section>`).join('')}
+    </div>`;
+  $('#print').onclick = () => window.print();
+  $('#back').onclick = () => render('home');
+}
+
+/* ============================================================
+   起動
+   ============================================================ */
+document.getElementById('homeBtn').onclick = () => { stopTimer(); S = null; render('home'); };
+load();
+render('home');
+</script>
+</body>
+</html>

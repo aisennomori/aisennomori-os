@@ -3147,6 +3147,51 @@ const SYLLABUS_EXTRA = {
                 compare: "ResNetはスキップ結合を残差ブロックとして採用したモデル。スキップ結合はその構造そのものを指す" } },
     ]},
 
+    /* ===== 瞬殺トレーニングの決定打として参照される語（T33 / T26 / T29 / T30） ===== */
+    { label: "補.11　解釈性・画像・強化学習・生成（T33 / T26 / T29 / T30）", terms: [
+      { term: "Grad-CAM", syllabusId: "T33", source: "JDLAシラバス第1.4版",
+        desc: "畳み込みニューラルネットワークが判断の根拠とした画像の領域を、勾配の情報を用いてヒートマップとして可視化する手法。CAMを一般化したもので、構造を変えずに適用できる。",
+        meta: { short: "CNNが注目した画像領域をヒートマップで可視化する手法",
+                keywords: ["注目領域","ヒートマップ","画像","CAM","XAI","説明可能"],
+                compare: "SHAPは個々の予測への特徴量の寄与を示す。画像の注目領域を示すならGrad-CAM" } },
+
+      { term: "SHAP", syllabusId: "T33", source: "JDLAシラバス第1.4版",
+        desc: "各特徴量が個々の予測へどの向きにどれだけ寄与したかを、協力ゲーム理論のシャープレイ値に基づいて算出する手法。表形式データの説明に広く用いられる。",
+        meta: { short: "個々の予測に対する各特徴量の寄与を符号つきで示す手法",
+                keywords: ["個別予測","寄与","特徴量","シャープレイ値","XAI","説明可能"],
+                compare: "Permutation Importanceはモデル全体の重要度。SHAPは1件ごとの予測理由を示す" } },
+
+      { term: "U-Net", syllabusId: "T26", source: "JDLAシラバス第1.4版",
+        desc: "エンコーダとデコーダをU字型に配置し、対応する層どうしをスキップ結合でつないだセグメンテーション向けネットワーク。医用画像など、少ない学習データでも高い精度が得られる。",
+        meta: { short: "U字型のエンコーダ・デコーダ構造をもつセマンティックセグメンテーションのネットワーク",
+                keywords: ["セグメンテーション","画素単位","U字","スキップ結合","医用画像"],
+                compare: "YOLOやSSDは矩形で位置を示す物体検出。U-Netは画素単位で領域を塗り分ける" } },
+
+      { term: "Faster R-CNN", syllabusId: "T26", source: "JDLAシラバス第1.4版",
+        desc: "候補領域の抽出をネットワーク内部で行うようにしたR-CNN系の物体検出モデル。候補領域を出してから分類する2段階モデルにあたる。",
+        meta: { short: "候補領域の抽出も学習で行う2段階の物体検出モデル",
+                keywords: ["物体検出","2段階","候補領域","矩形","R-CNN"],
+                compare: "YOLOやSSDは1段階モデルで高速。R-CNN系は2段階で精度を重視する" } },
+
+      { term: "SSD", syllabusId: "T26", source: "JDLAシラバス第1.4版",
+        desc: "Single Shot MultiBox Detectorの略。候補領域の抽出と分類を1回の処理で行う1段階の物体検出モデルで、複数の解像度の特徴マップを用いて大小の物体に対応する。",
+        meta: { short: "検出と分類を一度に行う1段階の物体検出モデル",
+                keywords: ["物体検出","1段階","高速","矩形","Single Shot"],
+                compare: "YOLOと同じ1段階モデル。Faster R-CNNなどのR-CNN系は2段階" } },
+
+      { term: "REINFORCE", syllabusId: "T29", source: "JDLAシラバス第1.4版",
+        desc: "方策そのものを直接学習する方策勾配法の代表的なアルゴリズム。行動の結果として得られた報酬をもとに、方策のパラメータを更新する。",
+        meta: { short: "方策を直接学習する方策勾配法の代表的アルゴリズム",
+                keywords: ["方策ベース","方策勾配法","強化学習","報酬"],
+                compare: "Q学習やSARSAは価値ベース。Actor-Criticは価値ベースと方策ベースを組み合わせる" } },
+
+      { term: "拡散モデル", syllabusId: "T30", source: "JDLAシラバス第1.4版",
+        desc: "データへ段階的にノイズを加える過程を学習し、その逆をたどってノイズから元のデータを復元する形で生成を行うモデル。画像生成で高い品質が得られる一方、反復処理のため生成の計算量は大きい。",
+        meta: { short: "ノイズを加える過程の逆をたどって生成するモデル（Diffusion Model）",
+                keywords: ["Diffusion","ノイズ","逆過程","画像生成","生成モデル"],
+                compare: "GANは生成器と識別器を競わせる。VAEは潜在変数の確率分布へ写像する" } },
+    ]},
+
   ],
 };
 
@@ -3883,6 +3928,19 @@ function updateWebFallback(q, terms, multi, visible, termNameHit, foundTerms){
 
 searchInput.addEventListener('input', runSearch);
 runSearch();   // 起動時にWeb/AIボタンを無効状態で常設する
+
+/* URLの ?q= があれば、その語で検索した状態で起動する。
+   検索処理は既存の runSearch() をそのまま使い、ロジックを二重化しない。
+   値は searchInput.value へ代入するだけなので innerHTML を経由しない。
+   スマホでキーボードが立ち上がって結果が隠れないよう、フォーカスは当てない。 */
+(function applyQueryParam(){
+  try{
+    const q = new URLSearchParams(location.search).get('q');
+    if(!q) return;                       // 無ければ通常起動のまま
+    searchInput.value = q.slice(0, 100); // 長すぎるクエリは切り詰める
+    runSearch();
+  }catch(e){ /* 不正なパラメータでも通常起動へフォールバック */ }
+})();
 clearBtn.addEventListener('click', () => {
   searchInput.value = '';
   runSearch();
