@@ -366,6 +366,47 @@ function fmtMs(ms){
 }
 
 /* ============================================================
+   受験履歴（受験1回＝1レコード。既存2キーは触らない）
+   ============================================================ */
+const H_LS_KEY = 'gkentei_exam_history_v1';
+const H_LIMIT  = 10;                       // 直近10回まで保存
+let HSTORE = {version:1, runs:[]};
+
+function hLoad(){
+  try{
+    const raw = localStorage.getItem(H_LS_KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      if(o && Array.isArray(o.runs)) HSTORE.runs = o.runs;
+    }
+  }catch(e){ console.warn('history load failed', e); }
+}
+function hSave(){
+  try{ localStorage.setItem(H_LS_KEY, JSON.stringify(HSTORE)); }
+  catch(e){ console.warn('history save failed', e); }
+}
+/* 採点が完了した受験だけを記録する。中断時は呼ばれない */
+function hPush(sess){
+  const g = sess.graded;
+  const answered = sess.ids.filter(i => g[i] !== undefined);
+  const ok = answered.filter(i => g[i]).length;
+  HSTORE.runs.unshift({
+    at:      new Date().toISOString(),
+    mode:    sess.label || '実戦テスト',
+    n:       sess.ids.length,
+    answered:answered.length,
+    correct: ok,
+    rate:    answered.length ? Math.round(ok/answered.length*100) : 0,
+    totalMs: sess.elapsedMs,
+    avgMs:   sess.ids.length ? Math.round(sess.elapsedMs/sess.ids.length) : 0,
+    items:   sess.ids.map(id => ({id, ok: g[id] === undefined ? null : !!g[id],
+                                  ms: sess.timeMs[id] || 0}))
+  });
+  if(HSTORE.runs.length > H_LIMIT) HSTORE.runs.length = H_LIMIT;
+  hSave();
+}
+
+/* ============================================================
    共通ユーティリティ
    ============================================================ */
 const $  = s => document.querySelector(s);
@@ -419,7 +460,7 @@ function render(v){
   ({home:vHome, quiz:vQuiz, result:vResult, list:vList, search:vSearch,
     syllabus:vSyllabus, exps:vExps, settings:vSettings,
     practical:vPractical, pquiz:vPQuiz, presult:vPResult, preview:vPReview,
-    wrongList:vWrongList, wrongDetail:vWrongDetail}[view] || vHome)();
+    wrongList:vWrongList, wrongDetail:vWrongDetail, examHist:vExamHist}[view] || vHome)();
 }
 
 /* ---------- ホーム ---------- */
@@ -910,11 +951,21 @@ function vPractical(){
       </div>
       <h2 class="sec">セットを選ぶ</h2>
       <div class="grid" style="grid-template-columns:1fr">${cards}</div>
+
+      <h2 class="sec">通し受験</h2>
+      <button class="btn prac wide" id="fullBtn" type="button">第1＋第2セット 60問通し</button>
+      <p class="muted" style="margin-top:7px">
+        ${P_ALL.length}問を途中採点なしで通します。採点は60問終了時に1回だけです。</p>
+
       <h2 class="sec">復習</h2>
       <button class="btn sub wide" id="wrongBtn" type="button">間違えた問題を見返す（${wrongIds().length}問）</button>
+      <button class="btn ghost wide" id="histBtn" type="button" style="margin-top:8px">受験履歴（${HSTORE.runs.length}件）</button>
       <div class="navbtns"><button class="btn ghost" id="pBack2" type="button">ホームへ戻る</button></div>`;
     app.querySelectorAll('[data-set]').forEach(b => b.onclick = () => { pSetKey = b.dataset.set; render('practical'); });
+    /* 60問通し：P_ALL をそのまま使い、問題データは複製しない */
+    $('#fullBtn').onclick = () => { pSetKey = null; pStart(P_ALL.map(q => q.id), '60問通し'); };
     $('#wrongBtn').onclick = () => render('wrongList');
+    $('#histBtn').onclick = () => render('examHist');
     $('#pBack2').onclick = () => render('home');
     return;
   }
@@ -1117,6 +1168,7 @@ function pSubmit(){
   });
   pSession.submitted = true;
   pSave();
+  hPush(pSession);            // 採点完了時のみ受験履歴へ記録
   render('presult');
 }
 
@@ -1132,6 +1184,7 @@ function vPResult(){
   const rate = ansIds.length ? Math.round(okIds.length/ansIds.length*100) : 0;
   const avg = pSession.ids.length ? pSession.elapsedMs/pSession.ids.length : 0;
   const sumMs = pSession.ids.reduce((a,id) => a + (pSession.timeMs[id]||0), 0);
+  const isFull = pSession.ids.length === P_ALL.length;
 
   const agg = {};
   pSession.ids.forEach(id => {
@@ -1160,6 +1213,12 @@ function vPResult(){
       </div>
       <div class="muted" style="margin-top:12px">
         所要時間 ${fmtMs(pSession.elapsedMs)}　／　平均 ${(avg/1000).toFixed(1)}秒 / 問</div>
+      ${isFull ? `<div class="tally" style="margin-top:12px">
+        ${PRACTICE_SETS.map(st => { const ids = pSession.ids.filter(i => setOf(i).key === st.key);
+          const o = ids.filter(i => g[i]).length;
+          return `<div style="background:var(--navy-l); color:var(--navy-d)">${st.name} ${o} / ${ids.length}</div>`;
+        }).join('')}
+      </div>` : ''}
       <div class="muted" style="margin-top:4px; font-size:12px">
         問題別の合計 ${fmtMs(sumMs)}（差 ${fmtMs(Math.max(0, pSession.elapsedMs - sumMs))} は採点確認などの時間）</div>
     </div>
@@ -1400,6 +1459,48 @@ function vWrongDetail(){
 }
 
 /* ============================================================
+   受験履歴の一覧
+   ============================================================ */
+let histOpen = null;                       // 展開中の受験のインデックス
+
+function vExamHist(){
+  pStopTimer();
+  const runs = HSTORE.runs;
+  app.innerHTML = `
+    <h2 class="sec">受験履歴</h2>
+    ${runs.length ? `<p class="muted">採点まで完了した受験を、直近${H_LIMIT}件まで保存します。中断した受験は残りません。</p>
+      <div class="card" style="padding:4px 12px">
+        ${runs.map((r,i) => `<div class="qrow" data-hi="${i}">
+          <span class="nm">
+            <b>${r.at.slice(0,10)}　${esc(r.mode)}</b>
+            <small>${r.correct} / ${r.answered}　${r.rate}%　／　${fmtMs(r.totalMs)}　平均 ${(r.avgMs/1000).toFixed(1)}秒</small>
+          </span></div>`).join('')}
+      </div>` : '<div class="empty">まだ受験履歴がありません。<br>実戦テストを最後まで解くと記録されます。</div>'}
+
+    ${histOpen !== null && runs[histOpen] ? (() => {
+      const r = runs[histOpen];
+      return `<h2 class="sec">問題別（${r.at.slice(0,10)}　${esc(r.mode)}）</h2>
+        <div class="card" style="padding:4px 12px">
+          ${r.items.map(it => { const q = pById(it.id);
+            const m = it.ok === null ? ['n','－'] : it.ok ? ['o','✓'] : ['x','×'];
+            return `<div class="qrow"><span class="mark ${m[0]}">${m[1]}</span>
+              <span class="nm">${it.id}　${q ? esc(q.topic) : ''}
+                <small>${q ? q.syllabus.join('・') : ''}　／　${fmtMs(it.ms)}</small></span></div>`;
+          }).join('')}
+        </div>`;
+    })() : ''}
+
+    <div class="navbtns"><button class="btn ghost" id="hBack" type="button">実戦テストへ戻る</button></div>`;
+
+  app.querySelectorAll('[data-hi]').forEach(el => el.onclick = () => {
+    const i = +el.dataset.hi;
+    histOpen = (histOpen === i) ? null : i;      // 同じ行を押したら閉じる
+    render('examHist');
+  });
+  $('#hBack').onclick = () => { histOpen = null; pSetKey = null; render('practical'); };
+}
+
+/* ============================================================
    第1セット初回受験履歴の復元（欠落時のみ・手動実行・一度きり）
    ============================================================ */
 const SET1_FIRST_RESULT = {
@@ -1520,6 +1621,7 @@ document.getElementById('homeBtn').onclick = () => {
 
 loadStore();
 pLoad();
+hLoad();
 render('home');
 </script>
 </body>
