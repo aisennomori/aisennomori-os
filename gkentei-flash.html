@@ -128,6 +128,21 @@
 
   .empty{text-align:center; color:var(--muted); padding:32px 14px; font-size:14.5px;}
 
+  /* ---------- 履歴 ---------- */
+  .hs .hd2{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
+  .hs .sc{font-size:19px; font-weight:800; color:var(--navy);}
+  .hs .dt{font-size:12.5px; color:var(--muted); font-weight:700;}
+  .hs .kv{display:flex; gap:7px; flex-wrap:wrap; margin-top:9px;}
+  .hs .kv span{background:var(--paper); border:1px solid var(--line); border-radius:8px;
+    padding:4px 10px; font-size:12.5px; font-weight:800;}
+  .hs details{margin-top:10px;}
+  .hs summary{cursor:pointer; font-size:13.5px; font-weight:800; color:var(--navy);
+    min-height:38px; display:flex; align-items:center;}
+  .hs h4{margin:12px 0 0; font-size:12.5px; color:var(--amber-deep);}
+  .ta{width:100%; min-height:220px; padding:10px; font-size:12px; line-height:1.6;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    border:1.5px solid var(--line); border-radius:10px; background:#fff; color:var(--ink);}
+
   /* ---------- 印刷シート ---------- */
   .sheet{display:none;}
   .sheet.show{display:block;}
@@ -357,6 +372,10 @@ const STREAK_FIX = 2;          // 5秒以内を2回連続で正解すると定�
 const SESSION_N = 26;
 const YOUGO_URL = 'gkentei-yougo.html';
 
+/* セッション単位の履歴。カード単位の履歴（LS_KEY）とは完全に分離する */
+const LS_HIST_KEY = 'gkentei_flash_history_v1';
+const HIST_MAX = 20;           // 保存するセッション数の上限。超えたら古いものから削除
+
 let STORE = {version:1, history:{}, settings:{mode:'all'}};
 
 function load(){
@@ -379,6 +398,49 @@ function rec(id){
   if(!STORE.history[id]) STORE.history[id] =
     {ok:0, ng:0, streak:0, last:null, bestMs:null, lastMs:null, lastResult:null};
   return STORE.history[id];
+}
+
+/* ---------- セッション履歴（新しい順に保持） ---------- */
+let HIST = [];
+function loadHist(){
+  try{
+    const raw = localStorage.getItem(LS_HIST_KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      if(Array.isArray(o)) HIST = o.filter(x => x && Array.isArray(x.results));
+    }
+  }catch(e){ console.warn('history load failed', e); }
+}
+function saveHist(){
+  try{ localStorage.setItem(LS_HIST_KEY, JSON.stringify(HIST)); }
+  catch(e){ console.warn('history save failed', e); }
+}
+/* 出題を最後まで終えたセッションだけを1回だけ保存する。
+   中断（S=null）は vResult を通らないため、ここには到達しない。
+   問題数は固定値を使わず、実際の results から求める。 */
+function pushSession(){
+  if(!S || S.saved) return;                       // 結果画面の再描画による二重保存を防ぐ
+  if(!S.results.length) return;
+  if(S.results.length !== S.ids.length) return;   // 途中終了は記録しない
+  S.saved = true;
+
+  const n    = S.results.length;
+  const ok   = S.results.filter(r => r.ok).length;
+  const fast = S.results.filter(r => r.fast).length;
+  HIST.unshift({
+    at: new Date().toISOString(),
+    mode: S.mode,
+    questionCount: n,
+    correctCount: ok,
+    incorrectCount: n - ok,
+    rate: Math.round(ok / n * 100),
+    averageMs: Math.round(S.results.reduce((a,r) => a + r.ms, 0) / n),
+    fastCount: fast,
+    results: S.results.map(r =>
+      ({id:r.id, ok:r.ok, ms:r.ms, fast:r.fast, slow:r.slow, state:r.state})),
+  });
+  if(HIST.length > HIST_MAX) HIST.length = HIST_MAX;
+  saveHist();
 }
 /* 直近の解答から、そのカードの状態を5区分で返す
    fixed  定着確認済み … 5秒以内の正解が2回連続
@@ -413,6 +475,20 @@ function shuffled(a){
   return x;
 }
 const fmtSec = ms => (ms/1000).toFixed(1) + '秒';
+const fmtDT = iso => {
+  const d = new Date(iso);
+  if(isNaN(d.getTime())) return '—';
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+};
+const MODE_LABEL = {all:'全カード', weak:'弱点だけ'};
+const modeLabel = m => MODE_LABEL[m] || m || '—';
+/* 外部AIへ渡すときの表記。瞬殺の独自IDをJDLAシラバスコードと誤認させないため、
+   IDとcatを必ずセットで出す */
+const cardLabel = id => {
+  const c = byId(id);
+  return `【瞬殺:${id}】${c ? c.cat : '不明'}`;
+};
 
 /* ============================================================
    出題の生成
@@ -457,7 +533,7 @@ function startSession(mode){
   /* weight の大きいカードを優先しつつ、順序はランダム */
   const w = shuffled(pool).sort((a,b) => (b.weight||1) - (a.weight||1));
   const ids = shuffled(w.slice(0, Math.min(SESSION_N, w.length))).map(c => c.id);
-  S = {ids, cur:0, q:null, results:[], startedAt:Date.now(), shownAt:0, answered:false, mode};
+  S = {ids, cur:0, q:null, results:[], startedAt:Date.now(), shownAt:0, answered:false, mode, saved:false};
   render('quiz');
 }
 function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
@@ -474,7 +550,7 @@ let view = 'home';
 function render(v){
   if(v) view = v;
   window.scrollTo(0,0);
-  ({home:vHome, quiz:vQuiz, result:vResult, sheet:vSheet}[view] || vHome)();
+  ({home:vHome, quiz:vQuiz, result:vResult, sheet:vSheet, hist:vHist}[view] || vHome)();
 }
 
 function counts(){
@@ -490,7 +566,7 @@ function vHome(){
   app.innerHTML = `
     <div class="hero">
       <h3>瞬殺トレーニング</h3>
-      <p>4択を${(FAST_MS/1000)}秒以内で切る反射をつくる。26論点・1回${SESSION_N}問。</p>
+      <p>4択を${(FAST_MS/1000)}秒以内で切る反射をつくる。${CARDS.length}論点・1回${SESSION_N}問。</p>
       <div class="stat">
         <div>弱点 ${c.weak}</div>
         <div>要反射 ${c.slow}</div>
@@ -525,12 +601,17 @@ function vHome(){
       }).join('')}
     </div>
 
+    <h2 class="sec">履歴</h2>
+    <button class="btn ghost wide" id="histBtn" type="button">セッション履歴（${HIST.length}）</button>
+    <p class="muted" style="margin-top:8px">1セット終えるごとに記録します。分析用テキストのコピーもここからです。</p>
+
     <h2 class="sec">印刷</h2>
     <button class="btn ghost wide" id="sheetBtn" type="button">A4瞬殺シートを表示</button>
     <p class="muted" style="margin-top:8px">同じカードデータから3ページのシートを生成します。</p>`;
 
   $('#allBtn').onclick  = () => startSession('all');
   $('#weakBtn').onclick = () => startSession('weak');
+  $('#histBtn').onclick = () => { S = null; render('hist'); };
   $('#sheetBtn').onclick = () => render('sheet');
 }
 
@@ -636,6 +717,7 @@ function answer(i){
 function vResult(){
   if(!S){ render('home'); return; }
   stopTimer();
+  pushSession();                 // 再描画しても S.saved により1回だけ保存される
   const n = S.results.length;
   const ok = S.results.filter(r => r.ok).length;
   const fast = S.results.filter(r => r.fast).length;
@@ -697,6 +779,131 @@ function vResult(){
 }
 
 /* ============================================================
+   セッション履歴
+   ============================================================ */
+/* 結果画面と同じ区分でセッションを分類する */
+function splitResults(results){
+  return {
+    ng:   results.filter(r => !r.ok),
+    slow: results.filter(r => r.ok && r.slow),
+    mid:  results.filter(r => r.ok && !r.fast && !r.slow),
+  };
+}
+function histRows(list, cls){
+  return list.map(r => `<div class="lrow">
+    <span class="m ${cls==='x'?'x':'o'}">${cls==='x'?'×':'✓'}</span>
+    <span class="t">${esc(cardLabel(r.id))}
+      <small>${esc((byId(r.id)||{key:''}).key)}</small></span>
+    <span class="sec2 ${cls==='slow'?'slow':''}">${fmtSec(r.ms)}</span>
+  </div>`).join('');
+}
+
+/* 外部AIへ貼り付けるためのプレーンテキスト。
+   カードは必ず「【瞬殺:ID】cat」の形で出す */
+function buildAnalysisText(){
+  if(!HIST.length) return '【G検定 瞬殺トレーニング履歴】\n\n保存されている履歴はありません。';
+  const L = [];
+  L.push('【G検定 瞬殺トレーニング履歴】');
+  L.push(`出力日時：${fmtDT(new Date().toISOString())}`);
+  L.push(`保存セッション：${HIST.length}件`);
+
+  const h = HIST[0];
+  const s = splitResults(h.results);
+  L.push('', '■ 最新セッション');
+  L.push(`日時：${fmtDT(h.at)}`);
+  L.push(`モード：${modeLabel(h.mode)}`);
+  L.push(`${h.correctCount} / ${h.questionCount}`);
+  L.push(`正答率 ${h.rate}%`);
+  L.push(`平均 ${fmtSec(h.averageMs)}`);
+  L.push(`${FAST_MS/1000}秒以内 ${h.fastCount}`);
+
+  L.push('', '■ 誤答');
+  L.push(s.ng.length ? s.ng.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('\n') : 'なし');
+  L.push('', `■ ${SLOW_MS/1000}秒超正解`);
+  L.push(s.slow.length ? s.slow.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('\n') : 'なし');
+  L.push('', `■ ${FAST_MS/1000}〜${SLOW_MS/1000}秒正解`);
+  L.push(s.mid.length ? s.mid.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('\n') : 'なし');
+
+  L.push('', '■ 過去セッション推移（新しい順）');
+  L.push(`日時 / モード / 正解数 / 正答率 / 平均秒 / ${FAST_MS/1000}秒以内`);
+  HIST.forEach(x => {
+    L.push(`${fmtDT(x.at)} / ${modeLabel(x.mode)} / ${x.correctCount}/${x.questionCount}`
+      + ` / ${x.rate}% / ${fmtSec(x.averageMs)} / ${x.fastCount}`);
+  });
+
+  L.push('', '■ 各セッションの誤答と要反射（新しい順）');
+  HIST.forEach(x => {
+    const q = splitResults(x.results);
+    L.push(`${fmtDT(x.at)}　${x.correctCount}/${x.questionCount}`);
+    L.push(`誤答：${q.ng.length ? q.ng.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('、') : 'なし'}`);
+    L.push(`${SLOW_MS/1000}秒超：${q.slow.length ? q.slow.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('、') : 'なし'}`);
+  });
+  return L.join('\n');
+}
+
+/* navigator.clipboard が使えない環境（file:// 等）ではテキストを画面へ出す */
+function showCopyFallback(txt, note){
+  const box = document.getElementById('copyBox');
+  if(!box) return;
+  box.innerHTML = `<p class="muted" style="margin:10px 0 6px">${esc(note)}</p>
+    <textarea class="ta" id="copyTa" readonly></textarea>`;
+  const ta = document.getElementById('copyTa');
+  ta.value = txt;
+  ta.focus(); ta.select();
+}
+function copyAnalysis(btn){
+  const txt = buildAnalysisText();
+  const label = btn.textContent;
+  const done = () => { btn.textContent = 'コピーしました'; setTimeout(() => { btn.textContent = label; }, 1600); };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(done).catch(() =>
+      showCopyFallback(txt, 'クリップボードへ書き込めませんでした。下のテキストを選択してコピーしてください。'));
+  }else{
+    showCopyFallback(txt, 'この環境ではクリップボードを使えません。下のテキストを選択してコピーしてください。');
+  }
+}
+
+function vHist(){
+  stopTimer();
+  app.innerHTML = `
+    <h2 class="sec">セッション履歴</h2>
+    <p class="muted">直近${HIST_MAX}セッションまで、この端末のブラウザに保存します。</p>
+    <div class="row" style="margin:10px 0">
+      <button class="btn" id="copyBtn" type="button" ${HIST.length?'':'disabled'}>分析用テキストをコピー</button>
+      <button class="btn ghost" id="back3" type="button">ホームへ</button>
+    </div>
+    <div id="copyBox"></div>
+
+    ${HIST.length ? HIST.map(h => {
+      const s = splitResults(h.results);
+      return `<div class="card hs">
+        <div class="hd2">
+          <span class="sc">${h.correctCount} / ${h.questionCount}</span>
+          <span class="dt">${esc(fmtDT(h.at))}　${esc(modeLabel(h.mode))}</span>
+        </div>
+        <div class="kv">
+          <span>正答率 ${h.rate}%</span>
+          <span>平均 ${fmtSec(h.averageMs)}</span>
+          <span>${FAST_MS/1000}秒以内 ${h.fastCount}</span>
+          <span>不正解 ${h.incorrectCount}</span>
+        </div>
+        <details>
+          <summary>詳細を見る</summary>
+          ${s.ng.length ? `<h4>間違えたカード</h4>${histRows(s.ng,'x')}` : ''}
+          ${s.slow.length ? `<h4>要反射（${SLOW_MS/1000}秒超で正解）</h4>${histRows(s.slow,'slow')}` : ''}
+          ${s.mid.length ? `<h4>理解済み（${FAST_MS/1000}〜${SLOW_MS/1000}秒で正解）</h4>${histRows(s.mid,'o')}` : ''}
+          ${!s.ng.length && !s.slow.length && !s.mid.length
+            ? `<p class="muted" style="margin:10px 0 0">全問を${FAST_MS/1000}秒以内で正解しています。</p>` : ''}
+        </details>
+      </div>`;
+    }).join('')
+    : `<div class="empty">まだ履歴はありません。<br>1セット最後まで終えると、ここに記録されます。</div>`}`;
+
+  $('#back3').onclick = () => render('home');
+  if(HIST.length) $('#copyBtn').onclick = e => copyAnalysis(e.currentTarget);
+}
+
+/* ============================================================
    A4瞬殺シート（同じCARDSから生成）
    ============================================================ */
 const SHEET_PAGES = [
@@ -749,6 +956,7 @@ function vSheet(){
    ============================================================ */
 document.getElementById('homeBtn').onclick = () => { stopTimer(); S = null; render('home'); };
 load();
+loadHist();
 render('home');
 </script>
 </body>
