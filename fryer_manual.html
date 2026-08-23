@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>【フライヤー①】簡易版 商品化基準書</title>
+<style>
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 24px;
+    background: #faf8f5;
+    color: #2c2c2c;
+  }
+  .header {
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+  }
+  h1 {
+    font-size: 1.3rem;
+    margin: 0 0 4px 0;
+    border-left: 6px solid #d98c3d;
+    padding-left: 10px;
+  }
+  .subinfo {
+    font-size: 0.85rem;
+    color: #777;
+    margin-left: 16px;
+  }
+  .controls {
+    max-width: 1000px;
+    margin: 0 auto 16px auto;
+    background: #fff;
+    border: 1px solid #e2ddd5;
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+  .controls label {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  select, input[type="text"] {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  select { min-width: 220px; }
+  input[type="text"] { min-width: 220px; }
+  .count {
+    font-size: 0.85rem;
+    color: #888;
+    margin-left: auto;
+  }
+  .clear-btn {
+    font-size: 0.8rem;
+    color: #a05a20;
+    background: none;
+    border: 1px solid #d98c3d;
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .clear-btn:hover { background: #fdf0e3; }
+
+  .cards {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e2ddd5;
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .card .cat {
+    display: inline-block;
+    font-size: 0.72rem;
+    color: #a05a20;
+    background: #fdf0e3;
+    border-radius: 999px;
+    padding: 2px 10px;
+    margin-bottom: 6px;
+  }
+  .card .name {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card .point {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    color: #3a3a3a;
+  }
+  .no-result {
+    text-align: center;
+    color: #999;
+    padding: 30px;
+  }
+  .footnote {
+    max-width: 1000px;
+    margin: 20px auto 0 auto;
+    font-size: 0.78rem;
+    color: #999;
+    line-height: 1.6;
+  }
+  mark {
+    background: #ffe8b3;
+    padding: 0 1px;
+    border-radius: 2px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>【フライヤー①】簡易版　商品化基準書</h1>
+  <div class="subinfo">2026/8/17〜　｜　社外秘</div>
+</div>
+
+<div class="controls">
+  <div>
+    <label for="itemSelect">商品名で選択：</label><br>
+    <select id="itemSelect">
+      <option value="">（すべて表示）</option>
+    </select>
+  </div>
+  <div>
+    <label for="catSelect">層で絞込：</label><br>
+    <select id="catSelect">
+      <option value="">（すべて）</option>
+    </select>
+  </div>
+  <div>
+    <label for="searchInput">あいまい検索：</label><br>
+    <input type="text" id="searchInput" placeholder="例：170℃　からあげ　塩　など" />
+  </div>
+  <button class="clear-btn" id="clearBtn">条件をクリア</button>
+  <div class="count" id="countLabel"></div>
+</div>
+
+<div class="cards" id="cardsArea"></div>
+
+<div class="footnote" id="footnote"></div>
+
+<script>
+  // ------------------------------------------------------------------
+  // データ：フライヤー簡易版 商品化基準書（2026/8/17〜）より
+  // 用語・数字はPDF記載のとおり一切変更せず転記しています。
+  // ------------------------------------------------------------------
+  const data = [
+    { cat: "フライヤー【唐揚げ層】", name: "幸唐　若鶏ももからあげ",
+      point: "吟選醤油40g　30回混ぜる。片栗粉250gバットにあけ粉付け　皮面を上にして広げ5分置く。\n広げて揚げ網に並べ、170℃4分（最大投入1B）ブラックペッパー大口3振り、放熱20分" },
+    { cat: "フライヤー【唐揚げ層】", name: "２１世紀のたれ鶏からあげ",
+      point: "鶏肉1Bボウルで50回混ぜる→鶏肉の両面に粉付けする。揚げ網使用　170℃2分30秒（最大投入1/2 B）\n10分放熱後、たれかつのたれ250gと混ぜ合わせる" },
+    { cat: "フライヤー【唐揚げ層】", name: "鶏の豪快半身からあげ",
+      point: "5個：唐揚げ粉100g　全体になじませ10分放置　皮面を下にして油調　170℃3分　最大投入5本" },
+    { cat: "フライヤー【唐揚げ層】", name: "骨付き辛味チキン",
+      point: "170℃2分30秒(90g)　最大投入2B" },
+    { cat: "フライヤー【唐揚げ層】", name: "骨なしフライドチキン",
+      point: "170℃　4分30秒(最大投入1B)" },
+    { cat: "フライヤー【唐揚げ層】", name: "幸唐　手羽先からあげ",
+      point: "揚げ網　冷凍のまま170℃　5分（最大投入1B）" },
+    { cat: "フライヤー【唐揚げ層】", name: "いか唐揚",
+      point: "170℃　2分　（最大投入1B）放熱20分以上" },
+    { cat: "フライヤー【唐揚げ層】", name: "たこ唐揚",
+      point: "170℃　3分(最大投入1B)" },
+    { cat: "フライヤー【唐揚げ層】", name: "骨取り真あじ竜田揚南蛮酢",
+      point: "野菜と鷹の爪をタレに漬す。あじ竜田　170℃2分30秒（最大投入1B）" },
+    { cat: "フライヤー【唐揚げ層】", name: "丸ごとかれい唐揚",
+      point: "唐揚げ粉200g+水200cc　身:170℃3分（最大投入20切）、骨：160℃10分（4分経過後15秒間つまんで形成）" },
+    { cat: "フライヤー【唐揚げ層】", name: "さば唐揚（ぶどう山椒使用）",
+      point: "《前日》さば1B+白だし20g+南蛮パウダー20g混ぜ冷蔵庫管理\n《当日》唐揚げ粉液：唐揚げ粉100g+天かす100g+醤油10g+水180g混ぜる→さばを入れ混ぜる\n170℃　4分（投入1分+油調3分）　最大投入0.5B　放熱後、山椒1gまぶす" },
+    { cat: "フライヤー【唐揚げ層】", name: "お肉柔らか黒酢入酢豚",
+      point: "肉：片栗粉(36cc3杯(90g))と混ぜ、揚げ網に載せ170℃2分30秒。玉ねぎ（170℃15秒）\n肉・玉ねぎとタレ混ぜる。ボウルに余ったタレと人参（170℃15秒）ピーマン（170℃5秒）和えトッピング" },
+    { cat: "フライヤー【唐揚げ層】", name: "国産豚レバニラ",
+      point: "ニラ：ざるにあけ油90cc×3杯かけ混ぜる→さらに3杯かけ混ぜる\nレバー：170℃の油（36cc3杯）加えレードルで30回混ぜる→170℃1分、30秒経過後ほぐす\nレバーのみボウルにあけタレ加え30回混ぜ→ニラ加え優しく5回混ぜる" },
+    { cat: "フライヤー【唐揚げ層】", name: "海老チリソース",
+      point: "海老原料+片栗粉36cc入れ混ぜる→170℃1分→10分放熱" },
+    { cat: "フライヤー【唐揚げ層】", name: "いかとじゃが芋甘辛揚",
+      point: "【唐揚層】するめいか1/2B170℃2分、皮付きポテト1B　170℃5分【フライ層】にんにくの芽170℃5秒、玉ねぎ\nボウルにいか唐揚+ポテト+塩付たれ150gを入れ混ぜる" },
+    { cat: "フライヤー【唐揚げ層】", name: "チンジャオロース",
+      point: "豚肉：グレーざるで肉のドリップを切る→醤油40cc混ぜる→唐揚層の油を90ccレードル×5杯混ぜる→170℃20秒\nたけのこ：170℃1分(最大投入1/2B)　ピーマン：170℃5秒" },
+    { cat: "フライヤー【唐揚げ層】", name: "砂肝とブロッコリーの塩和え",
+      point: "砂肝:170℃ 1分30秒(最大投入1B) ブロッコリー:170℃ 10秒 ブロッコリーの水気を取る→にんにく塩だれ50g投入し混ぜる" },
+    { cat: "【唐揚げ層】米飯　類", name: "カットチキン900g",
+      point: "170℃の油（90cc3杯）加えレードルで30回混ぜる→170℃2分30秒 油調後タレ和える" },
+
+    { cat: "フライヤー【フライ層】", name: "手仕込みロースとんかつ",
+      point: "170℃ 2分→ベンチ4分（とんかつは揚げ網に立てかける!!）→180℃ 20秒 放熱10分" },
+    { cat: "フライヤー【フライ層】", name: "ハムかつ",
+      point: "170℃ 4分30秒" },
+    { cat: "フライヤー【フライ層】", name: "一口豚ヒレかつ",
+      point: "170℃ 2分（最大投入20枚） 投入1分後揚げ網を揺らす。放熱10分" },
+    { cat: "フライヤー【フライ層】", name: "ささみ大葉かつ",
+      point: "揚げ網 細い方を内側に並べる 170℃ 4分、投入1分後揚げ網を揺らす。放熱10分。1/2カット斜め45度のそぎ切り" },
+    { cat: "フライヤー【フライ層】", name: "二層仕立てメンチかつ（プレーン、キャベツ）",
+      point: "170℃ （8/5水〜）5分30秒 投入30秒後揚げ網を揺らす。" },
+    { cat: "フライヤー【フライ層】", name: "いかフライ",
+      point: "170℃ 4分(最大投入10枚)" },
+    { cat: "フライヤー【フライ層】", name: "あじフライ",
+      point: "170℃ 5分(最大投入8枚)" },
+    { cat: "フライヤー【フライ層】", name: "かにクリームコロッケ",
+      point: "170℃ 6分（最大投入16個）" },
+    { cat: "フライヤー【フライ層】", name: "北海道産男爵いもコロッケ",
+      point: "170℃ 4分30秒(最大投入20個)" },
+    { cat: "フライヤー【フライ層】", name: "中華春巻",
+      point: "170℃ 5分（最大投入30本） 投入1分後網をかぶせ揚げムラが出ないようにする 放熱10分以上" },
+    { cat: "フライヤー【フライ層】", name: "皮つき半切りポテト",
+      point: "170℃ 5分" },
+    { cat: "フライヤー【フライ層】", name: "ぷりぷり海老の薄衣揚",
+      point: "重ならないように並べる 170℃ 3分40秒（最大投入1Cs）" },
+    { cat: "フライヤー【フライ層】", name: "薄衣仕立ての串揚6種盛合せ",
+      point: "じゃがいも・れんこん・豚ロース各1B 170℃3分（最大投入36本）→豚ロースにパセリトッピング\n海老・うずら・白身魚各1B 170℃3分(最大投入36本)" },
+    { cat: "フライヤー【フライ層】", name: "サクサクチーズ",
+      point: "170℃ 2分30秒（最大投入2B）" },
+    { cat: "フライヤー【フライ層】", name: "揚じゃが",
+      point: "唐揚げ粉200g+水200gを混ぜ合わせる→皮付きポテト1Bと混ぜ合わせる→170℃6分油調" },
+    { cat: "フライヤー【フライ層】", name: "黒胡椒香る♪塩ねぎメンチ",
+      point: "玉ねぎメンチかつ：170℃ 3分30秒\n九条ねぎ：ざるにあけ油90cc×3杯かけ混ぜる→さらに3杯かけ混ぜる→ボウルにあけ塩だれ10g混ぜる" },
+    { cat: "フライヤー【フライ層】", name: "冷凍グリル野菜ミックス",
+      point: "170℃ 1分30秒" },
+    { cat: "フライヤー【フライ層】", name: "彩野菜の薄衣揚",
+      point: "グリル野菜となすに塩こしょうを振る→天ぷら粉を混ぜる→鶏卵を混ぜる→パン粉をつけて油調（170℃1分30秒）→15分放熱→順番に注意して盛り込む" },
+
+    { cat: "米飯　類", name: "乱切りなす",
+      point: "170℃ 1分30秒" },
+    { cat: "米飯　類", name: "牛タンスライス",
+      point: "一枚一枚手で剥がしながら、揚げ網に乗せる。170℃10秒" },
+    { cat: "米飯　類", name: "かつ重用ハーフかつ",
+      point: "170℃ 1分30秒" },
+    { cat: "米飯　類", name: "ブロッコリー",
+      point: "50g以下170℃5秒 50g以上170℃10秒 油調後味塩こしょう大1振り" },
+    { cat: "米飯　類", name: "豚重キット",
+      point: "豚肉：フライ層の油90ccレードル4杯 170℃20秒 玉ねぎ：170℃10秒\n→ボウルにマグロールを敷き油を吸着させる" },
+    { cat: "米飯　類", name: "焼そば用キャベツ",
+      point: "170℃10秒 味塩こしょう大口10振り" },
+    { cat: "米飯　類", name: "蓮根チップ",
+      point: "170℃5分" },
+  ];
+
+  const itemSelect = document.getElementById("itemSelect");
+  const catSelect = document.getElementById("catSelect");
+  const searchInput = document.getElementById("searchInput");
+  const cardsArea = document.getElementById("cardsArea");
+  const countLabel = document.getElementById("countLabel");
+  const clearBtn = document.getElementById("clearBtn");
+  const footnote = document.getElementById("footnote");
+
+  // 商品名プルダウン（登場順）
+  data.forEach(item => {
+    const opt = document.createElement("option");
+    opt.value = item.name;
+    opt.textContent = item.name;
+    itemSelect.appendChild(opt);
+  });
+
+  // 層（カテゴリ）プルダウン
+  const uniqueCats = [...new Set(data.map(i => i.cat))];
+  uniqueCats.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    catSelect.appendChild(opt);
+  });
+
+  // あいまい検索用の正規化（全角/半角スペース除去、ひらがな→カタカナ統一、大文字小文字統一）
+  function normalize(str) {
+    return str
+      .replace(/[\s　]+/g, "")
+      .replace(/[ぁ-ゔ]/g, ch => String.fromCharCode(ch.charCodeAt(0) + 0x60)) // ひらがな→カタカナ
+      .toLowerCase();
+  }
+
+  function highlight(text, keywords) {
+    if (!keywords.length) return escapeHtml(text);
+    let escaped = escapeHtml(text);
+    keywords.forEach(kw => {
+      if (!kw) return;
+      const esc = kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const re = new RegExp("(" + esc + ")", "gi");
+      escaped = escaped.replace(re, "<mark>$1</mark>");
+    });
+    return escaped;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function render() {
+    const selectedItem = itemSelect.value;
+    const selectedCat = catSelect.value;
+    const rawKeyword = searchInput.value.trim();
+    const keywordTokens = rawKeyword.split(/[\s　]+/).filter(Boolean);
+    const normTokens = keywordTokens.map(normalize);
+
+    const rows = data.filter(item => {
+      const matchesItem = !selectedItem || item.name === selectedItem;
+      const matchesCat = !selectedCat || item.cat === selectedCat;
+      const haystack = normalize(item.name + " " + item.point);
+      const matchesSearch = normTokens.every(t => haystack.includes(t));
+      return matchesItem && matchesCat && matchesSearch;
+    });
+
+    cardsArea.innerHTML = "";
+    countLabel.textContent = rows.length + " 件表示中";
+
+    if (rows.length === 0) {
+      const div = document.createElement("div");
+      div.className = "no-result";
+      div.textContent = "該当する商品が見つかりませんでした。";
+      cardsArea.appendChild(div);
+      return;
+    }
+
+    rows.forEach(item => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const cat = document.createElement("div");
+      cat.className = "cat";
+      cat.textContent = item.cat;
+
+      const name = document.createElement("div");
+      name.className = "name";
+      name.innerHTML = highlight(item.name, keywordTokens);
+
+      const point = document.createElement("div");
+      point.className = "point";
+      point.innerHTML = highlight(item.point, keywordTokens);
+
+      card.appendChild(cat);
+      card.appendChild(name);
+      card.appendChild(point);
+      cardsArea.appendChild(card);
+    });
+  }
+
+  itemSelect.addEventListener("change", () => { searchInput.value = ""; render(); });
+  catSelect.addEventListener("change", render);
+  searchInput.addEventListener("input", () => { itemSelect.value = ""; render(); });
+  clearBtn.addEventListener("click", () => {
+    itemSelect.value = "";
+    catSelect.value = "";
+    searchInput.value = "";
+    render();
+  });
+
+  footnote.innerHTML =
+    "※用語・数字はPDF記載のまま転記しています。<br>" +
+    "※セルフ再鑑にて全43品目を原本と照合済みです。「豚重キット」内の「マグロール」は原本画像のまま残しています。";
+
+  render();
+</script>
+
+</body>
+</html>
