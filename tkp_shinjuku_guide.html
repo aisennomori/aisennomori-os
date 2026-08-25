@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>品川→新宿→TKP新宿西口 道案内</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EE;
+    --ink:#1F1D19;
+    --sub:#6B6559;
+    --line:#DAD2C1;
+    --shinkansen:#0B5FA8;
+    --yamanote:#7CB518;
+    --yamanote-dark:#5C8B10;
+    --dest:#E8720C;
+    --card:#FFFFFF;
+    --tag-bg:#F0EBDD;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Noto Sans JP",sans-serif;
+    line-height:1.75;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px 80px;}
+
+  /* ===== Header ===== */
+  header{
+    padding:44px 20px 30px;
+    text-align:center;
+    border-bottom:3px solid var(--ink);
+    margin-bottom:36px;
+  }
+  .eyebrow{
+    font-family:"Space Mono",monospace;
+    font-size:12px;
+    letter-spacing:.15em;
+    color:var(--sub);
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:900;
+    font-size:clamp(26px,5vw,38px);
+    margin:0 0 8px;
+    letter-spacing:.02em;
+  }
+  .subtitle{
+    color:var(--sub);
+    font-size:15px;
+    margin-bottom:20px;
+  }
+  .total-time{
+    display:inline-flex;
+    align-items:baseline;
+    gap:8px;
+    background:var(--ink);
+    color:var(--paper);
+    padding:10px 22px;
+    border-radius:100px;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:700;
+  }
+  .total-time .num{
+    font-family:"Space Mono",monospace;
+    font-size:22px;
+    font-weight:700;
+  }
+  .event-info{
+    margin:22px auto 0;
+    max-width:480px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 22px;
+    text-align:left;
+  }
+  .event-row{
+    display:flex;
+    gap:14px;
+    padding:6px 0;
+    font-size:14.5px;
+  }
+  .event-row + .event-row{border-top:1px dashed var(--line);}
+  .event-label{
+    flex-shrink:0;
+    width:44px;
+    color:var(--sub);
+    font-weight:700;
+    font-size:13px;
+  }
+  .event-value{font-weight:600;}
+  .event-link{
+    display:block;
+    text-align:center;
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    font-size:13.5px;
+    color:var(--dest);
+    font-weight:700;
+    text-decoration:none;
+  }
+  .event-link:hover{text-decoration:underline;}
+
+  /* ===== Route diagram (signature element) ===== */
+  .route-diagram{
+    margin:0 0 44px;
+    padding:28px 18px 20px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+  }
+  .route-diagram svg{width:100%;height:auto;display:block;}
+  .route-caption{
+    display:flex;
+    justify-content:space-between;
+    font-family:"Space Mono",monospace;
+    font-size:11px;
+    color:var(--sub);
+    margin-top:10px;
+    padding:0 6px;
+  }
+
+  /* ===== Section ===== */
+  section{margin-bottom:40px;}
+  .sec-head{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:18px;
+  }
+  .sec-num{
+    font-family:"Space Mono",monospace;
+    font-size:13px;
+    font-weight:700;
+    color:var(--paper);
+    background:var(--ink);
+    width:30px;height:30px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .sec-head h2{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-size:20px;
+    font-weight:700;
+    margin:0;
+  }
+  .sec-head .line-tag{
+    font-family:"Space Mono",monospace;
+    font-size:11px;
+    padding:3px 10px;
+    border-radius:100px;
+    color:#fff;
+    margin-left:auto;
+    white-space:nowrap;
+  }
+  .tag-shinkansen{background:var(--shinkansen);}
+  .tag-yamanote{background:var(--yamanote-dark);}
+  .tag-dest{background:var(--dest);}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 22px 18px;
+    margin-bottom:14px;
+  }
+  .step{
+    display:flex;
+    gap:14px;
+    padding:12px 0;
+    border-top:1px dashed var(--line);
+  }
+  .step:first-child{border-top:none;padding-top:0;}
+  .step-icon{
+    flex-shrink:0;
+    width:38px;height:38px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .step-body b{display:block;margin-bottom:2px;font-weight:600;}
+  .step-body .desc{color:var(--sub);font-size:14px;}
+
+  .time-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-family:"Space Mono",monospace;
+    font-size:13px;
+    font-weight:700;
+    background:var(--tag-bg);
+    padding:5px 12px;
+    border-radius:8px;
+    margin-top:10px;
+  }
+
+  /* callout */
+  .callout{
+    background:#FFF6E9;
+    border:1px solid #F0D9A8;
+    border-left:5px solid var(--dest);
+    border-radius:10px;
+    padding:18px 20px;
+    font-size:14.5px;
+  }
+  .callout .callout-title{
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+  }
+  .callout ul{margin:0;padding-left:20px;}
+  .callout li{margin-bottom:6px;}
+
+  /* facility info table */
+  .facility{
+    display:grid;
+    grid-template-columns:88px 1fr;
+    gap:10px 16px;
+    font-size:14.5px;
+  }
+  .facility dt{color:var(--sub);font-weight:600;}
+  .facility dd{margin:0;}
+
+  /* footer summary */
+  footer{
+    margin-top:10px;
+    padding:26px 24px;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:16px;
+  }
+  footer h3{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    margin:0 0 10px;
+    font-size:17px;
+  }
+  footer p{margin:0;color:#D8D2C4;font-size:14.5px;}
+  footer .flow{
+    font-family:"Space Mono",monospace;
+    font-size:12px;
+    color:#B9C98C;
+    margin-top:14px;
+    line-height:1.9;
+    word-break:break-all;
+  }
+
+  @media(max-width:480px){
+    .facility{grid-template-columns:76px 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Gifu → Tokyo · Access Guide</div>
+    <h1>品川 ⇄ 新宿 ⇄ TKP新宿西口<br>カンファレンスセンター</h1>
+    <p class="subtitle">岐阜方面から新幹線でお越しの方向け／行き・帰り　初めての新宿でも迷わないルート</p>
+    <div class="total-time">品川駅到着からTKP到着まで　通常約<span class="num">30〜35</span>分</div>
+    <p style="font-size:12.5px;color:var(--sub);margin-top:8px;">※初めて新宿駅を利用する場合は40分程度みておくと安心です。</p>
+
+    <div class="event-info">
+      <div class="event-row">
+        <span class="event-label">日時</span>
+        <span class="event-value">2026年8月29日（土）15:30〜</span>
+      </div>
+      <div class="event-row">
+        <span class="event-label">会場</span>
+        <span class="event-value">TKP新宿西口カンファレンスセンター　カンファレンスルーム9B（9階）</span>
+      </div>
+      <a class="event-link" href="https://www.kashikaigishitsu.net/facilitys/cc-shinjuku-nishiguchi/" target="_blank" rel="noopener">会場ページを見る（kashikaigishitsu.net）↗</a>
+    </div>
+  </header>
+
+  <!-- 図解：ルート全体図 -->
+  <div class="route-diagram">
+    <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" font-family="Zen Kaku Gothic New, sans-serif">
+      <!-- base line -->
+      <line x1="60" y1="70" x2="640" y2="70" stroke="#DAD2C1" stroke-width="6" stroke-linecap="round"/>
+      <!-- shinkansen segment -->
+      <line x1="60" y1="70" x2="230" y2="70" stroke="#0B5FA8" stroke-width="6" stroke-linecap="round"/>
+      <!-- yamanote segment -->
+      <line x1="230" y1="70" x2="470" y2="70" stroke="#5C8B10" stroke-width="6" stroke-linecap="round"/>
+      <!-- walk segment (dashed) -->
+      <line x1="470" y1="70" x2="640" y2="70" stroke="#E8720C" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 14"/>
+
+      <!-- node: 岐阜方面 -->
+      <circle cx="60" cy="70" r="9" fill="#0B5FA8"/>
+      <text x="60" y="40" text-anchor="middle" font-size="13" fill="#1F1D19" font-weight="700">岐阜方面から</text>
+      <text x="60" y="100" text-anchor="middle" font-size="12" fill="#6B6559">東海道新幹線</text>
+
+      <!-- node: 品川 -->
+      <circle cx="230" cy="70" r="11" fill="#0B5FA8" stroke="#fff" stroke-width="3"/>
+      <text x="230" y="35" text-anchor="middle" font-size="15" fill="#1F1D19" font-weight="900">品川駅</text>
+      <text x="230" y="99" text-anchor="middle" font-size="12" fill="#6B6559">新幹線 → JR山手線</text>
+      <text x="230" y="114" text-anchor="middle" font-size="11" fill="#5C8B10" font-weight="700">乗換 約5分</text>
+
+      <!-- node: 新宿 -->
+      <circle cx="470" cy="70" r="11" fill="#5C8B10" stroke="#fff" stroke-width="3"/>
+      <text x="470" y="35" text-anchor="middle" font-size="15" fill="#1F1D19" font-weight="900">新宿駅（西口）</text>
+      <text x="470" y="99" text-anchor="middle" font-size="12" fill="#6B6559">山手線・外回り</text>
+      <text x="470" y="114" text-anchor="middle" font-size="11" fill="#5C8B10" font-weight="700">乗車 約20分</text>
+
+      <!-- node: TKP -->
+      <circle cx="640" cy="70" r="11" fill="#E8720C" stroke="#fff" stroke-width="3"/>
+      <text x="640" y="35" text-anchor="middle" font-size="14" fill="#1F1D19" font-weight="900">TKP新宿西口</text>
+      <text x="640" y="99" text-anchor="middle" font-size="12" fill="#6B6559">7番出口より徒歩</text>
+      <text x="640" y="114" text-anchor="middle" font-size="11" fill="#E8720C" font-weight="700">徒歩 約1分</text>
+
+      <text x="230" y="150" text-anchor="middle" font-size="11" fill="#0B5FA8">━ 新幹線</text>
+      <text x="380" y="150" text-anchor="middle" font-size="11" fill="#5C8B10">━ JR山手線（外回り）</text>
+      <text x="560" y="150" text-anchor="middle" font-size="11" fill="#E8720C">┅ 徒歩（地下通路直結）</text>
+    </svg>
+    <div class="route-caption">
+      <span>START：品川駅</span>
+      <span>GOAL：TKP新宿西口カンファレンスセンター</span>
+    </div>
+  </div>
+
+  <!-- 1. 品川駅での乗り換え -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">1</div>
+      <h2>品川駅の乗り換え</h2>
+      <span class="line-tag tag-shinkansen">新幹線 → 山手線</span>
+    </div>
+    <div class="card">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="13" rx="4" stroke="#0B5FA8" stroke-width="1.6"/><circle cx="8" cy="19" r="1.4" fill="#0B5FA8"/><circle cx="16" cy="19" r="1.4" fill="#0B5FA8"/><line x1="4" y1="10" x2="20" y2="10" stroke="#0B5FA8" stroke-width="1.6"/></svg>
+        </div>
+        <div class="step-body">
+          <b>新幹線を降りたら「JR乗換口」の案内へ</b>
+          <div class="desc">案内表示に従って進み、改札を出る。改札を出たら「山手線」の表示を探す。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#5C8B10" stroke-width="1.6"/><path d="M8 12h8M13 8l4 4-4 4" stroke="#5C8B10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>山手線ホームで「外回り（渋谷・新宿方面）」に乗車</b>
+          <div class="desc">ホームの案内・電光掲示板の緑色のラインが目印。反対方向（内回り）に乗らないよう行き先表示を確認。</div>
+          <div class="time-chip">🚃 乗車時間：約20分</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 新宿駅到着・西口案内 -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">2</div>
+      <h2>新宿駅に到着・西口へ</h2>
+      <span class="line-tag tag-yamanote">JR新宿駅</span>
+    </div>
+    <div class="card">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 5v8l-8 5-8-5V8l8-5z" stroke="#5C8B10" stroke-width="1.6" stroke-linejoin="round"/><text x="12" y="15" text-anchor="middle" font-size="8" fill="#5C8B10" font-weight="700">西</text></svg>
+        </div>
+        <div class="step-body">
+          <b>ホームから「西改札」方面の案内に従う</b>
+          <div class="desc">新宿駅は出口が非常に多いため、電車を降りたらまず案内表示の「西改札」を目印に進む。改札を出た後は「7番出口」方面を目指す。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="8" width="16" height="12" rx="1.5" stroke="#5C8B10" stroke-width="1.6"/><path d="M8 8V6a4 4 0 018 0v2" stroke="#5C8B10" stroke-width="1.6"/></svg>
+        </div>
+        <div class="step-body">
+          <b>「7番出口」方面の案内表示に従う</b>
+          <div class="desc">西口改札を出て、地下通路を通り7番出口方面へ。7番出口方面へ進み、「ヨドバシ新宿西口駅前ビル」を目印にする。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. TKPへの道のり -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">3</div>
+      <h2>7番出口からTKPへ</h2>
+      <span class="line-tag tag-dest">徒歩約1分</span>
+    </div>
+    <div class="card">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="2" stroke="#E8720C" stroke-width="1.6"/><path d="M12 8v6M8 21l4-7 4 7M9 12l-3 3M15 12l3 3" stroke="#E8720C" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>JR新宿駅7番出口から徒歩約1分</b>
+          <div class="desc">TKP新宿西口カンファレンスセンターは地下通路直結の施設です。案内表示と会場ページの地図を確認しながら「ヨドバシ新宿西口駅前ビル」を目指してください。</div>
+          <div class="time-chip">🚶 徒歩：約1分</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="17" rx="1" stroke="#E8720C" stroke-width="1.6"/><line x1="8" y1="8" x2="11" y2="8" stroke="#E8720C" stroke-width="1.6"/><line x1="13" y1="8" x2="16" y2="8" stroke="#E8720C" stroke-width="1.6"/><line x1="8" y1="12" x2="11" y2="12" stroke="#E8720C" stroke-width="1.6"/><line x1="13" y1="12" x2="16" y2="12" stroke="#E8720C" stroke-width="1.6"/></svg>
+        </div>
+        <div class="step-body">
+          <b>会場「カンファレンスルーム9B」は9階</b>
+          <div class="desc">大きな看板が目印。ビルに入ったらエレベーターで9階へ。9階受付でルーム名「9B」を伝える。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 施設情報 -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">4</div>
+      <h2>会場情報</h2>
+    </div>
+    <div class="card">
+      <dl class="facility">
+        <dt>日時</dt><dd>2026年8月29日（土）15:30〜</dd>
+        <dt>会場</dt><dd>TKP新宿西口カンファレンスセンター　カンファレンスルーム9B</dd>
+        <dt>住所</dt><dd>東京都新宿区西新宿1-10-1　ヨドバシ新宿西口駅前ビル（旧称：MY新宿第二ビル）9階</dd>
+        <dt>最寄り</dt><dd>JR新宿駅 西口7番出口より徒歩約1分</dd>
+        <dt>目印</dt><dd>ヨドバシカメラ新宿西口本店のそば、大きな看板が目印</dd>
+        <dt>会場URL</dt><dd><a href="https://www.kashikaigishitsu.net/facilitys/cc-shinjuku-nishiguchi/" target="_blank" rel="noopener" style="color:var(--dest);font-weight:600;">kashikaigishitsu.net ↗</a></dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 5. 帰り方：TKP→品川→新幹線 -->
+  <section>
+    <div class="sec-head">
+      <div class="sec-num">5</div>
+      <h2>帰り方：TKP → 品川 → 新幹線</h2>
+      <span class="line-tag tag-yamanote">帰路</span>
+    </div>
+
+    <!-- 図解：帰りのルート全体図 -->
+    <div class="route-diagram" style="margin-bottom:14px;">
+      <svg viewBox="0 0 700 190" xmlns="http://www.w3.org/2000/svg" font-family="Zen Kaku Gothic New, sans-serif">
+        <line x1="60" y1="70" x2="640" y2="70" stroke="#DAD2C1" stroke-width="6" stroke-linecap="round"/>
+        <line x1="60" y1="70" x2="230" y2="70" stroke="#E8720C" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 14"/>
+        <line x1="230" y1="70" x2="470" y2="70" stroke="#5C8B10" stroke-width="6" stroke-linecap="round"/>
+        <line x1="470" y1="70" x2="640" y2="70" stroke="#0B5FA8" stroke-width="6" stroke-linecap="round"/>
+
+        <circle cx="60" cy="70" r="11" fill="#E8720C" stroke="#fff" stroke-width="3"/>
+        <text x="60" y="35" text-anchor="middle" font-size="14" fill="#1F1D19" font-weight="900">TKP新宿西口</text>
+        <text x="60" y="99" text-anchor="middle" font-size="12" fill="#6B6559">7番出口方面へ</text>
+        <text x="60" y="114" text-anchor="middle" font-size="11" fill="#E8720C" font-weight="700">徒歩 約1分</text>
+
+        <circle cx="230" cy="70" r="11" fill="#5C8B10" stroke="#fff" stroke-width="3"/>
+        <text x="230" y="35" text-anchor="middle" font-size="15" fill="#1F1D19" font-weight="900">新宿駅（西改札）</text>
+        <text x="230" y="99" text-anchor="middle" font-size="12" fill="#6B6559">山手線 内回り</text>
+        <text x="230" y="114" text-anchor="middle" font-size="11" fill="#5C8B10" font-weight="700">乗車 約20分</text>
+
+        <circle cx="470" cy="70" r="11" fill="#0B5FA8" stroke="#fff" stroke-width="3"/>
+        <text x="470" y="35" text-anchor="middle" font-size="15" fill="#1F1D19" font-weight="900">品川駅</text>
+        <text x="470" y="99" text-anchor="middle" font-size="12" fill="#6B6559">新幹線のりかえ口へ</text>
+        <text x="470" y="114" text-anchor="middle" font-size="11" fill="#0B5FA8" font-weight="700">乗換 約5分</text>
+
+        <circle cx="640" cy="70" r="9" fill="#0B5FA8"/>
+        <text x="640" y="40" text-anchor="middle" font-size="13" fill="#1F1D19" font-weight="700">新幹線ホーム</text>
+        <text x="640" y="100" text-anchor="middle" font-size="12" fill="#6B6559">東海道新幹線</text>
+
+        <text x="145" y="150" text-anchor="middle" font-size="11" fill="#E8720C">┅ 徒歩</text>
+        <text x="350" y="150" text-anchor="middle" font-size="11" fill="#5C8B10">━ JR山手線（内回り）</text>
+        <text x="555" y="150" text-anchor="middle" font-size="11" fill="#0B5FA8">━ 新幹線のりかえ</text>
+      </svg>
+      <div class="route-caption">
+        <span>START：TKP新宿西口カンファレンスセンター</span>
+        <span>GOAL：品川駅 新幹線ホーム</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#E8720C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>TKPを出て、7番出口方面から新宿駅「西改札」へ</b>
+          <div class="desc">「ヨドバシ新宿西口駅前ビル」を出て、7番出口の案内表示に従い西改札を目指す。</div>
+          <div class="time-chip">🚶 徒歩：約1分</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#5C8B10" stroke-width="1.6"/><path d="M16 12H8M11 8l-4 4 4 4" stroke="#5C8B10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>山手線「内回り（原宿・渋谷・品川方面）」に乗車</b>
+          <div class="desc">西改札を入り、案内表示・電光掲示板で「山手線 内回り（原宿・渋谷・品川方面）」を確認してホームへ。外回り（池袋・上野方面）と間違えないよう注意する。</div>
+          <div class="time-chip">🚃 乗車時間：約20分</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="13" rx="4" stroke="#0B5FA8" stroke-width="1.6"/><circle cx="8" cy="19" r="1.4" fill="#0B5FA8"/><circle cx="16" cy="19" r="1.4" fill="#0B5FA8"/><line x1="4" y1="10" x2="20" y2="10" stroke="#0B5FA8" stroke-width="1.6"/></svg>
+        </div>
+        <div class="step-body">
+          <b>品川駅に到着したら、「新幹線のりかえ口」へ</b>
+          <div class="desc">案内表示の「新幹線のりかえ口」に従って進む。新幹線改札を通ったら、電光掲示板で乗車列車とホーム番号を確認する。</div>
+          <div class="time-chip">🔁 乗換：約5分</div>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:12.5px;color:var(--sub);margin-top:10px;">※新幹線の改札・ホームを探す時間も考え、余裕を持ってTKPを出発すると安心です。</p>
+  </section>
+
+  <!-- 迷いやすいポイント -->
+  <section>
+    <div class="callout">
+      <div class="callout-title">⚠️ 迷いやすいポイント</div>
+      <ul>
+        <li>新宿駅は出口が非常に多いが、「西口」「7番出口」だけを意識すれば問題ない</li>
+        <li>山手線は行きと帰りで方向が逆。行きは「外回り（渋谷・新宿方面）」、帰りは「内回り（原宿・渋谷・品川方面）」を電光掲示板で必ず確認する</li>
+        <li>地上に迷ったときは、ヨドバシカメラ新宿西口本店の大きな看板を目印にすると分かりやすい</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <h3>まとめ</h3>
+    <p>【行き】品川駅で山手線（外回り）に乗り換え、新宿駅で西改札方面へ進み、7番出口を目印にTKP新宿西口カンファレンスセンター（カンファレンスルーム9B）へ向かいます。8/29（土）15:30開始、初めて新宿を訪れる方でも迷いにくいルートです。</p>
+    <div class="flow">品川駅 → JR山手線 外回り（渋谷・新宿方面） → 新宿駅 → 西改札方面 → 7番出口 → TKP新宿西口カンファレンスセンター 9B</div>
+    <p style="margin-top:16px;">【帰り】TKPから7番出口方面へ戻り、新宿駅西改札から山手線内回り（原宿・渋谷・品川方面）で品川駅へ。新幹線のりかえ口から新幹線ホームへ向かいます。</p>
+    <div class="flow">TKP新宿西口カンファレンスセンター → 7番出口方面 → 新宿駅 西改札 → JR山手線 内回り（原宿・渋谷・品川方面） → 品川駅 → 新幹線のりかえ口 → 新幹線ホーム</div>
+  </footer>
+
+</div>
+</body>
+</html>
