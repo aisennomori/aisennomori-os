@@ -128,6 +128,19 @@
 
   .empty{text-align:center; color:var(--muted); padding:32px 14px; font-size:14.5px;}
 
+  /* ---------- 結果・履歴のアコーディオン ---------- */
+  .qrow{border-bottom:1px solid var(--line);}
+  .qrow:last-child{border-bottom:none;}
+  .qrow > summary{display:flex; align-items:center; gap:10px; cursor:pointer;
+    list-style:none; padding:10px 0; min-height:42px;}
+  .qrow > summary::-webkit-details-marker{display:none;}
+  .qrow > summary::after{content:'＞'; margin-left:auto; color:var(--muted); font-size:12px;}
+  .qrow[open] > summary::after{content:'▼';}
+  .qrow > summary .t{flex:1; font-size:13.5px; font-weight:700; color:var(--ink);}
+  .qrow > summary .sec2{margin-left:0;}
+  .qd{font-size:13px; line-height:1.7; padding:2px 0 8px 30px; color:var(--ink);}
+  .qd b{color:var(--navy);}
+
   /* ---------- 履歴 ---------- */
   .hs .hd2{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;}
   .hs .sc{font-size:19px; font-weight:800; color:var(--navy);}
@@ -900,7 +913,7 @@ const fmtDT = iso => {
   const p = n => String(n).padStart(2,'0');
   return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 };
-const MODE_LABEL = {all:'全カード', weak:'弱点だけ'};
+const MODE_LABEL = {all:'全カード', weak:'弱点だけ', wrong:'×だけ', slow:'要復習だけ'};
 const modeLabel = m => MODE_LABEL[m] || m || '—';
 const setLabel = s => SET_LABEL[s] || s || 'Set A 基礎';
 const lmLabel  = m => (MODES[m] ? MODES[m].label : '瞬殺');
@@ -1026,8 +1039,20 @@ let timerId = null;
 function startSession(mode){
   const set = CUR_SET;
   let pool = cardsFor();
-  if(mode === 'weak') pool = pool.filter(c => stateOf(c.id) !== 'fixed');   // 定着確認済み以外
-  if(!pool.length){ alert('該当するカードがありません。'); return; }
+  if(mode === 'weak')  pool = pool.filter(c => stateOf(c.id) !== 'fixed');  // 定着確認済み以外
+  if(mode === 'wrong') pool = pool.filter(c => stateOf(c.id) === 'weak');   // 直近が誤答のものだけ
+  if(mode === 'slow')  pool = pool.filter(c => {                           // 基準を超えて正解したものだけ
+    const r = bookOf(CUR_MODE)[c.id];
+    return r && r.lastResult === 'o' && r.lastMs != null && r.lastMs > slowMs();
+  });
+  if(!pool.length){
+    alert(mode === 'wrong'
+      ? 'この範囲には誤答問題がありません。'
+      : mode === 'slow'
+      ? `この範囲には${TR().slowHead}の問題がありません。`
+      : '該当するカードがありません。');
+    return;
+  }
   /* 1セットの問題数。範囲を絞っていないときだけ全枚数を通しで出す */
   const cap = (set === 'all' && CUR_SRC === 'all') ? pool.length : SESSION_N;
   /* weight の大きいカードを優先しつつ、順序はランダム */
@@ -1067,6 +1092,11 @@ function vHome(){
   const list = cardsFor();
   const n = list.length;
   const weakN = n - c.fixed;
+  const wrongN = c.weak;                       // 直近が誤答のものだけ
+  const slowN  = list.filter(x => {            // 基準を超えて正解したものだけ
+    const r = bookOf(CUR_MODE)[x.id];
+    return r && r.lastResult === 'o' && r.lastMs != null && r.lastMs > slowMs();
+  }).length;
   const crossSet = CUR_SET === 'all';
   app.innerHTML = `
     <div class="hero">
@@ -1117,7 +1147,14 @@ function vHome(){
       <button class="btn sub" id="weakBtn" type="button" style="flex:1" ${(!crossSet && weakN)?'':'disabled'}>
         弱点だけ（${crossSet ? '—' : weakN}）</button>
     </div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn ghost" id="wrongBtn" type="button" style="flex:1" ${wrongN?'':'disabled'}>
+        ×だけ（誤答 ${wrongN}）</button>
+      <button class="btn ghost" id="slowBtn" type="button" style="flex:1" ${slowN?'':'disabled'}>
+        ${TR().slowHead}だけ（${slowN}）</button>
+    </div>
     <p class="muted" style="margin-top:8px">
+      「×だけ」は直近で間違えた問題のみ、「弱点だけ」は未回答や時間超過も含みます。<br>
       ${fastMs()/1000}秒以内の正解＝${TR().fastLabel}。${STREAK_FIX}回続けて${fastMs()/1000}秒以内なら定着確認済み。
       ${fastMs()/1000}〜${slowMs()/1000}秒＝${TR().midHead}、${slowMs()/1000}秒超＝${TR().slowHead}、不正解＝弱点。</p>
 
@@ -1157,6 +1194,8 @@ function vHome(){
   });
   $('#allBtn').onclick  = () => startSession('all');
   $('#weakBtn').onclick = () => startSession('weak');
+  $('#wrongBtn').onclick = () => startSession('wrong');
+  $('#slowBtn').onclick  = () => startSession('slow');
   $('#histBtn').onclick = () => { S = null; render('hist'); };
   $('#sheetBtn').onclick = () => render('sheet');
 }
@@ -1229,7 +1268,7 @@ function answer(i){
   r.last = new Date().toISOString();
   save();
 
-  S.results.push({id:card.id, ok, ms, fast, slow, state:stateOf(card.id)});
+  S.results.push({id:card.id, ok, ms, fast, slow, state:stateOf(card.id), pick:q.opts[i].label});
 
   document.querySelectorAll('.opt').forEach((b, idx) => {
     b.disabled = true;
@@ -1273,20 +1312,9 @@ function vResult(){
   const mid  = S.results.filter(r => r.ok && !r.fast && !r.slow);   // 5〜10秒
   const slow = S.results.filter(r => r.ok && r.slow);                // 10秒超
   const ng   = S.results.filter(r => !r.ok);
+  const fastList = S.results.filter(r => r.ok && r.fast);
 
   /* YAML問題は「問題文＋正解」、瞬殺カードは従来どおり key を出す */
-  const rowOf = (r, cls, mark) => {
-    const c = byId(r.id);
-    const body = c.question
-      ? `<b>【問題】</b>${esc(c.question)}<br><b>【正解】</b>${esc(c.answer)}`
-      : esc(c.key);
-    const note = c.question ? `<small>${esc(c.key)}</small>` : '';
-    return `<div class="lrow">
-      <span class="m ${cls}">${mark}</span>
-      <span class="t">${body}${note}
-        <small>${c.id}　${esc(c.cat)}</small></span>
-      <span class="sec2 ${cls==='slow'?'slow':''}">${fmtSec(r.ms)}</span></div>`;
-  };
 
   app.innerHTML = `
     <h2 class="sec">結果</h2>
@@ -1303,23 +1331,28 @@ function vResult(){
 
     ${ng.length ? `<h2 class="sec">間違えた問題</h2>
       <div class="card" style="padding:4px 13px">
-        ${ng.map(r => rowOf(r,'x','×')).join('')}
+        ${accList(ng,'x','×')}
       </div>` : ''}
 
     ${slow.length ? `<h2 class="sec">${TR().slowHead}（${slowMs()/1000}秒超で正解）</h2>
       <p class="muted">${TR().slowNote}</p>
       <div class="card" style="padding:4px 13px">
-        ${slow.map(r => rowOf(r,'slow','✓')).join('')}
+        ${accList(slow,'slow','✓')}
       </div>` : ''}
 
     ${mid.length ? `<h2 class="sec">${TR().midHead}（${fastMs()/1000}〜${slowMs()/1000}秒で正解）</h2>
       <p class="muted">${TR().midNote}</p>
       <div class="card" style="padding:4px 13px">
-        ${mid.map(r => rowOf(r,'o','✓')).join('')}
+        ${accList(mid,'o','✓')}
       </div>` : ''}
 
-    ${!ng.length && !slow.length && !mid.length
-      ? `<div class="empty">全問を${fastMs()/1000}秒以内で正解しました。</div>` : ''}
+    ${fastList.length ? `<h2 class="sec">${TR().fastLabel}（${fastMs()/1000}秒以内で正解）</h2>
+      <div class="card" style="padding:4px 13px">
+        ${accList(fastList,'o','✓')}
+      </div>` : ''}
+
+    ${!ng.length && !slow.length && !mid.length && !fastList.length
+      ? `<div class="empty">この回の記録はありません。</div>` : ''}
 
     <div class="navbtns">
       <button class="btn" id="again" type="button">もう1セット</button>
@@ -1334,20 +1367,46 @@ function vResult(){
    セッション履歴
    ============================================================ */
 /* 結果画面と同じ区分でセッションを分類する */
+/* 結果一覧・履歴詳細で共通に使うアコーディオン行。
+   閉じている間はID・見出し・時間だけ、開くと問題文と正解を出す。
+   details/summary を使うので他の行を開いても状態は混ざらない。 */
+function accRow(r, cls, mark){
+  const c = byId(r.id) || {};
+  const head = c.question ? (c.cat || '') : (c.cat || '');
+  const title = c.question
+    ? `${esc(c.id)}　${esc(head)}`
+    : `${esc(c.id)}　${esc(head)}`;
+  const detail = c.question
+    ? `<div class="qd"><b>【問題】</b>${esc(c.question)}</div>
+       ${r.pick ? `<div class="qd"><b>【あなたの回答】</b>${esc(r.pick)}</div>` : ''}
+       <div class="qd"><b>【正解】</b>${esc(c.answer || '')}</div>
+       <div class="qd"><b>【解説】</b>${esc(c.key || '')}</div>
+       <div class="qd"><b>【所要時間】</b>${fmtSec(r.ms)}</div>`
+    : `<div class="qd"><b>【決定打】</b>${esc(c.key || '')}</div>
+       ${r.pick ? `<div class="qd"><b>【あなたの回答】</b>${esc(r.pick)}</div>` : ''}
+       <div class="qd"><b>【所要時間】</b>${fmtSec(r.ms)}</div>`;
+  return `<details class="qrow">
+    <summary>
+      <span class="m ${cls}">${mark}</span>
+      <span class="t">${title}</span>
+      <span class="sec2 ${cls==='slow'?'slow':''}">${fmtSec(r.ms)}</span>
+    </summary>
+    ${detail}
+  </details>`;
+}
+function accList(list, cls, mark){ return list.map(r => accRow(r, cls, mark)).join(''); }
+
 function splitResults(results){
   return {
     ng:   results.filter(r => !r.ok),
     slow: results.filter(r => r.ok && r.slow),
     mid:  results.filter(r => r.ok && !r.fast && !r.slow),
+    fast: results.filter(r => r.ok && r.fast),
   };
 }
 function histRows(list, cls){
-  return list.map(r => `<div class="lrow">
-    <span class="m ${cls==='x'?'x':'o'}">${cls==='x'?'×':'✓'}</span>
-    <span class="t">${esc(cardLabel(r.id))}
-      <small>${esc((byId(r.id)||{key:''}).key)}</small></span>
-    <span class="sec2 ${cls==='slow'?'slow':''}">${fmtSec(r.ms)}</span>
-  </div>`).join('');
+  return accList(list, cls === 'x' ? 'x' : (cls === 'slow' ? 'slow' : 'o'),
+                 cls === 'x' ? '×' : '✓');
 }
 
 /* 外部AIへ貼り付けるためのプレーンテキスト。
@@ -1442,11 +1501,10 @@ function vHist(){
         </div>
         <details>
           <summary>詳細を見る</summary>
-          ${s.ng.length ? `<h4>間違えたカード</h4>${histRows(s.ng,'x')}` : ''}
-          ${s.slow.length ? `<h4>要反射（${SLOW_MS/1000}秒超で正解）</h4>${histRows(s.slow,'slow')}` : ''}
-          ${s.mid.length ? `<h4>理解済み（${FAST_MS/1000}〜${SLOW_MS/1000}秒で正解）</h4>${histRows(s.mid,'o')}` : ''}
-          ${!s.ng.length && !s.slow.length && !s.mid.length
-            ? `<p class="muted" style="margin:10px 0 0">全問を${FAST_MS/1000}秒以内で正解しています。</p>` : ''}
+          ${s.ng.length ? `<h4>間違えた問題</h4>${histRows(s.ng,'x')}` : ''}
+          ${s.slow.length ? `<h4>${TR(h.learnMode).slowHead}（${slowMs(h.learnMode)/1000}秒超で正解）</h4>${histRows(s.slow,'slow')}` : ''}
+          ${s.mid.length ? `<h4>${TR(h.learnMode).midHead}（${fastMs(h.learnMode)/1000}〜${slowMs(h.learnMode)/1000}秒で正解）</h4>${histRows(s.mid,'o')}` : ''}
+          ${s.fast.length ? `<h4>${TR(h.learnMode).fastLabel}（${fastMs(h.learnMode)/1000}秒以内で正解）</h4>${histRows(s.fast,'o')}` : ''}
         </details>
       </div>`;
     }).join('')
