@@ -444,6 +444,313 @@ const CARDS = [
   key:"何をする技術かで棚を決める。SVMとランダムフォレストは教師あり、k-meansとPCAは教師なし",
   decoys:["強化学習・方策の最適化","教師なし学習・異常検知",
           "教師あり学習・回帰"], look:"教師あり学習 教師なし学習" },
+
+
+/* ---------- Set B 追加分 ── ①②③.pdf の重要論点を集約（1枚で2〜4論点） ---------- */
+{ id:"B-T10", type:"pair", cat:"パラメータ区分", weight:3,
+  items:[{term:"ニューラルネットワークの重み",home:"学習で自動的に決まる（パラメータ）"},
+         {term:"学習率",home:"人が学習前に決める（ハイパーパラメータ）"}],
+  key:"学習で変わるならパラメータ、学習前に人が決めるならハイパーパラメータ。重み・バイアス・回帰係数は前者、学習率・バッチサイズ・k は後者",
+  decoys:["推論時にだけ使う値","データ側に最初から入っている値","学習後に自動で調整される値"], look:"ハイパーパラメータ" },
+
+{ id:"B-T11", type:"trio", cat:"性能低下の現象", weight:3,
+  items:[{term:"訓練の性能は上がるが検証の性能が下がる",home:"過学習"},
+         {term:"訓練も検証も性能が上がらない",home:"未学習（学習不足）"},
+         {term:"新しいタスクを学ぶと以前のタスクができなくなる",home:"破滅的忘却"}],
+  key:"何と何を比べるかで決まる。訓練と検証を比べるなら過学習・未学習、古いタスクと新しいタスクを比べるなら破滅的忘却",
+  decoys:["次元の呪い","データリーケージ","勾配爆発"], look:"過学習 破滅的忘却" },
+
+{ id:"B-T12", type:"pair", cat:"誤差逆伝播の数学", weight:3,
+  items:[{term:"連鎖律",home:"合成関数の微分。誤差逆伝播の根拠"},
+         {term:"ベイズの定理",home:"条件付き確率を求める定理"}],
+  key:"バックプロパゲーションの数学的根拠は連鎖律。ベイズは確率、中心極限定理は分布の話で別物",
+  decoys:["独立同分布の和が正規分布に近づく定理","三角形の辺と角の関係を表す定理","行列を固有値へ分解する操作"], look:"連鎖律" },
+
+{ id:"B-T13", type:"quad", cat:"モデルの所属", weight:3,
+  items:[{term:"CLIP",home:"マルチモーダル（画像と文章を同じ空間へ）"},
+         {term:"AdaGrad",home:"最適化（学習率の自動調整）"},
+         {term:"LSTM",home:"時系列（長期依存を扱うRNN）"},
+         {term:"k-means",home:"クラスタリング（教師なし）"}],
+  key:"CLIPは画像と文章を同じベクトル空間へ埋め込むマルチモーダルモデル。最適化・時系列・クラスタリングとは所属が違う",
+  decoys:["次元削減（教師なし）","物体検出（矩形で位置を出す）","強化学習（報酬で行動を学ぶ）"], look:"CLIP マルチモーダル" },
+
+{ id:"B-T14", type:"pair", cat:"特徴量の扱い", weight:3,
+  items:[{term:"特徴量選択",home:"既にある特徴量から有用なものを選ぶ"},
+         {term:"特徴抽出",home:"元の特徴量を組み合わせて新しい軸を作る"}],
+  key:"選ぶのが特徴量選択、作るのが特徴抽出。主成分分析は特徴抽出、L1正則化は特徴量選択として働く",
+  decoys:["欠損値を補って埋める","データの単位をそろえる","カテゴリを0と1の列に変える"], look:"特徴量選択 特徴抽出" },
+
+{ id:"B-T15", type:"trio", cat:"スケール変換", weight:3,
+  items:[{term:"標準化",home:"平均0・分散1にそろえる"},
+         {term:"正規化",home:"0〜1の範囲に収める"},
+         {term:"白色化",home:"無相関にしたうえで分散をそろえる"}],
+  key:"平均0分散1が標準化、0〜1が正規化、無相関化まで行うのが白色化",
+  decoys:["外れ値を取り除く","欠損値を平均で埋める","次元を減らして可視化する"], look:"標準化 正規化 白色化" },
+
+{ id:"B-T16", type:"quad", cat:"強化学習の要素", weight:3,
+  items:[{term:"マルコフ決定過程（MDP）",home:"強化学習の問題設定の枠組み"},
+         {term:"状態価値関数 V",home:"その状態がどれだけ良いかを表す"},
+         {term:"行動価値関数 Q",home:"その状態で行動をとる良さを表す"},
+         {term:"方策",home:"状態から行動を選ぶ規則"}],
+  key:"枠組みがMDP、状態の良さがV、状態と行動の組の良さがQ、選び方が方策",
+  decoys:["環境から返る即時の数値","行動の履歴をためておく仕組み","学習を打ち切る条件"], look:"MDP 価値関数 方策" },
+
+{ id:"B-T17", type:"trio", cat:"強化学習の手法系統", weight:3,
+  items:[{term:"Q学習",home:"価値ベース（Q値を学ぶ）"},
+         {term:"REINFORCE",home:"方策ベース（方策を直接最適化する）"},
+         {term:"Actor-Critic",home:"方策と価値を組み合わせる"}],
+  key:"Q学習・SARSAは価値ベース、REINFORCEは方策勾配の基本形、Actor-CriticはActorが方策・Criticが価値",
+  decoys:["環境モデルを推定して計画する","乱数で行動をランダムに選ぶだけ","報酬をあとから設計し直す"], look:"価値ベース 方策勾配" },
+
+{ id:"B-T18", type:"trio", cat:"SVMの考え方", weight:3,
+  items:[{term:"マージン最大化",home:"分類境界と最も近いデータの距離を最大にする"},
+         {term:"サポートベクトル",home:"境界の決定に関わる最も近いデータ点"},
+         {term:"カーネルトリック",home:"高次元へ写像して非線形に対応する"}],
+  key:"境界を最も余裕をもって引くのがマージン最大化、その境界を決めている点がサポートベクトル、非線形に対応する工夫がカーネルトリック",
+  decoys:["決定木を並列に多数作る","重みの絶対値に罰則を与える","近傍k個の多数決で決める"], look:"SVM マージン カーネル" },
+
+{ id:"B-T19", type:"quad", cat:"AIの包含関係", weight:3,
+  items:[{term:"人工知能（AI）",home:"最も広い概念"},
+         {term:"機械学習",home:"データから規則性を学ぶAIの一分野"},
+         {term:"ニューラルネットワーク",home:"脳の仕組みを模した機械学習の手法"},
+         {term:"ディープラーニング",home:"多層のニューラルネットワークを用いる手法"}],
+  key:"AI ⊃ 機械学習 ⊃ ニューラルネットワーク ⊃ ディープラーニング。外側ほど広い",
+  decoys:["人が全てのルールを書く方式","統計の記述に用いる指標","データを保管する基盤"], look:"人工知能 機械学習 包含" },
+
+{ id:"B-T20", type:"pair", cat:"強いAI / 弱いAI", weight:3,
+  items:[{term:"強いAI",home:"人間と同じ意識や自我を持ちうるとする立場"},
+         {term:"弱いAI",home:"意識は持たず、特定の課題を処理する道具とする立場"}],
+  key:"ジョン・サールの区別で、論点は「心を持ちうるか」。対応できるタスクの広さで分ける汎用型・特化型とは別の軸",
+  decoys:["幅広いタスクをこなせるAI","特定タスクに特化したAI","人を超える性能を持つAI"], look:"強いAI 弱いAI" },
+
+{ id:"B-T21", type:"quad", cat:"AIの古典的難問", weight:3,
+  items:[{term:"フレーム問題",home:"関係のある事柄だけを切り出せない問題"},
+         {term:"シンボルグラウンディング問題",home:"記号と意味を結びつけられない問題"},
+         {term:"トイ・プロブレム",home:"単純化された問題は解けても現実は解けないこと"},
+         {term:"身体性",home:"身体を通した相互作用がなければ概念を獲得できないという考え"}],
+  key:"切り出せないのがフレーム問題、意味と結びつかないのがシンボルグラウンディング問題",
+  decoys:["計算量が指数的に増える問題","データが高次元で疎になる問題","学習した内容を忘れる問題"], look:"フレーム問題 シンボルグラウンディング" },
+
+{ id:"B-T22", type:"trio", cat:"AIをめぐる古典的話題", weight:3,
+  items:[{term:"チューリングテスト",home:"人間と区別がつかない受け答えができるかで知能を判定する"},
+         {term:"ELIZA",home:"キーワードとテンプレートで応答をまねた対話プログラム"},
+         {term:"AI効果",home:"実現すると「これは知能ではない」と見なされる現象"}],
+  key:"判定方法がチューリングテスト、初期の対話プログラムがELIZA、評価が下がる現象がAI効果",
+  decoys:["医療診断を行うエキスパートシステム","知識を記号で表す仕組み","囲碁で人間に勝ったAI"], look:"チューリングテスト ELIZA AI効果" },
+
+{ id:"B-T23", type:"trio", cat:"3度のAIブーム", weight:3,
+  items:[{term:"第1次AIブーム",home:"探索と推論。迷路やチェスは解けたが現実問題で行き詰まる"},
+         {term:"第2次AIブーム",home:"知識を大量に入力するエキスパートシステム"},
+         {term:"第3次AIブーム",home:"大量データから学ぶ機械学習とディープラーニング"}],
+  key:"探索と推論→知識を入れる→データから学ぶ、の順。エキスパートシステムは第2次",
+  decoys:["人間の脳を完全に再現する研究","計算機そのものが発明された時期","AIが自ら目的を持ち始めた時期"], look:"AIブーム" },
+
+{ id:"B-T24", type:"pair", cat:"探索の順序", weight:3,
+  items:[{term:"幅優先探索",home:"同じ階層をすべて調べてから次の階層へ進む"},
+         {term:"深さ優先探索",home:"一方向に進めるだけ進み、行き止まりで戻る"}],
+  key:"階層ごとに広げるのが幅優先で最短経路を見つけやすいがメモリを食う。深さ優先はメモリが少なくて済む",
+  decoys:["評価値の高い方から調べる","ランダムに次の手を選ぶ","すべての組み合わせを一度に展開する"], look:"幅優先探索 深さ優先探索" },
+
+{ id:"B-T25", type:"pair", cat:"k の意味", weight:3,
+  items:[{term:"k-means法の k",home:"分けるクラスタの数（教師なし）"},
+         {term:"k近傍法の k",home:"参照する近傍データの個数（教師あり）"}],
+  key:"同じ k でも別物。分ける数か、見に行く数か。k-meansは教師なし、k近傍法は教師あり",
+  decoys:["学習を繰り返す回数","一度に処理するデータ数","特徴量の次元数"], look:"k-means k近傍法" },
+
+{ id:"B-T26", type:"pair", cat:"検証の方法", weight:3,
+  items:[{term:"ホールドアウト法",home:"データを訓練用と検証用に一度だけ分ける"},
+         {term:"k分割交差検証",home:"データをk個に分け、検証用を入れ替えながらk回評価する"}],
+  key:"一度だけ分けるのがホールドアウト、入れ替えて繰り返すのが交差検証。データが少ないときは交差検証が有利",
+  decoys:["訓練データをそのまま評価に使う","データを増やして水増しする","外れ値を除いてから評価する"], look:"ホールドアウト 交差検証" },
+
+{ id:"B-T27", type:"trio", cat:"分類指標の見方", weight:3,
+  items:[{term:"正解率",home:"全体のうち正しく分類できた割合"},
+         {term:"ROC曲線",home:"しきい値を変えたときの真陽性率と偽陽性率の軌跡"},
+         {term:"AUC",home:"ROC曲線の下側の面積。1に近いほど良い"}],
+  key:"正解率は不均衡データで当てにならない。ROCはしきい値を動かした軌跡、AUCはその面積",
+  decoys:["予測した陽性のうち実際に陽性だった割合","実際の陽性のうち拾えた割合","適合率と再現率の調和平均"], look:"ROC AUC 正解率" },
+
+{ id:"B-T28", type:"pair", cat:"カテゴリ変数の変換", weight:3,
+  items:[{term:"One-Hotエンコーディング",home:"カテゴリごとに列を作り0と1で表す"},
+         {term:"ラベルエンコーディング",home:"カテゴリを整数の番号に置き換える"}],
+  key:"列を増やすのがOne-Hot、番号を振るのがラベルエンコーディング。番号には大小の意味が生まれる点に注意",
+  decoys:["値を0〜1の範囲に収める","欠損値を平均で埋める","少数クラスを水増しする"], look:"One-Hot ラベルエンコーディング" },
+
+{ id:"B-T29", type:"trio", cat:"不均衡・欠損への対処", weight:3,
+  items:[{term:"アンダーサンプリング",home:"多いクラスのデータを減らす"},
+         {term:"オーバーサンプリング（SMOTE）",home:"少ないクラスのデータを増やす"},
+         {term:"欠損値補完",home:"欠けている値を平均や回帰で埋める"}],
+  key:"多い方を減らすのがアンダー、少ない方を増やすのがオーバー。SMOTEは近いデータから新しい点を作る",
+  decoys:["特徴量の数を減らす","データの単位をそろえる","訓練と検証に分ける"], look:"不均衡データ SMOTE" },
+
+{ id:"B-T30", type:"pair", cat:"パーセプトロン", weight:3,
+  items:[{term:"単純パーセプトロン",home:"入力層と出力層のみ。線形分離できる問題しか解けない"},
+         {term:"多層パーセプトロン",home:"隠れ層を持ち、非線形の問題も表現できる"}],
+  key:"隠れ層があるかどうか。単純パーセプトロンはXORが解けないことが限界の例として問われる",
+  decoys:["層を持たない単純な回帰式","畳み込みを行う層","時系列を扱う再帰構造"], look:"パーセプトロン" },
+
+{ id:"B-T31", type:"trio", cat:"勾配降下の停滞", weight:3,
+  items:[{term:"局所最適解",home:"全体で最も良い点ではないが周囲より良い点に留まる"},
+         {term:"鞍点",home:"ある方向では極小、別の方向では極大になる点"},
+         {term:"プラトー",home:"勾配がほぼ0の平坦な領域が続き学習が進まない"}],
+  key:"周囲より良いだけが局所最適解、方向によって形が変わるのが鞍点、平坦で進まないのがプラトー",
+  decoys:["勾配が急激に大きくなる現象","重みが0に近づく現象","損失が発散する現象"], look:"局所最適解 鞍点 プラトー" },
+
+{ id:"B-T32", type:"trio", cat:"学習の単位", weight:3,
+  items:[{term:"エポック",home:"訓練データ全体を1回学習し終える単位"},
+         {term:"バッチサイズ",home:"1回の更新に使うデータの数"},
+         {term:"イテレーション",home:"重みを更新した回数"}],
+  key:"全体を1周がエポック、1回に使う数がバッチサイズ、更新回数がイテレーション",
+  decoys:["更新の歩幅を決める値","学習を打ち切る条件","層の数"], look:"エポック バッチサイズ" },
+
+{ id:"B-T33", type:"trio", cat:"CNNの層", weight:3,
+  items:[{term:"畳み込み層",home:"フィルタを当てて特徴マップを作る"},
+         {term:"プーリング層",home:"位置のずれに強くしながら情報を圧縮する"},
+         {term:"全結合層",home:"取り出した特徴をまとめて分類の出力につなぐ"}],
+  key:"特徴を取り出すのが畳み込み層、位置ずれに強くするのがプーリング層、最後にまとめるのが全結合層",
+  decoys:["入力を正規化して学習を安定させる","一部のノードを無効にする","勾配を逆向きに伝える"], look:"畳み込み層 プーリング層" },
+
+{ id:"B-T34", type:"pair", cat:"畳み込みの設定", weight:3,
+  items:[{term:"パディング",home:"画像の周囲を0などで埋めて出力サイズの縮小を防ぐ"},
+         {term:"ストライド",home:"フィルタを動かす間隔"}],
+  key:"周囲を埋めるのがパディング、動かす幅がストライド。ストライドを大きくすると出力は小さくなる",
+  decoys:["フィルタの枚数","一度に使うデータ数","層の深さ"], look:"パディング ストライド" },
+
+{ id:"B-T35", type:"quad", cat:"CNN代表モデル", weight:3,
+  items:[{term:"AlexNet",home:"2012年のILSVRCで優勝しディープラーニングの普及を決定づけた"},
+         {term:"GoogLeNet",home:"インセプションモジュールで横に広がる構造を持つ"},
+         {term:"ResNet",home:"スキップ結合で層を深くしても学習できるようにした"},
+         {term:"EfficientNet",home:"深さ・広さ・解像度をまとめて最適化した"}],
+  key:"2012年の転機がAlexNet、横に広げたのがGoogLeNet、飛び越えたのがResNet、まとめて最適化したのがEfficientNet",
+  decoys:["物体検出を1回の推論で行うモデル","画素ごとに分類するモデル","文章を生成する言語モデル"], look:"AlexNet ResNet" },
+
+{ id:"B-T36", type:"trio", cat:"オートエンコーダ系", weight:3,
+  items:[{term:"オートエンコーダ",home:"入力と同じ出力を学習し、隠れ層で次元を圧縮する"},
+         {term:"積層オートエンコーダ",home:"重ねて事前学習に用いる"},
+         {term:"変分オートエンコーダ（VAE）",home:"潜在変数の確率分布へ写像して生成に使う"}],
+  key:"圧縮と復元が基本のオートエンコーダ。確率分布へ写像すると生成モデルのVAEになる",
+  decoys:["生成器と識別器を競わせる","ノイズを加える過程の逆をたどる","時系列を再帰的に処理する"], look:"オートエンコーダ" },
+
+{ id:"B-T37", type:"pair", cat:"強化学習の前提と更新", weight:3,
+  items:[{term:"マルコフ性",home:"次の状態は現在の状態と行動だけで決まる"},
+         {term:"モンテカルロ法",home:"エピソードが終わってから、得られた報酬でまとめて更新する"}],
+  key:"過去の履歴に依存しないのがマルコフ性。終わってから更新するのがモンテカルロ法",
+  decoys:["1ステップごとに推定値を更新する","環境モデルを推定して計画する","経験を保存して再利用する"], look:"マルコフ性 モンテカルロ" },
+
+{ id:"B-T38", type:"quad", cat:"言語解析の段階", weight:3,
+  items:[{term:"形態素解析",home:"文章を意味を持つ最小単位に分け品詞を判定する"},
+         {term:"構文解析",home:"語と語の係り受けの構造を明らかにする"},
+         {term:"意味解析",home:"文の意味を解釈する"},
+         {term:"文脈解析",home:"複数の文にまたがる関係を解析する"}],
+  key:"形態素→構文→意味→文脈の順に進む。文をまたぐのは文脈解析だけ",
+  decoys:["文章を数値ベクトルへ変換する","高頻度語を取り除く","文字数で機械的に区切る"], look:"形態素解析 構文解析 文脈解析" },
+
+{ id:"B-T39", type:"trio", cat:"文書の数値化", weight:3,
+  items:[{term:"Bag-of-Words",home:"単語の出現回数だけで文書を表す"},
+         {term:"TF-IDF",home:"珍しい語ほど重みを大きくして重要度を測る"},
+         {term:"N-gram",home:"連続するN個の文字や単語で機械的に区切る"}],
+  key:"回数だけがBag-of-Words、珍しさで重み付けるのがTF-IDF、辞書を使わず機械的に区切るのがN-gram",
+  decoys:["単語を意味の近い分散表現に変換する","品詞を判定する","係り受けを解析する"], look:"TF-IDF Bag-of-Words" },
+
+{ id:"B-T40", type:"quad", cat:"系列モデルの発展", weight:3,
+  items:[{term:"Seq2Seq",home:"エンコーダとデコーダで系列を別の系列へ変換する"},
+         {term:"Attention",home:"出力のどの位置がどの入力に対応するか重みを付ける"},
+         {term:"Self-Attention",home:"入力の中で単語どうしの関連を計算する"},
+         {term:"Transformer",home:"Attentionだけで構成し並列処理を可能にした"}],
+  key:"変換の枠組みがSeq2Seq、対応づけがAttention、入力内部の関連がSelf-Attention、RNNを使わず並列にしたのがTransformer",
+  decoys:["単語を1語1ベクトルで固定して表す","画像から特徴マップを作る","報酬から行動を学ぶ"], look:"Attention Transformer" },
+
+{ id:"B-T41", type:"trio", cat:"音声の特徴", weight:3,
+  items:[{term:"フォルマント",home:"声道の共鳴によってできる周波数のピーク"},
+         {term:"メル周波数ケプストラム係数",home:"人の聴覚特性に合わせた音の特徴量"},
+         {term:"隠れマルコフモデル",home:"音素の並びを確率的に扱うモデル"}],
+  key:"共鳴のピークがフォルマント、聴覚に合わせた特徴量がMFCC、並びを確率で扱うのがHMM",
+  decoys:["アナログ信号を離散値に変換する操作","文章から音声を合成する手法","話者を識別する処理"], look:"フォルマント メル周波数" },
+
+{ id:"B-T42", type:"trio", cat:"相関と因果", weight:3,
+  items:[{term:"相関関係",home:"2つの変数が一緒に動く関係"},
+         {term:"因果関係",home:"一方が他方の原因になっている関係"},
+         {term:"疑似相関",home:"第三の要因によって見かけ上関係があるように見えること"}],
+  key:"一緒に動くだけが相関。相関があっても因果とは限らない",
+  decoys:["2つの変数が独立であること","分布が正規分布に従うこと","データにばらつきがあること"], look:"相関 因果" },
+
+{ id:"B-L02", type:"quad", cat:"契約と開発方式", weight:3,
+  items:[{term:"NDA",home:"開示した情報を第三者に漏らさないと約束する契約"},
+         {term:"PoC",home:"実現可能性を小さく試して見極める検証段階"},
+         {term:"ウォーターフォール",home:"要件から設計・実装へ順に一方向で進める開発方式"},
+         {term:"アジャイル",home:"短い反復を繰り返しながら作り上げる開発方式"}],
+  key:"秘密を守るのがNDA、試すのがPoC、順に進むのがウォーターフォール、繰り返すのがアジャイル",
+  decoys:["成果物の完成を約束する契約","業務の遂行を約束する契約","成果物の権利の帰属を定める条項"], look:"NDA PoC アジャイル" },
+
+{ id:"B-L03", type:"quad", cat:"データ活用の技術", weight:3,
+  items:[{term:"DX",home:"デジタル技術で事業やビジネスモデルそのものを変革すること"},
+         {term:"RPA",home:"定型的な事務作業をソフトウェアで自動化すること"},
+         {term:"BI",home:"蓄積したデータを可視化して意思決定に使う仕組み"},
+         {term:"MLOps",home:"機械学習モデルの開発から運用までを一体で回す取り組み"}],
+  key:"事業を変えるのがDX、事務を自動化するのがRPA、見える化がBI、機械学習の運用がMLOps",
+  decoys:["身の回りのものをネットにつなぐ仕組み","端末側で推論を行う仕組み","データ分析の標準的な進め方"], look:"DX RPA MLOps" },
+
+{ id:"B-L04", type:"pair", cat:"データの形式", weight:3,
+  items:[{term:"構造化データ",home:"行と列で表形式に整理されたデータ"},
+         {term:"非構造化データ",home:"画像・音声・自由文など形式が定まっていないデータ"}],
+  key:"表にできるのが構造化データ。ビッグデータの多くは非構造化データで、発生頻度も高い",
+  decoys:["暗号化されたデータ","個人を識別できないよう加工したデータ","一度だけ使う一時的なデータ"], look:"構造化データ 非構造化データ" },
+
+{ id:"B-L05", type:"quad", cat:"クラウドと実行環境", weight:3,
+  items:[{term:"SaaS",home:"完成したソフトウェアをサービスとして使う"},
+         {term:"PaaS",home:"アプリを動かす基盤や開発環境まで提供される"},
+         {term:"IaaS",home:"サーバやストレージなどのインフラだけ提供される"},
+         {term:"エッジAI",home:"端末側で推論を行い、通信せずに応答する"}],
+  key:"使うだけがSaaS、作る場が付くのがPaaS、土台だけがIaaS。手元で処理するのがエッジAI",
+  decoys:["改ざんが困難な分散台帳の仕組み","アプリをコンテナ単位で動かす技術","複数システムをつなぐ接続口"], look:"SaaS PaaS IaaS エッジAI" },
+
+{ id:"B-L06", type:"trio", cat:"個人データの提供類型", weight:3,
+  items:[{term:"第三者提供",home:"本人の同意を得て別の事業者へ渡す"},
+         {term:"委託",home:"利用目的の達成に必要な範囲で処理を外部に任せる"},
+         {term:"共同利用",home:"あらかじめ通知したうえで特定の者と共同で利用する"}],
+  key:"委託と共同利用は第三者提供にあたらないため本人同意が不要。ただし通知や監督の義務がある",
+  decoys:["本人が求めたときに開示する","復元できないよう加工して公表する","本人の同意なく取得する"], look:"第三者提供 委託 共同利用" },
+
+{ id:"B-L07", type:"pair", cat:"個人情報の特別な類型", weight:3,
+  items:[{term:"要配慮個人情報",home:"人種・信条・病歴・犯罪歴など、取得に原則本人同意が必要な情報"},
+         {term:"個人識別符号",home:"指紋やマイナンバーなど、単体で個人を識別できる符号"}],
+  key:"内容が差別につながるのが要配慮個人情報、単体で個人を特定できるのが個人識別符号",
+  decoys:["復元できないよう加工した情報","照合しなければ識別できない情報","法人に関する情報"], look:"要配慮個人情報 個人識別符号" },
+
+{ id:"B-L08", type:"trio", cat:"特許の三要件", weight:3,
+  items:[{term:"新規性",home:"まだ世に知られていないこと"},
+         {term:"進歩性",home:"当業者が容易に思いつくものでないこと"},
+         {term:"産業上利用可能性",home:"産業として実施できるものであること"}],
+  key:"知られていないのが新規性、容易でないのが進歩性、産業で使えるのが産業上利用可能性。三つ揃って特許になる",
+  decoys:["秘密として管理されていること","公然と知られていないこと","創作的に表現されていること"], look:"新規性 進歩性" },
+
+{ id:"B-L09", type:"pair", cat:"実施権", weight:3,
+  items:[{term:"専用実施権",home:"設定した範囲で独占的に実施でき、登録が効力の要件"},
+         {term:"通常実施権",home:"独占的でなく、複数の相手へ重ねて許諾できる"}],
+  key:"独占するのが専用実施権で、その範囲では特許権者自身も実施できなくなる",
+  decoys:["特許を受ける権利そのもの","先に出願した者が権利を得る原則","職務上の発明に関する権利"], look:"専用実施権 通常実施権" },
+
+{ id:"B-L10", type:"trio", cat:"AIへの攻撃", weight:3,
+  items:[{term:"敵対的攻撃",home:"入力にわずかな細工を加えてモデルを誤らせる"},
+         {term:"データ汚染",home:"学習データに不正なデータを混ぜて性能や判断を狂わせる"},
+         {term:"モデル窃取",home:"出力を繰り返し観察してモデルの中身を推定し複製する"}],
+  key:"入力を細工するのが敵対的攻撃、学習データを汚すのがデータ汚染、中身を盗むのがモデル窃取",
+  decoys:["学習データから個人情報を復元する","モデルの判断根拠を可視化する","事実でない内容を生成する"], look:"敵対的攻撃 データ汚染" },
+
+{ id:"B-L11", type:"quad", cat:"AIに求められる価値", weight:3,
+  items:[{term:"XAI",home:"判断の根拠を人が理解できるようにする技術"},
+         {term:"透明性",home:"仕組みや処理の内容を開示すること"},
+         {term:"公平性",home:"特定の属性によって不利益が生じないこと"},
+         {term:"アカウンタビリティ",home:"結果に対して責任をもって説明し対応すること"}],
+  key:"技術がXAI、開示が透明性、偏りがないのが公平性、責任を負うのがアカウンタビリティ",
+  decoys:["個人データを本人が持ち出せる権利","リスクに応じて規制を変える考え方","人が最終判断に関与する設計"], look:"XAI 透明性 公平性" },
+
+{ id:"B-L12", type:"pair", cat:"国際的な枠組み", weight:3,
+  items:[{term:"GDPR",home:"EUの個人データ保護規則。域外へ移転するには十分性認定などが必要"},
+         {term:"ELSI",home:"科学技術がもたらす倫理的・法的・社会的な課題の総称"}],
+  key:"EUの規則がGDPR、倫理・法・社会の課題全体を指すのがELSI",
+  decoys:["EUのリスクベースなAI規制法","日本の個人情報保護法","AI事業者向けの国内ガイドライン"], look:"GDPR ELSI" },
+
 ];
 
 /* ============================================================
@@ -460,7 +767,7 @@ const YOUGO_URL = 'gkentei-yougo.html';
 const LS_HIST_KEY = 'gkentei_flash_history_v1';
 const HIST_MAX = 20;           // 保存するセッション数の上限。超えたら古いものから削除
 
-let STORE = {version:1, history:{}, settings:{mode:'all'}};
+let STORE = {version:1, history:{}, mhistory:{fill:{}, ident:{}}, settings:{mode:'all'}};
 
 function load(){
   try{
@@ -470,6 +777,9 @@ function load(){
       if(o && typeof o === 'object'){
         STORE.history  = o.history  || {};
         STORE.settings = Object.assign(STORE.settings, o.settings || {});
+        /* 穴埋め・識別の履歴は瞬殺（history）とは別枠に持つ。既存データは触らない */
+        const mh = o.mhistory || {};
+        STORE.mhistory = {fill: mh.fill || {}, ident: mh.ident || {}};
       }
     }
   }catch(e){ console.warn('load failed', e); }
@@ -478,10 +788,16 @@ function save(){
   try{ localStorage.setItem(LS_KEY, JSON.stringify(STORE)); }
   catch(e){ console.warn('save failed', e); }
 }
-function rec(id){
-  if(!STORE.history[id]) STORE.history[id] =
+function bookOf(mode){
+  if(mode === 'flash' || !mode) return STORE.history;
+  if(!STORE.mhistory[mode]) STORE.mhistory[mode] = {};
+  return STORE.mhistory[mode];
+}
+function rec(id, mode){
+  const bk = bookOf(mode || CUR_MODE);
+  if(!bk[id]) bk[id] =
     {ok:0, ng:0, streak:0, last:null, bestMs:null, lastMs:null, lastResult:null};
-  return STORE.history[id];
+  return bk[id];
 }
 
 /* ---------- セッション履歴（新しい順に保持） ---------- */
@@ -515,6 +831,8 @@ function pushSession(){
     at: new Date().toISOString(),
     mode: S.mode,
     set: S.set || 'A',
+    learnMode: S.learnMode || 'flash',
+    src: S.src || 'all',
     questionCount: n,
     correctCount: ok,
     incorrectCount: n - ok,
@@ -533,8 +851,8 @@ function pushSession(){
    mid    理解済み     … 直近が5〜10秒の正解（反射化の途中）
    slow   要反射       … 直近が10秒超の正解、または未回答
    weak   弱点         … 直近が不正解 */
-function stateOf(id){
-  const r = STORE.history[id];
+function stateOf(id, mode){
+  const r = bookOf(mode || CUR_MODE)[id];
   if(!r || (r.ok + r.ng) === 0) return 'slow';        // 未回答は要反射から始める
   if(r.lastResult === 'x') return 'weak';
   if(r.streak >= STREAK_FIX) return 'fixed';
@@ -569,6 +887,8 @@ const fmtDT = iso => {
 const MODE_LABEL = {all:'全カード', weak:'弱点だけ'};
 const modeLabel = m => MODE_LABEL[m] || m || '—';
 const setLabel = s => SET_LABEL[s] || s || 'Set A 基礎';
+const lmLabel  = m => (MODES[m] ? MODES[m].label : '瞬殺');
+const srcLabel = v => (v === 'all' || !v) ? '全範囲' : (SRC_LABEL[v] || v);
 /* 外部AIへ渡すときの表記。瞬殺の独自IDをJDLAシラバスコードと誤認させないため、
    IDとcatを必ずセットで出す */
 const cardLabel = id => {
@@ -588,6 +908,32 @@ const cardsOf = set => (set === 'all' ? CARDS.slice() : CARDS.filter(c => setOf(
 const SET_LABEL = {A:'Set A 基礎', B:'Set B 識別', all:'全部'};
 let CUR_SET = 'A';
 
+/* ---------- 出典（①②③.pdf）とモード ----------
+   src: 1=①(第1-2章 AI基礎・機械学習) 2=②(第3-4章 DL) 3=③(第5-7章 社会実装・法規制・数学) */
+const SRC_OF = {
+  T01:2,T02:2,T03:2,T04:1,T05:2,T06:1,T07:2,T08:2,T09:2,T10:2,
+  T11:2,T12:2,T13:1,T14:1,T15:2,T16:2,T17:2,T18:2,T19:2,T20:1,
+  L01:3,L02:3,L03:3,L04:3,L05:3,L06:3,
+  'B-L01':3,'B-T01':1,'B-T02':1,'B-T03':1,'B-T04':1,'B-T05':1,'B-T06':1,'B-T07':2,'B-T08':1,'B-T09':1,
+  'B-T10':1,'B-T11':1,'B-T12':2,'B-T13':2,'B-T14':1,'B-T15':1,'B-T16':2,'B-T17':2,'B-T18':1,'B-T19':1,
+  'B-T20':1,'B-T21':1,'B-T22':1,'B-T23':1,'B-T24':1,'B-T25':1,'B-T26':1,'B-T27':1,'B-T28':1,'B-T29':1,
+  'B-T30':2,'B-T31':2,'B-T32':2,'B-T33':2,'B-T34':2,'B-T35':2,'B-T36':2,'B-T37':2,'B-T38':2,'B-T39':2,
+  'B-T40':2,'B-T41':2,'B-T42':3,
+  'B-L02':3,'B-L03':3,'B-L04':3,'B-L05':3,'B-L06':3,'B-L07':3,'B-L08':3,'B-L09':3,'B-L10':3,'B-L11':3,'B-L12':3,
+};
+const srcOf = id => SRC_OF[id] || 0;
+const SRC_LABEL = {1:'① AI基礎・機械学習', 2:'② ディープラーニング', 3:'③ 社会実装・法規制'};
+let CUR_SRC = 'all';                       // 'all' | 1 | 2 | 3
+
+/* モード1=穴埋め、モード2=識別・比較、モード3=瞬殺 */
+const MODES = {
+  fill:  {label:'穴埋め',    hint:'説明から用語を思い出す'},
+  ident: {label:'識別・比較', hint:'似た概念どうしを見分ける'},
+  flash: {label:'瞬殺',      hint:'所属と役割を反射で切る'},
+};
+let CUR_MODE = 'flash';
+const cardsFor = () => cardsOf(CUR_SET).filter(c => CUR_SRC === 'all' || srcOf(c.id) === CUR_SRC);
+
 function poolHomes(card){
   const mine = new Set(card.items.map(i => i.home));
   /* 誤答肢は同じセット内からのみ集める。
@@ -601,7 +947,38 @@ function poolHomes(card){
     .filter(h => !mine.has(h))
     .filter((h,i,arr) => arr.indexOf(h) === i);
 }
+/* 同じ80枚から3方向の問題を作る。
+   fill  : 説明文 → 用語（誤答肢は他カードの用語も混ぜる＝思い出す練習）
+   ident : 説明文 → 用語（誤答肢は同じカードの兄弟用語だけ＝見分ける練習）
+   flash : 用語 → 所属（既存の瞬殺。変更しない） */
+function poolTerms(card){
+  const mine = new Set(card.items.map(i => i.term));
+  const scope = cardsOf(setOf(card.id));
+  const same  = scope.filter(c => c.cat === card.cat && c.id !== card.id);
+  const other = scope.filter(c => c.cat !== card.cat && srcOf(c.id) === srcOf(card.id));
+  const pick = list => list.reduce((a,c) => a.concat(c.items.map(i => i.term)), []);
+  return pick(same).concat(pick(other))
+    .filter(t => !mine.has(t))
+    .filter((t,i,arr) => arr.indexOf(t) === i);
+}
+function buildFill(card){
+  const target = card.items[Math.floor(Math.random()*card.items.length)];
+  const sib = card.items.filter(i => i !== target).map(i => i.term);
+  const wrong = shuffled(sib.concat(shuffled(poolTerms(card)))).slice(0, 3);
+  const opts = shuffled([{label:target.term, ok:true}].concat(wrong.map(w => ({label:w, ok:false}))));
+  return {prompt:target.home, opts, sub:card.cat, kind:'fill'};
+}
+function buildIdent(card){
+  const target = card.items[Math.floor(Math.random()*card.items.length)];
+  let wrong = card.items.filter(i => i !== target).map(i => i.term);
+  if(wrong.length < 3) wrong = wrong.concat(shuffled(poolTerms(card)).slice(0, 3 - wrong.length));
+  wrong = shuffled(wrong).slice(0, 3);
+  const opts = shuffled([{label:target.term, ok:true}].concat(wrong.map(w => ({label:w, ok:false}))));
+  return {prompt:target.home, opts, sub:card.cat, kind:'ident'};
+}
 function buildQuestion(card){
+  if(CUR_MODE === 'fill')  return buildFill(card);
+  if(CUR_MODE === 'ident') return buildIdent(card);
   if(card.type === 'odd'){
     /* answer で指定された1件だけを正解にする */
     const ansTerm = card.items[card.answer-1].term;
@@ -623,15 +1000,16 @@ let timerId = null;
 
 function startSession(mode){
   const set = CUR_SET;
-  let pool = cardsOf(set);
+  let pool = cardsFor();
   if(mode === 'weak') pool = pool.filter(c => stateOf(c.id) !== 'fixed');   // 定着確認済み以外
   if(!pool.length){ alert('該当するカードがありません。'); return; }
-  /* 1セットの問題数。「全部」は名称どおり全枚数を通しで出す */
-  const cap = (set === 'all') ? pool.length : SESSION_N;
+  /* 1セットの問題数。範囲を絞っていないときだけ全枚数を通しで出す */
+  const cap = (set === 'all' && CUR_SRC === 'all') ? pool.length : SESSION_N;
   /* weight の大きいカードを優先しつつ、順序はランダム */
   const w = shuffled(pool).sort((a,b) => (b.weight||1) - (a.weight||1));
   const ids = shuffled(w.slice(0, Math.min(cap, w.length))).map(c => c.id);
-  S = {ids, cur:0, q:null, results:[], startedAt:Date.now(), shownAt:0, answered:false, mode, set, saved:false};
+  S = {ids, cur:0, q:null, results:[], startedAt:Date.now(), shownAt:0, answered:false,
+       mode, set, learnMode:CUR_MODE, src:CUR_SRC, saved:false};
   render('quiz');
 }
 function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
@@ -653,22 +1031,23 @@ function render(v){
 
 function counts(set){
   const c = {weak:0, slow:0, mid:0, cand:0, fixed:0, new:0};
-  cardsOf(set || CUR_SET).forEach(x => c[stateOf(x.id)]++);
+  (set ? cardsOf(set).filter(x => CUR_SRC === 'all' || srcOf(x.id) === CUR_SRC) : cardsFor())
+    .forEach(x => c[stateOf(x.id)]++);
   return c;
 }
 
 function vHome(){
   stopTimer();
   const c = counts();
-  const list = cardsOf(CUR_SET);
+  const list = cardsFor();
   const n = list.length;
   const weakN = n - c.fixed;
   const crossSet = CUR_SET === 'all';
   app.innerHTML = `
     <div class="hero">
       <h3>瞬殺トレーニング</h3>
-      <p>4択を${(FAST_MS/1000)}秒以内で切る反射をつくる。${n}論点・1回${
-        CUR_SET==='all' ? n : Math.min(SESSION_N, n)}問。</p>
+      <p>${esc(MODES[CUR_MODE].label)}｜${n}論点・1回${
+        (CUR_SET==='all' && CUR_SRC==='all') ? n : Math.min(SESSION_N, n)}問。</p>
       <div class="stat">
         <div>弱点 ${c.weak}</div>
         <div>要反射 ${c.slow}</div>
@@ -676,6 +1055,21 @@ function vHome(){
         <div>定着候補 ${c.cand}</div>
         <div>定着確認済み ${c.fixed}</div>
       </div>
+    </div>
+
+    <h2 class="sec">モード</h2>
+    <div class="row">
+      ${Object.keys(MODES).map(m => `<button class="btn ${CUR_MODE===m?'amber':'ghost'} modeBtn"
+        data-mode="${m}" type="button" style="flex:1">${MODES[m].label}</button>`).join('')}
+    </div>
+    <p class="muted" style="margin-top:8px">${MODES[CUR_MODE].hint}。同じ${CARDS.length}枚を3方向から出題します。記録はモードごとに分けています。</p>
+
+    <h2 class="sec">教材の範囲</h2>
+    <div class="row" style="flex-wrap:wrap">
+      ${['all',1,2,3].map(v => `<button class="btn ${String(CUR_SRC)===String(v)?'amber':'ghost'} srcBtn"
+        data-src="${v}" type="button" style="flex:1 1 46%">${
+          v==='all' ? '全範囲（'+cardsOf(CUR_SET).length+'）'
+                    : SRC_LABEL[v].slice(0,1)+' '+SRC_LABEL[v].slice(2)+'（'+cardsOf(CUR_SET).filter(c=>srcOf(c.id)===v).length+'）'}</button>`).join('')}
     </div>
 
     <h2 class="sec">セット</h2>
@@ -724,6 +1118,12 @@ function vHome(){
   document.querySelectorAll('.setBtn').forEach(b => {
     b.onclick = () => { CUR_SET = b.dataset.set; render('home'); };
   });
+  document.querySelectorAll('.modeBtn').forEach(b => {
+    b.onclick = () => { CUR_MODE = b.dataset.mode; render('home'); };
+  });
+  document.querySelectorAll('.srcBtn').forEach(b => {
+    b.onclick = () => { const v = b.dataset.src; CUR_SRC = (v === 'all') ? 'all' : +v; render('home'); };
+  });
   $('#allBtn').onclick  = () => startSession('all');
   $('#weakBtn').onclick = () => startSession('weak');
   $('#histBtn').onclick = () => { S = null; render('hist'); };
@@ -747,9 +1147,11 @@ function vQuiz(){
     </div>
 
     <div class="card">
-      <div class="prompt">${q.isHome
-        ? `<span class="em">${esc(q.prompt)}</span> の所属は？`
-        : esc(q.prompt)}</div>
+      <div class="prompt">${
+        q.kind === 'fill'  ? `${esc(q.prompt)}<br><span class="em">これにあたる用語は（　　　）</span>` :
+        q.kind === 'ident' ? `${esc(q.prompt)}<br><span class="em">にあたるのはどれ？</span>` :
+        q.isHome ? `<span class="em">${esc(q.prompt)}</span> の所属は？`
+                 : esc(q.prompt)}</div>
       <div class="opts" id="opts">
         ${q.opts.map((o,i) => `<button class="opt" data-i="${i}" type="button">${esc(o.label)}</button>`).join('')}
       </div>
@@ -926,8 +1328,8 @@ function buildAnalysisText(){
   const s = splitResults(h.results);
   L.push('', '■ 最新セッション');
   L.push(`日時：${fmtDT(h.at)}`);
-  L.push(`セット：${setLabel(h.set)}`);
-  L.push(`モード：${modeLabel(h.mode)}`);
+  L.push(`モード：${lmLabel(h.learnMode)}　範囲：${srcLabel(h.src)}`);
+  L.push(`セット：${setLabel(h.set)}　出題：${modeLabel(h.mode)}`);
   L.push(`${h.correctCount} / ${h.questionCount}`);
   L.push(`正答率 ${h.rate}%`);
   L.push(`平均 ${fmtSec(h.averageMs)}`);
@@ -941,9 +1343,9 @@ function buildAnalysisText(){
   L.push(s.mid.length ? s.mid.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('\n') : 'なし');
 
   L.push('', '■ 過去セッション推移（新しい順）');
-  L.push(`日時 / セット / モード / 正解数 / 正答率 / 平均秒 / ${FAST_MS/1000}秒以内`);
+  L.push(`日時 / モード / 範囲 / セット / 正解数 / 正答率 / 平均秒 / ${FAST_MS/1000}秒以内`);
   HIST.forEach(x => {
-    L.push(`${fmtDT(x.at)} / ${setLabel(x.set)} / ${modeLabel(x.mode)} / ${x.correctCount}/${x.questionCount}`
+    L.push(`${fmtDT(x.at)} / ${lmLabel(x.learnMode)} / ${srcLabel(x.src)} / ${setLabel(x.set)} / ${x.correctCount}/${x.questionCount}`
       + ` / ${x.rate}% / ${fmtSec(x.averageMs)} / ${x.fastCount}`);
   });
 
@@ -995,7 +1397,7 @@ function vHist(){
       return `<div class="card hs">
         <div class="hd2">
           <span class="sc">${h.correctCount} / ${h.questionCount}</span>
-          <span class="dt">${esc(fmtDT(h.at))}　${esc(setLabel(h.set))}　${esc(modeLabel(h.mode))}</span>
+          <span class="dt">${esc(fmtDT(h.at))}　${esc(lmLabel(h.learnMode))}　${esc(srcLabel(h.src))}　${esc(setLabel(h.set))}</span>
         </div>
         <div class="kv">
           <span>正答率 ${h.rate}%</span>
@@ -1026,7 +1428,10 @@ const SHEET_PAGES = [
   {title:'1. 技術：所属（住所）', ids:['T01','T07','T14','T15','T16','T20','T13','T12','T09','T17']},
   {title:'2. 技術：比較（決定打）', ids:['T02','T03','T04','T05','T06','T08','T10','T11','T18','T19']},
   {title:'3. 法務・倫理', ids:['L01','L02','L03','L04','L05','L06']},
-  {title:'4. Set B：識別・穴埋め', ids:['B-L01','B-T01','B-T02','B-T03','B-T04','B-T05','B-T06','B-T07','B-T08','B-T09']},
+  {title:'4. Set B：識別・穴埋め①', ids:['B-L01','B-T01','B-T02','B-T03','B-T04','B-T05','B-T06','B-T07','B-T08','B-T09','B-T10','B-T11','B-T12','B-T13']},
+  {title:'5. Set B：識別・穴埋め②（技術）', ids:['B-T14','B-T15','B-T16','B-T17','B-T18','B-T19','B-T20','B-T21','B-T22','B-T23','B-T24','B-T25','B-T26','B-T27','B-T28','B-T29']},
+  {title:'6. Set B：識別・穴埋め③（技術）', ids:['B-T30','B-T31','B-T32','B-T33','B-T34','B-T35','B-T36','B-T37','B-T38','B-T39','B-T40','B-T41','B-T42']},
+  {title:'7. Set B：識別・穴埋め④（法務・社会実装）', ids:['B-L02','B-L03','B-L04','B-L05','B-L06','B-L07','B-L08','B-L09','B-L10','B-L11','B-L12']},
 ];
 /* シートに全カードが載っているかを起動時に自己検査する */
 (function checkSheet(){
