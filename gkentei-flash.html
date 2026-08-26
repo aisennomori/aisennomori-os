@@ -794,8 +794,17 @@ const STREAK_FIX = 2;          // 5秒以内を2回連続で正解すると定�
 const SESSION_N = 26;           // 瞬殺の1セット問題数（従来値・変更しない）
 /* 1セットの問題数はモードごとに変える。1問あたりの所要時間が違うため、
    1セットの所要時間がおおよそ揃うようにする。 */
-const SESSION_N_BY_MODE = {flash:26, ident:15, fill:15};
-const sessionN = mode => SESSION_N_BY_MODE[mode || CUR_MODE] || SESSION_N;
+const SESSION_N_BY_MODE = {flash:26, ident:15, fill:15};   // モード別の既定値
+/* 1セットの出題数。'all' は選択中の範囲に存在する全問を出す */
+const COUNT_CHOICES = [15, 30, 'all'];
+let CUR_COUNT = null;                       // null のときはモード別の既定値を使う
+const sessionN = mode => {
+  if(CUR_COUNT === 'all') return Infinity;
+  if(typeof CUR_COUNT === 'number') return CUR_COUNT;
+  return SESSION_N_BY_MODE[mode || CUR_MODE] || SESSION_N;
+};
+/* 実際に出題される数（母数を超えない） */
+const askN = (poolLen, mode) => Math.min(sessionN(mode), poolLen);
 const YOUGO_URL = 'gkentei-yougo.html';
 
 /* セッション単位の履歴。カード単位の履歴（LS_KEY）とは完全に分離する */
@@ -867,6 +876,7 @@ function pushSession(){
     mode: S.mode,
     set: S.set || 'A',
     learnMode: S.learnMode || 'flash',
+    countSel: S.countSel === undefined ? null : S.countSel,
     src: S.src || 'all',
     questionCount: n,
     correctCount: ok,
@@ -1064,14 +1074,14 @@ function startSession(mode){
     return;
   }
   /* 1セットの問題数。範囲を絞っていないときだけ全枚数を通しで出す */
-  /* 瞬殺の「全部×全範囲」だけは名称どおり全枚数を通しで出す。それ以外はモード別の上限 */
-  const cap = (CUR_MODE === 'flash' && set === 'all' && CUR_SRC === 'all')
+  /* 出題数の選択が優先。未選択なら瞬殺の「全部×全範囲」だけ全枚数、他はモード別の既定値 */
+  const cap = (CUR_COUNT === null && CUR_MODE === 'flash' && set === 'all' && CUR_SRC === 'all')
     ? pool.length : sessionN();
   /* weight の大きいカードを優先しつつ、順序はランダム */
   const w = shuffled(pool).sort((a,b) => (b.weight||1) - (a.weight||1));
   const ids = shuffled(w.slice(0, Math.min(cap, w.length))).map(c => c.id);
   S = {ids, cur:0, q:null, results:[], startedAt:Date.now(), shownAt:0, answered:false,
-       mode, set, learnMode:CUR_MODE, src:CUR_SRC, saved:false};
+       mode, set, learnMode:CUR_MODE, src:CUR_SRC, countSel:CUR_COUNT, saved:false};
   render('quiz');
 }
 function stopTimer(){ if(timerId){ clearInterval(timerId); timerId = null; } }
@@ -1113,8 +1123,10 @@ function vHome(){
   app.innerHTML = `
     <div class="hero">
       <h3>瞬殺トレーニング</h3>
-      <p>${esc(MODES[CUR_MODE].label)}｜${n}論点・1回${
-        (CUR_MODE==='flash' && CUR_SET==='all' && CUR_SRC==='all') ? n : Math.min(sessionN(), n)}問。</p>
+      <p>${esc(MODES[CUR_MODE].label)}｜この範囲の総数 <b>${n}</b>${
+        CUR_MODE==='flash' ? '枚' : '問'}・1セット <b>${
+        (CUR_COUNT===null && CUR_MODE==='flash' && CUR_SET==='all' && CUR_SRC==='all') ? n : askN(n)}</b>${
+        CUR_MODE==='flash' ? '枚' : '問'}</p>
       <div class="stat">
         <div>弱点 ${c.weak}</div>
         <div>${TR().slowHead} ${c.slow}</div>
@@ -1154,14 +1166,25 @@ function vHome(){
       : CUR_SET==='B' ? '転移確認と反復網の穴を埋める識別カードです。'
       : '両方をまとめて出題します。弱点だけはセット内で閉じる方針のため使えません。'}</p>` : ''}
 
+    <h2 class="sec">1セットの出題数</h2>
+    <div class="row">
+      ${COUNT_CHOICES.map(v => `<button class="btn ${String(CUR_COUNT)===String(v)?'amber':'ghost'} cntBtn"
+        data-count="${v}" type="button" style="flex:1">${
+          v==='all' ? `全問（${n}）` : v+'問'}</button>`).join('')}
+    </div>
+    <p class="muted" style="margin-top:8px">${
+      CUR_COUNT==='all' ? 'この範囲の'+n+(CUR_MODE==='flash'?'枚':'問')+'を通しで出題します。'
+      : CUR_COUNT===null ? '未選択のときはモード既定（穴埋め15問／識別15問／瞬殺26枚）です。'
+      : CUR_COUNT+(CUR_MODE==='flash'?'枚':'問')+'を上限に出題します。範囲がこれより少ない場合はある分だけ出題します。'}</p>
+
     <h2 class="sec">トレーニング</h2>
     <div class="row">
       <button class="btn amber" id="allBtn" type="button" style="flex:1">${
         CUR_MODE==='flash' ? '全カード' : '全問から出題'}（${
-        (CUR_MODE==='flash' && CUR_SET==='all' && CUR_SRC==='all') ? n
-          : Math.min(sessionN(), n) + ' / ' + n}）</button>
+        (CUR_COUNT===null && CUR_MODE==='flash' && CUR_SET==='all' && CUR_SRC==='all') ? n
+          : askN(n) + ' / ' + n}）</button>
       <button class="btn sub" id="weakBtn" type="button" style="flex:1" ${(!crossSet && weakN)?'':'disabled'}>
-        弱点だけ（${crossSet ? '—' : Math.min(sessionN(), weakN) + ' / ' + weakN}）</button>
+        弱点だけ（${crossSet ? '—' : askN(weakN) + ' / ' + weakN}）</button>
     </div>
     <div class="row" style="margin-top:8px">
       <button class="btn ghost" id="wrongBtn" type="button" style="flex:1" ${wrongN?'':'disabled'}>
@@ -1204,6 +1227,9 @@ function vHome(){
   });
   document.querySelectorAll('.modeBtn').forEach(b => {
     b.onclick = () => { CUR_MODE = b.dataset.mode; render('home'); };
+  });
+  document.querySelectorAll('.cntBtn').forEach(b => {
+    b.onclick = () => { const v = b.dataset.count; CUR_COUNT = (v === 'all') ? 'all' : +v; render('home'); };
   });
   document.querySelectorAll('.srcBtn').forEach(b => {
     b.onclick = () => { const v = b.dataset.src; CUR_SRC = (v === 'all') ? 'all' : +v; render('home'); };
