@@ -757,8 +757,24 @@ const CARDS = [
    定数・localStorage
    ============================================================ */
 const LS_KEY = 'gkentei_flash_v1';
-const FAST_MS = 5000;          // 5秒以内の正解＝定着候補
-const SLOW_MS = 10000;         // 5〜10秒＝理解済み／反射化途中、10秒超＝要反射
+const FAST_MS = 5000;          // 瞬殺：5秒以内の正解＝定着候補
+const SLOW_MS = 10000;         // 瞬殺：5〜10秒＝理解済み／反射化途中、10秒超＝要反射
+/* モードごとに読む量が違うため、時間の基準を分ける。
+   flash=用語→所属、ident=短い設問＋2〜4択、fill=50〜80字の問題文を読む */
+const TIME_RULES = {
+  flash: {fast:5000,  slow:10000,
+          fastLabel:'定着候補',   slowHead:'要反射',   slowNote:'最優先で反射化すべき論点です。',
+          midHead:'理解済み',     midNote:'意味は分かっているが、反射化の途中です。'},
+  ident: {fast:10000, slow:20000,
+          fastLabel:'即答',       slowHead:'要復習',   slowNote:'見分けに時間がかかった論点です。',
+          midHead:'判断できた',   midNote:'見分けはついたが、まだ迷いがあります。'},
+  fill:  {fast:15000, slow:30000,
+          fastLabel:'すぐ想起',   slowHead:'要復習',   slowNote:'想起に時間がかかった論点です。',
+          midHead:'想起できた',   midNote:'思い出せたが、出てくるまでに間があります。'},
+};
+const TR = (mode) => TIME_RULES[mode || CUR_MODE] || TIME_RULES.flash;
+const fastMs = mode => TR(mode).fast;
+const slowMs = mode => TR(mode).slow;
 const STREAK_FIX = 2;          // 5秒以内を2回連続で正解すると定着確認済み
 const SESSION_N = 26;
 const YOUGO_URL = 'gkentei-yougo.html';
@@ -856,8 +872,8 @@ function stateOf(id, mode){
   if(!r || (r.ok + r.ng) === 0) return 'slow';        // 未回答は要反射から始める
   if(r.lastResult === 'x') return 'weak';
   if(r.streak >= STREAK_FIX) return 'fixed';
-  if(r.lastMs != null && r.lastMs > SLOW_MS) return 'slow';
-  if(r.lastMs != null && r.lastMs > FAST_MS) return 'mid';
+  if(r.lastMs != null && r.lastMs > slowMs(mode)) return 'slow';
+  if(r.lastMs != null && r.lastMs > fastMs(mode)) return 'mid';
   return 'cand';
 }
 /* 判定の重い順。弱点だけモードと集計の並びに使う */
@@ -1102,8 +1118,8 @@ function vHome(){
         弱点だけ（${crossSet ? '—' : weakN}）</button>
     </div>
     <p class="muted" style="margin-top:8px">
-      ${FAST_MS/1000}秒以内の正解＝定着候補。${STREAK_FIX}回続けて${FAST_MS/1000}秒以内なら定着確認済み。
-      ${FAST_MS/1000}〜${SLOW_MS/1000}秒＝理解済み（反射化の途中）、${SLOW_MS/1000}秒超＝要反射、不正解＝弱点。</p>
+      ${fastMs()/1000}秒以内の正解＝${TR().fastLabel}。${STREAK_FIX}回続けて${fastMs()/1000}秒以内なら定着確認済み。
+      ${fastMs()/1000}〜${slowMs()/1000}秒＝${TR().midHead}、${slowMs()/1000}秒超＝${TR().slowHead}、不正解＝弱点。</p>
 
     <h2 class="sec">カード一覧</h2>
     <div class="card" style="padding:4px 13px">
@@ -1116,7 +1132,7 @@ function vHome(){
           <span class="m ${st==='fixed'?'o':st==='weak'?'x':''}">${mk}</span>
           <span class="t">${esc(title)}
             <small>${x.id}　${esc(x.cat)}　${STATE_LABEL[st]}</small></span>
-          <span class="sec2 ${r&&r.lastMs&&r.lastMs>FAST_MS?'slow':''}">${
+          <span class="sec2 ${r&&r.lastMs&&r.lastMs>fastMs()?'slow':''}">${
             r&&r.lastMs!=null ? fmtSec(r.lastMs) : '—'}</span>
         </div>`;
       }).join('')}
@@ -1204,8 +1220,8 @@ function answer(i){
 
   const r = rec(card.id);
   if(ok) r.ok++; else r.ng++;
-  const fast = ok && ms <= FAST_MS;            // 5秒以内の正解＝定着候補
-  const slow = ok && ms > SLOW_MS;             // 10秒超の正解＝要反射
+  const fast = ok && ms <= fastMs();           // モード別の基準内で正解
+  const slow = ok && ms > slowMs();            // モード別の基準を超えて正解
   r.streak = fast ? r.streak + 1 : 0;          // 5秒以内で正解したときだけ連続を伸ばす
   if(ok && (r.bestMs === null || ms < r.bestMs)) r.bestMs = ms;
   r.lastMs = ms;
@@ -1225,9 +1241,9 @@ function answer(i){
   $('#after').innerHTML = `
     <div class="verdict ${ok?'ok':'ng'}">
       <div class="top">
-        <span class="mark">${ok ? (fast ? '瞬殺' : (slow ? '正解（要反射）' : '正解')) : '不正解'}</span>
+        <span class="mark">${ok ? (fast ? TR().fastLabel : (slow ? '正解（'+TR().slowHead+'）' : '正解')) : '不正解'}</span>
         <span class="sec">${fmtSec(ms)}${
-          ok && slow ? `　（${SLOW_MS/1000}秒超）` : (ok && !fast ? `　（${FAST_MS/1000}秒超）` : '')}</span>
+          ok && slow ? `　（${slowMs()/1000}秒超）` : (ok && !fast ? `　（${fastMs()/1000}秒超）` : '')}</span>
         <span class="sec">${STATE_LABEL[stateOf(card.id)]}</span>
       </div>
       <div class="key">${esc(card.key)}</div>
@@ -1258,6 +1274,20 @@ function vResult(){
   const slow = S.results.filter(r => r.ok && r.slow);                // 10秒超
   const ng   = S.results.filter(r => !r.ok);
 
+  /* YAML問題は「問題文＋正解」、瞬殺カードは従来どおり key を出す */
+  const rowOf = (r, cls, mark) => {
+    const c = byId(r.id);
+    const body = c.question
+      ? `<b>【問題】</b>${esc(c.question)}<br><b>【正解】</b>${esc(c.answer)}`
+      : esc(c.key);
+    const note = c.question ? `<small>${esc(c.key)}</small>` : '';
+    return `<div class="lrow">
+      <span class="m ${cls}">${mark}</span>
+      <span class="t">${body}${note}
+        <small>${c.id}　${esc(c.cat)}</small></span>
+      <span class="sec2 ${cls==='slow'?'slow':''}">${fmtSec(r.ms)}</span></div>`;
+  };
+
   app.innerHTML = `
     <h2 class="sec">結果</h2>
     <div class="card score">
@@ -1266,39 +1296,30 @@ function vResult(){
       <div class="tally">
         <div class="c">正解 ${ok}</div>
         <div class="w">不正解 ${n-ok}</div>
-        <div class="s">${FAST_MS/1000}秒以内 ${fast}</div>
+        <div class="s">${fastMs()/1000}秒以内 ${fast}</div>
       </div>
       <div class="muted" style="margin-top:12px">平均 ${fmtSec(avg)} / 問</div>
     </div>
 
-    ${ng.length ? `<h2 class="sec">間違えたカード</h2>
+    ${ng.length ? `<h2 class="sec">間違えた問題</h2>
       <div class="card" style="padding:4px 13px">
-        ${ng.map(r => { const c = byId(r.id); return `<div class="lrow">
-          <span class="m x">×</span>
-          <span class="t">${esc(c.key)}<small>${c.id}　${esc(c.cat)}</small></span>
-          <span class="sec2">${fmtSec(r.ms)}</span></div>`; }).join('')}
+        ${ng.map(r => rowOf(r,'x','×')).join('')}
       </div>` : ''}
 
-    ${slow.length ? `<h2 class="sec">要反射（${SLOW_MS/1000}秒超で正解）</h2>
-      <p class="muted">最優先で反射化すべき論点です。</p>
+    ${slow.length ? `<h2 class="sec">${TR().slowHead}（${slowMs()/1000}秒超で正解）</h2>
+      <p class="muted">${TR().slowNote}</p>
       <div class="card" style="padding:4px 13px">
-        ${slow.map(r => { const c = byId(r.id); return `<div class="lrow">
-          <span class="m o">✓</span>
-          <span class="t">${esc(c.key)}<small>${c.id}　${esc(c.cat)}</small></span>
-          <span class="sec2 slow">${fmtSec(r.ms)}</span></div>`; }).join('')}
+        ${slow.map(r => rowOf(r,'slow','✓')).join('')}
       </div>` : ''}
 
-    ${mid.length ? `<h2 class="sec">理解済み（${FAST_MS/1000}〜${SLOW_MS/1000}秒で正解）</h2>
-      <p class="muted">意味は分かっているが、反射化の途中です。</p>
+    ${mid.length ? `<h2 class="sec">${TR().midHead}（${fastMs()/1000}〜${slowMs()/1000}秒で正解）</h2>
+      <p class="muted">${TR().midNote}</p>
       <div class="card" style="padding:4px 13px">
-        ${mid.map(r => { const c = byId(r.id); return `<div class="lrow">
-          <span class="m o">✓</span>
-          <span class="t">${esc(c.key)}<small>${c.id}　${esc(c.cat)}</small></span>
-          <span class="sec2">${fmtSec(r.ms)}</span></div>`; }).join('')}
+        ${mid.map(r => rowOf(r,'o','✓')).join('')}
       </div>` : ''}
 
     ${!ng.length && !slow.length && !mid.length
-      ? `<div class="empty">全問を${FAST_MS/1000}秒以内で正解しました。</div>` : ''}
+      ? `<div class="empty">全問を${fastMs()/1000}秒以内で正解しました。</div>` : ''}
 
     <div class="navbtns">
       <button class="btn" id="again" type="button">もう1セット</button>
