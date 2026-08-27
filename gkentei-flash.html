@@ -1272,7 +1272,7 @@ function vQuiz(){
       <span class="idx">${S.cur+1} / ${S.ids.length}</span>
       <span class="timer" id="tm">0.0秒</span>
       <div class="bar"><span style="width:${pct}%"></span></div>
-      <span class="tag ${STATE_CLS[st]}">${esc(card.cat)}｜${esc(stateLabel(st))}</span>
+      <!-- 出題中は論点名と状態を出さない。cat が正解と一致する問題があり、答えが漏れるため -->
     </div>
 
     <div class="card">
@@ -1342,7 +1342,7 @@ function answer(i){
         <span class="mark">${ok ? (fast ? TR().fastLabel : (slow ? '正解（'+TR().slowHead+'）' : '正解')) : '不正解'}</span>
         <span class="sec">${fmtSec(ms)}${
           ok && slow ? `　（${slowMs()/1000}秒超）` : (ok && !fast ? `　（${fastMs()/1000}秒超）` : '')}</span>
-        <span class="sec">${esc(stateLabel(stateOf(card.id)))}</span>
+        <span class="sec">${esc(card.cat)}｜${esc(stateLabel(stateOf(card.id)))}</span>
       </div>
       <div class="key">${esc(card.key)}</div>
       <div class="link">
