@@ -1327,7 +1327,18 @@ function answer(i){
   r.last = new Date().toISOString();
   save();
 
-  S.results.push({id:card.id, ok, ms, fast, slow, state:stateOf(card.id), pick:q.opts[i].label});
+  /* 瞬殺は出題内容が毎回生成されるため、あとから復元できるようスナップショットを残す。
+     穴埋め・識別はQBANKに原文があるため保存しない。 */
+  const rec0 = {id:card.id, ok, ms, fast, slow, state:stateOf(card.id), pick:q.opts[i].label};
+  if(!card.question){
+    rec0.snap = {
+      prompt: q.prompt,
+      isHome: !!q.isHome,
+      choices: q.opts.map(o => o.label),
+      correct: (q.opts.find(o => o.ok) || {}).label || '',
+    };
+  }
+  S.results.push(rec0);
 
   document.querySelectorAll('.opt').forEach((b, idx) => {
     b.disabled = true;
@@ -1435,14 +1446,19 @@ function accRow(r, cls, mark){
   const title = c.question
     ? `${esc(c.id)}　${esc(head)}`
     : `${esc(c.id)}　${esc(head)}`;
+  const sn = r.snap || null;                    // 古い履歴には無いのでnull互換
   const detail = c.question
     ? `<div class="qd"><b>【問題】</b>${esc(c.question)}</div>
        ${r.pick ? `<div class="qd"><b>【あなたの回答】</b>${esc(r.pick)}</div>` : ''}
        <div class="qd"><b>【正解】</b>${esc(c.answer || '')}</div>
        <div class="qd"><b>【解説】</b>${esc(c.key || '')}</div>
        <div class="qd"><b>【所要時間】</b>${fmtSec(r.ms)}</div>`
-    : `<div class="qd"><b>【決定打】</b>${esc(c.key || '')}</div>
+    : `${sn ? `<div class="qd"><b>【問題】</b>${
+             sn.isHome ? esc(sn.prompt) + ' の所属は？' : esc(sn.prompt)}</div>
+       <div class="qd"><b>【選択肢】</b>${sn.choices.map(x => esc(x)).join(' ／ ')}</div>` : ''}
        ${r.pick ? `<div class="qd"><b>【あなたの回答】</b>${esc(r.pick)}</div>` : ''}
+       ${sn ? `<div class="qd"><b>【正解】</b>${esc(sn.correct)}</div>` : ''}
+       <div class="qd"><b>【決定打】</b>${esc(c.key || '')}</div>
        <div class="qd"><b>【所要時間】</b>${fmtSec(r.ms)}</div>`;
   return `<details class="qrow">
     <summary>
