@@ -18,6 +18,8 @@
     --dest:#E8720C;
     --card:#FFFFFF;
     --tag-bg:#F0EBDD;
+    --detour:#6E4B9E;
+    --chuo:#E8531C;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
@@ -278,8 +280,152 @@
     word-break:break-all;
   }
 
+  /* ===== 寄り道編（OPTION） ===== */
+  .detour{
+    margin-top:8px;
+    padding:26px 20px 22px;
+    background:#F5F1FA;
+    border:1px solid #D8CCE9;
+    border-radius:18px;
+  }
+  .detour-banner{
+    text-align:center;
+    padding-bottom:20px;
+    margin-bottom:22px;
+    border-bottom:2px dashed #C9B8E0;
+  }
+  .option-badge{
+    display:inline-block;
+    font-family:"Space Mono",monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    background:var(--detour);
+    color:#fff;
+    padding:4px 14px;
+    border-radius:100px;
+    margin-bottom:10px;
+  }
+  .detour-banner h2{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-size:clamp(19px,4vw,25px);
+    font-weight:900;
+    margin:0 0 8px;
+    line-height:1.5;
+  }
+  .detour-banner p{
+    margin:0;
+    font-size:13.5px;
+    color:var(--sub);
+  }
+  .detour-banner p b{color:var(--detour);}
+  .detour .sec-num{background:var(--detour);}
+  .detour .card{border-color:#DED2ED;}
+  .tag-detour{background:var(--detour);}
+  .tag-chuo{background:var(--chuo);}
+
+  /* case block */
+  .case{
+    background:var(--card);
+    border:1px solid #DED2ED;
+    border-radius:14px;
+    padding:0 0 16px;
+    margin-bottom:14px;
+    overflow:hidden;
+  }
+  .case-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 20px;
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:700;
+    font-size:15px;
+    color:#fff;
+  }
+  .case-a .case-head{background:#2E7D5B;}
+  .case-b .case-head{background:#B5651D;}
+  .case-head .case-mark{
+    font-family:"Space Mono",monospace;
+    font-size:11px;
+    background:rgba(255,255,255,.22);
+    padding:3px 9px;
+    border-radius:6px;
+  }
+  .case-body{padding:16px 20px 0;font-size:14.5px;}
+  .case-body ul{margin:0;padding-left:20px;}
+  .case-body li{margin-bottom:8px;}
+  .verdict{
+    display:inline-block;
+    font-weight:700;
+    font-size:14px;
+    padding:7px 14px;
+    border-radius:8px;
+    margin-bottom:12px;
+  }
+  .verdict-ok{background:#E4F3EC;color:#1F6B4C;border:1px solid #A9D8C2;}
+  .verdict-ng{background:#FBEEE0;color:#8A4A10;border:1px solid #E7C79B;}
+  .ticket-face{
+    font-family:"Space Mono",monospace;
+    font-size:12.5px;
+    background:#FFFDF5;
+    border:1px dashed #C9BE9E;
+    border-radius:8px;
+    padding:10px 14px;
+    margin:10px 0 4px;
+    line-height:1.8;
+    word-break:break-all;
+  }
+  .say{
+    background:#F0EBDD;
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:14px;
+    margin-top:10px;
+  }
+  .say .say-label{
+    display:block;
+    font-size:11.5px;
+    font-weight:700;
+    color:var(--sub);
+    margin-bottom:4px;
+    letter-spacing:.06em;
+  }
+  .fare{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+    margin-top:4px;
+  }
+  .fare th,.fare td{
+    text-align:left;
+    padding:9px 8px;
+    border-bottom:1px dashed var(--line);
+  }
+  .fare th{color:var(--sub);font-weight:600;font-size:13px;}
+  .fare td:last-child{
+    font-family:"Space Mono",monospace;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .callout-detour{
+    background:#F3EDFA;
+    border:1px solid #D6C6EA;
+    border-left:5px solid var(--detour);
+  }
+  .handback{
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:14px;
+    padding:18px 20px;
+    font-size:14.5px;
+    margin-top:14px;
+  }
+  .handback b{color:#C9B2E8;}
+
   @media(max-width:480px){
     .facility{grid-template-columns:76px 1fr;}
+    .detour{padding:22px 14px 18px;}
+    .case-body{padding:14px 15px 0;}
   }
 </style>
 </head>
@@ -563,6 +709,244 @@
         <dt>商品</dt><dd>スマートEX（おとな1名）</dd>
       </dl>
     </div>
+  </section>
+
+  <!-- ============================================= -->
+  <!-- 寄り道編（OPTION）：本編には手を加えていません -->
+  <!-- ============================================= -->
+  <section class="detour">
+
+    <div class="detour-banner">
+      <span class="option-badge">OPTION · 寄り道編</span>
+      <h2>品川で降りずに東京駅へ<br>→ 山手線で神田駅「北口」</h2>
+      <p>本編（品川 ⇄ 新宿 ⇄ TKP）は<b>そのまま</b>です。こちらは<b>品川で降りずに神田駅 北口へ向かう場合だけ</b>の別ルート。<br>品川までは本編とまったく同じ電車。降りずに1駅先の東京駅まで乗って、山手線で神田へ1駅です。</p>
+    </div>
+
+    <!-- 図解：寄り道ルート全体図 -->
+    <div class="route-diagram" style="margin-bottom:20px;">
+      <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" font-family="Zen Kaku Gothic New, sans-serif">
+        <line x1="60" y1="78" x2="640" y2="78" stroke="#DAD2C1" stroke-width="6" stroke-linecap="round"/>
+        <line x1="60" y1="78" x2="440" y2="78" stroke="#0B5FA8" stroke-width="6" stroke-linecap="round"/>
+        <line x1="440" y1="78" x2="640" y2="78" stroke="#5C8B10" stroke-width="6" stroke-linecap="round"/>
+
+        <!-- 岐阜羽島 -->
+        <circle cx="60" cy="78" r="9" fill="#0B5FA8"/>
+        <text x="60" y="44" text-anchor="middle" font-size="13" fill="#1F1D19" font-weight="700">岐阜羽島</text>
+        <text x="60" y="106" text-anchor="middle" font-size="11.5" fill="#6B6559">7:33発 自由席</text>
+
+        <!-- 品川（降りない） -->
+        <circle cx="250" cy="78" r="10" fill="#FFFFFF" stroke="#0B5FA8" stroke-width="3"/>
+        <text x="250" y="40" text-anchor="middle" font-size="13.5" fill="#6B6559" font-weight="700">品川駅 9:35</text>
+        <text x="250" y="57" text-anchor="middle" font-size="12" fill="#C0392B" font-weight="700">✕ 降りない</text>
+        <text x="250" y="106" text-anchor="middle" font-size="11.5" fill="#6B6559">そのまま乗ったまま</text>
+
+        <!-- 東京駅 -->
+        <circle cx="440" cy="78" r="11" fill="#0B5FA8" stroke="#fff" stroke-width="3"/>
+        <text x="440" y="42" text-anchor="middle" font-size="15" fill="#1F1D19" font-weight="900">東京駅</text>
+        <text x="440" y="106" text-anchor="middle" font-size="11.5" fill="#6B6559">JR線のりかえ口</text>
+        <text x="440" y="122" text-anchor="middle" font-size="11.5" fill="#0B5FA8" font-weight="700">乗換 約7〜10分</text>
+
+        <!-- 神田駅 北口（GOAL） -->
+        <circle cx="640" cy="78" r="13" fill="#5C8B10" stroke="#fff" stroke-width="3"/>
+        <text x="640" y="40" text-anchor="middle" font-size="16" fill="#1F1D19" font-weight="900">神田駅 北口</text>
+        <text x="640" y="56" text-anchor="middle" font-size="11" fill="#5C8B10" font-weight="700">GOAL</text>
+        <text x="640" y="106" text-anchor="middle" font-size="11.5" fill="#6B6559">山手線 内回り 1駅</text>
+        <text x="640" y="122" text-anchor="middle" font-size="11.5" fill="#5C8B10" font-weight="700">乗車 約2分</text>
+
+        <text x="250" y="166" text-anchor="middle" font-size="11.5" fill="#0B5FA8">━ 東海道新幹線（品川は通過扱い）</text>
+        <text x="545" y="166" text-anchor="middle" font-size="11.5" fill="#5C8B10">━ JR山手線 内回り</text>
+      </svg>
+      <div class="route-caption">
+        <span>START：岐阜羽島（本編と同じ電車）</span>
+        <span>GOAL：神田駅 北口</span>
+      </div>
+    </div>
+
+    <!-- A. きっぷの確認 -->
+    <div class="sec-head">
+      <div class="sec-num">A</div>
+      <h2>まず「乗車券の券面」を見てください</h2>
+      <span class="line-tag tag-detour">きっぷ</span>
+    </div>
+    <p style="font-size:14.5px;margin:0 0 14px;">手続きが必要かどうかは、<b>買い方によって正反対</b>です。手元のきっぷがどちらか確認してください。</p>
+
+    <!-- ケース1 -->
+    <div class="case case-a">
+      <div class="case-head"><span class="case-mark">CASE 1</span>みどりの窓口・券売機で買った紙のきっぷ</div>
+      <div class="case-body">
+        <span class="verdict verdict-ok">✅ 変更手続きも追加運賃も、原則いりません</span>
+        <p style="margin:0 0 10px;">岐阜羽島から東京エリアまでは約396kmあり、200kmを超えるため、乗車券は着駅が1駅ではなく<b>「東京都区内」というゾーン</b>で発券されます。神田駅は千代田区＝東京都区内なので、<b>そのまま神田で降りられます</b>。</p>
+        <div class="ticket-face">
+          乗車券　岐阜羽島 → <b>［東京都区内］</b>　…この表示があればOK<br>
+          自由席特急券　岐阜羽島 → <b>［東京・品川］</b>　…東京駅でも降りられる
+        </div>
+        <ul style="margin-top:12px;">
+          <li>東海道新幹線は<b>東京駅と品川駅で特急料金が同額</b>のため、自由席特急券は最初から「東京・品川」の連名で印字されています。東京駅まで乗っても特急券の変更は不要です。</li>
+          <li><b>品川でいったん改札を出ないこと。</b>「東京都区内」ゾーンの中では途中下車ができません。品川で出てしまうと、その時点で乗車券は使用済みになります。</li>
+          <li>神田の改札を出た時点で、この乗車券は使い終わりです。そのあと別の駅へ移動する場合は、あらためて運賃がかかります。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ケース2 -->
+    <div class="case case-b">
+      <div class="case-head"><span class="case-mark">CASE 2</span>スマートEX・EX予約で取った場合</div>
+      <div class="case-body">
+        <span class="verdict verdict-ng">⚠️ 「東京都区内」は使えません。手続きが必要です</span>
+        <p style="margin:0 0 10px;">スマートEX／EX予約は<b>「東京都区内」「大阪市内」といった特定都区市内制度が適用外</b>の商品です。予約した区間（＝品川まで）を超える分は、別途運賃がかかります。</p>
+        <ul>
+          <li><b>いちばんラクなのは事前変更。</b>乗る列車の発車時刻前なら、アプリ・サイトで区間を「岐阜羽島 → <b>東京</b>」に変更できます。自由席なら特急料金は同額なので、増えるのは品川〜東京の運賃相当分だけです。</li>
+          <li>変更しそびれたら<b>乗り越し精算</b>。車内で車掌に申し出るか、東京駅の新幹線のりかえ口の<b>有人通路</b>できっぷを見せて精算します。</li>
+          <li>神田までの在来線運賃（東京 → 神田）は、いずれの場合も<b>別途必要</b>です。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- B. 手続きの場所と言い方 -->
+    <div class="sec-head" style="margin-top:30px;">
+      <div class="sec-num">B</div>
+      <h2>変更・精算をする場所と、伝え方</h2>
+      <span class="line-tag tag-detour">3つの窓口</span>
+    </div>
+    <div class="card">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="7" width="18" height="11" rx="2" stroke="#6E4B9E" stroke-width="1.6"/><path d="M3 12h18" stroke="#6E4B9E" stroke-width="1.6"/><circle cx="17" cy="15" r="1.2" fill="#6E4B9E"/></svg>
+        </div>
+        <div class="step-body">
+          <b>① 出発前：岐阜羽島駅のみどりの窓口（いちばん安心）</b>
+          <div class="desc">当日の朝、乗車前に済ませておくのが確実です。紙のきっぷなら「東京都区内」の表示を一緒に確認してもらえます。</div>
+          <div class="say"><span class="say-label">窓口での言い方</span>「品川までの切符ですが、東京駅まで乗って、神田で降りたいんです。このままで大丈夫ですか？」</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="#6E4B9E" stroke-width="1.6"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7" stroke="#6E4B9E" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>② 車内：車掌さんに申し出る</b>
+          <div class="desc">巡回してきた車掌さんに声をかければ、その場で乗り越しの手続きをしてもらえます。</div>
+          <div class="say"><span class="say-label">車内での言い方</span>「品川までの切符ですが、東京まで乗り越します。」</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="#6E4B9E" stroke-width="1.6"/><path d="M8 9h8M8 13h5" stroke="#6E4B9E" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>③ 東京駅：のりかえ口の「有人通路」または のりこし精算機</b>
+          <div class="desc">自動改札が通れなかった場合も、駅員さんのいる通路できっぷを見せれば案内してもらえます。慌てて自動改札に何度も入れなくて大丈夫です。</div>
+        </div>
+      </div>
+
+      <div class="ref-links">
+        <div class="ref-title">💴 追加でかかる運賃のめやす</div>
+        <table class="fare">
+          <tr><th>東京 → 神田（山手線・1駅）</th><td>約160円</td></tr>
+        </table>
+        <p style="font-size:12px;color:var(--sub);margin:10px 0 0;">※2026年3月14日にJR東日本の運賃が改定されています。金額は駅の運賃表・ICの残額表示でご確認ください。</p>
+      </div>
+    </div>
+
+    <!-- C. 東京駅での乗り換え -->
+    <div class="sec-head" style="margin-top:30px;">
+      <div class="sec-num">C</div>
+      <h2>東京駅で山手線に乗り換える</h2>
+      <span class="line-tag tag-shinkansen">新幹線 → 山手線</span>
+    </div>
+    <div class="card">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="13" rx="4" stroke="#0B5FA8" stroke-width="1.6"/><circle cx="8" cy="19" r="1.4" fill="#0B5FA8"/><circle cx="16" cy="19" r="1.4" fill="#0B5FA8"/><line x1="4" y1="10" x2="20" y2="10" stroke="#0B5FA8" stroke-width="1.6"/></svg>
+        </div>
+        <div class="step-body">
+          <b>品川（9:35頃）では降りず、そのまま座っている</b>
+          <div class="desc">品川の次は終点・東京です。品川〜東京は約7〜8分。荷物をまとめるのは品川を出てからで十分間に合います。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M12 21l-5-5M12 21l5-5" stroke="#0B5FA8" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>東京駅で降りたら「JR線のりかえ口」へ</b>
+          <div class="desc">東海道新幹線から在来線への乗換改札は「中央のりかえ口」と「南のりかえ口」の2か所。<b>ひかりの自由席（1〜5号車）からは「南のりかえ口」</b>が近く、8号車より後ろなら「中央のりかえ口」が近いです。改札を出ずに在来線へ移動できます。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="8" height="12" rx="1.5" stroke="#6E4B9E" stroke-width="1.6"/><rect x="13" y="6" width="8" height="12" rx="1.5" stroke="#6E4B9E" stroke-width="1.6"/></svg>
+        </div>
+        <div class="step-body">
+          <b>乗換改札は「特急券」と「乗車券」を2枚重ねて投入</b>
+          <div class="desc">特急券だけが回収され、乗車券が戻ってきます。<b>戻ってきた乗車券は必ず受け取ってください</b>（神田で降りるときに使います）。スマートEXでICカードを使っている場合は、案内どおりタッチします。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#5C8B10" stroke-width="1.6"/><path d="M12 16V8M8 11l4-4 4 4" stroke="#5C8B10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>山手線「内回り（上野・池袋方面）」＝ 4番線ホームへ</b>
+          <div class="desc">緑色の案内が目印です。<b>「品川・渋谷方面」と書かれた5番線は逆方向</b>なので乗らないでください。隣の3番線に来る京浜東北線（大宮方面）も神田に停まるので、先に来たほうで大丈夫です。</div>
+          <div class="time-chip">🚃 乗車時間：1駅・約2分</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- D. 神田駅北口 -->
+    <div class="sec-head" style="margin-top:30px;">
+      <div class="sec-num">D</div>
+      <h2>神田駅に到着・北口を出る</h2>
+      <span class="line-tag tag-yamanote">JR神田駅</span>
+    </div>
+    <div class="card">
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M12 3l8 5v8l-8 5-8-5V8l8-5z" stroke="#5C8B10" stroke-width="1.6" stroke-linejoin="round"/><text x="12" y="15" text-anchor="middle" font-size="8" fill="#5C8B10" font-weight="700">北</text></svg>
+        </div>
+        <div class="step-body">
+          <b>内回りは「3番線ホーム」（2階）に到着</b>
+          <div class="desc">神田駅は高架のコンパクトな駅なので、新宿駅のような複雑さはありません。ホームから階段・エスカレーター・エレベーターで1階へ下ります。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M11 6l-6 6 6 6" stroke="#5C8B10" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>1階に下りたら「北口・東口」と書かれた改札（＝北改札）を出る</b>
+          <div class="desc">神田駅の改札は「北改札（北口・東口）」と「南改札（西口・南口）」の2つ。<b>改札を出て左が北口、右が東口</b>です。北改札を出たところに東京メトロ銀座線の入口もあります。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><rect x="4" y="3" width="16" height="13" rx="1.5" stroke="#6E4B9E" stroke-width="1.6"/><path d="M8 8h8M8 12h5" stroke="#6E4B9E" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="step-body">
+          <b>【時短メモ】北口改札にいちばん近いドア</b>
+          <div class="desc">山手線内回りは<b>先頭が11号車</b>。北口改札に近いのは<b>9号車の1番ドア</b>（前から3両目）あたりです。東京駅で乗るときに、この位置を狙っておくとスムーズです。</div>
+        </div>
+      </div>
+      <div class="ref-links">
+        <div class="ref-title">🗺️ 神田駅の構内図で確認したい場合</div>
+        改札は2か所だけなので迷いにくい駅ですが、出口の位置関係を先に見ておくとより安心です。<br>
+        <a href="https://www.jreast.co.jp/estation/stations/538.html" target="_blank" rel="noopener">JR東日本 神田駅 構内図 ↗</a>
+      </div>
+    </div>
+
+    <!-- 寄り道編の注意点 -->
+    <div class="callout callout-detour" style="margin-top:22px;">
+      <div class="callout-title">⚠️ 寄り道編で気をつけること</div>
+      <ul>
+        <li><b>品川で改札を出ない。</b>「東京都区内」の乗車券はゾーン内で途中下車ができません。品川で出ると、その先は全部あらためて運賃がかかります。</li>
+        <li><b>東京駅の山手線は方向に注意。</b>神田へは<b>内回り＝4番線（上野・池袋方面）</b>。5番線（品川・渋谷方面）は本編で使う方向で、こちらでは逆方向です。</li>
+        <li><b>乗換改札で戻ってきた乗車券を必ず受け取る。</b>特急券だけ回収されます。取り忘れると神田で出られません。</li>
+        <li><b>帰りは本編どおり。</b>帰りの新幹線は「品川 18:10発 ひかり655号」のままです。</li>
+        <li><b>時間の目安。</b>品川9:35 →（新幹線）→ 東京9:43頃 →（乗換7〜10分）→ 山手線 → <b>神田10:00前後</b>に到着するイメージです。</li>
+      </ul>
+    </div>
+
   </section>
 
   <!-- 迷いやすいポイント -->
