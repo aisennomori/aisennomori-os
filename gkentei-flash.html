@@ -884,8 +884,14 @@ function pushSession(){
     rate: Math.round(ok / n * 100),
     averageMs: Math.round(S.results.reduce((a,r) => a + r.ms, 0) / n),
     fastCount: fast,
-    results: S.results.map(r =>
-      ({id:r.id, ok:r.ok, ms:r.ms, fast:r.fast, slow:r.slow, state:r.state})),
+    /* pick（あなたの回答）と snap（瞬殺の出題スナップショット）も残す。
+       どちらも無い過去の履歴は undefined のまま扱われる */
+    results: S.results.map(r => {
+      const o = {id:r.id, ok:r.ok, ms:r.ms, fast:r.fast, slow:r.slow, state:r.state};
+      if(r.pick !== undefined) o.pick = r.pick;
+      if(r.snap) o.snap = r.snap;
+      return o;
+    }),
   });
   if(HIST.length > HIST_MAX) HIST.length = HIST_MAX;
   saveHist();
