@@ -1508,17 +1508,17 @@ function buildAnalysisText(){
   L.push(`${h.correctCount} / ${h.questionCount}`);
   L.push(`正答率 ${h.rate}%`);
   L.push(`平均 ${fmtSec(h.averageMs)}`);
-  L.push(`${FAST_MS/1000}秒以内 ${h.fastCount}`);
+  L.push(`${fastMs(h.learnMode)/1000}秒以内 ${h.fastCount}`);
 
   L.push('', '■ 誤答');
   L.push(s.ng.length ? s.ng.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('\n') : 'なし');
-  L.push('', `■ ${SLOW_MS/1000}秒超正解`);
+  L.push('', `■ ${TR(h.learnMode).slowHead}（${slowMs(h.learnMode)/1000}秒超で正解）`);
   L.push(s.slow.length ? s.slow.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('\n') : 'なし');
-  L.push('', `■ ${FAST_MS/1000}〜${SLOW_MS/1000}秒正解`);
+  L.push('', `■ ${TR(h.learnMode).midHead}（${fastMs(h.learnMode)/1000}〜${slowMs(h.learnMode)/1000}秒で正解）`);
   L.push(s.mid.length ? s.mid.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('\n') : 'なし');
 
   L.push('', '■ 過去セッション推移（新しい順）');
-  L.push(`日時 / モード / 範囲 / セット / 正解数 / 正答率 / 平均秒 / ${FAST_MS/1000}秒以内`);
+  L.push('日時 / モード / 範囲 / セット / 正解数 / 正答率 / 平均秒 / 基準内（瞬殺5秒・識別10秒・穴埋め15秒）');
   HIST.forEach(x => {
     L.push(`${fmtDT(x.at)} / ${lmLabel(x.learnMode)} / ${srcLabel(x.src)} / ${setLabel(x.set)} / ${x.correctCount}/${x.questionCount}`
       + ` / ${x.rate}% / ${fmtSec(x.averageMs)} / ${x.fastCount}`);
@@ -1529,7 +1529,7 @@ function buildAnalysisText(){
     const q = splitResults(x.results);
     L.push(`${fmtDT(x.at)}　${x.correctCount}/${x.questionCount}`);
     L.push(`誤答：${q.ng.length ? q.ng.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('、') : 'なし'}`);
-    L.push(`${SLOW_MS/1000}秒超：${q.slow.length ? q.slow.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('、') : 'なし'}`);
+    L.push(`${TR(x.learnMode).slowHead}（${slowMs(x.learnMode)/1000}秒超）：${q.slow.length ? q.slow.map(r => `${cardLabel(r.id)} ${fmtSec(r.ms)}`).join('、') : 'なし'}`);
   });
   return L.join('\n');
 }
@@ -1577,7 +1577,7 @@ function vHist(){
         <div class="kv">
           <span>正答率 ${h.rate}%</span>
           <span>平均 ${fmtSec(h.averageMs)}</span>
-          <span>${FAST_MS/1000}秒以内 ${h.fastCount}</span>
+          <span>${fastMs(h.learnMode)/1000}秒以内 ${h.fastCount}</span>
           <span>不正解 ${h.incorrectCount}</span>
         </div>
         <details>
