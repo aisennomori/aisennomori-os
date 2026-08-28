@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新宿駅西口 待ち合わせ案内</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Noto+Sans+JP:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF6EE;
+    --ink:#1F1D19;
+    --sub:#6B6559;
+    --line:#DAD2C1;
+    --dest:#E8720C;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Noto Sans JP",sans-serif;
+    line-height:1.75;
+  }
+  .wrap{max-width:520px;margin:0 auto;padding:36px 20px 60px;}
+  h1{
+    font-family:"Zen Kaku Gothic New",sans-serif;
+    font-weight:900;
+    font-size:22px;
+    text-align:center;
+    margin:0 0 6px;
+  }
+  .subtitle{
+    text-align:center;
+    color:var(--sub);
+    font-size:13.5px;
+    margin-bottom:28px;
+  }
+  .diagram{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px 18px 16px;
+    margin-bottom:20px;
+  }
+  .diagram svg{width:100%;height:auto;display:block;}
+  .steps{display:flex;flex-direction:column;gap:0;}
+  .step{
+    display:flex;
+    gap:14px;
+    padding:16px 4px;
+    border-top:1px dashed var(--line);
+  }
+  .step:first-child{border-top:none;}
+  .step-num{
+    flex-shrink:0;
+    width:30px;height:30px;
+    border-radius:50%;
+    background:var(--ink);
+    color:var(--paper);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Space Mono",monospace;
+    font-weight:700;
+    font-size:13px;
+  }
+  .step-body b{display:block;font-size:15px;margin-bottom:2px;}
+  .step-body .desc{color:var(--sub);font-size:13.5px;}
+  .badge{
+    display:block;
+    text-align:center;
+    margin-top:14px;
+    padding:10px;
+    background:#FFF6E9;
+    border:1px solid #F0D9A8;
+    border-radius:10px;
+    font-size:13px;
+    color:var(--ink);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>新宿駅西口 → 7番出口 → 大きな看板</h1>
+  <p class="subtitle">待ち合わせ場所の目印</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 500 130" xmlns="http://www.w3.org/2000/svg" font-family="Zen Kaku Gothic New, sans-serif">
+      <line x1="50" y1="55" x2="450" y2="55" stroke="#DAD2C1" stroke-width="6" stroke-linecap="round"/>
+      <line x1="50" y1="55" x2="450" y2="55" stroke="#E8720C" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 14"/>
+
+      <circle cx="50" cy="55" r="10" fill="#E8720C" stroke="#fff" stroke-width="3"/>
+      <text x="50" y="30" text-anchor="middle" font-size="13" fill="#1F1D19" font-weight="900">新宿駅 西口</text>
+
+      <circle cx="250" cy="55" r="10" fill="#E8720C" stroke="#fff" stroke-width="3"/>
+      <text x="250" y="30" text-anchor="middle" font-size="13" fill="#1F1D19" font-weight="900">7番出口</text>
+
+      <circle cx="450" cy="55" r="10" fill="#E8720C" stroke="#fff" stroke-width="3"/>
+      <text x="450" y="30" text-anchor="middle" font-size="13" fill="#1F1D19" font-weight="900">大きな看板</text>
+
+      <text x="250" y="90" text-anchor="middle" font-size="11" fill="#E8720C">┅ 徒歩 約1分</text>
+    </svg>
+  </div>
+
+  <div class="diagram">
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <b>新宿駅「西口」を目指す</b>
+          <div class="desc">案内表示の「西口」に従って進む。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <b>「7番出口」の案内表示に従う</b>
+          <div class="desc">西口を出たら、7番出口方面の表示を目印に進む。</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <b>大きな看板の前で待ち合わせ</b>
+          <div class="desc">7番出口を出てすぐ、TKP新宿西口カンファレンスセンターが入る建物の大きな看板が目印。</div>
+        </div>
+      </div>
+    </div>
+    <div class="badge">📍 待ち合わせ：7番出口を出てすぐの建物入口（大きな看板前）</div>
+  </div>
+
+  <div class="diagram">
+    <img src="images/tkp_building_entrance.png" alt="ヨドバシ新宿西口駅前ビル入口・フロア案内（1Fエレベーター前）" style="width:100%;height:auto;display:block;border-radius:10px;border:1px solid var(--line);">
+    <p style="font-size:13px;color:var(--sub);margin:10px 4px 2px;">写真中央の「1Fエレベーター前」の場所が目印。壁面にはTKP・ヨドバシカメラのフロア案内（3F〜11F）があり、9F・10FにTKP新宿西口の表示が見える。</p>
+    <p style="font-size:11.5px;color:var(--sub);margin:6px 4px 0;">出典：TKP新宿西口カンファレンスセンター公式サイト（360°ビュー）</p>
+  </div>
+</div>
+</body>
+</html>
