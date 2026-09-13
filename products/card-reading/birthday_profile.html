@@ -367,18 +367,8 @@
           <div class="ft-desc fd" id="monthFortuneDesc"></div>
 
           <div class="fortune-verify">
-            <div class="fortune-formula-label fd fortune-standard-label">計算式（標準）</div>
+            <div class="fortune-formula-label fd">計算式</div>
             <pre class="fortune-formula" id="monthFortuneFormulaStandard"></pre>
-          </div>
-
-          <div class="fortune-verify fortune-refonly">
-            <div class="fortune-formula-label fd">※以下は参考比較・検証用（正式値ではありません）</div>
-
-            <div class="fortune-formula-label fd">参考A（個人年＋対象月）</div>
-            <pre class="fortune-formula" id="monthFortuneFormulaA"></pre>
-
-            <div class="fortune-formula-label fd">参考B（誕生月＋誕生日＋採用サイクル年＋対象月を一括還元）</div>
-            <pre class="fortune-formula" id="monthFortuneFormulaB"></pre>
           </div>
         </div>
       </div>
@@ -1223,13 +1213,11 @@ function renderFortune(){
   document.getElementById('yearFortuneDesc').textContent = yMsg.desc;
   document.getElementById('yearFortuneFormula').textContent = formulaPersonalYear(month, day, effectiveYear);
 
-  document.getElementById('monthFortuneLabel').textContent = '【' + targetYear + '年の個人月サイクル（愛泉の杜標準）】';
+  document.getElementById('monthFortuneLabel').textContent = '【' + targetYear + '年の個人月サイクル】';
   document.getElementById('monthFortuneNum').textContent = monthFortune;
   document.getElementById('monthFortuneKw').textContent = mMsg.kw;
   document.getElementById('monthFortuneDesc').textContent = mMsg.desc;
   document.getElementById('monthFortuneFormulaStandard').textContent = formulaPersonalMonthC(birthYear, month, day, targetYear);
-  document.getElementById('monthFortuneFormulaA').textContent = formulaPersonalMonthA(yearFortune, targetMonth);
-  document.getElementById('monthFortuneFormulaB').textContent = formulaPersonalMonthB(month, day, effectiveYear, targetMonth);
 
   document.getElementById('birthdaySwitchNote').textContent =
     formulaBirthdaySwitchNote(month, day, targetYear, targetMonth, targetDay, effectiveYear);
