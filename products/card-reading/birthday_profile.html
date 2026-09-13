@@ -148,7 +148,11 @@
     background:var(--panel2); border:1px solid var(--line); color:var(--ink);
     padding:6px 8px; border-radius:6px; font-family:inherit; font-size:.82rem;
   }
-  .fortune-grid{ display:flex; gap:14px; flex-wrap:wrap; }
+  .fortune-grid{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:16px; }
+  .fortune-group-label{
+    font-size:.74rem; color:var(--gold); font-weight:700; letter-spacing:.04em;
+    margin:4px 0 8px;
+  }
   .fortune-cell{
     flex:1; min-width:160px; background:var(--panel2); border:1px solid var(--line);
     border-radius:10px; padding:14px;
@@ -290,6 +294,20 @@
         <span>対象月</span>
         <select id="targetMonth"></select>
       </div>
+
+      <div class="fortune-group-label fd">【社会のサイクル】</div>
+      <div class="fortune-grid">
+        <div class="fortune-cell">
+          <div class="ft-label fd" id="universalYearLabel"></div>
+          <div class="ft-num" id="universalYearNum"></div>
+        </div>
+        <div class="fortune-cell">
+          <div class="ft-label fd" id="universalMonthLabel"></div>
+          <div class="ft-num" id="universalMonthNum"></div>
+        </div>
+      </div>
+
+      <div class="fortune-group-label fd">【あなたのサイクル】</div>
       <div class="fortune-grid">
         <div class="fortune-cell">
           <div class="ft-label fd" id="yearFortuneLabel"></div>
@@ -900,16 +918,28 @@ function reduceToMaster(n){
   return n;
 }
 
-// 年運数：誕生月＋誕生日＋対象年（西暦）の各桁を合計し、共通還元ルールを適用
+// 年運数（個人年サイクル / Personal Year）：誕生月＋誕生日＋対象年（西暦）の各桁を合計し、共通還元ルールを適用
 function calcYearFortune(month, day, targetYear){
   const digits = (String(month) + String(day) + String(targetYear)).split('').map(Number);
   const sum = digits.reduce((a,b)=>a+b, 0);
   return reduceToMaster(sum);
 }
 
-// 月運数：年運数＋対象月を合計し、共通還元ルールを適用
+// 月運数（個人月サイクル / Personal Month）：個人年サイクル＋対象月を合計し、共通還元ルールを適用
 function calcMonthFortune(yearFortune, targetMonth){
   return reduceToMaster(yearFortune + targetMonth);
+}
+
+// 社会年サイクル（Universal Year）：全員共通。対象年（西暦）の各桁を合計し、共通還元ルールを適用
+function calcUniversalYear(targetYear){
+  const digits = String(targetYear).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0);
+  return reduceToMaster(sum);
+}
+
+// 社会月サイクル（Universal Month）：全員共通。社会年サイクル＋対象月を合計し、共通還元ルールを適用
+function calcUniversalMonth(universalYear, targetMonth){
+  return reduceToMaster(universalYear + targetMonth);
 }
 
 /* ============================================================
@@ -996,17 +1026,26 @@ function renderFortune(){
   const targetYear = parseInt(document.getElementById('targetYear').value);
   const targetMonth = parseInt(document.getElementById('targetMonth').value);
 
+  // 【社会のサイクル】全員共通
+  const universalYear = calcUniversalYear(targetYear);
+  const universalMonth = calcUniversalMonth(universalYear, targetMonth);
+  document.getElementById('universalYearLabel').textContent = '【' + targetYear + '年の社会年サイクル】';
+  document.getElementById('universalYearNum').textContent = universalYear;
+  document.getElementById('universalMonthLabel').textContent = '【' + targetYear + '年' + targetMonth + '月の社会月サイクル】';
+  document.getElementById('universalMonthNum').textContent = universalMonth;
+
+  // 【あなたのサイクル】誕生日に基づく個人サイクル
   const yearFortune = calcYearFortune(month, day, targetYear);
   const monthFortune = calcMonthFortune(yearFortune, targetMonth);
   const yMsg = fortuneMessage(yearFortune);
   const mMsg = fortuneMessage(monthFortune);
 
-  document.getElementById('yearFortuneLabel').textContent = '【' + targetYear + '年の年運数】';
+  document.getElementById('yearFortuneLabel').textContent = '【' + targetYear + '年の個人年サイクル】';
   document.getElementById('yearFortuneNum').textContent = yearFortune;
   document.getElementById('yearFortuneKw').textContent = yMsg.kw;
   document.getElementById('yearFortuneDesc').textContent = yMsg.desc;
 
-  document.getElementById('monthFortuneLabel').textContent = '【' + targetYear + '年' + targetMonth + '月の月運数】';
+  document.getElementById('monthFortuneLabel').textContent = '【' + targetYear + '年' + targetMonth + '月の個人月サイクル】';
   document.getElementById('monthFortuneNum').textContent = monthFortune;
   document.getElementById('monthFortuneKw').textContent = mMsg.kw;
   document.getElementById('monthFortuneDesc').textContent = mMsg.desc;
