@@ -43,3 +43,15 @@
 - `moon_card_gallery.html?night=XX` へのディープリンクを実装し、該当する月夜カードを直接表示
 - PCではPDF印刷、スマートフォンでは画像保存に対応
 - `APP_REGISTRY.md` に BirthdayProfile を Active として追加登録
+
+### 2026-09-13 — BirthdayProfile Version 1.1
+
+- BirthdayProfileの数秘サイクル仕様を拡張
+- 「社会のサイクル」と「あなたのサイクル」の2階層表示を正式採用
+- 社会年サイクル・社会月サイクルを追加
+- 個人年サイクル・個人月サイクルの算出仕様を正式化
+- 誕生日を基準としたサイクル切替方式を正式採用
+- 対象日の判定基準を明文化
+- 数秘術の共通還元ルールはOS-DEC-008を継承
+- 上記仕様をOS-DEC-009「Birthday Profile 数秘サイクル仕様の正式化」として記録
+- `birthday_profile.html` をVersion 1.1として更新
