@@ -1042,9 +1042,11 @@ function formulaUniversalMonth(universalYear, targetMonth){
 }
 
 function formulaPersonalYear(month, day, effectiveYear){
-  const digits = (String(month) + String(day) + String(effectiveYear)).split('').map(Number);
+  // 表示順のみ「対象年→誕生月→誕生日」に変更（利用者提示の表記順を再現するため）。
+  // 合計は交換法則により順序に依存しないため、計算結果・内部ロジックは無変更。
+  const digits = (String(effectiveYear) + String(month) + String(day)).split('').map(Number);
   const sum = digits.reduce((a,b)=>a+b, 0);
-  return [month + '月 + ' + day + '日 + ' + effectiveYear + '年', '= ' + digits.join(' + '), '= ' + sum]
+  return [effectiveYear + '年 + ' + month + '月 + ' + day + '日', '= ' + digits.join(' + '), '= ' + sum]
     .concat(furtherReductionLines(sum)).join('\n');
 }
 
