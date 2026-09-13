@@ -33,3 +33,13 @@
 
 - DOC_STANDARD.md を Edition 1 / Version 2.1へ更新
 - Documentation Version Ruleを追加し、OS-root文書の版更新時にCHANGELOGまたはDECISIONSへ記録する運用を明文化
+
+### 2026-09-13 — BirthdayProfile Version 1.0
+
+- `products/card-reading/birthday_profile.html` を新規追加
+- 生年月日を1回入力することで、古代ハワイアンムーン・数秘術・宿曜占星術の3体系から基礎プロフィールを一覧表示する統合入口を実装
+- 数秘術に年運数・月運数を追加
+- 数秘術の共通還元ルールとして、1〜9および11・22・33を最終値とし、11・22・33はマスターナンバーとして保持
+- `moon_card_gallery.html?night=XX` へのディープリンクを実装し、該当する月夜カードを直接表示
+- PCではPDF印刷、スマートフォンでは画像保存に対応
+- `APP_REGISTRY.md` に BirthdayProfile を Active として追加登録

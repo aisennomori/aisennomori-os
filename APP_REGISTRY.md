@@ -33,6 +33,7 @@ Documentation Standard（`DOC_STANDARD.md`）は、会話・設計・ドキュ�
 | ManaCard | 未定 | 未定 | Planned |
 | SoulReading | 未定 | 未定 | Planned |
 | Healing | 未定 | 未定 | Planned |
+| BirthdayProfile | `products/card-reading/birthday_profile.html`（生年月日を一度入力し、古代ハワイアンムーン・数秘術・宿曜占星術の3体系から基礎プロフィールを一覧表示する統合入口） | 未定 | Active |
 
 ## 備考：MoonCardと`moon-tools`の関係
 
