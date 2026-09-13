@@ -161,6 +161,23 @@
   .fortune-note{
     font-size:.68rem; color:var(--soft); margin:-2px 0 10px;
   }
+
+  /* ── Version 1.1 ロジック検証用表示（fortune-verify配下）─────────
+     将来この検証用表示が不要になった場合は、.fortune-verify を
+     持つ要素をまとめて削除／非表示にすれば良い構造にしている。 */
+  .fortune-verify{ margin-top:8px; }
+  .fortune-formula-label{
+    font-size:.62rem; color:var(--gold-soft); letter-spacing:.04em; margin-top:2px;
+  }
+  .fortune-formula{
+    font-size:.66rem; color:var(--soft); white-space:pre-line; line-height:1.7;
+    margin:2px 0 0; font-family:"SFMono-Regular",Consolas,monospace,"Hiragino Sans",sans-serif;
+  }
+  .fortune-cycle-rule{
+    font-size:.66rem; color:var(--soft); white-space:pre-line; line-height:1.6;
+    margin:6px 0 4px; padding:8px 10px; background:rgba(255,255,255,.03);
+    border:1px dashed var(--line); border-radius:8px;
+  }
   .fortune-cell{
     flex:1; min-width:160px; background:var(--panel2); border:1px solid var(--line);
     border-radius:10px; padding:14px;
@@ -310,27 +327,44 @@
         <div class="fortune-cell">
           <div class="ft-label fd" id="universalYearLabel"></div>
           <div class="ft-num" id="universalYearNum"></div>
+          <div class="fortune-verify">
+            <div class="fortune-formula-label fd">計算式</div>
+            <pre class="fortune-formula" id="universalYearFormula"></pre>
+          </div>
         </div>
         <div class="fortune-cell">
           <div class="ft-label fd" id="universalMonthLabel"></div>
           <div class="ft-num" id="universalMonthNum"></div>
+          <div class="fortune-verify">
+            <div class="fortune-formula-label fd">計算式</div>
+            <pre class="fortune-formula" id="universalMonthFormula"></pre>
+          </div>
         </div>
       </div>
 
       <div class="fortune-group-label fd">【あなたのサイクル】</div>
       <div class="fortune-note fd">※ 個人年は誕生日に切り替わります</div>
+      <div class="fortune-cycle-rule fd fortune-verify" id="birthdaySwitchNote"></div>
       <div class="fortune-grid">
         <div class="fortune-cell">
           <div class="ft-label fd" id="yearFortuneLabel"></div>
           <div class="ft-num" id="yearFortuneNum"></div>
           <div class="ft-kw" id="yearFortuneKw"></div>
           <div class="ft-desc fd" id="yearFortuneDesc"></div>
+          <div class="fortune-verify">
+            <div class="fortune-formula-label fd">計算式</div>
+            <pre class="fortune-formula" id="yearFortuneFormula"></pre>
+          </div>
         </div>
         <div class="fortune-cell">
           <div class="ft-label fd" id="monthFortuneLabel"></div>
           <div class="ft-num" id="monthFortuneNum"></div>
           <div class="ft-kw" id="monthFortuneKw"></div>
           <div class="ft-desc fd" id="monthFortuneDesc"></div>
+          <div class="fortune-verify">
+            <div class="fortune-formula-label fd">還元過程</div>
+            <pre class="fortune-formula" id="monthFortuneFormula"></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -950,6 +984,67 @@ function getEffectivePersonalYear(birthMonth, birthDay, targetYear, targetMonth,
   return hasHadBirthdayThisYear ? targetYear : targetYear - 1;
 }
 
+/* ============================================================
+   ⑨ Version 1.1 ロジック検証用表示（算術式の可視化）
+   ------------------------------------------------------------
+   計算ロジック（上記の各calc関数）は一切変更せず、
+   表示専用の文字列を別途組み立てる。検証期間終了後は
+   このブロックと、HTML側の .fortune-verify 要素をまとめて
+   削除／非表示にすれば恒久UIへ戻せる。
+   ============================================================ */
+function furtherReductionLines(sum){
+  const lines = [];
+  let n = sum;
+  while(n > 9 && n !== 11 && n !== 22 && n !== 33){
+    const digs = String(n).split('').map(Number);
+    const next = digs.reduce((a,b)=>a+b, 0);
+    lines.push('→ ' + digs.join(' + '));
+    lines.push('= ' + next);
+    n = next;
+  }
+  if(n === 11 || n === 22 || n === 33){
+    lines.push('→ Master Number');
+  }
+  return lines;
+}
+
+function formulaUniversalYear(targetYear){
+  const digits = String(targetYear).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0);
+  return [digits.join(' + '), '= ' + sum].concat(furtherReductionLines(sum)).join('\n');
+}
+
+function formulaUniversalMonth(universalYear, targetMonth){
+  const sum = universalYear + targetMonth;
+  return ['社会年 ' + universalYear + ' + ' + targetMonth + '月', '= ' + sum]
+    .concat(furtherReductionLines(sum)).join('\n');
+}
+
+function formulaPersonalYear(month, day, effectiveYear){
+  const digits = (String(month) + String(day) + String(effectiveYear)).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0);
+  return [month + '月 + ' + day + '日 + ' + effectiveYear + '年', '= ' + digits.join(' + '), '= ' + sum]
+    .concat(furtherReductionLines(sum)).join('\n');
+}
+
+function formulaPersonalMonth(yearFortune, targetMonth){
+  // 「個人年＋対象月」という内部ロジックの式は表示しない（検証表示の表現調整）。
+  // 還元過程（合計値からの還元ステップ）のみを見せる。
+  const sum = yearFortune + targetMonth;
+  return [String(sum)].concat(furtherReductionLines(sum)).join('\n');
+}
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+function formulaBirthdaySwitchNote(birthMonth, birthDay, targetYear, targetMonth, targetDay, effectiveYear){
+  const hasHad = (targetMonth > birthMonth) || (targetMonth === birthMonth && targetDay >= birthDay);
+  const dateStr = targetYear + '/' + pad2(targetMonth) + '/' + pad2(targetDay);
+  if(hasHad){
+    return '判定基準：\n' + dateStr + ' 誕生日到達済み\n→ ' + effectiveYear + '年サイクルを使用';
+  }
+  return '判定基準：\n' + dateStr + ' 誕生日前\n→ 前年側（' + effectiveYear + '年）サイクルを使用';
+}
+
 // 社会年サイクル（Universal Year）：全員共通。対象年（西暦）の各桁を合計し、共通還元ルールを適用
 function calcUniversalYear(targetYear){
   const digits = String(targetYear).split('').map(Number);
@@ -1060,6 +1155,8 @@ function renderFortune(){
   document.getElementById('universalYearNum').textContent = universalYear;
   document.getElementById('universalMonthLabel').textContent = '【' + targetYear + '年' + targetMonth + '月の社会月サイクル】';
   document.getElementById('universalMonthNum').textContent = universalMonth;
+  document.getElementById('universalYearFormula').textContent = formulaUniversalYear(targetYear);
+  document.getElementById('universalMonthFormula').textContent = formulaUniversalMonth(universalYear, targetMonth);
 
   // 【あなたのサイクル】誕生日切替方式：対象日が誕生日前なら前年側の個人年を使う
   const effectiveYear = getEffectivePersonalYear(month, day, targetYear, targetMonth, targetDay);
@@ -1072,11 +1169,16 @@ function renderFortune(){
   document.getElementById('yearFortuneNum').textContent = yearFortune;
   document.getElementById('yearFortuneKw').textContent = yMsg.kw;
   document.getElementById('yearFortuneDesc').textContent = yMsg.desc;
+  document.getElementById('yearFortuneFormula').textContent = formulaPersonalYear(month, day, effectiveYear);
 
   document.getElementById('monthFortuneLabel').textContent = '【' + targetYear + '年' + targetMonth + '月の個人月サイクル】';
   document.getElementById('monthFortuneNum').textContent = monthFortune;
   document.getElementById('monthFortuneKw').textContent = mMsg.kw;
   document.getElementById('monthFortuneDesc').textContent = mMsg.desc;
+  document.getElementById('monthFortuneFormula').textContent = formulaPersonalMonth(yearFortune, targetMonth);
+
+  document.getElementById('birthdaySwitchNote').textContent =
+    formulaBirthdaySwitchNote(month, day, targetYear, targetMonth, targetDay, effectiveYear);
 }
 
 function renderSukuyo(year, month, day){
