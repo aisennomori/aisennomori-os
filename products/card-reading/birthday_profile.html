@@ -178,6 +178,10 @@
     margin:6px 0 4px; padding:8px 10px; background:rgba(255,255,255,.03);
     border:1px dashed var(--line); border-radius:8px;
   }
+  .fortune-standard-label{ color:var(--gold); font-weight:700; }
+  .fortune-refonly{
+    margin-top:10px; padding-top:8px; border-top:1px dashed var(--line); opacity:.75;
+  }
   .fortune-cell{
     flex:1; min-width:160px; background:var(--panel2); border:1px solid var(--line);
     border-radius:10px; padding:14px;
@@ -361,9 +365,20 @@
           <div class="ft-num" id="monthFortuneNum"></div>
           <div class="ft-kw" id="monthFortuneKw"></div>
           <div class="ft-desc fd" id="monthFortuneDesc"></div>
+
           <div class="fortune-verify">
-            <div class="fortune-formula-label fd">還元過程</div>
-            <pre class="fortune-formula" id="monthFortuneFormula"></pre>
+            <div class="fortune-formula-label fd fortune-standard-label">計算式（標準）</div>
+            <pre class="fortune-formula" id="monthFortuneFormulaStandard"></pre>
+          </div>
+
+          <div class="fortune-verify fortune-refonly">
+            <div class="fortune-formula-label fd">※以下は参考比較・検証用（正式値ではありません）</div>
+
+            <div class="fortune-formula-label fd">参考A（個人年＋対象月）</div>
+            <pre class="fortune-formula" id="monthFortuneFormulaA"></pre>
+
+            <div class="fortune-formula-label fd">参考B（誕生月＋誕生日＋採用サイクル年＋対象月を一括還元）</div>
+            <pre class="fortune-formula" id="monthFortuneFormulaB"></pre>
           </div>
         </div>
       </div>
@@ -971,9 +986,15 @@ function calcYearFortune(month, day, effectiveYear){
   return reduceToMaster(sum);
 }
 
-// 個人月サイクル（Personal Month）：対象日時点で有効な個人年サイクル＋対象月を合計し、共通還元ルールを適用
-function calcMonthFortune(yearFortune, targetMonth){
-  return reduceToMaster(yearFortune + targetMonth);
+// 個人月サイクル（Personal Month）：愛泉の杜標準（旧・検証C方式を正式昇格）
+// 対象年＋生年の各桁 ＋ 誕生月＋誕生日（整数のまま）を合計し、共通還元ルールを適用する。
+// ※対象月そのものは計算式に含めない。数秘術には複数流派の計算方式が存在するため、
+//   これを唯一の一般解としてではなく、BirthdayProfileにおける愛泉の杜標準として採用する。
+function calcMonthFortune(birthYear, birthMonth, birthDay, targetYear){
+  const yearDigits = String(targetYear).split('').map(Number);
+  const birthYearDigits = String(birthYear).split('').map(Number);
+  const sum = yearDigits.reduce((a,b)=>a+b,0) + birthYearDigits.reduce((a,b)=>a+b,0) + birthMonth + birthDay;
+  return reduceToMaster(sum);
 }
 
 // 誕生日切替方式：対象日が「その年の誕生日」以降なら対象年、まだ誕生日前なら前年を「有効年」として使う
@@ -1027,11 +1048,40 @@ function formulaPersonalYear(month, day, effectiveYear){
     .concat(furtherReductionLines(sum)).join('\n');
 }
 
-function formulaPersonalMonth(yearFortune, targetMonth){
-  // 「個人年＋対象月」という内部ロジックの式は表示しない（検証表示の表現調整）。
-  // 還元過程（合計値からの還元ステップ）のみを見せる。
-  const sum = yearFortune + targetMonth;
-  return [String(sum)].concat(furtherReductionLines(sum)).join('\n');
+// 検証A：現在の内部ロジックそのもの（個人年サイクル ＋ 対象月 → 還元）
+// ※これがVersion1.1現在、実際にアプリが使っている正式な計算経路
+function formulaPersonalMonthA(personalYear, targetMonth){
+  const sum = personalYear + targetMonth;
+  return [
+    '個人年 ' + personalYear + ' + ' + targetMonth + '月',
+    '= ' + sum
+  ].concat(furtherReductionLines(sum)).join('\n');
+}
+
+// 検証B：元データ（誕生月・誕生日・採用サイクル年・対象月）を一括展開して一度に還元
+// ※個人年をいったん計算・還元してから対象月を足すA方式とは異なる経路になる
+function formulaPersonalMonthB(month, day, effectiveYear, targetMonth){
+  const digits = (String(month) + String(day) + String(effectiveYear)).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0) + targetMonth;
+  return [
+    month + '月 + ' + day + '日 + ' + effectiveYear + '年 + ' + targetMonth + '月',
+    '= ' + digits.join(' + ') + ' + ' + targetMonth,
+    '= ' + sum
+  ].concat(furtherReductionLines(sum)).join('\n');
+}
+
+// 標準の計算式表示：対象年＋生年＋誕生月＋誕生日（月日は整数のまま）を段組みで展開
+function formulaPersonalMonthC(birthYear, birthMonth, birthDay, targetYear){
+  const yearDigits = String(targetYear).split('').map(Number);
+  const birthYearDigits = String(birthYear).split('').map(Number);
+  const sum = yearDigits.reduce((a,b)=>a+b,0) + birthYearDigits.reduce((a,b)=>a+b,0) + birthMonth + birthDay;
+  return [
+    targetYear + '年 + ' + birthYear + '年 + ' + birthMonth + '月 + ' + birthDay + '日',
+    '= ' + yearDigits.join(' + '),
+    '+ ' + birthYearDigits.join(' + '),
+    '+ ' + birthMonth + ' + ' + birthDay,
+    '= ' + sum
+  ].concat(furtherReductionLines(sum)).join('\n');
 }
 
 function pad2(n){ return String(n).padStart(2,'0'); }
@@ -1143,7 +1193,7 @@ function renderNumerology(){
 }
 
 function renderFortune(){
-  const { month, day } = currentBirth;
+  const { year: birthYear, month, day } = currentBirth;
   const targetYear = parseInt(document.getElementById('targetYear').value);
   const targetMonth = parseInt(document.getElementById('targetMonth').value);
   const targetDay = parseInt(document.getElementById('targetDay').value);
@@ -1161,7 +1211,7 @@ function renderFortune(){
   // 【あなたのサイクル】誕生日切替方式：対象日が誕生日前なら前年側の個人年を使う
   const effectiveYear = getEffectivePersonalYear(month, day, targetYear, targetMonth, targetDay);
   const yearFortune = calcYearFortune(month, day, effectiveYear);
-  const monthFortune = calcMonthFortune(yearFortune, targetMonth);
+  const monthFortune = calcMonthFortune(birthYear, month, day, targetYear);
   const yMsg = fortuneMessage(yearFortune);
   const mMsg = fortuneMessage(monthFortune);
 
@@ -1171,11 +1221,13 @@ function renderFortune(){
   document.getElementById('yearFortuneDesc').textContent = yMsg.desc;
   document.getElementById('yearFortuneFormula').textContent = formulaPersonalYear(month, day, effectiveYear);
 
-  document.getElementById('monthFortuneLabel').textContent = '【' + targetYear + '年' + targetMonth + '月の個人月サイクル】';
+  document.getElementById('monthFortuneLabel').textContent = '【' + targetYear + '年の個人月サイクル（愛泉の杜標準）】';
   document.getElementById('monthFortuneNum').textContent = monthFortune;
   document.getElementById('monthFortuneKw').textContent = mMsg.kw;
   document.getElementById('monthFortuneDesc').textContent = mMsg.desc;
-  document.getElementById('monthFortuneFormula').textContent = formulaPersonalMonth(yearFortune, targetMonth);
+  document.getElementById('monthFortuneFormulaStandard').textContent = formulaPersonalMonthC(birthYear, month, day, targetYear);
+  document.getElementById('monthFortuneFormulaA').textContent = formulaPersonalMonthA(yearFortune, targetMonth);
+  document.getElementById('monthFortuneFormulaB').textContent = formulaPersonalMonthB(month, day, effectiveYear, targetMonth);
 
   document.getElementById('birthdaySwitchNote').textContent =
     formulaBirthdaySwitchNote(month, day, targetYear, targetMonth, targetDay, effectiveYear);
