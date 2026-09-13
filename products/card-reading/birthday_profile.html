@@ -153,6 +153,9 @@
     font-size:.74rem; color:var(--gold); font-weight:700; letter-spacing:.04em;
     margin:4px 0 8px;
   }
+  .fortune-note{
+    font-size:.68rem; color:var(--soft); margin:-2px 0 10px;
+  }
   .fortune-cell{
     flex:1; min-width:160px; background:var(--panel2); border:1px solid var(--line);
     border-radius:10px; padding:14px;
@@ -293,6 +296,8 @@
         <select id="targetYear"></select>
         <span>対象月</span>
         <select id="targetMonth"></select>
+        <span>対象日</span>
+        <select id="targetDay"></select>
       </div>
 
       <div class="fortune-group-label fd">【社会のサイクル】</div>
@@ -308,6 +313,7 @@
       </div>
 
       <div class="fortune-group-label fd">【あなたのサイクル】</div>
+      <div class="fortune-note fd">※ 個人年は誕生日に切り替わります</div>
       <div class="fortune-grid">
         <div class="fortune-cell">
           <div class="ft-label fd" id="yearFortuneLabel"></div>
@@ -918,16 +924,25 @@ function reduceToMaster(n){
   return n;
 }
 
-// 年運数（個人年サイクル / Personal Year）：誕生月＋誕生日＋対象年（西暦）の各桁を合計し、共通還元ルールを適用
-function calcYearFortune(month, day, targetYear){
-  const digits = (String(month) + String(day) + String(targetYear)).split('').map(Number);
+// 個人年サイクル（Personal Year）：誕生月＋誕生日＋「有効年（西暦）」の各桁を合計し、共通還元ルールを適用
+// ※ここで渡す年は暦年ではなく、誕生日切替方式で判定した「有効年」（getEffectivePersonalYear参照）
+function calcYearFortune(month, day, effectiveYear){
+  const digits = (String(month) + String(day) + String(effectiveYear)).split('').map(Number);
   const sum = digits.reduce((a,b)=>a+b, 0);
   return reduceToMaster(sum);
 }
 
-// 月運数（個人月サイクル / Personal Month）：個人年サイクル＋対象月を合計し、共通還元ルールを適用
+// 個人月サイクル（Personal Month）：対象日時点で有効な個人年サイクル＋対象月を合計し、共通還元ルールを適用
 function calcMonthFortune(yearFortune, targetMonth){
   return reduceToMaster(yearFortune + targetMonth);
+}
+
+// 誕生日切替方式：対象日が「その年の誕生日」以降なら対象年、まだ誕生日前なら前年を「有効年」として使う
+// 例：1968/10/18生まれ／対象日2026/10/17→有効年2025、対象日2026/10/18→有効年2026
+function getEffectivePersonalYear(birthMonth, birthDay, targetYear, targetMonth, targetDay){
+  const hasHadBirthdayThisYear =
+    (targetMonth > birthMonth) || (targetMonth === birthMonth && targetDay >= birthDay);
+  return hasHadBirthdayThisYear ? targetYear : targetYear - 1;
 }
 
 // 社会年サイクル（Universal Year）：全員共通。対象年（西暦）の各桁を合計し、共通還元ルールを適用
@@ -985,14 +1000,20 @@ function isValidDate(y, m, d){
 
   const targetYearSel = document.getElementById('targetYear');
   const targetMonthSel = document.getElementById('targetMonth');
+  const targetDaySel = document.getElementById('targetDay');
   for(let y = nowY - 1; y <= nowY + 3; y++){
     targetYearSel.appendChild(new Option(y + '年', y));
   }
   for(let m = 1; m <= 12; m++){
     targetMonthSel.appendChild(new Option(m + '月', m));
   }
+  for(let d = 1; d <= 31; d++){
+    targetDaySel.appendChild(new Option(d + '日', d));
+  }
+  const today = new Date();
   targetYearSel.value = nowY;
-  targetMonthSel.value = new Date().getMonth() + 1;
+  targetMonthSel.value = today.getMonth() + 1;
+  targetDaySel.value = today.getDate();
 })();
 
 let currentBirth = null; // { name, year, month, day }
@@ -1025,8 +1046,9 @@ function renderFortune(){
   const { month, day } = currentBirth;
   const targetYear = parseInt(document.getElementById('targetYear').value);
   const targetMonth = parseInt(document.getElementById('targetMonth').value);
+  const targetDay = parseInt(document.getElementById('targetDay').value);
 
-  // 【社会のサイクル】全員共通
+  // 【社会のサイクル】全員共通（誕生日とは無関係。従来通り対象年・対象月で計算）
   const universalYear = calcUniversalYear(targetYear);
   const universalMonth = calcUniversalMonth(universalYear, targetMonth);
   document.getElementById('universalYearLabel').textContent = '【' + targetYear + '年の社会年サイクル】';
@@ -1034,13 +1056,14 @@ function renderFortune(){
   document.getElementById('universalMonthLabel').textContent = '【' + targetYear + '年' + targetMonth + '月の社会月サイクル】';
   document.getElementById('universalMonthNum').textContent = universalMonth;
 
-  // 【あなたのサイクル】誕生日に基づく個人サイクル
-  const yearFortune = calcYearFortune(month, day, targetYear);
+  // 【あなたのサイクル】誕生日切替方式：対象日が誕生日前なら前年側の個人年を使う
+  const effectiveYear = getEffectivePersonalYear(month, day, targetYear, targetMonth, targetDay);
+  const yearFortune = calcYearFortune(month, day, effectiveYear);
   const monthFortune = calcMonthFortune(yearFortune, targetMonth);
   const yMsg = fortuneMessage(yearFortune);
   const mMsg = fortuneMessage(monthFortune);
 
-  document.getElementById('yearFortuneLabel').textContent = '【' + targetYear + '年の個人年サイクル】';
+  document.getElementById('yearFortuneLabel').textContent = '【' + targetYear + '年' + targetMonth + '月' + targetDay + '日時点の個人年サイクル】';
   document.getElementById('yearFortuneNum').textContent = yearFortune;
   document.getElementById('yearFortuneKw').textContent = yMsg.kw;
   document.getElementById('yearFortuneDesc').textContent = yMsg.desc;
@@ -1092,6 +1115,7 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 
 document.getElementById('targetYear').addEventListener('change', () => { if(currentBirth) renderFortune(); });
 document.getElementById('targetMonth').addEventListener('change', () => { if(currentBirth) renderFortune(); });
+document.getElementById('targetDay').addEventListener('change', () => { if(currentBirth) renderFortune(); });
 
 /* ============================================================
    ⑧ 印刷／画像保存（正本: moon_calendar.htmlの方式を踏襲）
