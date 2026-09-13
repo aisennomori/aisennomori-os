@@ -942,6 +942,17 @@ iosModal.addEventListener('click', (e) => {
 
 render();
 
+// ── ディープリンク対応（?night=1〜30） ─────────────────────────
+// birthday_profile.html等、外部ツールから「特定の夜のカード」を直接開くための機能。
+// 不正値（範囲外・非数値）の場合は何もせず、従来通りギャラリー先頭（第1夜）を表示する。
+(function applyDeepLinkNight(){
+  const params = new URLSearchParams(location.search);
+  const night = Number(params.get('night'));
+  if(Number.isInteger(night) && night >= 1 && night <= TOTAL){
+    goTo(night - 1, false);
+  }
+})();
+
 </script>
 </body>
 </html>

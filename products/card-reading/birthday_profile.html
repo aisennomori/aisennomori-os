@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>生年月日統合プロフィール | 愛泉の杜</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   :root{
     --bg:#0F1626;
@@ -104,6 +105,9 @@
   .section.moon .eyebrow{ color:var(--hawaii); }
   .section.numero .eyebrow{ color:var(--numero); }
   .section.sukuyo .eyebrow{ color:var(--sukuyo); }
+  .section .section-sub{
+    font-size:.72rem; color:var(--soft); margin-bottom:14px; letter-spacing:.03em;
+  }
   .section h2{ font-size:1.15rem; margin:0 0 18px; font-weight:600; }
 
   .headline-row{ display:flex; align-items:center; gap:18px; margin-bottom:16px; }
@@ -160,6 +164,55 @@
     font-size:.76rem; color:var(--soft); line-height:2;
   }
 
+  /* ── 印刷／画像保存 ───────────────────────────── */
+  .pbtn{
+    display:block; width:calc(100% - 48px); max-width:592px; margin:36px auto 0;
+    padding:15px; background:var(--panel2); border:1px solid var(--gold-soft);
+    color:var(--gold); border-radius:12px; font-size:.92rem; font-weight:700;
+    letter-spacing:.06em; cursor:pointer; font-family:inherit;
+  }
+  .pbtn:active{ opacity:.85; }
+  .phint{
+    text-align:center; font-size:.72rem; color:var(--soft); margin:8px 0 10px;
+    font-family:"Hiragino Sans","Yu Gothic",sans-serif;
+  }
+
+  @media print{
+    body{ background:#fff; color:#1B1506; }
+    .hero, .input-card, .pbtn, .phint, .result-head .lead,
+    .detail-link, .fortune-selectors, .caveat, .ios-modal-overlay{ display:none !important; }
+    .section{ border:1px solid #ddd; background:#fff; color:#1B1506; box-shadow:none; }
+    .section .body-text, .section .kw-tags span{ color:#333; }
+    .fortune-cell{ background:#F7F5EF; border-color:#ddd; }
+    .fortune-cell .ft-desc{ color:#333; }
+    .headline-row .num-badge{ background:#F0E9D8 !important; border-color:#ddd !important; }
+  }
+
+  /* ── 画像として保存（スマホ） ───────────────────── */
+  .ios-modal-overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.78);
+    z-index:9999; align-items:flex-end; justify-content:center;
+  }
+  .ios-modal-overlay.active{ display:flex; }
+  .ios-modal{
+    background:var(--panel); border-radius:22px 22px 0 0; padding:24px 18px 44px;
+    width:100%; max-width:560px; text-align:center;
+  }
+  .ios-modal h3{ font-size:1rem; font-weight:700; margin:0 0 14px; color:var(--ink); }
+  .ios-modal img#capturedImg{
+    width:100%; border-radius:12px; border:1px solid var(--line); margin-bottom:14px;
+  }
+  .ios-modal .guide-text{
+    font-size:.82rem; color:var(--soft); line-height:1.75; margin-bottom:18px;
+    font-family:"Hiragino Sans","Yu Gothic",sans-serif;
+  }
+  .ios-modal .guide-text strong{ color:var(--ink); }
+  .ios-modal-close{
+    width:100%; padding:13px; border-radius:12px; border:1px solid var(--line);
+    background:var(--panel2); font-size:.9rem; cursor:pointer; color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic",sans-serif;
+  }
+
   @media (max-width:480px){
     .hero{ padding:40px 18px 28px; }
     .section{ padding:22px 18px; }
@@ -194,6 +247,7 @@
 </div>
 
 <div class="result" id="result">
+  <div id="profileResultCapture">
   <div class="result-head">
     <div class="name" id="rName"></div>
     <div class="date fd" id="rDate"></div>
@@ -201,7 +255,8 @@
   </div>
 
   <div class="section moon">
-    <div class="eyebrow fd">🌺 HAWAIIAN MOON</div>
+    <div class="eyebrow fd">🌺 ① 古代ハワイアンムーン</div>
+    <div class="section-sub fd">月の満ち欠け × 自然のリズム</div>
     <h2>バースデームーン</h2>
     <div class="headline-row">
       <img id="moonImg" src="" alt="">
@@ -213,11 +268,12 @@
     </div>
     <div class="keyword-line" id="moonKeyword"></div>
     <div class="body-text fd" id="moonBody"></div>
-    <a class="detail-link" href="../moon-tools/moon_reading.html" target="_blank">詳しく見る →</a>
+    <a class="detail-link" id="moonDetailLink" href="../moon-tools/moon_card_gallery.html" target="_blank">この月夜を詳しく見る →</a>
   </div>
 
   <div class="section numero">
-    <div class="eyebrow fd">🔢 NUMEROLOGY</div>
+    <div class="eyebrow fd">🔢 ② 数秘術</div>
+    <div class="section-sub fd">太陽暦 × 数字の象徴</div>
     <h2>あなたの数秘</h2>
     <div class="headline-row">
       <div class="num-badge" id="numBadge"></div>
@@ -253,7 +309,8 @@
   </div>
 
   <div class="section sukuyo">
-    <div class="eyebrow fd">🌙 SUKUYO</div>
+    <div class="eyebrow fd">🌙 ③ 宿曜占星術</div>
+    <div class="section-sub fd">月の運行 × 27宿</div>
     <h2>あなたの本命宿</h2>
     <div class="headline-row">
       <div class="num-badge" id="shukuBadge"></div>
@@ -267,10 +324,23 @@
     <div class="body-text fd" id="shukuMeta"></div>
     <a class="detail-link" href="sukuyo_individual.html" target="_blank">詳しく見る →</a>
   </div>
+  </div>
 
   <div class="caveat fd">
     この結果は、異なる伝統や体系から自分自身を見つめるためのヒントです。<br>
     正解として受け取るのではなく、心に響く部分を自己理解のきっかけとしてお使いください。
+  </div>
+
+  <button class="pbtn fd" id="pBtn">📄 PDFとして印刷</button>
+  <p class="phint fd" id="printHint">印刷ダイアログで「PDFに保存」を選ぶとPDF化できます</p>
+
+  <div class="ios-modal-overlay" id="iosModal">
+    <div class="ios-modal">
+      <h3>📸 画像を保存してください</h3>
+      <img id="capturedImg" src="" alt="キャプチャ画像">
+      <p class="guide-text">画像を<strong>長押し</strong>して<br>「<strong>写真に追加</strong>」または「<strong>画像を保存</strong>」を選んでください</p>
+      <button class="ios-modal-close" id="iosModalClose">閉じる</button>
+    </div>
   </div>
 </div>
 
@@ -908,6 +978,7 @@ function renderMoon(year, month, day){
   document.getElementById('moonMeta').textContent = '第' + night.n + '夜 ／ ' + CYCLE_NAMES[night.cycle];
   document.getElementById('moonKeyword').textContent = reading.keyword;
   document.getElementById('moonBody').textContent = reading.headline + '。' + reading.body;
+  document.getElementById('moonDetailLink').href = '../moon-tools/moon_card_gallery.html?night=' + night.n;
 }
 
 function renderNumerology(){
@@ -982,6 +1053,46 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 
 document.getElementById('targetYear').addEventListener('change', () => { if(currentBirth) renderFortune(); });
 document.getElementById('targetMonth').addEventListener('change', () => { if(currentBirth) renderFortune(); });
+
+/* ============================================================
+   ⑧ 印刷／画像保存（正本: moon_calendar.htmlの方式を踏襲）
+   ============================================================ */
+function isMobileSave(){
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+
+document.getElementById('pBtn').addEventListener('click', async function(){
+  if(!isMobileSave()){ window.print(); return; }
+  const btn = this;
+  const origText = btn.textContent;
+  btn.textContent = '生成中...'; btn.disabled = true;
+  try{
+    const canvas = await html2canvas(document.getElementById('profileResultCapture'), {
+      scale:2, useCORS:true, allowTaint:true, logging:false, backgroundColor:'#0F1626'
+    });
+    document.getElementById('capturedImg').src = canvas.toDataURL('image/png');
+    document.getElementById('iosModal').classList.add('active');
+  }catch(e){
+    alert('キャプチャに失敗しました。\nスクリーンショットで保存してください。');
+  }finally{
+    btn.textContent = origText; btn.disabled = false;
+  }
+});
+document.getElementById('iosModalClose').addEventListener('click', function(){
+  document.getElementById('iosModal').classList.remove('active');
+  document.getElementById('capturedImg').src = '';
+});
+document.getElementById('iosModal').addEventListener('click', function(e){
+  if(e.target === this){ this.classList.remove('active'); document.getElementById('capturedImg').src=''; }
+});
+
+(function(){
+  if(isMobileSave()){
+    document.getElementById('pBtn').textContent = '📸 画像として保存';
+    document.getElementById('printHint').textContent = '画像が表示されます。長押しして写真に保存してください。';
+  }
+})();
 
 </script>
 </body>
