@@ -65,6 +65,11 @@
   .base-number .label{ font-size:.76rem; color:var(--soft); margin-bottom:4px; }
   .base-number .value{ font-size:1.6rem; font-weight:700; color:var(--gold); }
 
+  .base-date{
+    text-align:center; font-size:.76rem; color:var(--soft); margin-bottom:10px;
+  }
+  .base-date strong{ color:var(--ink); }
+
   table{
     width:100%; border-collapse:collapse; background:var(--panel);
     border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:.86rem;
@@ -113,7 +118,6 @@
 <div class="hero">
   <div class="mark">✦ 愛泉の杜 ✦</div>
   <h1>数秘サイクル検算表</h1>
-  <div class="sub">セルフ再鑑用ツール（手計算の検算専用・解説文なし）</div>
 </div>
 
 <div class="input-card">
@@ -134,6 +138,7 @@
 </div>
 
 <div class="result" id="result">
+  <div class="base-date" id="baseDateLine"></div>
   <div class="base-number">
     <div class="label">誕生数秘</div>
     <div class="value" id="baseNumberValue"></div>
@@ -329,10 +334,17 @@ document.getElementById('submitBtn').addEventListener('click', () => {
   // 誕生数秘（基礎数）
   document.getElementById('baseNumberValue').textContent = calcTalentNumber(birthYear, birthMonth, birthDay);
 
-  // 対象年月マトリックス：今月から12ヶ月分。対象日は常に誕生日の「日」を使用する。
+  // 対象年月マトリックス：「今アクティブな個人年サイクル」の起点（誕生月）から12ヶ月分固定。
+  // 「今日が何月か」には依存させない。これにより、次の誕生日が来るまでは
+  // いつ開いても同じ表になる（誕生日をまたいだ瞬間だけ、次のサイクルへ切り替わる）。
   const today = new Date();
-  let rowYear = today.getFullYear();
-  let rowMonth = today.getMonth() + 1;
+  const cycleStartYear = getEffectivePersonalYear(
+    birthMonth, birthDay, today.getFullYear(), today.getMonth()+1, today.getDate()
+  );
+  document.getElementById('baseDateLine').innerHTML =
+    '基準日：<strong>' + birthDay + '日</strong>';
+  let rowYear = cycleStartYear;
+  let rowMonth = birthMonth;
 
   const tbody = document.getElementById('matrixBody');
   tbody.innerHTML = '';
