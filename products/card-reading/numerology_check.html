@@ -93,6 +93,7 @@
   .formula-item{ margin-bottom:14px; }
   .formula-item:last-child{ margin-bottom:0; }
   .formula-item .f-label{ font-size:.72rem; color:var(--soft); margin-bottom:3px; }
+  .formula-item .f-note{ font-size:.7rem; color:var(--gold-soft); margin-bottom:6px; }
   .formula-item pre{
     font-size:.72rem; color:var(--soft); white-space:pre-line; line-height:1.7; margin:0;
     font-family:"SFMono-Regular",Consolas,monospace,"Hiragino Sans",sans-serif;
@@ -169,7 +170,7 @@
       <pre id="fUniversalMonth"></pre>
     </div>
     <div class="formula-item">
-      <div class="f-label">判定基準</div>
+      <div class="f-label">個人年サイクルの判定基準</div>
       <pre id="fSwitchNote"></pre>
     </div>
     <div class="formula-item">
@@ -177,6 +178,7 @@
       <pre id="fPersonalYear"></pre>
     </div>
     <div class="formula-item">
+      <div class="f-note" id="fPersonalMonthNote"></div>
       <div class="f-label">個人月サイクル 計算式</div>
       <pre id="fPersonalMonth"></pre>
     </div>
@@ -288,9 +290,9 @@ function formulaBirthdaySwitchNote(birthMonth, birthDay, targetYear, targetMonth
   const hasHad = (targetMonth > birthMonth) || (targetMonth === birthMonth && targetDay >= birthDay);
   const dateStr = targetYear + '/' + pad2(targetMonth) + '/' + pad2(targetDay);
   if(hasHad){
-    return '判定基準：\n' + dateStr + ' 誕生日到達済み\n→ ' + effectiveYear + '年サイクルを使用';
+    return dateStr + ' 誕生日到達済み\n→ 個人年は' + effectiveYear + '年を使用';
   }
-  return '判定基準：\n' + dateStr + ' 誕生日前\n→ 前年側（' + effectiveYear + '年）サイクルを使用';
+  return dateStr + ' 誕生日前\n→ 個人年は前年側（' + effectiveYear + '年）を使用';
 }
 
 /* ============================================================
@@ -380,6 +382,8 @@ document.getElementById('submitBtn').addEventListener('click', () => {
   document.getElementById('fSwitchNote').textContent =
     formulaBirthdaySwitchNote(birthMonth, birthDay, firstRow.rowYear, firstRow.rowMonth, birthDay, firstRow.effectiveYear);
   document.getElementById('fPersonalYear').textContent = formulaPersonalYear(birthMonth, birthDay, firstRow.effectiveYear);
+  document.getElementById('fPersonalMonthNote').textContent =
+    '※個人月は誕生日による年切替を使用せず、対象年' + firstRow.rowYear + '年を使用';
   document.getElementById('fPersonalMonth').textContent = formulaPersonalMonthC(birthYear, birthMonth, birthDay, firstRow.rowYear);
 
   document.getElementById('result').style.display = 'block';
