@@ -334,17 +334,14 @@ document.getElementById('submitBtn').addEventListener('click', () => {
   // 誕生数秘（基礎数）
   document.getElementById('baseNumberValue').textContent = calcTalentNumber(birthYear, birthMonth, birthDay);
 
-  // 対象年月マトリックス：「今アクティブな個人年サイクル」の起点（誕生月）から12ヶ月分固定。
-  // 「今日が何月か」には依存させない。これにより、次の誕生日が来るまでは
-  // いつ開いても同じ表になる（誕生日をまたいだ瞬間だけ、次のサイクルへ切り替わる）。
+  // 対象年月マトリックス：今日の年月を先頭行とし、そこから12ヶ月分。
+  // 各行の個人年・個人月は、対象日＝誕生日の「日」（birthDay）で計算する
+  // （誕生日の日から新しくカウント1される、という仕様のため）。
   const today = new Date();
-  const cycleStartYear = getEffectivePersonalYear(
-    birthMonth, birthDay, today.getFullYear(), today.getMonth()+1, today.getDate()
-  );
   document.getElementById('baseDateLine').innerHTML =
     '基準日：<strong>' + birthDay + '日</strong>';
-  let rowYear = cycleStartYear;
-  let rowMonth = birthMonth;
+  let rowYear = today.getFullYear();
+  let rowMonth = today.getMonth() + 1;
 
   const tbody = document.getElementById('matrixBody');
   tbody.innerHTML = '';
