@@ -141,6 +141,11 @@
     padding-bottom:1px; font-family:"Hiragino Sans","Yu Gothic",sans-serif;
   }
 
+  .counselor-note{
+    margin-top:16px; padding-top:14px; border-top:1px dashed var(--line);
+    font-size:.76rem; color:var(--soft); line-height:1.9;
+  }
+
   /* ── 数秘：年運/月運 ───────────────────────────── */
   .fortune-box{
     margin-top:18px; padding-top:18px; border-top:1px dashed var(--line);
@@ -165,7 +170,17 @@
   /* ── Version 1.1 ロジック検証用表示（fortune-verify配下）─────────
      将来この検証用表示が不要になった場合は、.fortune-verify を
      持つ要素をまとめて削除／非表示にすれば良い構造にしている。 */
-  .fortune-verify{ margin-top:8px; }
+  .fortune-verify{ display:none; margin-top:8px; }
+  body.show-formulas .fortune-verify{ display:block; }
+
+  .calc-toggle-field{
+    display:flex; align-items:center; gap:8px; margin:-8px 0 20px;
+    font-size:.82rem; color:var(--soft); font-family:"Hiragino Sans","Yu Gothic",sans-serif;
+  }
+  .calc-toggle-field input[type=checkbox]{
+    width:16px; height:16px; accent-color:var(--gold); cursor:pointer;
+  }
+  .calc-toggle-field label{ cursor:pointer; }
   .fortune-formula-label{
     font-size:.62rem; color:var(--gold-soft); letter-spacing:.04em; margin-top:2px;
   }
@@ -276,6 +291,10 @@
       <select id="dayInput"></select>
     </div>
   </div>
+  <div class="calc-toggle-field">
+    <input type="checkbox" id="showCalcToggle">
+    <label for="showCalcToggle">計算式を表示する</label>
+  </div>
   <button class="submit-btn fd" id="submitBtn">プロフィールを見る</button>
 </div>
 
@@ -374,6 +393,10 @@
       </div>
     </div>
     <a class="detail-link" href="talent_number.html" target="_blank">詳しく見る →</a>
+    <div class="counselor-note fd">
+      数秘術には複数の考え方や読み解き方があります。この結果は、自分自身を見つめるためのひとつのヒントとしてご活用ください。<br>
+      数字の意味やサイクルについて、より詳しく知りたい場合は、数秘カウンセラーなど専門家に相談しながら読み解いていくこともおすすめです。
+    </div>
   </div>
 
   <div class="section sukuyo">
@@ -1104,10 +1127,57 @@ function calcUniversalMonth(universalYear, targetMonth){
    数秘の基礎数（TALENTS）のキーワード・特性を流用し、
    「年運・月運としての読み方」に言い換えて表示する。
    ============================================================ */
-function fortuneMessage(number){
-  const t = TALENTS[number];
-  if(!t) return { kw:'', desc:'' };
-  return { kw:t.keyword, desc:t.traits };
+
+/* ============================================================
+   数秘の解釈データは3レイヤーに分離する（人物像とサイクルの意味を混同しない）
+   1. 基礎数秘（TALENTS）        …その人の資質・傾向（無変更・renderNumerologyで直接参照）
+   2. 個人年サイクルの解釈       …その年のテーマ・流れ・意識するとよいこと
+   3. 個人月サイクルの解釈       …その月のテーマ・過ごし方・行動のヒント
+   ------------------------------------------------------------
+   今回はまず構造のみ分離する。文章は「6」のみレビュー済みのサンプルとして
+   投入し、それ以外は準備中として明示する（MoonCard DEC-006の「完成して
+   いないことを隠さない」原則を踏襲）。文章は別途レビューの上で確定する。
+   ============================================================ */
+const PERSONAL_YEAR_INTERPRETATIONS = {
+  1: { desc:'新しい何かを始める、種をまくことがテーマになりやすい一年。まだ形になっていなくても、動き出すこと自体に意味がある時期。' },
+  2: { desc:'一人で抱え込むより、人との協力やタイミングを待つことがテーマになりやすい一年。じっくり関係を育てる時期。' },
+  3: { desc:'表現すること、楽しむこと、人とのつながりが広がりやすい一年。言葉や創作で発信すると流れが動きやすい時期。' },
+  4: { desc:'土台を整え、地道に積み重ねることがテーマになりやすい一年。派手さより、日々の積み重ねが力になる時期。' },
+  5: { desc:'変化や新しい風が入りやすい一年。予定通りにいかないことも、視野を広げるきっかけとして受け止めやすい時期。' },
+  6: { desc:'人との関係や暮らしを整え、支え合いや調和を育てることがテーマになりやすい一年。' },
+  7: { desc:'立ち止まり、深く考え、自分の内側を見つめることがテーマになりやすい一年。学びや探求が力になる時期。' },
+  8: { desc:'これまでの努力が形になりやすい一年。成果や責任と向き合い、現実的な基盤を築く時期。' },
+  9: { desc:'区切りをつけ、手放すことがテーマになりやすい一年。次の始まりに向けて、整理する時期。' },
+  11: { desc:'直感や気づきが冴えやすい一年。頭で考えすぎるより、感じたことを大切にしたい時期。' },
+  22: { desc:'大きな構想を現実に落とし込みやすい一年。理想と実務の両方に意識を向けたい時期。' },
+  33: { desc:'誰かのために力を尽くすことがテーマになりやすい一年。与えることが自分自身も満たす時期。' }
+};
+
+const PERSONAL_MONTH_INTERPRETATIONS = {
+  1: { desc:'新しいことを始めるのに向く月。小さな一歩でも、動き出すことで流れが変わりやすい時期。' },
+  2: { desc:'一人で急がず、人との呼吸を合わせることに意識が向きやすい月。焦らず待つことが吉と出やすい時期。' },
+  3: { desc:'表現や交流、楽しむことに意識が向きやすい月。言葉にする、発信することで気持ちが軽くなりやすい時期。' },
+  4: { desc:'計画や整理、基礎固めに向く月。地味に見える作業が、後になって効いてくる時期。' },
+  5: { desc:'変化や新しい刺激に意識が向きやすい月。予定を詰め込みすぎず、動きに身を委ねてみたい時期。' },
+  6: { desc:'身近な人との関係や生活環境に意識が向きやすい月。無理に広げるより、今あるつながりや日常を丁寧に整える時期。' },
+  7: { desc:'外へ広げるより、整理・振り返り・学びに向く月。一人の時間を意識的に持ちたい時期。' },
+  8: { desc:'成果を積み上げる、責任と結果に向き合うことに意識が向きやすい月。現実的な判断が求められやすい時期。' },
+  9: { desc:'整理や手放し、締めくくりに意識が向きやすい月。次に進む前の、区切りをつける時期。' },
+  11: { desc:'直感やインスピレーションに従うと流れに乗りやすい月。ひらめきをメモしておきたい時期。' },
+  22: { desc:'構想を形にする、理想と実務を結ぶことに意識が向きやすい月。腰を据えて取り組みたい時期。' },
+  33: { desc:'誰かを支える、思いやりを行動にすることに意識が向きやすい月。与えた分だけ自分にも返ってきやすい時期。' }
+};
+
+function yearCycleMessage(number){
+  const t = PERSONAL_YEAR_INTERPRETATIONS[number];
+  if(!t || !t.desc) return { kw:'', desc:'（この数字の個人年サイクル解釈は準備中です）' };
+  return { kw:'', desc:t.desc };
+}
+
+function monthCycleMessage(number){
+  const t = PERSONAL_MONTH_INTERPRETATIONS[number];
+  if(!t || !t.desc) return { kw:'', desc:'（この数字の個人月サイクル解釈は準備中です）' };
+  return { kw:'', desc:t.desc };
 }
 
 /* ============================================================
@@ -1204,8 +1274,8 @@ function renderFortune(){
   const effectiveYear = getEffectivePersonalYear(month, day, targetYear, targetMonth, targetDay);
   const yearFortune = calcYearFortune(month, day, effectiveYear);
   const monthFortune = calcMonthFortune(birthYear, month, day, targetYear);
-  const yMsg = fortuneMessage(yearFortune);
-  const mMsg = fortuneMessage(monthFortune);
+  const yMsg = yearCycleMessage(yearFortune);
+  const mMsg = monthCycleMessage(monthFortune);
 
   document.getElementById('yearFortuneLabel').textContent = '【' + targetYear + '年' + targetMonth + '月' + targetDay + '日時点の個人年サイクル】';
   document.getElementById('yearFortuneNum').textContent = yearFortune;
@@ -1265,6 +1335,11 @@ document.getElementById('submitBtn').addEventListener('click', () => {
 document.getElementById('targetYear').addEventListener('change', () => { if(currentBirth) renderFortune(); });
 document.getElementById('targetMonth').addEventListener('change', () => { if(currentBirth) renderFortune(); });
 document.getElementById('targetDay').addEventListener('change', () => { if(currentBirth) renderFortune(); });
+
+// 計算式表示トグル（初期値OFF）：.fortune-verify配下の表示/非表示を一括制御
+document.getElementById('showCalcToggle').addEventListener('change', function(){
+  document.body.classList.toggle('show-formulas', this.checked);
+});
 
 /* ============================================================
    ⑧ 印刷／画像保存（正本: moon_calendar.htmlの方式を踏襲）
