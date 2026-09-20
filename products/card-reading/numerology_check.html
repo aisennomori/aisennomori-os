@@ -41,6 +41,7 @@
     flex:1; padding:11px 8px; background:var(--panel2); border:1px solid var(--line);
     border-radius:8px; color:var(--ink); font-size:.92rem; font-family:inherit;
   }
+  .date-row #yearInput{ flex:1.7; font-size:.84rem; padding:11px 6px; }
   .calc-toggle-field{
     display:flex; align-items:center; gap:8px; margin:0 0 18px; font-size:.8rem; color:var(--soft);
   }
@@ -304,12 +305,31 @@ function isValidDate(y, m, d){
   return dt.getFullYear() === y && dt.getMonth() === m-1 && dt.getDate() === d;
 }
 
+// 和暦表示専用（表示ラベルのみ。計算ロジックには一切使用しない）
+function getJapaneseEraLabel(year) {
+  if (year >= 2020) return `令和${year - 2018}年`;
+  if (year === 2019) return '令和元年';
+
+  if (year >= 1990) return `平成${year - 1988}年`;
+  if (year === 1989) return '平成元年';
+
+  if (year >= 1927) return `昭和${year - 1925}年`;
+  if (year === 1926) return '昭和元年';
+
+  if (year >= 1913) return `大正${year - 1911}年`;
+
+  return '';
+}
+
 (function initSelectors(){
   const yearSel = document.getElementById('yearInput');
   const monthSel = document.getElementById('monthInput');
   const daySel = document.getElementById('dayInput');
   const nowY = new Date().getFullYear();
-  for(let y = nowY; y >= 1920; y--){ yearSel.appendChild(new Option(y + '年', y)); }
+  for(let y = nowY; y >= 1920; y--){
+    const wareki = getJapaneseEraLabel(y);
+    yearSel.appendChild(new Option(`${y}年${wareki ? `（${wareki}）` : ''}`, y));
+  }
   for(let m = 1; m <= 12; m++){ monthSel.appendChild(new Option(m + '月', m)); }
   for(let d = 1; d <= 31; d++){ daySel.appendChild(new Option(d + '日', d)); }
   yearSel.value = nowY - 30;
