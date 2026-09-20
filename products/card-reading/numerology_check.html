@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<!--
+  数秘サイクル検算表（愛泉の杜｜独自ツール）
+  目的：数秘カウンセラー自身が手計算した結果と一致するかを確認するためのセルフ検算ツール。
+  解説文・キーワードは意図的に含めない（解釈はカウンセラーの専門領域のため）。
+  計算ロジックは birthday_profile.html の正本関数をそのまま転記し、独自に再実装しない。
+-->
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数秘サイクル検算表 | 愛泉の杜</title>
+<style>
+  :root{
+    --bg:#0F1626;
+    --panel:#161F35;
+    --panel2:#1B2542;
+    --ink:#ECEAE2;
+    --soft:#9AA5C1;
+    --gold:#C9A24B;
+    --gold-soft:#8C7B4E;
+    --line:rgba(236,234,226,.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;
+    line-height:1.7; min-height:100vh; padding-bottom:50px;
+  }
+  .hero{ max-width:640px; margin:0 auto; padding:36px 20px 20px; text-align:center; }
+  .hero .mark{ font-size:.7rem; letter-spacing:.3em; color:var(--gold); margin-bottom:12px; }
+  .hero h1{ font-size:1.3rem; font-weight:600; margin:0 0 8px; }
+  .hero .sub{ font-size:.78rem; color:var(--soft); }
+
+  .input-card{ max-width:460px; margin:20px auto 0; padding:0 20px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:.76rem; color:var(--soft); margin-bottom:6px; }
+  .date-row{ display:flex; gap:8px; }
+  .date-row select{
+    flex:1; padding:11px 8px; background:var(--panel2); border:1px solid var(--line);
+    border-radius:8px; color:var(--ink); font-size:.92rem; font-family:inherit;
+  }
+  .calc-toggle-field{
+    display:flex; align-items:center; gap:8px; margin:0 0 18px; font-size:.8rem; color:var(--soft);
+  }
+  .calc-toggle-field input[type=checkbox]{ width:16px; height:16px; accent-color:var(--gold); cursor:pointer; }
+  .calc-toggle-field label{ cursor:pointer; }
+  .err-msg{
+    display:none; background:rgba(200,80,80,.12); border:1px solid rgba(200,80,80,.4);
+    color:#E3A4A4; padding:10px 14px; border-radius:8px; font-size:.8rem; margin-bottom:14px;
+  }
+  .submit-btn{
+    width:100%; padding:14px; background:linear-gradient(180deg,#D8B565,var(--gold));
+    color:#1B1506; border:none; border-radius:10px; font-size:.96rem; font-weight:700;
+    letter-spacing:.06em; cursor:pointer; font-family:inherit;
+  }
+  .submit-btn:active{ opacity:.85; }
+
+  .result{ display:none; max-width:640px; margin:30px auto 0; padding:0 20px; }
+  .base-number{
+    text-align:center; margin-bottom:20px; padding:16px; background:var(--panel);
+    border:1px solid var(--line); border-radius:12px;
+  }
+  .base-number .label{ font-size:.76rem; color:var(--soft); margin-bottom:4px; }
+  .base-number .value{ font-size:1.6rem; font-weight:700; color:var(--gold); }
+
+  table{
+    width:100%; border-collapse:collapse; background:var(--panel);
+    border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:.86rem;
+  }
+  thead th{
+    background:var(--panel2); color:var(--gold); font-weight:700; padding:10px 6px;
+    text-align:center; border-bottom:1px solid var(--line); white-space:nowrap;
+  }
+  tbody td{
+    padding:9px 6px; text-align:center; border-bottom:1px solid var(--line); color:var(--ink);
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:first-child td{ background:rgba(201,162,75,.08); font-weight:700; }
+  .ym-col{ color:var(--soft); font-weight:400 !important; }
+
+  .formula-block{
+    margin-top:22px; padding:16px 18px; background:var(--panel); border:1px solid var(--line);
+    border-radius:12px;
+  }
+  .formula-block h3{ font-size:.86rem; margin:0 0 12px; color:var(--gold); font-weight:700; }
+  .formula-item{ margin-bottom:14px; }
+  .formula-item:last-child{ margin-bottom:0; }
+  .formula-item .f-label{ font-size:.72rem; color:var(--soft); margin-bottom:3px; }
+  .formula-item pre{
+    font-size:.72rem; color:var(--soft); white-space:pre-line; line-height:1.7; margin:0;
+    font-family:"SFMono-Regular",Consolas,monospace,"Hiragino Sans",sans-serif;
+  }
+
+  @media (max-width:480px){
+    table{ font-size:.76rem; }
+    thead th, tbody td{ padding:7px 3px; }
+  }
+
+  @media print{
+    body{ background:#fff; color:#1B1506; }
+    .hero, .input-card{ display:none !important; }
+    table{ border:1px solid #ddd; background:#fff; }
+    thead th{ background:#F0E9D8; color:#1B1506; }
+    tbody td{ color:#1B1506; border-color:#ddd; }
+    .base-number, .formula-block{ background:#fff; border-color:#ddd; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="mark">✦ 愛泉の杜 ✦</div>
+  <h1>数秘サイクル検算表</h1>
+  <div class="sub">セルフ再鑑用ツール（手計算の検算専用・解説文なし）</div>
+</div>
+
+<div class="input-card">
+  <div class="err-msg" id="errMsg">生年月日が正しくありません。実在する日付を入力してください。</div>
+  <div class="field">
+    <label>生年月日</label>
+    <div class="date-row">
+      <select id="yearInput"></select>
+      <select id="monthInput"></select>
+      <select id="dayInput"></select>
+    </div>
+  </div>
+  <div class="calc-toggle-field">
+    <input type="checkbox" id="showCalcToggle">
+    <label for="showCalcToggle">計算式を表示する</label>
+  </div>
+  <button class="submit-btn" id="submitBtn">計算する</button>
+</div>
+
+<div class="result" id="result">
+  <div class="base-number">
+    <div class="label">誕生数秘</div>
+    <div class="value" id="baseNumberValue"></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>年月</th>
+        <th>社会年</th>
+        <th>社会月</th>
+        <th>個人年</th>
+        <th>個人月</th>
+      </tr>
+    </thead>
+    <tbody id="matrixBody"></tbody>
+  </table>
+
+  <div class="formula-block" id="formulaBlock" style="display:none;">
+    <h3 id="formulaBlockTitle"></h3>
+
+    <div class="formula-item">
+      <div class="f-label">社会年サイクル 計算式</div>
+      <pre id="fUniversalYear"></pre>
+    </div>
+    <div class="formula-item">
+      <div class="f-label">社会月サイクル 計算式</div>
+      <pre id="fUniversalMonth"></pre>
+    </div>
+    <div class="formula-item">
+      <div class="f-label">判定基準</div>
+      <pre id="fSwitchNote"></pre>
+    </div>
+    <div class="formula-item">
+      <div class="f-label">個人年サイクル 計算式</div>
+      <pre id="fPersonalYear"></pre>
+    </div>
+    <div class="formula-item">
+      <div class="f-label">個人月サイクル 計算式</div>
+      <pre id="fPersonalMonth"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   数秘ロジック（birthday_profile.html の正本関数をそのまま転記）
+   ============================================================ */
+function reduceToMaster(n){
+  while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+    n = String(n).split('').reduce((a,b)=>a+Number(b), 0);
+  }
+  return n;
+}
+
+function calcTalentNumber(y, m, d) {
+  const str = String(y) + String(m) + String(d);
+  const digits = str.split('').map(Number);
+  let sum = digits.reduce((a,b)=>a+b, 0);
+  while(sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+    const digs = String(sum).split('').map(Number);
+    sum = digs.reduce((a,b)=>a+b,0);
+  }
+  return sum;
+}
+
+function calcYearFortune(month, day, effectiveYear){
+  const digits = (String(month) + String(day) + String(effectiveYear)).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0);
+  return reduceToMaster(sum);
+}
+
+function calcMonthFortune(birthYear, birthMonth, birthDay, targetYear){
+  const yearDigits = String(targetYear).split('').map(Number);
+  const birthYearDigits = String(birthYear).split('').map(Number);
+  const sum = yearDigits.reduce((a,b)=>a+b,0) + birthYearDigits.reduce((a,b)=>a+b,0) + birthMonth + birthDay;
+  return reduceToMaster(sum);
+}
+
+function calcUniversalYear(targetYear){
+  const digits = String(targetYear).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0);
+  return reduceToMaster(sum);
+}
+
+function calcUniversalMonth(universalYear, targetMonth){
+  return reduceToMaster(universalYear + targetMonth);
+}
+
+function getEffectivePersonalYear(birthMonth, birthDay, targetYear, targetMonth, targetDay){
+  const hasHadBirthdayThisYear =
+    (targetMonth > birthMonth) || (targetMonth === birthMonth && targetDay >= birthDay);
+  return hasHadBirthdayThisYear ? targetYear : targetYear - 1;
+}
+
+function furtherReductionLines(sum){
+  const lines = [];
+  let n = sum;
+  while(n > 9 && n !== 11 && n !== 22 && n !== 33){
+    const digs = String(n).split('').map(Number);
+    const next = digs.reduce((a,b)=>a+b, 0);
+    lines.push('→ ' + digs.join(' + '));
+    lines.push('= ' + next);
+    n = next;
+  }
+  if(n === 11 || n === 22 || n === 33){
+    lines.push('→ Master Number');
+  }
+  return lines;
+}
+
+function pad2(n){ return String(n).padStart(2,'0'); }
+
+function formulaUniversalYear(targetYear){
+  const digits = String(targetYear).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0);
+  return [digits.join(' + '), '= ' + sum].concat(furtherReductionLines(sum)).join('\n');
+}
+
+function formulaUniversalMonth(universalYear, targetMonth){
+  const sum = universalYear + targetMonth;
+  return ['社会年 ' + universalYear + ' + ' + targetMonth + '月', '= ' + sum]
+    .concat(furtherReductionLines(sum)).join('\n');
+}
+
+function formulaPersonalYear(month, day, effectiveYear){
+  const digits = (String(effectiveYear) + String(month) + String(day)).split('').map(Number);
+  const sum = digits.reduce((a,b)=>a+b, 0);
+  return [effectiveYear + '年 + ' + month + '月 + ' + day + '日', '= ' + digits.join(' + '), '= ' + sum]
+    .concat(furtherReductionLines(sum)).join('\n');
+}
+
+function formulaPersonalMonthC(birthYear, birthMonth, birthDay, targetYear){
+  const yearDigits = String(targetYear).split('').map(Number);
+  const birthYearDigits = String(birthYear).split('').map(Number);
+  const sum = yearDigits.reduce((a,b)=>a+b,0) + birthYearDigits.reduce((a,b)=>a+b,0) + birthMonth + birthDay;
+  return [
+    targetYear + '年 + ' + birthYear + '年 + ' + birthMonth + '月 + ' + birthDay + '日',
+    '= ' + yearDigits.join(' + '),
+    '+ ' + birthYearDigits.join(' + '),
+    '+ ' + birthMonth + ' + ' + birthDay,
+    '= ' + sum
+  ].concat(furtherReductionLines(sum)).join('\n');
+}
+
+function formulaBirthdaySwitchNote(birthMonth, birthDay, targetYear, targetMonth, targetDay, effectiveYear){
+  const hasHad = (targetMonth > birthMonth) || (targetMonth === birthMonth && targetDay >= birthDay);
+  const dateStr = targetYear + '/' + pad2(targetMonth) + '/' + pad2(targetDay);
+  if(hasHad){
+    return '判定基準：\n' + dateStr + ' 誕生日到達済み\n→ ' + effectiveYear + '年サイクルを使用';
+  }
+  return '判定基準：\n' + dateStr + ' 誕生日前\n→ 前年側（' + effectiveYear + '年）サイクルを使用';
+}
+
+/* ============================================================
+   画面制御
+   ============================================================ */
+function isValidDate(y, m, d){
+  if(!y || !m || !d) return false;
+  const dt = new Date(y, m-1, d);
+  return dt.getFullYear() === y && dt.getMonth() === m-1 && dt.getDate() === d;
+}
+
+(function initSelectors(){
+  const yearSel = document.getElementById('yearInput');
+  const monthSel = document.getElementById('monthInput');
+  const daySel = document.getElementById('dayInput');
+  const nowY = new Date().getFullYear();
+  for(let y = nowY; y >= 1920; y--){ yearSel.appendChild(new Option(y + '年', y)); }
+  for(let m = 1; m <= 12; m++){ monthSel.appendChild(new Option(m + '月', m)); }
+  for(let d = 1; d <= 31; d++){ daySel.appendChild(new Option(d + '日', d)); }
+  yearSel.value = nowY - 30;
+  monthSel.value = 1;
+  daySel.value = 1;
+})();
+
+document.getElementById('showCalcToggle').addEventListener('change', function(){
+  document.getElementById('formulaBlock').style.display = this.checked ? 'block' : 'none';
+});
+
+document.getElementById('submitBtn').addEventListener('click', () => {
+  const birthYear = parseInt(document.getElementById('yearInput').value);
+  const birthMonth = parseInt(document.getElementById('monthInput').value);
+  const birthDay = parseInt(document.getElementById('dayInput').value);
+  const errEl = document.getElementById('errMsg');
+
+  if(!isValidDate(birthYear, birthMonth, birthDay)){
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  // 誕生数秘（基礎数）
+  document.getElementById('baseNumberValue').textContent = calcTalentNumber(birthYear, birthMonth, birthDay);
+
+  // 対象年月マトリックス：今月から12ヶ月分。対象日は常に誕生日の「日」を使用する。
+  const today = new Date();
+  let rowYear = today.getFullYear();
+  let rowMonth = today.getMonth() + 1;
+
+  const tbody = document.getElementById('matrixBody');
+  tbody.innerHTML = '';
+
+  let firstRow = null;
+
+  for(let i = 0; i < 12; i++){
+    const effectiveYear = getEffectivePersonalYear(birthMonth, birthDay, rowYear, rowMonth, birthDay);
+    const personalYear = calcYearFortune(birthMonth, birthDay, effectiveYear);
+    const personalMonth = calcMonthFortune(birthYear, birthMonth, birthDay, rowYear);
+    const universalYear = calcUniversalYear(rowYear);
+    const universalMonth = calcUniversalMonth(universalYear, rowMonth);
+
+    if(i === 0){
+      firstRow = { rowYear, rowMonth, effectiveYear, universalYear };
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td class="ym-col">' + rowYear + '/' + rowMonth + '</td>' +
+      '<td>' + universalYear + '</td>' +
+      '<td>' + universalMonth + '</td>' +
+      '<td>' + personalYear + '</td>' +
+      '<td>' + personalMonth + '</td>';
+    tbody.appendChild(tr);
+
+    rowMonth++;
+    if(rowMonth > 12){ rowMonth = 1; rowYear++; }
+  }
+
+  // 最初の年月の計算式（チェックボックスON時のみ表示）
+  document.getElementById('formulaBlockTitle').textContent =
+    firstRow.rowYear + '年' + firstRow.rowMonth + '月の計算式';
+  document.getElementById('fUniversalYear').textContent = formulaUniversalYear(firstRow.rowYear);
+  document.getElementById('fUniversalMonth').textContent = formulaUniversalMonth(firstRow.universalYear, firstRow.rowMonth);
+  document.getElementById('fSwitchNote').textContent =
+    formulaBirthdaySwitchNote(birthMonth, birthDay, firstRow.rowYear, firstRow.rowMonth, birthDay, firstRow.effectiveYear);
+  document.getElementById('fPersonalYear').textContent = formulaPersonalYear(birthMonth, birthDay, firstRow.effectiveYear);
+  document.getElementById('fPersonalMonth').textContent = formulaPersonalMonthC(birthYear, birthMonth, birthDay, firstRow.rowYear);
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('formulaBlock').style.display =
+    document.getElementById('showCalcToggle').checked ? 'block' : 'none';
+});
+</script>
+</body>
+</html>
