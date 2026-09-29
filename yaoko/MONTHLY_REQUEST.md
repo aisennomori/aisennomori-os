@@ -41,6 +41,7 @@
 | ● | `requested_leave`（申請休） |
 | 時刻記載 | `work` |
 | 出張 | `business_trip` |
+| 有休 | `paid_leave` |
 | 休職 | `leave_of_absence` |
 | 判読不能 | `needs_review` |
 

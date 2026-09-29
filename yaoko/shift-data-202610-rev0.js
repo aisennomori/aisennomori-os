@@ -1,14 +1,13 @@
-// 2026年10月度 人員計画表（ワカバウォーク 014 惣菜）確定版
-// 出典: 202610シフト3.pdf / 作成日 2026年09月29日 16:38（計画確認 3ページ版）
-// 抽出・照合済み: 月計33/33一致、残業月計33/33一致、○/●画像監査461件全一致、要確認0件
-// 旧版(202610シフト.pdf 配布用)は shift-data-202610-rev0.js に退避
-// 新区分: 有休 paid_leave（玉木10/23・小海10/24）
+// 2026年10月度 人員計画表（ワカバウォーク 014 惣菜）
+// 出典: 202610シフト.pdf / 作成日 2026年09月27日 07:10
+// 抽出・照合済み: 月計33/33一致、残業月計33/33一致、○/●画像監査458件全一致、要確認0件
+// 注記: 残業はPDF記載値をそのまま採用（契約時間からの計算では導出しない）
 
 SHIFT_DATA["2026-10"] = {
-  "source": "202610シフト3.pdf",
+  "source": "202610シフト.pdf",
   "store": "1099 ワカバウォーク",
   "dept": "014 惣菜",
-  "createdAt": "2026-09-29 16:38",
+  "createdAt": "2026-09-27 07:10",
   "verified": true,
   "employees": [
     {
@@ -20,8 +19,8 @@ SHIFT_DATA["2026-10"] = {
         "end": "17:45",
         "hours": "7.45"
       },
-      "monthTotal": "181.00",
-      "monthOvertime": "18.30"
+      "monthTotal": "180.40",
+      "monthOvertime": "18.00"
     },
     {
       "no": 2,
@@ -44,8 +43,8 @@ SHIFT_DATA["2026-10"] = {
         "end": "15:45",
         "hours": "7.45"
       },
-      "monthTotal": "163.35",
-      "monthOvertime": "16.30"
+      "monthTotal": "188.30",
+      "monthOvertime": "18.00"
     },
     {
       "no": 4,
@@ -56,7 +55,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "16:00",
         "hours": "8.00"
       },
-      "monthTotal": "160.00",
+      "monthTotal": "168.00",
       "monthOvertime": "0.00"
     },
     {
@@ -68,7 +67,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "11:30",
         "hours": "4.30"
       },
-      "monthTotal": "76.00",
+      "monthTotal": "71.30",
       "monthOvertime": "0.00"
     },
     {
@@ -80,7 +79,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "12:20",
         "hours": "5.50"
       },
-      "monthTotal": "104.00",
+      "monthTotal": "99.10",
       "monthOvertime": "0.00"
     },
     {
@@ -92,7 +91,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "11:30",
         "hours": "5.00"
       },
-      "monthTotal": "77.30",
+      "monthTotal": "83.00",
       "monthOvertime": "0.00"
     },
     {
@@ -116,8 +115,8 @@ SHIFT_DATA["2026-10"] = {
         "end": "16:00",
         "hours": "8.00"
       },
-      "monthTotal": "177.30",
-      "monthOvertime": "9.30"
+      "monthTotal": "177.00",
+      "monthOvertime": "9.00"
     },
     {
       "no": 10,
@@ -128,8 +127,8 @@ SHIFT_DATA["2026-10"] = {
         "end": "16:00",
         "hours": "8.00"
       },
-      "monthTotal": "170.40",
-      "monthOvertime": "2.40"
+      "monthTotal": "170.20",
+      "monthOvertime": "2.20"
     },
     {
       "no": 11,
@@ -176,7 +175,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "13:00",
         "hours": "4.30"
       },
-      "monthTotal": "60.00",
+      "monthTotal": "63.00",
       "monthOvertime": "0.00"
     },
     {
@@ -212,7 +211,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "15:30",
         "hours": "7.00"
       },
-      "monthTotal": "119.00",
+      "monthTotal": "140.00",
       "monthOvertime": "0.00"
     },
     {
@@ -224,7 +223,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "16:30",
         "hours": "8.00"
       },
-      "monthTotal": "136.00",
+      "monthTotal": "160.00",
       "monthOvertime": "0.00"
     },
     {
@@ -236,7 +235,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "16:00",
         "hours": "7.00"
       },
-      "monthTotal": "147.00",
+      "monthTotal": "154.00",
       "monthOvertime": "0.00"
     },
     {
@@ -248,7 +247,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "17:30",
         "hours": "8.00"
       },
-      "monthTotal": "144.00",
+      "monthTotal": "136.00",
       "monthOvertime": "0.00"
     },
     {
@@ -260,7 +259,7 @@ SHIFT_DATA["2026-10"] = {
         "end": "17:00",
         "hours": "8.00"
       },
-      "monthTotal": "168.00",
+      "monthTotal": "176.00",
       "monthOvertime": "0.00"
     },
     {
@@ -410,13 +409,13 @@ SHIFT_DATA["2026-10"] = {
   ],
   "staffing": {
     "2026-10-01": {
-      "morning": 14,
-      "afternoon": 11,
+      "morning": 15,
+      "afternoon": 12,
       "night": 3
     },
     "2026-10-02": {
       "morning": 12,
-      "afternoon": 9,
+      "afternoon": 10,
       "night": 3
     },
     "2026-10-03": {
@@ -426,7 +425,7 @@ SHIFT_DATA["2026-10"] = {
     },
     "2026-10-04": {
       "morning": 17,
-      "afternoon": 15,
+      "afternoon": 16,
       "night": 3
     },
     "2026-10-05": {
@@ -435,13 +434,13 @@ SHIFT_DATA["2026-10"] = {
       "night": 3
     },
     "2026-10-06": {
-      "morning": 15,
-      "afternoon": 12,
+      "morning": 16,
+      "afternoon": 13,
       "night": 3
     },
     "2026-10-07": {
       "morning": 13,
-      "afternoon": 12,
+      "afternoon": 13,
       "night": 3
     },
     "2026-10-08": {
@@ -456,7 +455,7 @@ SHIFT_DATA["2026-10"] = {
     },
     "2026-10-10": {
       "morning": 16,
-      "afternoon": 12,
+      "afternoon": 14,
       "night": 4
     },
     "2026-10-11": {
@@ -466,42 +465,42 @@ SHIFT_DATA["2026-10"] = {
     },
     "2026-10-12": {
       "morning": 15,
-      "afternoon": 12,
+      "afternoon": 13,
       "night": 3
     },
     "2026-10-13": {
-      "morning": 15,
-      "afternoon": 11,
+      "morning": 14,
+      "afternoon": 12,
       "night": 3
     },
     "2026-10-14": {
-      "morning": 13,
+      "morning": 14,
       "afternoon": 12,
       "night": 3
     },
     "2026-10-15": {
       "morning": 14,
-      "afternoon": 12,
+      "afternoon": 13,
       "night": 3
     },
     "2026-10-16": {
       "morning": 13,
-      "afternoon": 10,
+      "afternoon": 11,
       "night": 3
     },
     "2026-10-17": {
-      "morning": 16,
-      "afternoon": 14,
-      "night": 4
-    },
-    "2026-10-18": {
       "morning": 17,
       "afternoon": 15,
       "night": 4
     },
+    "2026-10-18": {
+      "morning": 17,
+      "afternoon": 16,
+      "night": 4
+    },
     "2026-10-19": {
       "morning": 14,
-      "afternoon": 11,
+      "afternoon": 12,
       "night": 4
     },
     "2026-10-20": {
@@ -515,48 +514,48 @@ SHIFT_DATA["2026-10"] = {
       "night": 3
     },
     "2026-10-22": {
-      "morning": 13,
+      "morning": 14,
       "afternoon": 12,
       "night": 3
     },
     "2026-10-23": {
-      "morning": 13,
+      "morning": 14,
       "afternoon": 11,
       "night": 4
     },
     "2026-10-24": {
       "morning": 16,
-      "afternoon": 13,
+      "afternoon": 15,
       "night": 3
     },
     "2026-10-25": {
-      "morning": 17,
+      "morning": 18,
       "afternoon": 15,
       "night": 4
     },
     "2026-10-26": {
       "morning": 15,
-      "afternoon": 13,
+      "afternoon": 14,
       "night": 3
     },
     "2026-10-27": {
-      "morning": 14,
-      "afternoon": 12,
+      "morning": 15,
+      "afternoon": 11,
       "night": 2
     },
     "2026-10-28": {
-      "morning": 14,
+      "morning": 13,
       "afternoon": 12,
       "night": 3
     },
     "2026-10-29": {
-      "morning": 15,
+      "morning": 14,
       "afternoon": 12,
       "night": 4
     },
     "2026-10-30": {
       "morning": 13,
-      "afternoon": 11,
+      "afternoon": 10,
       "night": 3
     },
     "2026-10-31": {
@@ -570,10 +569,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 1,
         "name": "鈴木　崇也",
-        "status": "work",
-        "start": "07:00",
-        "end": "11:50",
-        "overtime": "01:00"
+        "status": "public_holiday"
       },
       {
         "no": 2,
@@ -595,7 +591,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 5,
         "name": "東條　ちか子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "11:30"
       },
       {
         "no": 6,
@@ -656,7 +654,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -671,7 +669,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
@@ -690,9 +690,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 20,
         "name": "長内　瞳",
-        "status": "work",
-        "start": "08:30",
-        "end": "17:30"
+        "status": "public_holiday"
       },
       {
         "no": 21,
@@ -704,7 +702,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 23,
@@ -787,8 +787,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 3,
         "name": "山本　真衣",
         "status": "work",
-        "start": "06:30",
-        "end": "15:15"
+        "start": "07:00",
+        "end": "15:45"
       },
       {
         "no": 4,
@@ -800,16 +800,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 5,
         "name": "東條　ちか子",
-        "status": "work",
-        "start": "07:00",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 6,
         "name": "板垣　由妃子",
         "status": "work",
         "start": "06:30",
-        "end": "12:00"
+        "end": "12:20"
       },
       {
         "no": 7,
@@ -858,7 +856,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -873,7 +871,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
@@ -975,8 +975,9 @@ SHIFT_DATA["2026-10"] = {
         "no": 1,
         "name": "鈴木　崇也",
         "status": "work",
-        "start": "06:30",
-        "end": "15:15"
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 2,
@@ -990,13 +991,15 @@ SHIFT_DATA["2026-10"] = {
         "name": "山本　真衣",
         "status": "work",
         "start": "06:30",
-        "end": "16:45",
-        "overtime": "01:30"
+        "end": "16:15",
+        "overtime": "01:00"
       },
       {
         "no": 4,
         "name": "野澤　美恵子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 5,
@@ -1018,9 +1021,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 9,
@@ -1034,14 +1035,16 @@ SHIFT_DATA["2026-10"] = {
         "no": 10,
         "name": "吉田　いずみ",
         "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 11,
         "name": "伊藤　正枝",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:40",
+        "end": "16:00",
+        "overtime": "00:20"
       },
       {
         "no": 12,
@@ -1079,16 +1082,12 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "work",
-        "start": "07:30",
-        "end": "15:30"
+        "status": "public_holiday"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "work",
-        "start": "07:30",
-        "end": "16:30"
+        "status": "public_holiday"
       },
       {
         "no": 19,
@@ -1105,7 +1104,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 21,
         "name": "綿谷　佳子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 22,
@@ -1204,15 +1205,14 @@ SHIFT_DATA["2026-10"] = {
         "no": 3,
         "name": "山本　真衣",
         "status": "work",
-        "start": "08:00",
-        "end": "11:50"
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 4,
         "name": "野澤　美恵子",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 5,
@@ -1234,7 +1234,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 9,
@@ -1247,9 +1249,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 11,
@@ -1302,7 +1302,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -1328,14 +1330,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 24,
@@ -1399,8 +1401,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 1,
         "name": "鈴木　崇也",
         "status": "work",
-        "start": "07:00",
-        "end": "11:50",
+        "start": "06:30",
+        "end": "16:15",
         "overtime": "01:00"
       },
       {
@@ -1457,20 +1459,22 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "public_holiday"
-      },
-      {
-        "no": 11,
-        "name": "伊藤　正枝",
         "status": "work",
         "start": "06:40",
         "end": "16:00",
         "overtime": "00:20"
       },
       {
+        "no": 11,
+        "name": "伊藤　正枝",
+        "status": "public_holiday"
+      },
+      {
         "no": 12,
         "name": "西田　真弓",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 13,
@@ -1487,7 +1491,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:30"
       },
       {
         "no": 16,
@@ -1525,9 +1531,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 21,
         "name": "綿谷　佳子",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 22,
@@ -1539,9 +1543,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 24,
@@ -1636,14 +1638,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 6,
         "name": "板垣　由妃子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:30",
+        "end": "12:20"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "work",
-        "start": "06:30",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 8,
@@ -1673,9 +1675,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 12,
         "name": "西田　真弓",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 13,
@@ -1689,19 +1689,19 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:30"
+        "status": "public_holiday"
       },
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:00"
       },
       {
         "no": 17,
@@ -1718,7 +1718,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 19,
         "name": "寺田　弘子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "16:00"
       },
       {
         "no": 20,
@@ -1735,7 +1737,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 23,
@@ -1807,7 +1811,8 @@ SHIFT_DATA["2026-10"] = {
         "name": "鈴木　崇也",
         "status": "work",
         "start": "06:30",
-        "end": "15:15"
+        "end": "16:15",
+        "overtime": "01:00"
       },
       {
         "no": 2,
@@ -1818,8 +1823,9 @@ SHIFT_DATA["2026-10"] = {
         "no": 3,
         "name": "山本　真衣",
         "status": "work",
-        "start": "08:00",
-        "end": "11:50"
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 4,
@@ -1836,14 +1842,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 6,
         "name": "板垣　由妃子",
-        "status": "work",
-        "start": "06:30",
-        "end": "12:20"
+        "status": "public_holiday"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:30",
+        "end": "11:30"
       },
       {
         "no": 8,
@@ -1862,14 +1868,16 @@ SHIFT_DATA["2026-10"] = {
         "no": 10,
         "name": "吉田　いずみ",
         "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 11,
         "name": "伊藤　正枝",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:40",
+        "end": "16:00",
+        "overtime": "00:20"
       },
       {
         "no": 12,
@@ -1888,7 +1896,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -1934,9 +1942,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 23,
@@ -2022,8 +2028,8 @@ SHIFT_DATA["2026-10"] = {
         "name": "山本　真衣",
         "status": "work",
         "start": "06:30",
-        "end": "16:45",
-        "overtime": "01:30"
+        "end": "16:15",
+        "overtime": "01:00"
       },
       {
         "no": 4,
@@ -2069,10 +2075,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 11,
         "name": "伊藤　正枝",
-        "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "status": "public_holiday"
       },
       {
         "no": 12,
@@ -2091,7 +2094,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -2146,7 +2149,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 24,
@@ -2233,9 +2238,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 5,
         "name": "東條　ちか子",
-        "status": "work",
-        "start": "07:00",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 6,
@@ -2287,9 +2290,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 14,
@@ -2299,7 +2300,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:30"
       },
       {
         "no": 16,
@@ -2333,7 +2336,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 21,
         "name": "綿谷　佳子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 22,
@@ -2412,7 +2417,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "鈴木　崇也",
         "status": "work",
         "start": "07:00",
-        "end": "11:50",
+        "end": "16:45",
         "overtime": "01:00"
       },
       {
@@ -2443,15 +2448,13 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 6,
         "name": "板垣　由妃子",
-        "status": "work",
-        "start": "06:30",
-        "end": "12:20"
+        "status": "public_holiday"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
         "status": "work",
-        "start": "07:00",
+        "start": "06:30",
         "end": "11:30"
       },
       {
@@ -2473,9 +2476,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 10,
         "name": "吉田　いずみ",
         "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 11,
@@ -2485,7 +2487,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 12,
         "name": "西田　真弓",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 13,
@@ -2521,7 +2525,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -2552,9 +2558,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 24,
@@ -2623,8 +2627,8 @@ SHIFT_DATA["2026-10"] = {
         "name": "鈴木　崇也",
         "status": "work",
         "start": "06:30",
-        "end": "16:15",
-        "overtime": "01:00"
+        "end": "16:45",
+        "overtime": "01:30"
       },
       {
         "no": 2,
@@ -2681,9 +2685,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 11,
@@ -2703,7 +2705,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 14,
@@ -2713,14 +2717,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:30"
+        "status": "public_holiday"
       },
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:00"
       },
       {
         "no": 17,
@@ -2847,7 +2851,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 3,
         "name": "山本　真衣",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "15:45"
       },
       {
         "no": 4,
@@ -2917,7 +2923,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -2929,21 +2935,19 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:00"
+        "status": "public_holiday"
       },
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "work",
-        "start": "07:30",
-        "end": "16:30"
+        "status": "public_holiday"
       },
       {
         "no": 19,
@@ -3053,32 +3057,34 @@ SHIFT_DATA["2026-10"] = {
         "name": "山本　真衣",
         "status": "work",
         "start": "06:30",
-        "end": "16:45",
-        "overtime": "01:30"
+        "end": "16:15",
+        "overtime": "01:00"
       },
       {
         "no": 4,
         "name": "野澤　美恵子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 5,
         "name": "東條　ちか子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "11:30"
       },
       {
         "no": 6,
         "name": "板垣　由妃子",
         "status": "work",
         "start": "06:30",
-        "end": "12:00"
+        "end": "12:20"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "work",
-        "start": "07:00",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 8,
@@ -3095,7 +3101,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 11,
@@ -3120,9 +3128,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 14,
         "name": "渡辺　さや",
-        "status": "work",
-        "start": "08:30",
-        "end": "12:30"
+        "status": "public_holiday"
       },
       {
         "no": 15,
@@ -3132,16 +3138,12 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:00"
+        "status": "public_holiday"
       },
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "work",
-        "start": "07:30",
-        "end": "15:30"
+        "status": "public_holiday"
       },
       {
         "no": 18,
@@ -3257,9 +3259,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 4,
         "name": "野澤　美恵子",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 5,
@@ -3335,19 +3335,21 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:00"
       },
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "work",
-        "start": "07:30",
-        "end": "15:30"
+        "status": "public_holiday"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -3373,7 +3375,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 23,
@@ -3474,19 +3478,21 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 6,
         "name": "板垣　由妃子",
-        "status": "work",
-        "start": "06:30",
-        "end": "12:20"
+        "status": "public_holiday"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:30",
+        "end": "11:30"
       },
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 9,
@@ -3512,7 +3518,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 12,
         "name": "西田　真弓",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 13,
@@ -3534,21 +3542,19 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:00"
+        "status": "public_holiday"
       },
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "work",
-        "start": "07:30",
-        "end": "16:30"
+        "status": "public_holiday"
       },
       {
         "no": 19,
@@ -3574,9 +3580,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 23,
@@ -3669,7 +3673,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 4,
         "name": "野澤　美恵子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 5,
@@ -3679,21 +3685,19 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 6,
         "name": "板垣　由妃子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:30",
+        "end": "12:20"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "work",
-        "start": "06:30",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 9,
@@ -3723,14 +3727,16 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 14,
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -3742,9 +3748,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:00"
+        "status": "public_holiday"
       },
       {
         "no": 17,
@@ -3756,7 +3760,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -3778,9 +3784,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 23,
@@ -3850,7 +3854,10 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 1,
         "name": "鈴木　崇也",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:30",
+        "end": "16:15",
+        "overtime": "01:00"
       },
       {
         "no": 2,
@@ -3863,8 +3870,9 @@ SHIFT_DATA["2026-10"] = {
         "no": 3,
         "name": "山本　真衣",
         "status": "work",
-        "start": "08:00",
-        "end": "11:50"
+        "start": "07:00",
+        "end": "17:15",
+        "overtime": "01:30"
       },
       {
         "no": 4,
@@ -3925,16 +3933,12 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 12,
         "name": "西田　真弓",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 14,
@@ -3949,7 +3953,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:00"
       },
       {
         "no": 17,
@@ -3985,7 +3991,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 23,
@@ -4060,8 +4068,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 1,
         "name": "鈴木　崇也",
         "status": "work",
-        "start": "06:30",
-        "end": "16:15",
+        "start": "07:00",
+        "end": "16:45",
         "overtime": "01:00"
       },
       {
@@ -4075,8 +4083,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 3,
         "name": "山本　真衣",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
+        "start": "06:30",
+        "end": "16:15",
         "overtime": "01:00"
       },
       {
@@ -4148,7 +4156,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -4158,9 +4166,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:00"
+        "status": "public_holiday"
       },
       {
         "no": 17,
@@ -4172,7 +4178,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -4318,20 +4326,24 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 9,
         "name": "加藤　由紀",
         "status": "work",
-        "start": "06:30",
-        "end": "16:00",
-        "overtime": "00:30"
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:40",
+        "end": "16:00",
+        "overtime": "00:20"
       },
       {
         "no": 11,
@@ -4360,9 +4372,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:30"
+        "status": "public_holiday"
       },
       {
         "no": 16,
@@ -4374,14 +4384,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "work",
-        "start": "07:30",
-        "end": "16:30"
+        "status": "public_holiday"
       },
       {
         "no": 19,
@@ -4398,9 +4408,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 21,
         "name": "綿谷　佳子",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 22,
@@ -4478,9 +4486,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 1,
         "name": "鈴木　崇也",
         "status": "work",
-        "start": "06:30",
-        "end": "16:15",
-        "overtime": "01:00"
+        "start": "07:00",
+        "end": "15:45"
       },
       {
         "no": 2,
@@ -4492,8 +4499,8 @@ SHIFT_DATA["2026-10"] = {
         "name": "山本　真衣",
         "status": "work",
         "start": "06:30",
-        "end": "16:45",
-        "overtime": "01:30"
+        "end": "16:15",
+        "overtime": "01:00"
       },
       {
         "no": 4,
@@ -4518,15 +4525,13 @@ SHIFT_DATA["2026-10"] = {
         "no": 7,
         "name": "吉川　悦子",
         "status": "work",
-        "start": "07:00",
+        "start": "06:30",
         "end": "11:30"
       },
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 9,
@@ -4536,9 +4541,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 11,
@@ -4556,14 +4559,16 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 14,
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -4578,7 +4583,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
@@ -4694,14 +4701,13 @@ SHIFT_DATA["2026-10"] = {
         "name": "山本　真衣",
         "status": "work",
         "start": "07:00",
-        "end": "15:45"
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 4,
         "name": "野澤　美恵子",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 5,
@@ -4711,14 +4717,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 6,
         "name": "板垣　由妃子",
-        "status": "work",
-        "start": "06:30",
-        "end": "12:00"
+        "status": "public_holiday"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:30",
+        "end": "11:30"
       },
       {
         "no": 8,
@@ -4805,7 +4811,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 21,
         "name": "綿谷　佳子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 22,
@@ -4897,7 +4905,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 4,
         "name": "野澤　美恵子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 5,
@@ -4909,21 +4919,19 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 6,
         "name": "板垣　由妃子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:30",
+        "end": "12:20"
       },
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "work",
-        "start": "06:30",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 9,
@@ -4956,9 +4964,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 14,
@@ -4973,19 +4979,21 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:00"
       },
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "work",
-        "start": "07:30",
-        "end": "15:30"
+        "status": "public_holiday"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -5018,7 +5026,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 24,
@@ -5099,8 +5109,8 @@ SHIFT_DATA["2026-10"] = {
         "name": "山本　真衣",
         "status": "work",
         "start": "06:30",
-        "end": "16:45",
-        "overtime": "01:30"
+        "end": "16:15",
+        "overtime": "01:00"
       },
       {
         "no": 4,
@@ -5129,7 +5139,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 9,
@@ -5140,9 +5152,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 10,
         "name": "吉田　いずみ",
         "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 11,
@@ -5168,12 +5179,14 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:30"
       },
       {
         "no": 16,
@@ -5183,7 +5196,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "paid_leave"
+        "status": "public_holiday"
       },
       {
         "no": 18,
@@ -5219,9 +5232,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 24,
@@ -5300,8 +5311,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 3,
         "name": "山本　真衣",
         "status": "work",
-        "start": "08:00",
-        "end": "11:50"
+        "start": "07:00",
+        "end": "15:45"
       },
       {
         "no": 4,
@@ -5384,9 +5395,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:00"
+        "status": "public_holiday"
       },
       {
         "no": 17,
@@ -5398,7 +5407,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -5458,7 +5469,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 28,
         "name": "小海　珠実",
-        "status": "paid_leave"
+        "status": "requested_leave"
       },
       {
         "no": 29,
@@ -5495,8 +5506,8 @@ SHIFT_DATA["2026-10"] = {
         "no": 1,
         "name": "鈴木　崇也",
         "status": "work",
-        "start": "06:30",
-        "end": "16:15",
+        "start": "07:00",
+        "end": "16:45",
         "overtime": "01:00"
       },
       {
@@ -5510,9 +5521,9 @@ SHIFT_DATA["2026-10"] = {
         "no": 3,
         "name": "山本　真衣",
         "status": "work",
-        "start": "07:00",
+        "start": "06:30",
         "end": "16:45",
-        "overtime": "01:00"
+        "overtime": "01:30"
       },
       {
         "no": 4,
@@ -5534,7 +5545,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "11:30"
       },
       {
         "no": 8,
@@ -5582,7 +5595,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -5599,14 +5612,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "work",
-        "start": "07:30",
-        "end": "16:30"
+        "status": "public_holiday"
       },
       {
         "no": 19,
@@ -5706,10 +5719,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 1,
         "name": "鈴木　崇也",
-        "status": "work",
-        "start": "06:30",
-        "end": "16:15",
-        "overtime": "01:00"
+        "status": "public_holiday"
       },
       {
         "no": 2,
@@ -5745,9 +5755,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "work",
-        "start": "07:00",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 8,
@@ -5767,7 +5775,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 11,
@@ -5811,14 +5821,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "work",
-        "start": "07:30",
-        "end": "15:30"
+        "status": "public_holiday"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
@@ -5842,7 +5852,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 23,
@@ -5954,14 +5966,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "11:30"
       },
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 9,
@@ -5971,15 +5983,15 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "status": "public_holiday"
       },
       {
         "no": 11,
         "name": "伊藤　正枝",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:40",
+        "end": "16:00",
+        "overtime": "00:20"
       },
       {
         "no": 12,
@@ -5998,12 +6010,14 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:30"
       },
       {
         "no": 16,
@@ -6155,7 +6169,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 8,
         "name": "諸隈　弘美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 9,
@@ -6169,16 +6185,14 @@ SHIFT_DATA["2026-10"] = {
         "no": 10,
         "name": "吉田　いずみ",
         "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "start": "06:40",
+        "end": "16:00",
+        "overtime": "00:20"
       },
       {
         "no": 11,
         "name": "伊藤　正枝",
-        "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "status": "public_holiday"
       },
       {
         "no": 12,
@@ -6202,9 +6216,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 15,
         "name": "辻口　恵美",
-        "status": "work",
-        "start": "08:00",
-        "end": "12:30"
+        "status": "public_holiday"
       },
       {
         "no": 16,
@@ -6214,14 +6226,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "work",
-        "start": "07:30",
-        "end": "16:30"
+        "status": "public_holiday"
       },
       {
         "no": 19,
@@ -6245,14 +6257,14 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 22,
         "name": "木村　瞳",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "17:00"
       },
       {
         "no": 24,
@@ -6317,10 +6329,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 1,
         "name": "鈴木　崇也",
-        "status": "work",
-        "start": "07:00",
-        "end": "11:50",
-        "overtime": "01:00"
+        "status": "public_holiday"
       },
       {
         "no": 2,
@@ -6377,16 +6386,14 @@ SHIFT_DATA["2026-10"] = {
         "no": 10,
         "name": "吉田　いずみ",
         "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "start": "06:40",
+        "end": "16:00",
+        "overtime": "00:20"
       },
       {
         "no": 11,
         "name": "伊藤　正枝",
-        "status": "work",
-        "start": "06:40",
-        "end": "16:00",
-        "overtime": "00:20"
+        "status": "public_holiday"
       },
       {
         "no": 12,
@@ -6396,14 +6403,16 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 14,
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -6420,19 +6429,21 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "work",
-        "start": "07:30",
-        "end": "15:30"
+        "status": "public_holiday"
       },
       {
         "no": 18,
         "name": "石原　律子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "16:30"
       },
       {
         "no": 19,
         "name": "寺田　弘子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "16:00"
       },
       {
         "no": 20,
@@ -6458,9 +6469,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 24,
@@ -6541,8 +6550,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "山本　真衣",
         "status": "work",
         "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "end": "15:45"
       },
       {
         "no": 4,
@@ -6581,7 +6589,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       },
       {
         "no": 11,
@@ -6601,9 +6611,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 13,
         "name": "木村　千加",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 14,
@@ -6618,12 +6626,16 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 16,
         "name": "鈴木　弥生",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "08:00",
+        "end": "12:00"
       },
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:30",
+        "end": "15:30"
       },
       {
         "no": 18,
@@ -6635,9 +6647,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 19,
         "name": "寺田　弘子",
-        "status": "work",
-        "start": "08:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 20,
@@ -6719,9 +6729,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 33,
         "name": "岩田　直美",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       }
     ],
     "2026-10-31": [
@@ -6759,9 +6767,7 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 5,
         "name": "東條　ちか子",
-        "status": "work",
-        "start": "07:00",
-        "end": "11:30"
+        "status": "public_holiday"
       },
       {
         "no": 6,
@@ -6773,7 +6779,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 7,
         "name": "吉川　悦子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "11:30"
       },
       {
         "no": 8,
@@ -6793,21 +6801,20 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 10,
         "name": "吉田　いずみ",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 11,
         "name": "伊藤　正枝",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "06:40",
+        "end": "16:00",
+        "overtime": "00:20"
       },
       {
         "no": 12,
         "name": "西田　真弓",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 13,
@@ -6821,7 +6828,7 @@ SHIFT_DATA["2026-10"] = {
         "name": "渡辺　さや",
         "status": "work",
         "start": "08:30",
-        "end": "12:30"
+        "end": "13:00"
       },
       {
         "no": 15,
@@ -6934,7 +6941,9 @@ SHIFT_DATA["2026-10"] = {
       {
         "no": 33,
         "name": "岩田　直美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       }
     ]
   }
