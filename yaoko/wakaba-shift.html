@@ -3732,7 +3732,28 @@ let curDate  = null;
 /* ---- 月・日のインデックス ---- */
 function months(){ return Object.keys(SHIFT_DATA).sort(); }
 function monthDays(m){ return Object.keys(SHIFT_DATA[m].days).sort(); }
-function employeesOf(m){ return SHIFT_DATA[m].employees.slice().sort((a,b) => a.no - b.no); }
+/* 表示順（データ・No.・シフト・集計値は変更しない。並べ替えのみ）
+     1. No.1 の社員
+     2. 社員区分「正契」（No.1 と下記の固定枠を除く／元リスト順）
+     3. 加藤　由紀
+     4. 岩田　直美
+     5. 残り全員（元リスト順）
+   3・4 は「正契」であっても 2 より優先する。該当者がいない月は読み飛ばす。 */
+const PINNED = ["加藤　由紀", "岩田　直美"];
+function normName(s){ return String(s).replace(/[\s　]/g, ""); }
+function employeesOf(m){
+  const base = SHIFT_DATA[m].employees.slice().sort((a, b) => a.no - b.no);
+  const pin = PINNED.map(normName);
+  const out = [], seen = new Set();
+  const push = e => { if (e && !seen.has(e.no)){ seen.add(e.no); out.push(e); } };
+
+  push(base.find(e => e.no === 1));                                       // 1
+  base.filter(e => e.type === "正契" && !pin.includes(normName(e.name)))
+      .forEach(push);                                                     // 2
+  pin.forEach(p => push(base.find(e => normName(e.name) === p)));         // 3, 4
+  base.forEach(push);                                                     // 5
+  return out;
+}
 function recordsOf(m, date){ return SHIFT_DATA[m].days[date] || []; }
 
 /* ---- 集計 ---- */
