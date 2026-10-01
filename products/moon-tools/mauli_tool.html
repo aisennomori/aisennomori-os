@@ -275,14 +275,15 @@ function confirmRow(key,rid){
     alert('⚠️ Mukuの日付はHiloより後の日付にしてください（現在の日数差：'+diffDays+'日）');
     return;
   }
-  if(diffDays!==29&&diffDays!==30){
-    if(!confirm('⚠️ Hilo〜Mukuの日数が'+diffDays+'日です（通常は29日か30日）。\nこのまま確定しますか？'))return;
+  // 日付差28日＝29夜（Mauliなし）／29日＝30夜（Mauliあり）※2026確定値全件で検証済
+  if(diffDays!==28&&diffDays!==29){
+    if(!confirm('⚠️ Hilo〜Mukuの日数差が'+diffDays+'日です（通常は28日か29日）。\nこのまま確定しますか？'))return;
   }else{
-    const expectedMauli=(diffDays===30);
+    const expectedMauli=(diffDays===29);
     if(expectedMauli!==hm){
       const msg=expectedMauli
-        ?'⚠️ 日数は30日（Mauliあり想定）ですが、「Mauliなし」が選択されています。\nこのまま確定しますか？'
-        :'⚠️ 日数は29日（Mauliなし想定）ですが、「Mauliあり」が選択されています。\nこのまま確定しますか？';
+        ?'⚠️ 日数差は29日（Mauliあり想定）ですが、「Mauliなし」が選択されています。\nこのまま確定しますか？'
+        :'⚠️ 日数差は28日（Mauliなし想定）ですが、「Mauliあり」が選択されています。\nこのまま確定しますか？';
       if(!confirm(msg))return;
     }
   }
