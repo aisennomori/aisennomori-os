@@ -114,7 +114,9 @@ Released
 
 - **Component**: Hawaiian Lunar Calendar Engine（月読みツール集・共通暦エンジン）
 - **Version**: 1.0.0
-- **Status**: Release Candidate（main統合・GitHub Pages反映後に Released とする）
+- **Status**: Released
+- **Release Date**: 2026-10-04
+- **公開**: PR #1 を merge commit 方式で main に統合（c8cd0f0）。GitHub Pages 反映後、公開版の Smoke Test 完了
 - **Branch**: `calendar-engine-2026-10-04`
 - **関連決定**: DECISIONS.md OS-DEC-010〜016
 
