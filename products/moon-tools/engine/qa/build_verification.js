@@ -1,26 +1,32 @@
-// 正式確認データ（testdata）から「正式確認済み周期」一覧を生成し、検証モジュール official_verification.js を出力する。
-// 一覧は表示（✦）専用。暦の計算には使わない。実行：node engine/qa/build_verification.js
+// 検証モジュール official_verification.js（正式確認表示 ✦ 用）を出力する。表示専用で、暦の計算には使わない。
+// 公開版（OS-DEC-016）：正式資料由来の一覧は公開リポジトリに置かないため、一覧は空で出力する（v1.0.0公開版では ✦ は表示されない）。
+// 内部QA：privateList() が非公開の検証データ（engine/testdata、git管理外）から一覧を作り、QA時にだけページへ注入する。
+// 実行：node engine/qa/build_verification.js   → engine/official_verification.js（公開版）を出力
 'use strict';
 const fs=require('fs'),path=require('path');
 const ROOT=path.resolve(__dirname,'..'), TD=path.join(ROOT,'testdata');
-const J=f=>JSON.parse(fs.readFileSync(path.join(TD,f),'utf8'));
 const DAY=864e5, P=s=>Date.parse(s+'T00:00:00Z');
-const list=[];
-for(const v of Object.values(J('confirmed_2026.json').cycles)) list.push({hilo:v.hilo,muku:v.muku,hasMauli:v.hasMauli,src:'2026確定値（2026-12は10/4訂正）'});
-const H=J('official_hilo_2027.json').hilo2027, M=J('official_muku_2027.json').muku2027;
-// 2027年：Hilo(i) と 次周期の直前のMuku(i+1) が両方とも正式値の周期だけ（2027-12周期はMuku未提供のため対象外）
-for(let i=0;i+1<M.length;i++){ const hilo=H[i], muku=M[i+1]; const nights=(P(muku)-P(hilo))/DAY+1; list.push({hilo,muku,hasMauli:nights===30,src:'2027正式Hilo・正式Muku'}); }
-const seen=new Set(); const out=list.filter(c=>!seen.has(c.hilo)&&seen.add(c.hilo)).sort((a,b)=>a.hilo<b.hilo?-1:1);
-const data=out.map(c=>`    { hilo:'${c.hilo}', muku:'${c.muku}', hasMauli:${c.hasMauli} },  // ${c.src}`).join('\n');
-const js=`/* ===== HAWAIIAN_CALENDAR_VERIFICATION BEGIN v1.0.0 ===== */
-// 正式確認表示（✦・ピンク背景）専用の検証モジュール。正本：products/moon-tools/engine/official_verification.js
-// engine/qa/build_verification.js が engine/testdata から生成する（手で編集しない）。
-// ・暦の値（Hilo / Muku / Mauli / 夜番号）は常に共通暦エンジンの計算結果を使う。
-// ・この一覧は計算結果を上書きしない。計算結果が正式確認値と完全一致した周期にだけ「正式確認済み」表示を付ける。
-// ・正式確認値と計算結果が食い違う周期は表示を付けず、コンソールに QA 不一致として記録する。
-var OFFICIAL_VERIFIED_CYCLES = [
-${data}
-];
+
+// 非公開の検証データから「正式確認済み周期」一覧を作る（QA専用。公開ファイルには書き出さない）
+function privateList(){
+  const J=f=>JSON.parse(fs.readFileSync(path.join(TD,f),'utf8'));
+  const list=[];
+  for(const v of Object.values(J('confirmed_2026.json').cycles)) list.push({hilo:v.hilo,muku:v.muku,hasMauli:v.hasMauli});
+  const H=J('official_hilo_2027.json').hilo2027, M=J('official_muku_2027.json').muku2027;
+  // 2027年：Hilo(i) と 次周期の直前のMuku(i+1) が両方とも正式値の周期だけ（Mukuが未提供の周期は対象外）
+  for(let i=0;i+1<M.length;i++){ const hilo=H[i], muku=M[i+1]; const nights=(P(muku)-P(hilo))/DAY+1; list.push({hilo,muku,hasMauli:nights===30}); }
+  const seen=new Set();
+  return list.filter(c=>!seen.has(c.hilo)&&seen.add(c.hilo)).sort((a,b)=>a.hilo<b.hilo?-1:1);
+}
+
+const PUBLIC_MODULE=`/* ===== HAWAIIAN_CALENDAR_VERIFICATION BEGIN v1.0.0 ===== */
+// 正式確認表示（✦・ピンク背景）用の検証モジュール。正本：products/moon-tools/engine/official_verification.js
+// engine/qa/build_verification.js が出力する（手で編集しない）。
+// 公開版：正式資料由来の一覧は公開リポジトリに置かない（OS-DEC-016）。一覧が空のため、✦・ピンク背景は表示されない。
+// 判定の仕組みは将来の再検討に備えて残している。内部QAでは非公開の一覧をQA時にだけ注入して動作を確認する。
+// ・暦の値（Hilo / Muku / Mauli / 夜番号）は常に共通暦エンジンの計算結果を使う。一覧は計算結果を上書きしない。
+// ・一覧と計算結果が食い違う周期は表示を付けず、コンソールに QA 不一致として記録する。
+var OFFICIAL_VERIFIED_CYCLES = [];
 function isOfficiallyVerified(cycle){
   if(!cycle) return false;
   var ymd=HawaiianCalendar.ymd, h=ymd(cycle.hiloMs), m=ymd(cycle.mukuMs);
@@ -36,5 +42,9 @@ function isOfficiallyVerified(cycle){
 }
 /* ===== HAWAIIAN_CALENDAR_VERIFICATION END ===== */
 `;
-fs.writeFileSync(path.join(ROOT,'official_verification.js'),js);
-console.log('正式確認済み周期',out.length,'件 → engine/official_verification.js');
+
+module.exports={privateList, PUBLIC_MODULE};
+if(require.main===module){
+  fs.writeFileSync(path.join(ROOT,'official_verification.js'),PUBLIC_MODULE);
+  console.log('公開版の検証モジュール（一覧は空）→ engine/official_verification.js');
+}

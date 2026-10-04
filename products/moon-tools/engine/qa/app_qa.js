@@ -44,6 +44,9 @@ async function open(b,file,iso){
   for(const app of APPS){
     const a=await open(b,BASE+'__old_'+app+'.html','2026-06-20T12:00:00+09:00');
     const n=await open(b,BASE+app+'.html','2026-06-20T12:00:00+09:00');
+    // moon_techo：公開版は ✦・ピンク背景を表示しない（OS-DEC-016）。旧版から ✦・ピンク背景だけを外した画面を基準に比較する
+    if(app==='moon_techo') await a.p.evaluate(()=>{document.querySelectorAll('.confirmed-month').forEach(e=>e.classList.remove('confirmed-month'));
+      const t=document.getElementById('calTitle'); if(t) t.textContent=t.textContent.replace(' ✦','');});
     const sa=await a.p.screenshot({fullPage:true}), sn=await n.p.screenshot({fullPage:true});
     fs.writeFileSync(require('os').tmpdir()+`/${app}_old_20260620.png`,sa);fs.writeFileSync(require('os').tmpdir()+`/${app}_new_20260620.png`,sn);
     ck(`${app} UI無変更（2026/6/20 表示を旧版とピクセル比較）`,Buffer.compare(sa,sn)===0,`${sa.length}B / ${sn.length}B`);
