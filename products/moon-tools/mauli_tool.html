@@ -76,7 +76,7 @@ td.status-cell.same{color:var(--warn);}
 <body>
 <header class="hdr">
   <h1>🌙 マウリ調整ツール</h1>
-  <p class="sub">愛泉の杜 ─ CONFIRMEDテーブル生成 &amp; アプリ反映</p>
+  <p class="sub">愛泉の杜 ─ 検証データ作成 &amp; 計算結果との照合</p>
 </header>
 <a class="back-link" href="moon_tools.html">← 月読みツール集へ戻る</a>
 <div class="section">
@@ -101,17 +101,17 @@ td.status-cell.same{color:var(--warn);}
   </div>
 </div>
 <div class="section">
-  <div class="sec-title">③ CONFIRMEDコード生成</div>
+  <div class="sec-title">③ 検証データ（CONFIRMED形式）生成</div>
   <div class="output-box" id="outputBox">// ② で確定すると自動生成されます</div>
   <button class="btn-copy" onclick="copyCode()">📋 コピー</button>
   <div class="copy-ok" id="copyOk"></div>
 </div>
 <div class="section">
-  <div class="sec-title">④ アプリへ反映</div>
+  <div class="sec-title">④ 検証データとして登録</div>
   <div class="step-hint">
-    ③でコードをコピー後、各アプリファイルの<br>
-    <code>const CONFIRMED = { ... };</code><br>
-    の部分を貼り替えてGitHubにPushしてください。
+    正式資料を入手したら、③のコードを検証データとして<br>
+    <code>engine/testdata</code><br>
+    に登録し、共通暦エンジンの計算結果と照合してください（アプリへの貼り替えは不要です）。
   </div>
   <div class="app-list" id="appList"></div>
 </div>
