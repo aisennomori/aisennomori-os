@@ -1,0 +1,2 @@
+# 正式資料由来の検証データは公開リポジトリに置かない（OS-DEC-016）。内部QA用に手元にだけ置く。
+products/moon-tools/engine/testdata/

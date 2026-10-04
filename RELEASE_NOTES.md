@@ -109,3 +109,37 @@ Release Status:
 Released
 ```
 
+────────────────────────
+# Hawaiian Lunar Calendar Engine v1.0.0
+
+- **Component**: Hawaiian Lunar Calendar Engine（月読みツール集・共通暦エンジン）
+- **Version**: 1.0.0
+- **Status**: Release Candidate（main統合・GitHub Pages反映後に Released とする）
+- **Branch**: `calendar-engine-2026-10-04`
+- **関連決定**: DECISIONS.md OS-DEC-010〜016
+
+## 変更内容
+
+- **共通暦エンジンを導入**：`products/moon-tools/engine/` に、天文学的新月 → boundaryRule → Muku → Hilo → 周期 → 29/30夜 → Mauli → 夜番号 を一本で算出する共通エンジンを追加し、これを暦計算の唯一の正本とした
+- **CONFIRMED補正型から計算型へ移行**：本番経路から CONFIRMED による計算結果の上書き・補正を撤去した。CONFIRMED／正式資料のデータは計算入力ではなく、内部QA用の検証データとして扱う。正式資料由来のデータは公開リポジトリに置かない
+- **周期ベース探索へ移行**：カレンダー月（YYYY-MM）を計算上の主キーとせず、日付から周期を直接引く方式とした。1か月に2回Hiloがある月（例：2027年10月）や、旧方式で欠落していた区間（2027年8月・10月）も正しく扱える
+- **boundaryRule＝UTC_DATE を採用**：新月のUTC日付をMukuとする。これは現時点で入手済みの正式確認データ（2026年・2027年 Hilo／Muku／Mauli）をすべて再現する**運用上の採用仕様**であり、伝統的な日界が特定の時刻であることを確定したものではない。確認済みの境界は HST 13:51〜14:52 の範囲。boundaryRule は将来差し替え可能な構造とした
+- **2026-12 周期の正式訂正**：2026年12月の CONFIRMED 値を正式資料に基づき訂正した（Hilo 2026-12-10／Muku 2027-01-07／Mauliなし）
+- **対象5アプリを共通エンジンへ移行**：`moon_calendar.html`・`cycle_tracker.html`・`moon_cycle.html`・`moon_card_gallery.html`・`moon_techo.html`。暦計算ブロックのみを置き換え、UIは変更していない（moon_techo の ✦ は下記）
+- **moon_techo の ✦・ピンク背景を非表示**：v1.0.0公開版では、✦・ピンク背景を表示しない。正式資料由来のデータを公開リポジトリに置かないため（OS-DEC-016）。暦の表示値は常にエンジンの計算結果で、変更はない
+- **mauli_tool.html**：Hilo–Muku の日付差判定を 28日（29夜・Mauliなし）／29日（30夜・Mauliあり）に修正し、共通エンジンで周期を算出するよう変更。正式資料は検証データとして照合する運用へ説明文を整理（`moon_tools.html` の紹介文も同趣旨に更新）
+- **2029・2030年を Calculated／Predicted として凍結**：共通エンジンのみで生成した 2029年（13周期）・2030年（14周期）の Hilo／Muku／Mauli を、生成日時・engine version・boundaryRule・commit・data hash とともに凍結した。将来の正式資料との out-of-sample 検証に用いるため、予測ファイル自体は今後も書き換えない
+
+## 検証結果
+
+- Gate A（エンジン単体・正式確認データ照合）：28/28 PASS
+- Gate B（2028年計算値と2028年正式Mauliの照合）：12/12 一致。ただし boundaryRule 選定時に2028年正式Mauliを参照済みのため、これは**事後再現・実装整合性の確認**であり、未知データへの予測成功ではない
+- 対象5アプリ回帰QA：30/30 PASS（2026〜2030年の全対象日でエンジンと一致、UIピクセル比較を含む）
+- moon_techo 固有QA：20/20 PASS（公開版で ✦・ピンク背景が0件であること、暦がエンジンの計算結果のままであることを含む）
+- Gate A・Gate B・moon_techo固有QAの正式資料との照合は、非公開の検証データを使って内部で実施
+
+## Deferred（意図的な段階分離）
+
+- **Birthday Moon系**：`moon_reading.html`・`birthday_moon_calendar.html`・`birthday_moon_lookup.html` は今回変更していない（`moon_practice.html` も同様）。共通エンジンとの間で夜番号に差異が生じ得ることを Known Issue とし、過去の正式ハワイ暦によるバックテスト（Phase 2：Historical Backtesting / Birthday Moon）を経てから統合する
+
+────────────────────────
