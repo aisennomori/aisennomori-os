@@ -12,6 +12,9 @@ function loadEngine(text){ return new Function(engineBlock(text) + '\nreturn Haw
 const canonical = fs.readFileSync(ENGINE_FILE, 'utf8');
 const ABEGIN = '/* ===== HAWAIIAN_CALENDAR_ADAPTER BEGIN', AEND = '/* ===== HAWAIIAN_CALENDAR_ADAPTER END ===== */';
 const adapterCanon = fs.readFileSync(path.join(ROOT, 'engine', 'app_adapter.js'), 'utf8');
+const VBEGIN = '/* ===== HAWAIIAN_CALENDAR_VERIFICATION BEGIN', VEND = '/* ===== HAWAIIAN_CALENDAR_VERIFICATION END ===== */';
+const verCanon = fs.readFileSync(path.join(ROOT, 'engine', 'official_verification.js'), 'utf8');
+function verBlock(text){ const a = text.indexOf(VBEGIN), b = text.indexOf(VEND); return (a < 0 || b < 0) ? null : text.slice(a, b + VEND.length); }
 function adapterBlock(text){ const a = text.indexOf(ABEGIN), b = text.indexOf(AEND); return (a < 0 || b < 0) ? null : text.slice(a, b + AEND.length); }
 const HC = loadEngine(canonical);
 const sha = s => crypto.createHash('sha256').update(s, 'utf8').digest('hex');
@@ -26,6 +29,7 @@ const embedTargets = (process.env.EMBED_TARGETS || 'mauli_tool.html').split(',')
 for (const f of embedTargets){
   const t = fs.readFileSync(path.join(ROOT, f), 'utf8');
   check(`0 埋め込みエンジン一致: ${f}`, engineBlock(t) === engineBlock(canonical), 'sha256 ' + sha(engineBlock(canonical)).slice(0, 12));
+  if (t.indexOf(VBEGIN) >= 0) check(`0c 埋め込み検証モジュール一致: ${f}`, verBlock(t) === verBlock(verCanon), 'sha256 ' + sha(verBlock(verCanon)).slice(0, 12));
   if (t.indexOf(ABEGIN) >= 0) check(`0b 埋め込み接続コード一致: ${f}`, adapterBlock(t) === adapterBlock(adapterCanon), 'sha256 ' + sha(adapterBlock(adapterCanon)).slice(0, 12));
 }
 

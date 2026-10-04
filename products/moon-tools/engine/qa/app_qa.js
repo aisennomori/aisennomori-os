@@ -50,5 +50,5 @@ async function open(b,file,iso){
     await a.p.close();await n.p.close();
   }
   await b.close();
-  console.log(`\n4アプリ回帰QA: ${pass} PASS / ${fail} FAIL`+(fail?'  → '+fails.join(', '):''));
+  console.log(`\nアプリ回帰QA（${APPS.length}本）: ${pass} PASS / ${fail} FAIL`+(fail?'  → '+fails.join(', '):''));
 })();
