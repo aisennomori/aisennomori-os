@@ -122,15 +122,15 @@ Released
 
 ## 変更内容
 
-- **共通暦エンジンを導入**：`products/moon-tools/engine/` に、天文学的新月 → boundaryRule → Muku → Hilo → 周期 → 29/30夜 → Mauli → 夜番号 を一本で算出する共通エンジンを追加し、これを暦計算の唯一の正本とした
+- **共通暦エンジンを導入**：天文計算から Hilo・Muku・Mauli・夜番号を一本で算出する共通エンジンを導入し、これを暦計算の唯一の正本とした（エンジンは非公開。OS-DEC-017）
 - **CONFIRMED補正型から計算型へ移行**：本番経路から CONFIRMED による計算結果の上書き・補正を撤去した。CONFIRMED／正式資料のデータは計算入力ではなく、内部QA用の検証データとして扱う。正式資料由来のデータは公開リポジトリに置かない
 - **周期ベース探索へ移行**：カレンダー月（YYYY-MM）を計算上の主キーとせず、日付から周期を直接引く方式とした。1か月に2回Hiloがある月（例：2027年10月）や、旧方式で欠落していた区間（2027年8月・10月）も正しく扱える
-- **boundaryRule＝UTC_DATE を採用**：新月のUTC日付をMukuとする。これは現時点で入手済みの正式確認データ（2026年・2027年 Hilo／Muku／Mauli）をすべて再現する**運用上の採用仕様**であり、伝統的な日界が特定の時刻であることを確定したものではない。確認済みの境界は HST 13:51〜14:52 の範囲。boundaryRule は将来差し替え可能な構造とした
+- **境界判定（boundaryRule）を採用**：現時点で入手済みの正式確認データ（2026年・2027年 Hilo／Muku／Mauli）をすべて再現する**運用上の採用仕様**を採用した（内容は非公開）。伝統的な日界が特定の時刻であることを確定したものではない。boundaryRule は将来差し替え可能な構造とした
 - **2026-12 周期の正式訂正**：2026年12月の CONFIRMED 値を正式資料に基づき訂正した（Hilo 2026-12-10／Muku 2027-01-07／Mauliなし）
 - **対象5アプリを共通エンジンへ移行**：`moon_calendar.html`・`cycle_tracker.html`・`moon_cycle.html`・`moon_card_gallery.html`・`moon_techo.html`。暦計算ブロックのみを置き換え、UIは変更していない（moon_techo の ✦ は下記）
 - **moon_techo の ✦・ピンク背景を非表示**：v1.0.0公開版では、✦・ピンク背景を表示しない。正式資料由来のデータを公開リポジトリに置かないため（OS-DEC-016）。暦の表示値は常にエンジンの計算結果で、変更はない
 - **mauli_tool.html**：Hilo–Muku の日付差判定を 28日（29夜・Mauliなし）／29日（30夜・Mauliあり）に修正し、共通エンジンで周期を算出するよう変更。正式資料は検証データとして照合する運用へ説明文を整理（`moon_tools.html` の紹介文も同趣旨に更新）
-- **2029・2030年を Calculated／Predicted として凍結**：共通エンジンのみで生成した 2029年（13周期）・2030年（14周期）の Hilo／Muku／Mauli を、生成日時・engine version・boundaryRule・commit・data hash とともに凍結した。将来の正式資料との out-of-sample 検証に用いるため、予測ファイル自体は今後も書き換えない
+- **2029・2030年を Calculated／Predicted として凍結**：共通エンジンのみで生成した 2029年（13周期）・2030年（14周期）の Hilo／Muku／Mauli を、生成日時・engine version・commit・data hash とともに凍結した（凍結データは非公開で保管）。将来の正式資料との out-of-sample 検証に用いるため、予測ファイル自体は今後も書き換えない
 
 ## 検証結果
 
@@ -145,3 +145,20 @@ Released
 - **Birthday Moon系**：`moon_reading.html`・`birthday_moon_calendar.html`・`birthday_moon_lookup.html` は今回変更していない（`moon_practice.html` も同様）。共通エンジンとの間で夜番号に差異が生じ得ることを Known Issue とし、過去の正式ハワイ暦によるバックテスト（Phase 2：Historical Backtesting / Birthday Moon）を経てから統合する
 
 ────────────────────────
+
+────────────────────────
+# Hawaiian Lunar Calendar Engine v1.1.0（通常更新）
+
+- **Version**: 1.1.0
+- **Date**: 2026-10-05
+- **関連決定**: DECISIONS.md OS-DEC-017・OS-DEC-018
+
+## 変更内容
+
+- **公開版を共通周期データ方式へ変更**：公開アプリには、非公開エンジンで生成した1500〜2100年の共通周期データと検索・表示の処理だけを置き、暦の算出ロジックを公開側から外した。エンジン原本・QA・計算済みデータは公開リポジトリから外した。年次更新は不要
+- **ΔTの年代式を補完（engine v1.1.0）**：1860年より前の補正式を補った。1860〜2100年の周期はv1.0.0と同一
+- **Birthday Moonを共通基準へ統一**：moon_reading・birthday_moon_calendar・birthday_moon_lookup・birthday_profile を、ほかの月関連アプリと同じ共通周期データに統一し、旧方式を廃止した（旧方式とは約4割の日付で夜番号が1つ変わる）。v1.0.0のDeferred（Birthday Moon系）はこれで解消
+- **MoonCardの著名人**：200名を共通基準の夜に所属させた（75名を移動。人数の調整はしない）
+- **入力範囲**：Birthday Moonは1500年〜今日（未来日不可。1500〜1899年は歴史年代・参考利用として注意を表示、1499年以前は対象外）。通常の月関連アプリは今年1月〜2100年12月。Mauli検証ツールは1500〜2100年
+- **moon_practice.html**：使われていなかった旧計算コードを削除
+

@@ -357,165 +357,112 @@
   ];
 
 
-  // ============================================================
-  // Astronomical new-moon calculation (Meeus low-precision series)
-    // ============================================================
-      // ハワイアンムーン コアロジック
-      //
-      // 【基本】仮版（天文計算）
-      //   Hilo(1夜目) = 前の新月 + 1日
-      //   Muku(30夜目) = 次の新月
-      //   Mauli有無 = 新月間隔が30日なら「あり」
-      //
-      // 【上書き】確定版テーブル（先生データ）
-      //   CONFIRMED に追加するだけで該当月が自動的に上書き
-      //   キー = 仮版HiloのYYYY-MM
-      //   値   = { hilo, muku, hasMauli }
-      // ============================================================
-
-      const D = 86400000; // 1日 = ミリ秒
-
-  // ── 確定版テーブル ──────────────────────────────────────────
-    // ※ 毎年先生から届いたら追加する（それだけでOK）
-    // キー = 仮版HiloのYYYY-MM
-    // 値   = { hilo:確定Hilo, muku:第30夜(次の確定Muku), hasMauli:bool }
-    const CONFIRMED = {
-      // 2026年 全サイクル確定版
-      '2026-03': { hilo:'2026-03-20', muku:'2026-04-17', hasMauli:false },  // Mauli削除
-      '2026-04': { hilo:'2026-04-18', muku:'2026-05-16', hasMauli:false },  // Mauli削除
-      '2026-05': { hilo:'2026-05-17', muku:'2026-06-15', hasMauli:true  },  // Mauli追加 Mauli=6/14
-      '2026-06': { hilo:'2026-06-16', muku:'2026-07-14', hasMauli:false },  // Mauli削除
-      '2026-07': { hilo:'2026-07-15', muku:'2026-08-12', hasMauli:false },  // Mauli削除
-      '2026-08': { hilo:'2026-08-13', muku:'2026-09-11', hasMauli:true  },  // Mauli追加 Mauli=9/10
-      '2026-09': { hilo:'2026-09-12', muku:'2026-10-10', hasMauli:false },  // Mauli削除
-      '2026-10': { hilo:'2026-10-11', muku:'2026-11-09', hasMauli:true  },  // Mauli追加 Mauli=11/8
-      '2026-11': { hilo:'2026-11-10', muku:'2026-12-09', hasMauli:true  },  // Mauli追加 Mauli=12/8
-      '2026-12': { hilo:'2026-12-10', muku:'2027-01-08', hasMauli:true  },  // Mauli追加 Mauli=1/7
-    };
-
-
-      // ── 天文計算（Meeus）────────────────────────────────────────
-      function newMoonJDE(k){
-        const T=k/1236.85,T2=T*T,T3=T2*T,T4=T3*T;
-        const r=Math.PI/180,E=1-0.002516*T-0.0000074*T2;
-        const Mm=((201.5643+385.81693528*k+0.0107582*T2+0.00001238*T3-0.000000058*T4)%360)*r;
-        const Ms=((2.5534+29.10535670*k-0.0000014*T2-0.00000011*T3)%360)*r;
-        const Fm=((160.7108+390.67050284*k-0.0016118*T2-0.00000227*T3)%360)*r;
-        const Og=((124.7746-1.56375588*k+0.0020672*T2+0.00000215*T3)%360)*r;
-        const s=Math.sin,E2=E*E;
-        return 2451550.09766+29.530588861*k+0.00015437*T2-0.000000150*T3+0.00000000073*T4
-          -0.40720*s(Mm)+0.17241*E*s(Ms)+0.01608*s(2*Mm)+0.01039*s(2*Fm)
-          +0.00739*E*s(Mm-Ms)-0.00514*E*s(Mm+Ms)+0.00208*E2*s(2*Ms)
-          -0.00111*s(Mm-2*Fm)-0.00057*s(Mm+2*Fm)+0.00056*E*s(2*Mm+Ms)
-          -0.00042*s(3*Mm)+0.00042*E*s(Ms+2*Fm)+0.00038*E*s(Ms-2*Fm)
-          -0.00024*E*s(2*Mm-Ms)-0.00017*s(Og)-0.00007*s(Mm+2*Ms)
-          +0.00004*s(2*Mm-2*Fm)+0.00004*s(3*Ms)+0.00003*s(Mm+Ms-2*Fm)
-          +0.00003*s(2*Mm+2*Fm)-0.00003*s(Mm+Ms+2*Fm)+0.00003*s(Mm-Ms+2*Fm)
-          -0.00002*s(Mm-Ms-2*Fm)-0.00002*s(3*Mm+Ms)+0.00002*s(4*Mm);
-      }
-      function kFor(y,m){ return Math.floor((y+(m-0.5)/12-2000)*12.3685); }
-
-      const nmCache={};
-      function getNM(y){
-        if(nmCache[y]) return nmCache[y];
-        const seen=new Set(), list=[];
-        for(let k=kFor(y,1)-4; k<=kFor(y,12)+4; k++){
-          const jst=new Date((newMoonJDE(k)-2440587.5)*D+9*3600*1000);
-          const ms=Date.UTC(jst.getUTCFullYear(),jst.getUTCMonth(),jst.getUTCDate());
-          if(!seen.has(ms)){ seen.add(ms); list.push(ms); }
-        }
-        return nmCache[y]=list.sort((a,b)=>a-b);
-      }
-      function nmNear(y){
-        const merged=getNM(y-1).concat(getNM(y),getNM(y+1));
-        const seen=new Set();
-        return merged.filter(ms=>seen.has(ms)?false:seen.add(ms)).sort((a,b)=>a-b);
-      }
-
-      // ── サイクル取得 ─────────────────────────────────────────────
-      // cycle = { hiloMs, mukuMs, hasMauli, isConfirmed }
-      function findCycle(y,m){
-        const monthStart=Date.UTC(y,m-1,1);
-        const monthEnd=Date.UTC(m<12?y:y+1, m<12?m:0, 1);
-        const list=nmNear(y);
-        for(let i=1; i<list.length; i++){
-          const hiloKari=list[i-1]+D;  // 仮版Hilo
-          if(hiloKari>=monthEnd||list[i]<=monthStart) continue;  // ①範囲判定修正
-
-          // 仮版HiloのYYYY-MMで確定版を検索 → あれば上書き
-          const hd=new Date(hiloKari);
-          const key=hd.getUTCFullYear()+'-'+String(hd.getUTCMonth()+1).padStart(2,'0');
-          const ov=CONFIRMED[key];
-          if(ov) return {
-            hiloMs: new Date(ov.hilo+'T00:00:00Z').getTime(),
-            mukuMs: new Date(ov.muku+'T00:00:00Z').getTime(),
-            kariHiloMs: hiloKari,  // ②仮版Hiloを保持（adjCycle用）
-            hasMauli: ov.hasMauli,
-            isConfirmed: true,
-          };
-
-          // 仮版
-          const hasMauli=Math.round((list[i]-list[i-1])/D)===30;
-          return { hiloMs:hiloKari, mukuMs:list[i], kariHiloMs:hiloKari, hasMauli, isConfirmed:false };
-        }
-        return null;
-      }
-
-      // ── ±1月移動 ─────────────────────────────────────────────────
-      function adjCycle(cycle,dir){
-        // ③kariHiloMsで新月リストを検索（CONFIRMEDずれ対策）
-        const y=new Date(cycle.kariHiloMs).getUTCFullYear();
-        const list=nmNear(y);
-        const kariMuku=cycle.kariHiloMs-D;  // 仮版新月
-        for(let i=1; i<list.length-1; i++){
-          if(list[i-1]!==kariMuku) continue;
-          const ni=dir>0?i:i-2;
-          if(ni<0||ni+1>=list.length) return null;
-          const hiloKari=list[ni]+D;
-          const hd=new Date(hiloKari);
-          const key=hd.getUTCFullYear()+'-'+String(hd.getUTCMonth()+1).padStart(2,'0');
-          const ov=CONFIRMED[key];
-          if(ov) return {
-            hiloMs: new Date(ov.hilo+'T00:00:00Z').getTime(),
-            mukuMs: new Date(ov.muku+'T00:00:00Z').getTime(),
-            kariHiloMs: hiloKari,
-            hasMauli: ov.hasMauli,
-            isConfirmed: true,
-          };
-          const hasMauli=Math.round((list[ni+1]-list[ni])/D)===30;
-          return { hiloMs:hiloKari, mukuMs:list[ni+1], kariHiloMs:hiloKari, hasMauli, isConfirmed:false };
-        }
-        return null;
-      }
-
-      // ── 対象日を挟む新月ブラケットを直接探す（★新規追加）─────────────
-      // このアプリ（バースデー・ムーン診断）は、過去の任意の年月日を扱うため、
-      // 2026年分のみを収録するCONFIRMEDテーブル（mauli_tool.html由来の確定値）
-      // は参照しない。常に新月の天文計算のみで、直近の新月の翌日をHiloとする。
-      function findBracket(target, year){
-        const list = nmNear(year);
-        for(let i=1; i<list.length; i++){
-          const hiloMs = list[i-1] + D;   // 直近の１つ前の新月の翌日 = Hilo
-          const mukuMs = list[i];
-          if(target < hiloMs || target > mukuMs) continue;
-          const hasMauli = Math.round((mukuMs - list[i-1]) / D) === 30;
-          return { hiloMs, mukuMs, hasMauli };
-        }
-        return null;
-      }
-
-      // ── 指定日の夜番号（1〜30）───────────────────────────────────
-      function getMoonNight(year,month,day){
-        const target=Date.UTC(year,month-1,day);
-        const cy=findBracket(target, year);
-        if(!cy) return null;
-        const{hiloMs,mukuMs,hasMauli}=cy;
-        if(target===mukuMs) return 30;
-        if(target===mukuMs-D && hasMauli) return 29;
-        const offset=Math.round((target-hiloMs)/D);
-        if(offset>=0 && offset<=27) return offset+1;
-        return null;
-      }
+  // 暦は共通周期データ（計算済み）を参照する。
+  const D = 86400000; // 1日 = ミリ秒
+/* ===== HAWAIIAN_CALENDAR_DATA BEGIN v1.1.0 ===== */
+// 古来ハワイ太陰暦 共通周期データ（愛泉の杜OS）収録範囲：1499-12-12〜2101-01-29（7435周期）
+// 計算済みの周期一覧を参照するだけのモジュール。暦の算出処理は含まない。生成元は非公開。手で編集しない（OS-DEC-017）。
+// 日付は各アプリ既存の Date.UTC(y,m-1,d) と同じミリ秒表現で扱う。
+var HawaiianCalendar = (function(){
+  'use strict';
+  var VERSION = '1.1.0', DAY = 86400000, N = 7435;
+  var FIRST_HILO = Date.UTC(1499, 11, 12);
+  var DATA = '1apqk27STupKXakt1apqVbVKW6krdaW2VJuqVdUqbaWu1JXskl2yVdWqapW2UleyS3ZJN2mrrFXaSm2pLtkl3aSt1JVaS7WltmSXdJN2UldqS7Wm2lJt0k3aSV2pLdWmalW1STdpJ3WltlSXalW1KlulrdSVupJdqlXVqmqVtlJX6kp2yS7pqmxV1kpbqS3ZJb2km7RV2kptpbZkl/SSbtJWakutpdpSW7JLuklbqSu1pVpVrck26SZtpa7UlmpVtapapZu0lbpSW6pLtapqla3SVupKXsku2apqVbVKW6krtSW7ZJu0ldZKa6Wu1Jbskl7SVdpKbaW2UluyS3pJN2krtaXaUm2qLukl3aSt1JXaUq2qVmWbdJO2UldqS7WqWlWt0lXaSl2pLdmqWlW1SldpK3Ult2SXbJW1KlulrdSV3KJd0lXaSmultlRXakt2US/pKm2l1lJrqi3ZJb2kq7SV2lKtqjZll3STbtJW6kqtqlZVq7JVukpbqSu1qVpVrcpW6Sptxa7olmxVtapapau0lbqiW7RTtkpbpa3UVuqKbtEu6iptpbVSW6oruUW7qCt1pbZSa6o11Rbtom7UldpSbapWVauyk7pRV2pLdalWVa2qVupKXakt2aXaVK2qVmUrdaW6ZJd0k7bKWmWt1JXakl3STdpJW6Wt0lZqS3VJN2kndaW2UluqLdUl3aKd1JXaUluqVVWbapN2UlfqSm2pNlWrqlXaSl2pK7Wl2lStqlZVK3WlrmSX7JKtqlZVq7SVupJdsku6SVtlrdJWakt1yS7pJm2lrtJWai21Jbukm7STulJbqi3VluqSbtJO6kptqTZVq6pNukk7qSt1pbZUq6pV1Sptpa7UlexSbapWVau0lbpSV7JLdklXZauyVdpKbcku2SXdpK3SVmortaW6pJd0k7ZSV2ot1Zbakl3STdpKXakt1apqTbZJN2kndaW2VKuqVdUq3aSd1JXaUl2qVdWqapW2UlfqSnbJVlWrqlXaSl2pLdkl26SrtFVaK3WltmSX9JKu0lZqK7WV2pJd0ku6SVupLbWWalNtyS7pJm2lrtSWalW1Ktukm7SVulJbqlXVqmqVrtJW6kptyS7VqmpVtkpbqSu5Jbtkq6xV1Sptpa7kluySbtJWWiutlbpSW7JLeklXaSu1ldpSbcku6SXdpK3UlmpVtam6pJt0k7ZSV2pNtapala3STdpKXakt1apqVbVKV2krdSW3ZKsE';
+  var HILO = [FIRST_HILO];
+  (function(){ var raw = atob(DATA), h = FIRST_HILO;
+    for (var i = 0; i < N; i++){ h += (29 + ((raw.charCodeAt(i >> 3) >> (i & 7)) & 1)) * DAY; HILO.push(h); } })();
+  var MIN_MS = HILO[0], MAX_MS = HILO[N] - DAY;
+  function ymd(ms){ var d = new Date(ms); return d.getUTCFullYear() + '-' + ('0'+(d.getUTCMonth()+1)).slice(-2) + '-' + ('0'+d.getUTCDate()).slice(-2); }
+  function parse(s){ return Date.parse(s + 'T00:00:00Z'); }
+  function inRange(ms){ return ms >= MIN_MS && ms <= MAX_MS; }
+  function make(i){ var hilo = HILO[i], muku = HILO[i+1] - DAY, nights = Math.round((muku - hilo) / DAY) + 1;
+    return { id: ymd(hilo), hiloMs: hilo, mukuMs: muku, nights: nights, hasMauli: nights === 30, mauliMs: nights === 30 ? muku - DAY : null }; }
+  function indexOf(ms){ var lo = 0, hi = N - 1; if (!inRange(ms)) return -1;
+    while (lo < hi){ var mid = (lo + hi + 1) >> 1; if (HILO[mid] <= ms) lo = mid; else hi = mid - 1; } return lo; }
+  // fromMs〜toMs に重なる周期の配列（時系列順）。label：Hiloの年月（同じ暦月の2周期目は 'b'）。検索には使わない。
+  function cycles(fromMs, toMs){
+    var out = [], i = indexOf(Math.max(fromMs, MIN_MS)); if (i < 0) return out;
+    for (; i < N && HILO[i] <= toMs; i++) out.push(make(i));
+    var seen = {}; out.forEach(function(c){ var m = c.id.slice(0, 7); c.label = seen[m] ? m + 'b' : m; seen[m] = true; });
+    return out;
+  }
+  function cycleAt(targetMs){
+    if (!inRange(targetMs)) return null;
+    var list = cycles(targetMs - 40*DAY, targetMs + 40*DAY);
+    for (var i = 0; i < list.length; i++) if (list[i].hiloMs <= targetMs && targetMs <= list[i].mukuMs) return list[i];
+    return null;
+  }
+  function adjacent(cycle, dir){ return cycle ? cycleAt(dir > 0 ? cycle.mukuMs + DAY : cycle.hiloMs - DAY) : null; }
+  // 夜番号：1〜28、Mauliありの周期は29（Mauli）、Mukuは30。Mauliなしの周期では29を飛ばす。
+  function nightNumber(cycle, targetMs){
+    if (!cycle || targetMs < cycle.hiloMs || targetMs > cycle.mukuMs) return null;
+    if (targetMs === cycle.mukuMs) return 30;
+    if (cycle.hasMauli && targetMs === cycle.mukuMs - DAY) return 29;
+    return Math.round((targetMs - cycle.hiloMs) / DAY) + 1;
+  }
+  function nightAt(targetMs){ return nightNumber(cycleAt(targetMs), targetMs); }
+  // 指定年にHiloがある周期（表示ラベル付き）
+  function cyclesOfYear(year){
+    var a = Date.UTC(year, 0, 1), b = Date.UTC(year + 1, 0, 1) - DAY;
+    return cycles(a - 40*DAY, b + 40*DAY).filter(function(c){ return c.hiloMs >= a && c.hiloMs <= b; });
+  }
+  return { VERSION: VERSION, DAY: DAY, MIN_MS: MIN_MS, MAX_MS: MAX_MS, inRange: inRange,
+           cycles: cycles, cycleAt: cycleAt, adjacent: adjacent, nightNumber: nightNumber,
+           nightAt: nightAt, cyclesOfYear: cyclesOfYear, ymd: ymd, parse: parse };
+})();
+/* ===== HAWAIIAN_CALENDAR_DATA END ===== */
+/* ===== HAWAIIAN_CALENDAR_ADAPTER BEGIN v1.0.0 ===== */
+// アプリ接続（全アプリ共通・アプリ別の補正は禁止）。正本：products/moon-tools/engine/app_adapter.js
+// 暦の値はすべて HawaiianCalendar（共通暦エンジン）から取得する。暦月key・CONFIRMEDは使わない。
+// 既存画面のコードが使う関数名（findCycle / adjCycle / getMoonNight）と周期オブジェクトの形を保つ。
+function hcCycle(c){ return c ? { hiloMs:c.hiloMs, mukuMs:c.mukuMs, hasMauli:c.hasMauli, id:c.id, label:c.label } : null; }
+// 指定した年月を表示するための周期：その月の初日と重なる最初の周期（従来の表示仕様を維持）
+function findCycle(y,m){
+  var a=Date.UTC(y,m-1,1), b=Date.UTC(y,m,1);
+  var list=HawaiianCalendar.cycles(a,b-1);
+  for(var i=0;i<list.length;i++){ if(list[i].hiloMs<b && list[i].mukuMs>a) return hcCycle(list[i]); }
+  return null;
+}
+// 前後の周期（暦月ではなく周期の順番で移動）
+function adjCycle(cycle,dir){ return hcCycle(HawaiianCalendar.adjacent(cycle,dir)); }
+// 指定日の夜番号（1〜30。Mauliのない周期では29を飛ばす）
+function getMoonNight(year,month,day){ return HawaiianCalendar.nightAt(Date.UTC(year,month-1,day)); }
+/* ===== HAWAIIAN_CALENDAR_ADAPTER END ===== */
+/* ===== HAWAIIAN_BIRTHDAY_RANGE BEGIN v1.1.0 ===== */
+// Birthday Moon の入力範囲（全Birthday Moon画面で共通）。正本は非公開（OS-DEC-017）。手で編集しない。
+// ・1900年以降：通常利用 ／ 1500〜1899年：歴史年代・参考利用（注意表示あり）／ 1499年以前：対象外
+// ・未来の日付は入力できない（今日まで）
+var BIRTHDAY_MIN_YEAR = 1500, BIRTHDAY_NORMAL_FROM_YEAR = 1900;
+// 判定結果：'ok' | 'invalid'（実在しない日付・未入力）| 'before'（1499年以前）| 'future'（未来日）
+function birthdayCheck(y, m, d){
+  y = +y; m = +m; d = +d;
+  if (!y || !m || !d) return 'invalid';
+  var ms = Date.UTC(y, m - 1, d), dt = new Date(ms);
+  if (dt.getUTCFullYear() !== y || dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return 'invalid';
+  if (y < BIRTHDAY_MIN_YEAR) return 'before';
+  var now = new Date();
+  if (ms > Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) return 'future';
+  return 'ok';
+}
+function birthdayMessage(r){
+  if (r === 'before') return BIRTHDAY_MIN_YEAR + '年より前の生年月日には対応していません。';
+  if (r === 'future') return '未来の日付は入力できません。';
+  return '生年月日を正しく入力してください。';
+}
+// 1500〜1899年の結果に添える注意（HTML）。1900年以降は空文字。
+function birthdayHistoryNote(y){
+  if (+y >= BIRTHDAY_NORMAL_FROM_YEAR) return '';
+  return '<div class="birthday-history-note" style="margin:0 0 12px;padding:10px 12px;border-radius:8px;background:#FFF6E5;border:1px solid #F0D9A8;color:#6B5320;font-size:0.82rem;line-height:1.65;text-align:left;">'
+    + '<strong>歴史年代の参考結果です。</strong>1900年より前の生年月日は、旧暦やユリウス暦などで記録されていることがあります。'
+    + '記録の日付をそのまま入力した場合、実際の夜とは異なることがあります（現在の暦〈グレゴリオ暦〉の日付として計算しています）。</div>';
+}
+// 生年の選択肢（今年 → 1500年の降順）。placeholder を渡すと先頭に空の選択肢を付ける。
+function birthdayYearOptions(sel, placeholder){
+  var cur = new Date().getFullYear();
+  if (placeholder){ var p = document.createElement('option'); p.value = ''; p.textContent = placeholder; sel.appendChild(p); }
+  for (var y = cur; y >= BIRTHDAY_MIN_YEAR; y--){ var o = document.createElement('option'); o.value = y; o.textContent = y + '年'; sel.appendChild(o); }
+}
+/* ===== HAWAIIAN_BIRTHDAY_RANGE END ===== */
 
       // ── 30夜マップ生成 ────────────────────────────────────────────
       function buildDayMap(cycle){
@@ -576,8 +523,7 @@ const MOON_IMGS = [
   function getMoonNightInfo(year, month, day){
     const n = getMoonNight(year, month, day);
     if(!n) return { n:0, dayIdx:0, lunLen:29 };
-    const target = Date.UTC(year, month-1, day);
-    const cy = findBracket(target, year);
+    const cy = HawaiianCalendar.cycleAt(Date.UTC(year, month-1, day));
     const lunLen = cy && cy.hasMauli ? 30 : 29;
     return { n, dayIdx:n-1, lunLen };
   }
@@ -605,10 +551,12 @@ const MOON_IMGS = [
     tr.innerHTML =
       '<td class="row-num">' + rowCount + '</td>'
       + '<td><input type="text" class="name-input" placeholder="例: 山田太郎"></td>'
-      + '<td><input type="date" class="date-input"></td>';
+      + '<td><input type="date" class="date-input" min="' + BIRTHDAY_MIN_YEAR + '-01-01" max="' + todayISO() + '"></td>';
     tbody.appendChild(tr);
     updateAddButtonState();
   }
+
+  function todayISO(){ const n=new Date(); return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0'); }
 
   function updateAddButtonState(){
     document.getElementById('addRowBtn').disabled = (rowCount >= MAX_ROWS);
@@ -645,6 +593,10 @@ const MOON_IMGS = [
     resultTitle.style.display = '';
     printSection.style.display = '';
 
+    // 1500〜1899年の入力があれば、歴史年代の注意を一度だけ表示する
+    const hist = entries.find(en => { const yy = +en.dateStr.split('-')[0]; return birthdayCheck(...en.dateStr.split('-').map(Number)) === 'ok' && yy < BIRTHDAY_NORMAL_FROM_YEAR; });
+    if (hist) resultList.insertAdjacentHTML('beforeend', birthdayHistoryNote(+hist.dateStr.split('-')[0]));
+
     for (const entry of entries){
       const parts = entry.dateStr.split('-').map(Number);
       const y = parts[0], m = parts[1], d = parts[2];
@@ -654,7 +606,9 @@ const MOON_IMGS = [
 
       let valid = true;
       let info = null;
-      try {
+      const chk = birthdayCheck(y, m, d);
+      if (chk !== 'ok') valid = false;
+      else try {
         info = getMoonNightInfo(y, m, d);
         if (!info.n || isNaN(info.n)) valid = false;
       } catch(e){ valid = false; }
@@ -667,7 +621,7 @@ const MOON_IMGS = [
           + '<div class="info-block">'
             + '<span class="person-name">' + escapeHtml(entry.name) + '</span>'
             + '<span class="person-date">' + escapeHtml(entry.dateStr) + '</span>'
-            + '<div class="moon-name-line">日付を計算できませんでした</div>'
+            + '<div class="moon-name-line">' + (chk !== 'ok' ? birthdayMessage(chk) : '日付を計算できませんでした') + '</div>'
           + '</div>';
         resultList.appendChild(card);
         continue;
