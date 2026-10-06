@@ -90,6 +90,7 @@
 - トップページ（`index.html`）：「愛泉の杜」の入口ページとして刷新済み。🌿カウンセリング（育成中）／🔮オラクルカード（真実の愛カードのみ公開）／🌙月読みツール（非表示・開発中）／✨その他（準備中）
 - `products/moon-tools/`・`products/block-tools/`・`products/card-reading/`（`oracle_tools.html`・`other_tools.html`）に整理済み
 - 月読みツールは、現状トップページには表示しない方針（サブメニュー単位で管理）
+- **2026-10-06**：トップページに📅「暦」カテゴリを追加し、「月と暦のカレンダー」（`products/calendar/integrated_calendar.html`、2027年版 V1）を公開。注意事項・出典はカード下の開閉式（詳細は `RELEASE_NOTES.md`）
 
 ---
 

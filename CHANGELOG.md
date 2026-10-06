@@ -55,3 +55,13 @@
 - 数秘術の共通還元ルールはOS-DEC-008を継承
 - 上記仕様をOS-DEC-009「Birthday Profile 数秘サイクル仕様の正式化」として記録
 - `birthday_profile.html` をVersion 1.1として更新
+
+### 2026-10-06 — 月と暦のカレンダー（IntegratedCalendar）Version 1.0（2027年版）
+
+- `products/calendar/integrated_calendar.html` を新規追加（公開名称「月と暦のカレンダー」、内部名称 Integrated Calendar）
+- 日本の暦（祝日・六曜・一粒万倍日・天赦日・不成就日）、季節と月（二十四節気・月相・新月／満月の月のサイン）、古来ハワイ太陰暦（夜番号・月夜アイコン・正式な夜名・かな・周期の印）を1つのカレンダーで表示
+- 対象は2027年、データ版 2027.1.1（Gold Master）。PCは月間表＋日付詳細、スマートフォンは今日／一覧／月、印刷はA4縦の月間表＋一覧
+- トップページ（`index.html`）に「暦」カテゴリと入口カード、開閉式の「月と暦のカレンダーについて（注意事項・出典）」を追加
+- `APP_REGISTRY.md` に IntegratedCalendar を Active として追加登録
+- 設計判断を OS-DEC-019〜023、外部の暦サイトとの照合を OS-AUDIT-002 として記録
+- 詳細は `RELEASE_NOTES.md`「月と暦のカレンダー V1（2027年版）」を参照
