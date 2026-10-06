@@ -34,7 +34,7 @@ Documentation Standard（`DOC_STANDARD.md`）は、会話・設計・ドキュ�
 | SoulReading | 未定 | 未定 | Planned |
 | Healing | 未定 | 未定 | Planned |
 | BirthdayProfile | `products/card-reading/birthday_profile.html`（生年月日を一度入力し、古代ハワイアンムーン・数秘術・宿曜占星術の3体系から基礎プロフィールを一覧表示する統合入口） | 未定 | Active |
-| IntegratedCalendar（公開名称：月と暦のカレンダー） | `products/calendar/integrated_calendar.html`（日本の暦・季節と月（天文）・古来ハワイ太陰暦を1つのカレンダーで表示。V1、収録期間 2026年9月〜2027年12月、データ版 2027.1.2。ハワイ暦は共通周期データを参照） | 未定 | Active |
+| IntegratedCalendar（公開名称：月と暦のカレンダー） | `products/calendar/integrated_calendar.html`（日本の暦・季節と月（天文）・古来ハワイ太陰暦を1つのカレンダーで表示。V1、収録期間 2026年9月〜2027年12月、データ版 2027.1.3。ハワイ暦は共通周期データを参照） | 未定 | Active |
 
 ## 備考：MoonCardと`moon-tools`の関係
 
