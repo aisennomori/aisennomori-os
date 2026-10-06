@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>月と暦のカレンダー | 愛泉の杜</title>
+<!--
+  月と暦のカレンダー（愛泉の杜 Integrated Calendar／開発名：統合暦） V1 — 収録年：2027
+  データ：Integrated Calendar 2027 FACT Gold Master 2027.1.1（照合済みの固定データ。ブラウザでは暦を計算しない）
+  古来ハワイ太陰暦：共通周期データ v1.1.0 を参照するだけ（HAWAIIAN_CALENDAR_DATA ブロック。暦の算出処理は含まない）
+  表示方針：吉凶の総合判定・ランキングはしない。重なる暦注はすべて並べる。月相の時刻は表示しない。
+-->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap');
+  :root{
+    --bg:#F7F3EA; --card:#FFFFFF; --ink:#2F2A24; --soft:#857A6C; --faint:#B9AE9E;
+    --line:#E6DDCD; --line2:#D8CCB6; --navy:#24304A; --gold:#B08A3E; --gold-soft:#E9DCC0;
+    --sun:#B4513A; --taian:#B0584C; --sel:#F1E7D2; --today:#24304A; --hawaii:#3E7F78; --hawaii-soft:#E3EFED;
+    --serif:'Shippori Mincho','Hiragino Mincho ProN','Yu Mincho',serif;
+    --sans:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-text-size-adjust:100%}
+  button{font-family:inherit;color:inherit}
+  .wrap{max-width:1240px;margin:0 auto;padding:16px}
+  header.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin-bottom:12px}
+  .brand{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--navy);letter-spacing:.08em}
+  .brand small{font-family:var(--sans);font-size:12px;color:var(--soft);font-weight:500;margin-left:8px;letter-spacing:.04em}
+  .nav{display:flex;align-items:center;gap:6px;margin-left:auto}
+  .nav .ym{font-family:var(--serif);font-size:19px;font-weight:700;min-width:116px;text-align:center}
+  .btn{border:1px solid var(--line2);background:var(--card);border-radius:8px;padding:5px 11px;font-size:13px;cursor:pointer}
+  .btn:disabled{opacity:.35;cursor:default}
+  .btn:hover:not(:disabled){background:var(--sel)}
+  .toggles{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--soft);align-items:center}
+  .toggles label{display:inline-flex;align-items:center;gap:5px;cursor:pointer}
+  .notice{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--soft);margin-bottom:12px}
+  .tagline{font-size:12.5px;color:var(--soft);margin:1px 0 2px;letter-spacing:.03em}
+  .taian{color:var(--taian)}   /* 大安：文字色のみの穏やかな強調（吉凶判定ではない） */
+  a.back{font-size:12.5px;color:var(--soft);text-decoration:none}
+
+  /* ── 共通部品 ── */
+  .nb{display:inline-flex;align-items:center;justify-content:center;min-width:1.75em;height:1.75em;padding:0 .2em;border:1.3px solid var(--hawaii);border-radius:999px;
+      color:var(--hawaii);font-size:.78em;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;background:var(--card)}
+  .nightchip{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;cursor:pointer}
+  .nightchip .ic{font-size:.95em;line-height:1}
+  .sen{display:inline-block;font-size:.82em;border:1px solid var(--line2);border-radius:4px;padding:0 4px;margin:0 2px 2px 0;background:#FBF8F1;white-space:nowrap}
+  .phase{white-space:nowrap}
+  .hol{color:var(--sun)}
+  .sun{color:var(--sun)}
+
+  /* ── PC：月間カレンダー＋日付詳細 ── */
+  .pc{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:16px;align-items:start}
+  .grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:var(--line);gap:1px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .dow{background:#EFE8DA;text-align:center;font-size:12.5px;padding:5px 0;color:var(--soft);font-weight:700}
+  .dow.sun{color:var(--sun)}
+  .cell{background:var(--card);min-height:132px;padding:5px 6px 4px;display:flex;flex-direction:column;cursor:pointer;font-size:12px;line-height:1.35;position:relative}
+  .cell.empty{background:#FAF7F0;cursor:default}
+  .cell:hover:not(.empty){background:#FDFAF3}
+  .cell.sel{background:var(--sel);box-shadow:inset 0 0 0 2px var(--gold)}
+  .cell .d{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.1}
+  .cell.today .d{display:inline-block;background:var(--today);color:#fff;border-radius:6px;padding:0 5px}
+  .cell .holn{font-size:11px;color:var(--sun);margin-left:4px}
+  .slot{min-height:1.35em}
+  .slot.rk{color:var(--soft);font-size:11.5px}
+  .slot.senl{min-height:2.7em}
+  .slot.sea{font-size:11.5px}
+  .slot.hw{margin-top:auto;padding-top:3px;border-top:1px dashed var(--line);font-size:12.5px}
+  .detail{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;position:sticky;top:12px}
+
+  /* ── 日付詳細（PC・スマホ共通） ── */
+  .dt-date{font-family:var(--serif);font-size:20px;font-weight:700;margin:0 0 8px}
+  .band{margin:12px 0 0}
+  .band h3{font-size:12.5px;color:var(--soft);font-weight:700;margin:0 0 5px;letter-spacing:.06em;padding-bottom:3px;border-bottom:1px solid var(--line)}
+  .band.hawaii h3{color:var(--hawaii)}
+  .kv{display:grid;grid-template-columns:6.2em 1fr;gap:3px 8px;font-size:14px}
+  .kv .k{color:var(--soft);font-size:12.5px;padding-top:1px}
+  .kv .v.none{color:var(--faint)}
+  .hwbox{display:flex;align-items:center;gap:10px;background:var(--hawaii-soft);border-radius:10px;padding:8px 10px}
+  .hwbox .nb{font-size:15px}
+  .hwbox .ic{font-size:24px}
+  .hwname{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.2}
+  .hwkana{font-size:12px;color:var(--soft)}
+  .hwmeta{font-size:12px;color:var(--soft);margin-top:4px}
+  .mark{display:inline-block;font-size:11px;border:1px solid var(--hawaii);color:var(--hawaii);border-radius:4px;padding:0 5px;margin-left:6px}
+
+  /* ── スマホ：今日／一覧／月 ── */
+  .sp{display:none}
+  .tabs{display:flex;gap:6px;margin:0 0 10px;position:sticky;top:0;background:var(--bg);padding:6px 0;z-index:5}
+  .tabs button{flex:1;border:1px solid var(--line2);background:var(--card);border-radius:999px;padding:7px 0;font-size:14px;cursor:pointer}
+  .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .sp .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .daynav{display:flex;justify-content:space-between;margin-top:10px}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .row{display:grid;grid-template-columns:3.4em 2.6em minmax(0,1fr) 3.6em;align-items:center;gap:0 6px;padding:7px 10px;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer}
+  .row:last-child{border-bottom:none}
+  .row .dd{font-family:var(--serif);font-weight:700}
+  .row .rk{color:var(--soft);font-size:12.5px}
+  .row .ev{min-width:0;line-height:1.35}
+  .row .hwc{text-align:right}
+  .row.today{box-shadow:inset 3px 0 0 var(--today)}
+  .row.open{background:var(--sel)}
+  .rowdetail{padding:6px 12px 12px;border-bottom:1px solid var(--line);background:#FDFAF3}
+  .mgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .mgrid .dow{font-size:11px;padding:3px 0}
+  .mcell{background:var(--card);min-height:66px;padding:3px 2px;text-align:center;font-size:11px;line-height:1.25;cursor:pointer}
+  .mcell.empty{background:#FAF7F0;cursor:default}
+  .mcell .d{font-family:var(--serif);font-weight:700;font-size:14px}
+  .mcell.today .d{background:var(--today);color:#fff;border-radius:5px;padding:0 4px}
+  .mcell .dots{color:var(--gold);letter-spacing:1px;min-height:1.1em}
+  .mcell .p1{min-height:1.2em}
+  .mcell .nightchip{font-size:10.5px}
+  .legend{font-size:11.5px;color:var(--soft);margin-top:8px;line-height:1.7}
+
+  /* レイヤー表示切替 */
+  body.hide-jp .L-jp, body.hide-sea .L-sea, body.hide-hw .L-hw{visibility:hidden}
+
+  /* ── 印刷 ── */
+  #print{display:none}
+  @media (max-width: 899px){
+    .pc{display:none} .sp{display:block} .toggles{display:none}
+    .nav{margin-left:0;width:100%;justify-content:space-between}
+    .wrap{padding:12px}
+  }
+  @page{size:A4 portrait;margin:9mm 10mm}
+  @media print{
+    body{background:#fff}
+    .wrap{display:none}
+    #print{display:block}
+    .pg{page-break-after:always;break-after:page;font-size:8.2pt;color:#000}
+    .pg:last-child{page-break-after:auto;break-after:auto}
+    .pg h2{font-family:var(--serif);font-size:15pt;margin:0 0 1.5mm;display:flex;justify-content:space-between;align-items:baseline}
+    .pg h2 small{font-family:var(--sans);font-size:8pt;font-weight:500;color:#555}
+    .pmonth{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:2.5mm}
+    .pmonth th{font-size:7.6pt;border:.3pt solid #999;background:#f2eee6;padding:.4mm}
+    .pmonth td{position:relative;border:.3pt solid #999;vertical-align:top;height:15.5mm;padding:.6mm .9mm 4.6mm;font-size:6.7pt;line-height:1.22}
+    .pmonth td .d{font-weight:700;font-size:9pt}
+    .pmonth td .hwp{position:absolute;left:.9mm;bottom:.6mm}  /* 月夜はセル下端に固定 */
+    .plist{width:100%;border-collapse:collapse;table-layout:fixed}
+    .plist th{font-size:7pt;background:#f2eee6;border-bottom:.4pt solid #888;text-align:left;padding:.3mm .8mm}
+    .plist td{font-size:7.3pt;padding:.15mm .8mm;border-bottom:.2pt solid #ccc;line-height:1.28;white-space:nowrap;overflow:hidden}
+    .plist td.ev{white-space:normal}
+    .nb{border-width:.6pt;font-size:6.2pt;min-width:1.7em;height:1.7em}
+    .pfoot{margin-top:1.5mm;font-size:6.6pt;color:#333;line-height:1.45}
+    .sun,.hol{color:#a33}
+    .taian{color:#a8483d}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="brand">月と暦のカレンダー<small>2027年版（V1）</small></div>
+      <div class="tagline">日本の暦・季節と月・ハワイの月夜を、ひとつの暦に。</div>
+      <a class="back" href="../../index.html">← トップメニューへ戻る</a>
+    </div>
+    <div class="nav">
+      <button class="btn" id="prevM" aria-label="前の月">◀</button>
+      <div class="ym" id="ym"></div>
+      <button class="btn" id="nextM" aria-label="次の月">▶</button>
+      <button class="btn" id="goToday">今日</button>
+      <button class="btn" id="printBtn">印刷</button>
+    </div>
+  </header>
+  <div class="toggles" id="toggles">
+    表示：
+    <label><input type="checkbox" data-layer="jp" checked>日本の暦</label>
+    <label><input type="checkbox" data-layer="sea" checked>季節と月</label>
+    <label><input type="checkbox" data-layer="hw" checked>ハワイの月夜</label>
+    <label style="margin-left:auto"><input type="checkbox" id="printAll">印刷で12か月すべてを出力</label>
+  </div>
+  <div class="notice" id="rangeNotice" hidden></div>
+
+  <!-- PC -->
+  <div class="pc">
+    <div>
+      <div class="grid" id="grid"></div>
+      <div class="legend" id="legendPc"></div>
+    </div>
+    <aside class="detail" id="detailPc" aria-live="polite"></aside>
+  </div>
+
+  <!-- スマートフォン -->
+  <div class="sp">
+    <div class="tabs" role="tablist">
+      <button data-tab="today" class="on">今日</button>
+      <button data-tab="list">一覧</button>
+      <button data-tab="month">月</button>
+    </div>
+    <div id="spToday"></div>
+    <div id="spList" hidden></div>
+    <div id="spMonth" hidden></div>
+  </div>
+</div>
+<div id="print"></div>
+
+<script type="application/json" id="fact-data">{"edition":"2027","version":"2027.1.1","range":["2027-01-01","2027-12-31"],"days":[{"d":"2027-01-01","hol":"元日","rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-02","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-03","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-04","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-05","hol":null,"rk":"友引","sen":[],"sekki":"小寒","phase":null,"sign":null},{"d":"2027-01-06","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-07","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-08","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":"new","sign":"山羊座"},{"d":"2027-01-09","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-10","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-11","hol":"成人の日","rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-12","hol":null,"rk":"仏滅","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-13","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-14","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-15","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-16","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-01-17","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-18","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-19","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-20","hol":null,"rk":"赤口","sen":[],"sekki":"大寒","phase":null,"sign":null},{"d":"2027-01-21","hol":null,"rk":"先勝","sen":["ichiryu","fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-22","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":"full","sign":"獅子座"},{"d":"2027-01-23","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-24","hol":null,"rk":"仏滅","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-25","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-26","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-27","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-28","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-29","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":"last","sign":null},{"d":"2027-01-30","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-01-31","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-01","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-02","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-03","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-04","hol":null,"rk":"先負","sen":[],"sekki":"立春","phase":null,"sign":null},{"d":"2027-02-05","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-06","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-07","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":"new","sign":"水瓶座"},{"d":"2027-02-08","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-09","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-10","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-11","hol":"建国記念の日","rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-12","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-13","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-14","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-02-15","hol":null,"rk":"先負","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-16","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-17","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-18","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-19","hol":null,"rk":"先勝","sen":[],"sekki":"雨水","phase":null,"sign":null},{"d":"2027-02-20","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-21","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":"full","sign":"乙女座"},{"d":"2027-02-22","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-23","hol":"天皇誕生日","rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-24","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-25","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-26","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-27","hol":null,"rk":"先負","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-02-28","hol":null,"rk":"仏滅","sen":["tensha"],"sekki":null,"phase":"last","sign":null},{"d":"2027-03-01","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-02","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-03","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-04","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-05","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-06","hol":null,"rk":"仏滅","sen":[],"sekki":"啓蟄","phase":null,"sign":null},{"d":"2027-03-07","hol":null,"rk":"大安","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-08","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":"new","sign":"魚座"},{"d":"2027-03-09","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-10","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-11","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-12","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-13","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-14","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-15","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-16","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-03-17","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-18","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-19","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-20","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-21","hol":"春分の日","rk":"先負","sen":[],"sekki":"春分","phase":null,"sign":null},{"d":"2027-03-22","hol":"休日","rk":"仏滅","sen":[],"sekki":null,"phase":"full","sign":"天秤座"},{"d":"2027-03-23","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-24","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-25","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-26","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-27","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-28","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-29","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-03-30","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":"last","sign":null},{"d":"2027-03-31","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-01","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-02","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-03","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-04","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-05","hol":null,"rk":"赤口","sen":[],"sekki":"清明","phase":null,"sign":null},{"d":"2027-04-06","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-07","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":"new","sign":"牡羊座"},{"d":"2027-04-08","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-09","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-10","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-11","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-12","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-13","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-14","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-04-15","hol":null,"rk":"大安","sen":["ichiryu","fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-16","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-17","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-18","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-19","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-20","hol":null,"rk":"仏滅","sen":[],"sekki":"穀雨","phase":null,"sign":null},{"d":"2027-04-21","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":"full","sign":"蠍座"},{"d":"2027-04-22","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-23","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-24","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-25","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-26","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-27","hol":null,"rk":"大安","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-28","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-04-29","hol":"昭和の日","rk":"先勝","sen":["tensha"],"sekki":null,"phase":"last","sign":null},{"d":"2027-04-30","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-01","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-02","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-03","hol":"憲法記念日","rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-04","hol":"みどりの日","rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-05","hol":"こどもの日","rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-06","hol":null,"rk":"仏滅","sen":[],"sekki":"立夏","phase":"new","sign":"牡牛座"},{"d":"2027-05-07","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-08","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-09","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-10","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-11","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-12","hol":null,"rk":"仏滅","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-13","hol":null,"rk":"大安","sen":["ichiryu"],"sekki":null,"phase":"first","sign":null},{"d":"2027-05-14","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-15","hol":null,"rk":"先勝","sen":["tensha"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-16","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-17","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-18","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-19","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-20","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":"full","sign":"蠍座"},{"d":"2027-05-21","hol":null,"rk":"先勝","sen":[],"sekki":"小満","phase":null,"sign":null},{"d":"2027-05-22","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-23","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-24","hol":null,"rk":"仏滅","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-25","hol":null,"rk":"大安","sen":["ichiryu","fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-26","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-27","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-28","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":"last","sign":null},{"d":"2027-05-29","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-30","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-05-31","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-01","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-02","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-03","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-04","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-05","hol":null,"rk":"大安","sen":["ichiryu"],"sekki":null,"phase":"new","sign":"双子座"},{"d":"2027-06-06","hol":null,"rk":"赤口","sen":[],"sekki":"芒種","phase":null,"sign":null},{"d":"2027-06-07","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-08","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-09","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-10","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-11","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-06-12","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-13","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-14","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-15","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-16","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-17","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-18","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-19","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":"full","sign":"射手座"},{"d":"2027-06-20","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-21","hol":null,"rk":"先負","sen":[],"sekki":"夏至","phase":null,"sign":null},{"d":"2027-06-22","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-23","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-24","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-25","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-26","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-27","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":"last","sign":null},{"d":"2027-06-28","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-29","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-06-30","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-01","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-02","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-03","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-04","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":"new","sign":"蟹座"},{"d":"2027-07-05","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-06","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-07","hol":null,"rk":"先負","sen":[],"sekki":"小暑","phase":null,"sign":null},{"d":"2027-07-08","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-09","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-10","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-11","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-07-12","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-13","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-14","hol":null,"rk":"仏滅","sen":["ichiryu","tensha"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-15","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-16","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-17","hol":null,"rk":"先勝","sen":["ichiryu","fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-18","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-19","hol":"海の日","rk":"先負","sen":[],"sekki":null,"phase":"full","sign":"山羊座"},{"d":"2027-07-20","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-21","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-22","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-23","hol":null,"rk":"先勝","sen":[],"sekki":"大暑","phase":null,"sign":null},{"d":"2027-07-24","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-25","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-26","hol":null,"rk":"仏滅","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-27","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":"last","sign":null},{"d":"2027-07-28","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-29","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-30","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-07-31","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-01","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-02","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":"new","sign":"獅子座"},{"d":"2027-08-03","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-04","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-05","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-06","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-07","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-08","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":"立秋","phase":null,"sign":null},{"d":"2027-08-09","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-08-10","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-11","hol":"山の日","rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-12","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-13","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-14","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-15","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-16","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-17","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":"full","sign":"水瓶座"},{"d":"2027-08-18","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-19","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-20","hol":null,"rk":"先勝","sen":["ichiryu","fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-21","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-22","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-23","hol":null,"rk":"仏滅","sen":[],"sekki":"処暑","phase":null,"sign":null},{"d":"2027-08-24","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-25","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":"last","sign":null},{"d":"2027-08-26","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-27","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-28","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-29","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-30","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-08-31","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-01","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":"new","sign":"乙女座"},{"d":"2027-09-02","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-03","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-04","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-05","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-06","hol":null,"rk":"先勝","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-07","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-08","hol":null,"rk":"先負","sen":[],"sekki":"白露","phase":"first","sign":null},{"d":"2027-09-09","hol":null,"rk":"仏滅","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-10","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-11","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-12","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-13","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-14","hol":null,"rk":"先負","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-15","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-16","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":"full","sign":"魚座"},{"d":"2027-09-17","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-18","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-19","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-20","hol":"敬老の日","rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-21","hol":null,"rk":"仏滅","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-22","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-23","hol":"秋分の日","rk":"赤口","sen":[],"sekki":"秋分","phase":"last","sign":null},{"d":"2027-09-24","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-25","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-26","hol":null,"rk":"先負","sen":["ichiryu","tensha","fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-27","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-28","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-29","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-09-30","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":"new","sign":"天秤座"},{"d":"2027-10-01","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-02","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-03","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-04","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-05","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-06","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-07","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-10-08","hol":null,"rk":"大安","sen":["fujoju"],"sekki":"寒露","phase":null,"sign":null},{"d":"2027-10-09","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-10","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-11","hol":"スポーツの日","rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-12","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-13","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-14","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-15","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":"full","sign":"牡羊座"},{"d":"2027-10-16","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-17","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-18","hol":null,"rk":"先負","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-19","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-20","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-21","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-22","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-23","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":"last","sign":null},{"d":"2027-10-24","hol":null,"rk":"先負","sen":["fujoju"],"sekki":"霜降","phase":null,"sign":null},{"d":"2027-10-25","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-26","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-27","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-28","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-29","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":"new","sign":"蠍座"},{"d":"2027-10-30","hol":null,"rk":"大安","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-10-31","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-01","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-02","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-03","hol":"文化の日","rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-04","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-05","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-06","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-11-07","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-08","hol":null,"rk":"友引","sen":[],"sekki":"立冬","phase":null,"sign":null},{"d":"2027-11-09","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-10","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-11","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-12","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-13","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-14","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":"full","sign":"牡牛座"},{"d":"2027-11-15","hol":null,"rk":"先負","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-16","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-17","hol":null,"rk":"大安","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-18","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-19","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-20","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-21","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":"last","sign":null},{"d":"2027-11-22","hol":null,"rk":"仏滅","sen":[],"sekki":"小雪","phase":null,"sign":null},{"d":"2027-11-23","hol":"勤労感謝の日","rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-24","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-25","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-26","hol":null,"rk":"友引","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-27","hol":null,"rk":"先負","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-28","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":"new","sign":"射手座"},{"d":"2027-11-29","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-11-30","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-01","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-02","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-03","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-04","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-05","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-06","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":"first","sign":null},{"d":"2027-12-07","hol":null,"rk":"友引","sen":[],"sekki":"大雪","phase":null,"sign":null},{"d":"2027-12-08","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-09","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-10","hol":null,"rk":"大安","sen":["ichiryu","fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-11","hol":null,"rk":"赤口","sen":["ichiryu","tensha"],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-12","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-13","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-14","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":"full","sign":"双子座"},{"d":"2027-12-15","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-16","hol":null,"rk":"大安","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-17","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-18","hol":null,"rk":"先勝","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-19","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-20","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":"last","sign":null},{"d":"2027-12-21","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-22","hol":null,"rk":"大安","sen":["ichiryu"],"sekki":"冬至","phase":null,"sign":null},{"d":"2027-12-23","hol":null,"rk":"赤口","sen":["ichiryu"],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-24","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-25","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-26","hol":null,"rk":"先負","sen":["fujoju"],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-27","hol":null,"rk":"仏滅","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-28","hol":null,"rk":"赤口","sen":[],"sekki":null,"phase":"new","sign":"山羊座"},{"d":"2027-12-29","hol":null,"rk":"先勝","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-30","hol":null,"rk":"友引","sen":[],"sekki":null,"phase":null,"sign":null},{"d":"2027-12-31","hol":null,"rk":"先負","sen":[],"sekki":null,"phase":null,"sign":null}]}</script>
+<script type="application/json" id="night-data">[{"n":1,"name":"Hilo","kana":"ヒロ","icon":"🌑"},{"n":2,"name":"Hoaka","kana":"ホアカ","icon":"🌒"},{"n":3,"name":"Kū-kahi","kana":"クーカヒ","icon":"🌒"},{"n":4,"name":"Kū-lua","kana":"クールア","icon":"🌒"},{"n":5,"name":"Kū-kolu","kana":"クーコル","icon":"🌓"},{"n":6,"name":"Kū-pau","kana":"クーパウ","icon":"🌓"},{"n":7,"name":"ʻOle-kū-kahi","kana":"オレ・クー・カヒ","icon":"🌔"},{"n":8,"name":"ʻOle-kū-lua","kana":"オレ・クー・ルア","icon":"🌔"},{"n":9,"name":"ʻOle-kū-kolu","kana":"オレ・クー・コル","icon":"🌔"},{"n":10,"name":"ʻOle-pau","kana":"オレ・パウ","icon":"🌔"},{"n":11,"name":"Huna","kana":"フナ","icon":"🌔"},{"n":12,"name":"Mōhalu","kana":"モハル","icon":"🌕"},{"n":13,"name":"Hua","kana":"フア","icon":"🌕"},{"n":14,"name":"Akua","kana":"アクア","icon":"🌕"},{"n":15,"name":"Hoku","kana":"ホク","icon":"🌕"},{"n":16,"name":"Māhealani","kana":"マヘアラニ","icon":"🌕"},{"n":17,"name":"Kulu","kana":"クル","icon":"🌖"},{"n":18,"name":"Lāʻau-kū-kahi","kana":"ラーアウ・クー・カヒ","icon":"🌖"},{"n":19,"name":"Lāʻau-kū-lua","kana":"ラーアウ・クー・ルア","icon":"🌗"},{"n":20,"name":"Lāʻau-pau","kana":"ラーアウ・パウ","icon":"🌗"},{"n":21,"name":"ʻOle-kū-kahi","kana":"オレ・クー・カヒ","icon":"🌗"},{"n":22,"name":"ʻOle-kū-lua","kana":"オレ・クー・ルア","icon":"🌗"},{"n":23,"name":"ʻOle-pau","kana":"オレ・パウ","icon":"🌘"},{"n":24,"name":"Kāloa-kū-kahi","kana":"カーロア・クー・カヒ","icon":"🌘"},{"n":25,"name":"Kāloa-kū-lua","kana":"カーロア・クー・ルア","icon":"🌘"},{"n":26,"name":"Kāloa-pau","kana":"カーロア・パウ","icon":"🌘"},{"n":27,"name":"Kāne","kana":"カーネ","icon":"🌘"},{"n":28,"name":"Lono","kana":"ロノ","icon":"🌑"},{"n":29,"name":"Mauli","kana":"マウリ","icon":"🌑"},{"n":30,"name":"Muku","kana":"ムク","icon":"🌑"}]</script>
+<script>
+/* ===== HAWAIIAN_CALENDAR_DATA BEGIN v1.1.0 ===== */
+// 古来ハワイ太陰暦 共通周期データ（愛泉の杜OS）収録範囲：1499-12-12〜2101-01-29（7435周期）
+// 計算済みの周期一覧を参照するだけのモジュール。暦の算出処理は含まない。生成元は非公開。手で編集しない（OS-DEC-017）。
+// 日付は各アプリ既存の Date.UTC(y,m-1,d) と同じミリ秒表現で扱う。
+var HawaiianCalendar = (function(){
+  'use strict';
+  var VERSION = '1.1.0', DAY = 86400000, N = 7435;
+  var FIRST_HILO = Date.UTC(1499, 11, 12);
+  var DATA = '1apqk27STupKXakt1apqVbVKW6krdaW2VJuqVdUqbaWu1JXskl2yVdWqapW2UleyS3ZJN2mrrFXaSm2pLtkl3aSt1JVaS7WltmSXdJN2UldqS7Wm2lJt0k3aSV2pLdWmalW1STdpJ3WltlSXalW1KlulrdSVupJdqlXVqmqVtlJX6kp2yS7pqmxV1kpbqS3ZJb2km7RV2kptpbZkl/SSbtJWakutpdpSW7JLuklbqSu1pVpVrck26SZtpa7UlmpVtapapZu0lbpSW6pLtapqla3SVupKXsku2apqVbVKW6krtSW7ZJu0ldZKa6Wu1Jbskl7SVdpKbaW2UluyS3pJN2krtaXaUm2qLukl3aSt1JXaUq2qVmWbdJO2UldqS7WqWlWt0lXaSl2pLdmqWlW1SldpK3Ult2SXbJW1KlulrdSV3KJd0lXaSmultlRXakt2US/pKm2l1lJrqi3ZJb2kq7SV2lKtqjZll3STbtJW6kqtqlZVq7JVukpbqSu1qVpVrcpW6Sptxa7olmxVtapapau0lbqiW7RTtkpbpa3UVuqKbtEu6iptpbVSW6oruUW7qCt1pbZSa6o11Rbtom7UldpSbapWVauyk7pRV2pLdalWVa2qVupKXakt2aXaVK2qVmUrdaW6ZJd0k7bKWmWt1JXakl3STdpJW6Wt0lZqS3VJN2kndaW2UluqLdUl3aKd1JXaUluqVVWbapN2UlfqSm2pNlWrqlXaSl2pK7Wl2lStqlZVK3WlrmSX7JKtqlZVq7SVupJdsku6SVtlrdJWakt1yS7pJm2lrtJWai21Jbukm7STulJbqi3VluqSbtJO6kptqTZVq6pNukk7qSt1pbZUq6pV1Sptpa7UlexSbapWVau0lbpSV7JLdklXZauyVdpKbcku2SXdpK3SVmortaW6pJd0k7ZSV2ot1Zbakl3STdpKXakt1apqTbZJN2kndaW2VKuqVdUq3aSd1JXaUl2qVdWqapW2UlfqSnbJVlWrqlXaSl2pLdkl26SrtFVaK3WltmSX9JKu0lZqK7WV2pJd0ku6SVupLbWWalNtyS7pJm2lrtSWalW1Ktukm7SVulJbqlXVqmqVrtJW6kptyS7VqmpVtkpbqSu5Jbtkq6xV1Sptpa7kluySbtJWWiutlbpSW7JLeklXaSu1ldpSbcku6SXdpK3UlmpVtam6pJt0k7ZSV2pNtapala3STdpKXakt1apqVbVKV2krdSW3ZKsE';
+  var HILO = [FIRST_HILO];
+  (function(){ var raw = atob(DATA), h = FIRST_HILO;
+    for (var i = 0; i < N; i++){ h += (29 + ((raw.charCodeAt(i >> 3) >> (i & 7)) & 1)) * DAY; HILO.push(h); } })();
+  var MIN_MS = HILO[0], MAX_MS = HILO[N] - DAY;
+  function ymd(ms){ var d = new Date(ms); return d.getUTCFullYear() + '-' + ('0'+(d.getUTCMonth()+1)).slice(-2) + '-' + ('0'+d.getUTCDate()).slice(-2); }
+  function parse(s){ return Date.parse(s + 'T00:00:00Z'); }
+  function inRange(ms){ return ms >= MIN_MS && ms <= MAX_MS; }
+  function make(i){ var hilo = HILO[i], muku = HILO[i+1] - DAY, nights = Math.round((muku - hilo) / DAY) + 1;
+    return { id: ymd(hilo), hiloMs: hilo, mukuMs: muku, nights: nights, hasMauli: nights === 30, mauliMs: nights === 30 ? muku - DAY : null }; }
+  function indexOf(ms){ var lo = 0, hi = N - 1; if (!inRange(ms)) return -1;
+    while (lo < hi){ var mid = (lo + hi + 1) >> 1; if (HILO[mid] <= ms) lo = mid; else hi = mid - 1; } return lo; }
+  // fromMs〜toMs に重なる周期の配列（時系列順）。label：Hiloの年月（同じ暦月の2周期目は 'b'）。検索には使わない。
+  function cycles(fromMs, toMs){
+    var out = [], i = indexOf(Math.max(fromMs, MIN_MS)); if (i < 0) return out;
+    for (; i < N && HILO[i] <= toMs; i++) out.push(make(i));
+    var seen = {}; out.forEach(function(c){ var m = c.id.slice(0, 7); c.label = seen[m] ? m + 'b' : m; seen[m] = true; });
+    return out;
+  }
+  function cycleAt(targetMs){
+    if (!inRange(targetMs)) return null;
+    var list = cycles(targetMs - 40*DAY, targetMs + 40*DAY);
+    for (var i = 0; i < list.length; i++) if (list[i].hiloMs <= targetMs && targetMs <= list[i].mukuMs) return list[i];
+    return null;
+  }
+  function adjacent(cycle, dir){ return cycle ? cycleAt(dir > 0 ? cycle.mukuMs + DAY : cycle.hiloMs - DAY) : null; }
+  // 夜番号：1〜28、Mauliありの周期は29（Mauli）、Mukuは30。Mauliなしの周期では29を飛ばす。
+  function nightNumber(cycle, targetMs){
+    if (!cycle || targetMs < cycle.hiloMs || targetMs > cycle.mukuMs) return null;
+    if (targetMs === cycle.mukuMs) return 30;
+    if (cycle.hasMauli && targetMs === cycle.mukuMs - DAY) return 29;
+    return Math.round((targetMs - cycle.hiloMs) / DAY) + 1;
+  }
+  function nightAt(targetMs){ return nightNumber(cycleAt(targetMs), targetMs); }
+  // 指定年にHiloがある周期（表示ラベル付き）
+  function cyclesOfYear(year){
+    var a = Date.UTC(year, 0, 1), b = Date.UTC(year + 1, 0, 1) - DAY;
+    return cycles(a - 40*DAY, b + 40*DAY).filter(function(c){ return c.hiloMs >= a && c.hiloMs <= b; });
+  }
+  return { VERSION: VERSION, DAY: DAY, MIN_MS: MIN_MS, MAX_MS: MAX_MS, inRange: inRange,
+           cycles: cycles, cycleAt: cycleAt, adjacent: adjacent, nightNumber: nightNumber,
+           nightAt: nightAt, cyclesOfYear: cyclesOfYear, ymd: ymd, parse: parse };
+})();
+/* ===== HAWAIIAN_CALENDAR_DATA END ===== */
+</script>
+<script>
+'use strict';
+/* ── データ（FACT）：Gold Master の固定データ。ここでは暦を計算しない ── */
+const FACT = JSON.parse(document.getElementById('fact-data').textContent);
+const NIGHTS = JSON.parse(document.getElementById('night-data').textContent); // 夜番号→正式名・かな・月夜アイコン（既存アプリと同じ対応）
+const DAYS = FACT.days, BYDATE = {};
+DAYS.forEach(x => BYDATE[x.d] = x);
+const YEAR = 2027, DAY = 86400000;
+
+/* ── 表示辞書（Presentation。並び順・短縮名・注記はここだけで管理） ── */
+const DICT = {
+  sen: { ichiryu:{ full:'一粒万倍日', short:'万倍' }, tensha:{ full:'天赦日', short:'天赦' }, fujoju:{ full:'不成就日', short:'不成就' } },
+  senOrder: ['ichiryu','tensha','fujoju'],
+  phase: { new:'新月', first:'上弦', full:'満月', last:'下弦' },
+  phase1: { new:'新', first:'上', full:'満', last:'下' },
+  holiday: { '休日':'休日（振替休日）' },          // 正本名称（CSV）は保持し、表示だけ補う
+  dow: ['日','月','火','水','木','金','土'],
+  weekHead: ['月','火','水','木','金','土','日'],  // 月曜始まり（V1正式仕様）
+  notes: [
+    '暦注が重なる日の解釈には諸説あります。',
+    '不成就日は旧暦月方式によります。',
+    '月のサインは、月相が起きる時点の月の位置を西洋占星術のトロピカル方式で示しています。',
+    '古来ハワイ太陰暦の夜番号・月夜アイコンは、天文の月相とは別の情報です。'
+  ],
+  source: '出典：内閣府「国民の祝日」／国立天文台「暦要項」（令和9年）／古来ハワイ太陰暦は愛泉の杜の共通周期データ'
+};
+
+/* ── 古来ハワイ太陰暦：既存の共通周期データを参照するだけ ── */
+function hawaiian(ds){
+  const [y,m,d] = ds.split('-').map(Number), ms = Date.UTC(y,m-1,d);
+  const n = HawaiianCalendar.nightAt(ms);
+  if (!n) return null;
+  const c = HawaiianCalendar.cycleAt(ms), info = NIGHTS[n-1];
+  let mark = null;
+  // 周期の印は夜番号ではなく正式な夜名（既存アプリと同じ夜名データ）で判定する
+  const CYCLE_MARK = { Hilo:'周期のはじまり', Mauli:'Mauliの夜', Muku:'周期のおわり' };
+  mark = CYCLE_MARK[info.name] || null;
+  return { n, name: info.name, kana: info.kana, icon: info.icon, mark, nights: c ? c.nights : null };
+}
+
+/* ── 小さな部品 ── */
+const pad = v => String(v).padStart(2,'0');
+const dsOf = (y,m,d) => `${y}-${pad(m)}-${pad(d)}`;
+const dowOf = ds => new Date(ds+'T00:00:00Z').getUTCDay();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const holName = x => x.hol ? (DICT.holiday[x.hol] || x.hol) : null;
+const phaseText = x => x.phase ? DICT.phase[x.phase] + (x.sign ? '・' + x.sign : '') : null;
+const rkHtml = x => x.rk === '大安' ? `<span class="taian">${x.rk}</span>` : x.rk; // 六曜の表示（大安のみ文字色）
+const senList = x => DICT.senOrder.filter(k => x.sen.includes(k));
+const nightChip = h => h ? `<span class="nightchip" title="古来ハワイ太陰暦 第${h.n}夜"><span class="nb">${h.n}</span><span class="ic">${h.icon}</span></span>` : '';
+function eventsText(x, sep){ // 祝日 → 暦注 → 節気 → 月相 の固定順
+  const a = [];
+  if (x.hol) a.push(`<span class="hol L-jp">${esc(holName(x))}</span>`);
+  senList(x).forEach(k => a.push(`<span class="L-jp">${DICT.sen[k].short}</span>`));
+  if (x.sekki) a.push(`<span class="L-sea">${x.sekki}</span>`);
+  if (x.phase) a.push(`<span class="phase L-sea">${phaseText(x)}</span>`);
+  return a.join(sep);
+}
+
+/* ── 状態 ── */
+const now = new Date();
+const todayDs = dsOf(now.getFullYear(), now.getMonth()+1, now.getDate());
+const inRange = ds => !!BYDATE[ds];
+let curM = inRange(todayDs) ? now.getMonth()+1 : 1;
+let selDs = inRange(todayDs) ? todayDs : '2027-01-01';
+let spTab = 'today', openRow = null;
+(function fromHash(){
+  const h = (location.hash || '').slice(1);
+  if (/^2027-\d\d-\d\d$/.test(h) && inRange(h)) { selDs = h; curM = Number(h.slice(5,7)); }
+})();
+if (!inRange(todayDs)) {
+  const n = document.getElementById('rangeNotice');
+  n.hidden = false;
+  n.textContent = `月と暦のカレンダー V1 は2027年版です。今日（${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日）は収録範囲外です。2027年の暦を表示しています。`;
+}
+
+/* ── 日付詳細（FACT／ハワイ／将来の Interpretation 枠を分離） ── */
+function detailHtml(ds){
+  const x = BYDATE[ds], h = hawaiian(ds), [y,m,d] = ds.split('-').map(Number);
+  const v = (val) => val ? `<span class="v">${val}</span>` : `<span class="v none">—</span>`;
+  const sen = senList(x).map(k => DICT.sen[k].full).join('<br>');
+  return `
+  <div class="dt-date ${dowOf(ds)===0||x.hol?'sun':''}">${y}年${m}月${d}日（${DICT.dow[dowOf(ds)]}）</div>
+  <section class="band" data-layer="fact-jp"><h3>日本の暦</h3><div class="kv">
+    <span class="k">祝日</span>${v(x.hol ? esc(holName(x)) : null)}
+    <span class="k">六曜</span>${v(rkHtml(x))}
+    <span class="k">暦注</span>${v(sen || null)}
+  </div></section>
+  <section class="band" data-layer="fact-season"><h3>季節と月（天文）</h3><div class="kv">
+    <span class="k">二十四節気</span>${v(x.sekki)}
+    <span class="k">月の状態</span>${v(x.phase ? DICT.phase[x.phase] : null)}
+    <span class="k">月のサイン</span>${v(x.sign ? x.sign + '（トロピカル）' : null)}
+  </div></section>
+  <section class="band hawaii" data-layer="hawaiian"><h3>ハワイの月夜（古来ハワイ太陰暦）</h3>
+    ${h ? `<div class="hwbox"><span class="nb">${h.n}</span><span class="ic">${h.icon}</span>
+      <div><div class="hwname">${esc(h.name)}</div><div class="hwkana">${esc(h.kana)}</div></div></div>
+      <div class="hwmeta">第${h.n}夜${h.mark ? `<span class="mark">${h.mark}</span>` : ''}</div>` : '<span class="v none">—</span>'}
+  </section>
+  <div data-layer="interpretation" hidden></div>
+`;
+}
+
+/* ── PC：月間カレンダー ── */
+function renderPc(){
+  const g = document.getElementById('grid'); let html = DICT.weekHead.map((w,i) => `<div class="dow ${i===6?'sun':''}">${w}</div>`).join('');
+  const first = dsOf(YEAR,curM,1), off = (dowOf(first)+6)%7, dim = new Date(Date.UTC(YEAR,curM,0)).getUTCDate();
+  for (let i=0;i<off;i++) html += '<div class="cell empty"></div>';
+  for (let d=1; d<=dim; d++){
+    const ds = dsOf(YEAR,curM,d), x = BYDATE[ds], h = hawaiian(ds), red = dowOf(ds)===0 || x.hol;
+    const sea = [x.sekki, phaseText(x)].filter(Boolean).join(' ');
+    html += `<div class="cell ${ds===selDs?'sel':''} ${ds===todayDs?'today':''}" data-ds="${ds}" tabindex="0">
+      <div class="slot"><span class="d ${red?'sun':''}">${d}</span>${x.hol?`<span class="holn L-jp">${esc(holName(x))}</span>`:''}</div>
+      <div class="slot rk L-jp">${rkHtml(x)}</div>
+      <div class="slot senl L-jp">${senList(x).map(k=>`<span class="sen">${DICT.sen[k].short}</span>`).join('')}</div>
+      <div class="slot sea L-sea">${sea}</div>
+      <div class="slot hw L-hw">${nightChip(h)}</div></div>`;
+  }
+  const rem = (off+dim)%7; if (rem) for (let i=rem;i<7;i++) html += '<div class="cell empty"></div>';
+  g.innerHTML = html;
+  document.getElementById('detailPc').innerHTML = detailHtml(selDs);
+  document.getElementById('legendPc').innerHTML = '凡例：万倍＝一粒万倍日　天赦＝天赦日　不成就＝不成就日　／　新月・上弦・満月・下弦＝天文の月相（国立天文台「暦要項」）　／　<span class="nb">14</span>🌕＝古来ハワイ太陰暦の夜番号と月夜アイコン（天文の月相とは別の情報）';
+}
+
+/* ── スマホ ── */
+function renderSpToday(){
+  const i = DAYS.findIndex(x => x.d === selDs);
+  document.getElementById('spToday').innerHTML = `<div class="card">${detailHtml(selDs)}</div>
+    <div class="daynav"><button class="btn" id="dPrev" ${i<=0?'disabled':''}>◀ 前の日</button><button class="btn" id="dNext" ${i>=DAYS.length-1?'disabled':''}>次の日 ▶</button></div>`;
+  document.getElementById('dPrev').onclick = () => { selDs = DAYS[i-1].d; curM = Number(selDs.slice(5,7)); renderAll(); };
+  document.getElementById('dNext').onclick = () => { selDs = DAYS[i+1].d; curM = Number(selDs.slice(5,7)); renderAll(); };
+}
+function renderSpList(){
+  let html = '<div class="list">';
+  DAYS.filter(x => Number(x.d.slice(5,7)) === curM).forEach(x => {
+    const ds = x.d, h = hawaiian(ds), d = Number(ds.slice(8)), red = dowOf(ds)===0 || x.hol;
+    html += `<div class="row ${ds===todayDs?'today':''} ${ds===openRow?'open':''}" data-ds="${ds}" id="r-${ds}">
+      <span class="dd ${red?'sun':''}">${d} ${DICT.dow[dowOf(ds)]}</span><span class="rk">${rkHtml(x)}</span>
+      <span class="ev">${eventsText(x,'・')}</span><span class="hwc">${nightChip(h)}</span></div>`;
+    if (ds === openRow) html += `<div class="rowdetail">${detailHtml(ds)}</div>`;
+  });
+  document.getElementById('spList').innerHTML = html + '</div>';
+}
+function renderSpMonth(){
+  let html = '<div class="mgrid">' + DICT.weekHead.map((w,i) => `<div class="dow ${i===6?'sun':''}">${w}</div>`).join('');
+  const first = dsOf(YEAR,curM,1), off = (dowOf(first)+6)%7, dim = new Date(Date.UTC(YEAR,curM,0)).getUTCDate();
+  for (let i=0;i<off;i++) html += '<div class="mcell empty"></div>';
+  for (let d=1; d<=dim; d++){
+    const ds = dsOf(YEAR,curM,d), x = BYDATE[ds], h = hawaiian(ds), red = dowOf(ds)===0 || x.hol;
+    const dots = (x.hol?'祝':'') + '·'.repeat(x.sen.length);
+    html += `<div class="mcell ${ds===todayDs?'today':''}" data-ds="${ds}"><div class="d ${red?'sun':''}">${d}</div>
+      <div class="dots">${dots}</div><div class="p1">${x.phase?DICT.phase1[x.phase]:''}</div>${nightChip(h)}</div>`;
+  }
+  const rem = (off+dim)%7; if (rem) for (let i=rem;i<7;i++) html += '<div class="mcell empty"></div>';
+  html += '</div><div class="legend">祝＝祝日・休日　·＝暦注あり（件数分）　新・上・満・下＝天文の月相　<span class="nb">14</span>🌕＝ハワイの月夜<br>日付をタップすると一覧のその日へ移動します。</div>';
+  document.getElementById('spMonth').innerHTML = html;
+}
+function setTab(t){
+  spTab = t;
+  document.querySelectorAll('.tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  ['today','list','month'].forEach(k => document.getElementById('sp'+k[0].toUpperCase()+k.slice(1)).hidden = (k !== t));
+}
+
+/* ── 印刷（A4縦：月間表＋一覧） ── */
+function printPage(m){
+  const first = dsOf(YEAR,m,1), off = (dowOf(first)+6)%7, dim = new Date(Date.UTC(YEAR,m,0)).getUTCDate();
+  let t = '<table class="pmonth"><tr>' + DICT.weekHead.map((w,i)=>`<th class="${i===6?'sun':''}">${w}</th>`).join('') + '</tr><tr>';
+  let col = 0;
+  for (let i=0;i<off;i++){ t += '<td></td>'; col++; }
+  for (let d=1; d<=dim; d++){
+    const ds = dsOf(YEAR,m,d), x = BYDATE[ds], h = hawaiian(ds), red = dowOf(ds)===0 || x.hol;
+    const lines = [];
+    if (x.hol) lines.push(`<span class="hol">${esc(holName(x))}</span>`);
+    const s = senList(x).map(k=>DICT.sen[k].short).join(' '); if (s) lines.push(s);
+    const sea = [x.sekki, phaseText(x)].filter(Boolean).join(' '); if (sea) lines.push(sea);
+    t += `<td><span class="d ${red?'sun':''}">${d}</span> <span style="color:#555">${rkHtml(x)}</span><br>${lines.join('<br>')}<span class="hwp">${nightChip(h)}</span></td>`;
+    if (++col === 7 && d < dim){ t += '</tr><tr>'; col = 0; }
+  }
+  if (col) for (let i=col;i<7;i++) t += '<td></td>';
+  t += '</tr></table>';
+  let l = '<table class="plist"><colgroup><col style="width:9%"><col style="width:7%"><col><col style="width:9%"></colgroup><tr><th>日 曜</th><th>六曜</th><th>祝日・暦注・季節・月</th><th>月夜</th></tr>';
+  DAYS.filter(x => Number(x.d.slice(5,7)) === m).forEach(x => {
+    const ds = x.d, h = hawaiian(ds), red = dowOf(ds)===0 || x.hol, d = Number(ds.slice(8));
+    const ev = [];
+    if (x.hol) ev.push(`<span class="hol">${esc(holName(x))}</span>`);
+    senList(x).forEach(k => ev.push(DICT.sen[k].full));
+    if (x.sekki) ev.push(x.sekki);
+    if (x.phase) ev.push(phaseText(x));
+    l += `<tr><td class="${red?'sun':''}">${d} ${DICT.dow[dowOf(ds)]}</td><td>${rkHtml(x)}</td><td class="ev">${ev.join('・')}</td><td>${nightChip(h)}</td></tr>`;
+  });
+  l += '</table>';
+  const foot = `<div class="pfoot">凡例：万倍＝一粒万倍日 天赦＝天赦日 不成就＝不成就日／新月・上弦・満月・下弦＝国立天文台「暦要項」による天文の月相／<span class="nb">14</span>🌕＝古来ハワイ太陰暦の夜番号と月夜アイコン（天文の月相とは別の情報です）<br>
+    注記：${DICT.notes.join(' ')}<br>${DICT.source}　データ版：${FACT.version}</div>`;
+  return `<section class="pg"><h2>${YEAR}年 ${m}月<small>愛泉の杜 月と暦のカレンダー</small></h2>${t}${l}${foot}</section>`;
+}
+function buildPrint(){
+  const all = document.getElementById('printAll').checked;
+  const months = all ? [1,2,3,4,5,6,7,8,9,10,11,12] : [curM];
+  document.getElementById('print').innerHTML = months.map(printPage).join('');
+}
+
+/* ── 描画・操作 ── */
+function renderAll(){
+  document.getElementById('ym').textContent = `${YEAR}年 ${curM}月`;
+  document.getElementById('prevM').disabled = curM <= 1;
+  document.getElementById('nextM').disabled = curM >= 12;
+  renderPc(); renderSpToday(); renderSpList(); renderSpMonth(); buildPrint();
+}
+document.getElementById('prevM').onclick = () => { if (curM>1){ curM--; renderAll(); } };
+document.getElementById('nextM').onclick = () => { if (curM<12){ curM++; renderAll(); } };
+document.getElementById('goToday').onclick = () => {
+  selDs = inRange(todayDs) ? todayDs : '2027-01-01'; curM = Number(selDs.slice(5,7)); setTab('today'); renderAll();
+};
+document.getElementById('printBtn').onclick = () => { buildPrint(); window.print(); };
+document.getElementById('printAll').onchange = buildPrint;
+window.addEventListener('beforeprint', buildPrint);
+document.getElementById('grid').addEventListener('click', e => {
+  const c = e.target.closest('.cell[data-ds]'); if (!c) return; selDs = c.dataset.ds; renderAll();
+});
+document.getElementById('grid').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return; const c = e.target.closest('.cell[data-ds]'); if (c){ selDs = c.dataset.ds; renderAll(); }
+});
+document.getElementById('spList').addEventListener('click', e => {
+  const r = e.target.closest('.row[data-ds]'); if (!r) return;
+  if (e.target.closest('.nightchip')) { selDs = r.dataset.ds; setTab('today'); renderAll(); window.scrollTo(0,0); return; }
+  openRow = (openRow === r.dataset.ds) ? null : r.dataset.ds; selDs = r.dataset.ds; renderAll();
+});
+document.getElementById('spMonth').addEventListener('click', e => {
+  const c = e.target.closest('.mcell[data-ds]'); if (!c) return;
+  selDs = openRow = c.dataset.ds; setTab('list'); renderAll();
+  const el = document.getElementById('r-'+selDs); if (el) el.scrollIntoView({block:'center'});
+});
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => { setTab(b.dataset.tab); });
+document.querySelectorAll('#toggles input[data-layer]').forEach(cb => cb.onchange = () => {
+  document.body.classList.toggle('hide-' + cb.dataset.layer, !cb.checked);
+});
+window.addEventListener('hashchange', () => {
+  const h = (location.hash || '').slice(1);
+  if (/^2027-\d\d-\d\d$/.test(h) && inRange(h)) { selDs = h; curM = Number(h.slice(5,7)); renderAll(); }
+});
+renderAll();
+</script>
+</body>
+</html>

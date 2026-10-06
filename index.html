@@ -424,6 +424,27 @@ body {
   transition: gap 0.3s;
 }
 .intro-card.live:hover .intro-card-arrow { gap: 0.7rem; }
+.intro-more {
+  max-width: 560px;
+  margin: 0.8rem auto 0;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+.intro-more summary {
+  cursor: pointer;
+  color: var(--sand);
+  letter-spacing: 0.08em;
+}
+.intro-more-body {
+  margin-top: 0.7rem;
+  text-align: left;
+  line-height: 1.85;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 12px;
+}
+.intro-more-body p { margin: 0 0 0.3rem; }
 
 /* ===== CLOSING MESSAGE ===== */
 .closing-section {
@@ -520,6 +541,35 @@ body {
       </div>
       <div class="intro-card-arrow">カードを引く →</div>
     </a>
+  </div>
+
+  <div class="divider">✦ ✦ ✦</div>
+
+  <!-- 📅 暦 -->
+  <div class="category-block">
+    <div class="category-header">
+      <div class="category-icon">📅</div>
+      <div class="category-name">暦</div>
+    </div>
+    <a class="intro-card live" href="products/calendar/integrated_calendar.html">
+      <div class="intro-item-title">月と暦のカレンダー</div>
+      <div class="intro-badge">✦ 公開中</div>
+      <div class="intro-card-desc">
+        日本の暦、季節と月の動き、古来ハワイの月夜を、ひとつの暦で見られます。
+      </div>
+      <div class="intro-card-arrow">暦をひらく →</div>
+    </a>
+    <details class="intro-more">
+      <summary>月と暦のカレンダーについて（注意事項・出典）</summary>
+      <div class="intro-more-body">
+        <p>※暦注が重なる日の解釈には諸説あります。</p>
+        <p>※不成就日は旧暦月方式によります。</p>
+        <p>※月のサインは、月相が起きる時点の月の位置を西洋占星術のトロピカル方式で示しています。</p>
+        <p>※古来ハワイ太陰暦の夜番号・月夜アイコンは、天文の月相とは別の情報です。</p>
+        <p>出典：内閣府「国民の祝日」／国立天文台「暦要項」（令和9年）／古来ハワイ太陰暦は愛泉の杜の共通周期データ</p>
+        <p>データ版：2027.1.1</p>
+      </div>
+    </details>
   </div>
 
   <div class="divider">✦ ✦ ✦</div>
