@@ -91,6 +91,7 @@
 - `products/moon-tools/`・`products/block-tools/`・`products/card-reading/`（`oracle_tools.html`・`other_tools.html`）に整理済み
 - 月読みツールは、現状トップページには表示しない方針（サブメニュー単位で管理）
 - **2026-10-06**：トップページに📅「暦」カテゴリを追加し、「月と暦のカレンダー」（`products/calendar/integrated_calendar.html`、2027年版 V1）を公開。注意事項・出典はカード下の開閉式（詳細は `RELEASE_NOTES.md`）
+- **2026-10-08**：月と暦のカレンダーに日付別説明文（PC日付詳細・スマホ「今日」）と、スマホ「今日」の日付切り替え改善を反映。第20夜の夜名修正（Lāʻau-pau）もあわせて反映。いずれもコミット済み・スマホ実機で反映確認済み。データ版 2027.1.3 は変更なし（詳細は `RELEASE_NOTES.md`）
 
 ---
 
