@@ -99,7 +99,11 @@
   .tabs button{flex:1;border:1px solid var(--line2);background:var(--card);border-radius:999px;padding:7px 0;font-size:14px;cursor:pointer}
   .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
   .sp .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-  .daynav{display:flex;justify-content:space-between;margin-top:10px}
+  /* スマホ「今日」：日付切り替え（詳細の最上部） */
+  .spdaynav{display:flex;align-items:center;gap:8px;margin:0 0 4px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+  .spdaynav .dnav{flex:0 0 auto;min-width:44px;min-height:44px;padding:0;font-size:15px;display:flex;align-items:center;justify-content:center;touch-action:manipulation}
+  .spdate{flex:1 1 auto;min-width:0;text-align:center;font-family:var(--serif);font-weight:700;font-size:clamp(13.5px,4.3vw,19px);white-space:nowrap;letter-spacing:-.01em}
+  #spToday .dt-date{display:none}   /* 日付は上の切り替え欄に表示（詳細の中身は PC と共通） */
   .list{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
   .row{display:grid;grid-template-columns:3.4em 2.6em minmax(0,1fr) 3.6em;align-items:center;gap:0 6px;padding:7px 10px;border-bottom:1px solid var(--line);font-size:13.5px;cursor:pointer}
   .row:last-child{border-bottom:none}
@@ -459,11 +463,21 @@ function renderPc(){
 
 /* ── スマホ ── */
 function renderSpToday(){
-  const i = DAYS.findIndex(x => x.d === selDs);
-  document.getElementById('spToday').innerHTML = `<div class="card">${detailHtml(selDs, true)}</div>
-    <div class="daynav"><button class="btn" id="dPrev" ${i<=0?'disabled':''}>◀ 前の日</button><button class="btn" id="dNext" ${i>=DAYS.length-1?'disabled':''}>次の日 ▶</button></div>`;
-  document.getElementById('dPrev').onclick = () => { selDs = DAYS[i-1].d; cur = idxOf(selDs); renderAll(); };
-  document.getElementById('dNext').onclick = () => { selDs = DAYS[i+1].d; cur = idxOf(selDs); renderAll(); };
+  const i = DAYS.findIndex(x => x.d === selDs), x = DAYS[i], [y,m,d] = selDs.split('-').map(Number), red = dowOf(selDs)===0 || x.hol;
+  // 前日・翌日の切り替えは詳細の最上部。収録期間の先頭・末尾では、移動できない方向を無効にする
+  document.getElementById('spToday').innerHTML = `<div class="card"><div class="spdaynav">
+      <button class="btn dnav" id="dPrev" aria-label="前の日" ${i<=0?'disabled':''}>◀</button>
+      <div class="spdate ${red?'sun':''}" aria-live="polite">${y}年${m}月${d}日（${DICT.dow[dowOf(selDs)]}）</div>
+      <button class="btn dnav" id="dNext" aria-label="次の日" ${i>=DAYS.length-1?'disabled':''}>▶</button></div>${detailHtml(selDs, true)}</div>`;
+  const go = k => { selDs = DAYS[i+k].d; cur = idxOf(selDs); renderAll(); spTodayTop(); };
+  document.getElementById('dPrev').onclick = () => { if (i > 0) go(-1); };
+  document.getElementById('dNext').onclick = () => { if (i < DAYS.length-1) go(1); };
+}
+// 日付を切り替えたあと、詳細の先頭（日付の切り替え欄）が見える位置へ戻す
+function spTodayTop(){
+  const c = document.querySelector('#spToday .card'); if (!c) return;
+  const off = document.querySelector('.tabs').getBoundingClientRect().height + 6, top = c.getBoundingClientRect().top;
+  if (top < off) window.scrollTo(0, window.scrollY + top - off);
 }
 function renderSpList(){
   let html = '<div class="list">';
