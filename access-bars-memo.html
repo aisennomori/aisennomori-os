@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>アクセスバーズ体験メモ</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background: #f4f7f4;
+      color: #35453d;
+      font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      line-height: 1.7;
+    }
+
+    .container {
+      max-width: 620px;
+      margin: auto;
+      background: white;
+      padding: 28px;
+      border-radius: 18px;
+      box-shadow: 0 4px 22px rgba(0,0,0,.05);
+    }
+
+    h1 {
+      font-size: 23px;
+      text-align: center;
+      margin: 0 0 8px;
+      color: #39765c;
+    }
+
+    .intro {
+      text-align: center;
+      color: #78857c;
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .item {
+      padding: 18px 0;
+      border-bottom: 1px solid #e6ede7;
+    }
+
+    .item h2 {
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .description {
+      font-size: 12px;
+      color: #87938a;
+      margin: 2px 0 14px;
+    }
+
+    .sliders {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .score {
+      color: #39765c;
+      font-weight: bold;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #59977a;
+      cursor: pointer;
+    }
+
+    .notes-title {
+      margin-top: 28px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      margin-top: 8px;
+      border: 1px solid #d9e4db;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      background: #39765c;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover { background: #2e604a; }
+
+    .notice {
+      font-size: 11px;
+      color: #929c94;
+      text-align: center;
+      margin-top: 18px;
+    }
+
+    #message {
+      text-align: center;
+      font-size: 13px;
+      color: #39765c;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <h1>🌿 アクセスバーズ体験メモ</h1>
+    <p class="intro">
+      施術前後の心と身体の状態を記録しましょう。<br>
+      0〜10で、今の感覚に近い数字を選んでください。
+    </p>
+
+    <div id="items"></div>
+
+    <div class="notes-title">自由な感想</div>
+    <textarea id="notes"
+      placeholder="触れ方、心地よさ、気づいたこと、特に変化なし、など"></textarea>
+
+    <button onclick="copyMemo()">記録をコピー</button>
+    <div id="message" role="status"></div>
+
+    <p class="notice">
+      ※ この記録は個人の体感を整理するためのもので、<br>
+      医学的な効果を判定するものではありません。
+    </p>
+  </main>
+
+  <script>
+    const items = [
+      ["頭の中の静けさ", "考え事が多いか、落ち着いているか"],
+      ["身体のリラックス", "肩や首、身体の力が抜けているか"],
+      ["気分の軽さ", "気分が重いか、軽いか"],
+      ["眠気・休息感", "眠さや休んだ感覚があるか"]
+    ];
+
+    const area = document.getElementById("items");
+
+    items.forEach(([name, description], index) => {
+      const section = document.createElement("section");
+      section.className = "item";
+
+      section.innerHTML = `
+        <h2>${name}</h2>
+        <p class="description">${description}</p>
+        <div class="sliders">
+          ${["施術前", "施術後"].map((stage, j) => `
+            <div>
+              <label class="slider-label" for="s${index}_${j}">
+                <span>${stage}</span>
+                <span class="score" id="v${index}_${j}">5 / 10</span>
+              </label>
+              <input type="range" min="0" max="10" value="5"
+                id="s${index}_${j}"
+                oninput="document.getElementById('v${index}_${j}').textContent = this.value + ' / 10'">
+            </div>
+          `).join("")}
+        </div>
+      `;
+
+      area.appendChild(section);
+    });
+
+    async function copyMemo() {
+      const lines = ["アクセスバーズ体験メモ", ""];
+
+      items.forEach(([name], index) => {
+        const before = document.getElementById(`s${index}_0`).value;
+        const after = document.getElementById(`s${index}_1`).value;
+        lines.push(`${name}：施術前 ${before}/10 → 施術後 ${after}/10`);
+      });
+
+      lines.push("");
+      lines.push("感想：" + (document.getElementById("notes").value || "なし"));
+
+      try {
+        await navigator.clipboard.writeText(lines.join("\n"));
+        document.getElementById("message").textContent = "コピーしました";
+      } catch {
+        document.getElementById("message").textContent =
+          "コピーできませんでした。ブラウザの設定をご確認ください。";
+      }
+    }
+  </script>
+</body>
+</html>
