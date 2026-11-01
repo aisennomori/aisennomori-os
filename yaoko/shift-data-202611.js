@@ -1,15 +1,15 @@
-// 2026年11月度 人員計画表（ワカバウォーク 014 惣菜）【暫定版】
-// 出典: 202611シフト.pdf / 作成日 2026年10月25日 16:45（配布用 2ページ）
-// 抽出・照合済み: 月計31/31一致、残業月計31/31一致、○/●画像監査379件全一致、要確認0件
-// 暫定版のため申請休(●)が1件もない（全休暇が公休○）。確定版受領時に差し替えること。
+// 2026年11月度 人員計画表（ワカバウォーク 014 惣菜）【正式版】
+// 出典: 202611シフト2.pdf / 作成日 2026年11月01日 14:58（配布用 2ページ）
+// 抽出・照合済み: 月計31/31一致、残業月計31/31一致、○/●画像監査381件全一致、要確認0件
+// 旧暫定版(202611シフト.pdf)は shift-data-202611-provisional.js に退避
+// 暫定版からの変更: 27セル（細野麻維22日ほか5名各1日）、月計変更6名
 
 SHIFT_DATA["2026-11"] = {
-  "source": "202611シフト.pdf",
+  "source": "202611シフト2.pdf",
   "store": "1099 ワカバウォーク",
   "dept": "014 惣菜",
-  "createdAt": "2026-10-25 16:45",
+  "createdAt": "2026-11-01 14:58",
   "verified": true,
-  "provisional": true,
   "employees": [
     {
       "no": 1,
@@ -32,8 +32,8 @@ SHIFT_DATA["2026-11"] = {
         "end": "15:45",
         "hours": "7.45"
       },
-      "monthTotal": "187.30",
-      "monthOvertime": "17.00"
+      "monthTotal": "175.45",
+      "monthOvertime": "13.00"
     },
     {
       "no": 3,
@@ -152,7 +152,7 @@ SHIFT_DATA["2026-11"] = {
         "end": "16:00",
         "hours": "8.00"
       },
-      "monthTotal": "160.00",
+      "monthTotal": "152.00",
       "monthOvertime": "0.00"
     },
     {
@@ -212,7 +212,7 @@ SHIFT_DATA["2026-11"] = {
         "end": "15:30",
         "hours": "7.00"
       },
-      "monthTotal": "119.00",
+      "monthTotal": "112.00",
       "monthOvertime": "0.00"
     },
     {
@@ -284,7 +284,7 @@ SHIFT_DATA["2026-11"] = {
         "end": "17:00",
         "hours": "8.00"
       },
-      "monthTotal": "176.00",
+      "monthTotal": "168.00",
       "monthOvertime": "0.00"
     },
     {
@@ -296,7 +296,7 @@ SHIFT_DATA["2026-11"] = {
         "end": "22:00",
         "hours": "8.00"
       },
-      "monthTotal": "122.00",
+      "monthTotal": "127.00",
       "monthOvertime": "0.00"
     },
     {
@@ -380,7 +380,7 @@ SHIFT_DATA["2026-11"] = {
         "end": "21:00",
         "hours": "8.00"
       },
-      "monthTotal": "164.00",
+      "monthTotal": "172.00",
       "monthOvertime": "4.00"
     }
   ],
@@ -391,23 +391,23 @@ SHIFT_DATA["2026-11"] = {
       "night": 3
     },
     "2026-11-02": {
-      "morning": 15,
-      "afternoon": 11,
+      "morning": 14,
+      "afternoon": 10,
       "night": 3
     },
     "2026-11-03": {
-      "morning": 14,
-      "afternoon": 11,
+      "morning": 15,
+      "afternoon": 12,
       "night": 3
     },
     "2026-11-04": {
-      "morning": 14,
-      "afternoon": 13,
+      "morning": 13,
+      "afternoon": 12,
       "night": 4
     },
     "2026-11-05": {
-      "morning": 14,
-      "afternoon": 12,
+      "morning": 13,
+      "afternoon": 11,
       "night": 3
     },
     "2026-11-06": {
@@ -416,13 +416,13 @@ SHIFT_DATA["2026-11"] = {
       "night": 4
     },
     "2026-11-07": {
-      "morning": 16,
-      "afternoon": 14,
+      "morning": 17,
+      "afternoon": 15,
       "night": 3
     },
     "2026-11-08": {
-      "morning": 17,
-      "afternoon": 15,
+      "morning": 16,
+      "afternoon": 14,
       "night": 3
     },
     "2026-11-09": {
@@ -441,8 +441,8 @@ SHIFT_DATA["2026-11"] = {
       "night": 4
     },
     "2026-11-12": {
-      "morning": 14,
-      "afternoon": 13,
+      "morning": 13,
+      "afternoon": 12,
       "night": 3
     },
     "2026-11-13": {
@@ -451,8 +451,8 @@ SHIFT_DATA["2026-11"] = {
       "night": 3
     },
     "2026-11-14": {
-      "morning": 16,
-      "afternoon": 15,
+      "morning": 17,
+      "afternoon": 16,
       "night": 3
     },
     "2026-11-15": {
@@ -463,7 +463,7 @@ SHIFT_DATA["2026-11"] = {
     "2026-11-16": {
       "morning": 15,
       "afternoon": 12,
-      "night": 2
+      "night": 3
     },
     "2026-11-17": {
       "morning": 14,
@@ -481,13 +481,13 @@ SHIFT_DATA["2026-11"] = {
       "night": 3
     },
     "2026-11-20": {
-      "morning": 14,
-      "afternoon": 12,
+      "morning": 13,
+      "afternoon": 11,
       "night": 3
     },
     "2026-11-21": {
-      "morning": 16,
-      "afternoon": 13,
+      "morning": 17,
+      "afternoon": 14,
       "night": 4
     },
     "2026-11-22": {
@@ -496,8 +496,8 @@ SHIFT_DATA["2026-11"] = {
       "night": 2
     },
     "2026-11-23": {
-      "morning": 15,
-      "afternoon": 13,
+      "morning": 14,
+      "afternoon": 12,
       "night": 2
     },
     "2026-11-24": {
@@ -516,13 +516,13 @@ SHIFT_DATA["2026-11"] = {
       "night": 3
     },
     "2026-11-27": {
-      "morning": 14,
-      "afternoon": 11,
+      "morning": 13,
+      "afternoon": 10,
       "night": 3
     },
     "2026-11-28": {
-      "morning": 16,
-      "afternoon": 14,
+      "morning": 17,
+      "afternoon": 15,
       "night": 4
     },
     "2026-11-29": {
@@ -550,9 +550,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -749,9 +748,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "work",
-        "start": "07:00",
-        "end": "15:45"
+        "status": "public_holiday"
       },
       {
         "no": 3,
@@ -947,7 +944,10 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 3,
@@ -1141,9 +1141,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -1233,9 +1232,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 17,
         "name": "玉木　里美",
-        "status": "work",
-        "start": "07:30",
-        "end": "15:30"
+        "status": "public_holiday"
       },
       {
         "no": 18,
@@ -1335,10 +1332,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "status": "public_holiday"
       },
       {
         "no": 3,
@@ -1528,8 +1522,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "15:45"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -1723,7 +1717,10 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 3,
@@ -1921,10 +1918,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "status": "requested_leave"
       },
       {
         "no": 3,
@@ -2312,7 +2306,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "public_holiday"
+        "status": "requested_leave"
       },
       {
         "no": 3,
@@ -2500,9 +2494,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -2694,10 +2687,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "status": "requested_leave"
       },
       {
         "no": 3,
@@ -2890,8 +2880,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "15:45"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -3085,7 +3075,10 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 3,
@@ -3487,8 +3480,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
+        "start": "08:00",
+        "end": "17:45",
         "overtime": "01:00"
       },
       {
@@ -3625,7 +3618,9 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 24,
         "name": "石井　美津子",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "17:00",
+        "end": "22:00"
       },
       {
         "no": 25,
@@ -3868,9 +3863,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -4063,9 +4057,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -4262,9 +4255,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "work",
-        "start": "07:00",
-        "end": "15:45"
+        "status": "public_holiday"
       },
       {
         "no": 3,
@@ -4454,7 +4445,10 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 3,
@@ -4982,9 +4976,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 23,
         "name": "船山　明希奈",
-        "status": "work",
-        "start": "08:00",
-        "end": "17:00"
+        "status": "public_holiday"
       },
       {
         "no": 24,
@@ -5103,9 +5095,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 12,
         "name": "西田　真弓",
-        "status": "work",
-        "start": "07:00",
-        "end": "16:00"
+        "status": "public_holiday"
       },
       {
         "no": 13,
@@ -5220,7 +5210,9 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 31,
         "name": "岩田　直美",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:00"
       }
     ],
     "2026-11-25": [
@@ -5235,9 +5227,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
-        "overtime": "01:00"
+        "start": "08:00",
+        "end": "16:45"
       },
       {
         "no": 3,
@@ -5625,9 +5616,7 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "work",
-        "start": "07:00",
-        "end": "15:45"
+        "status": "public_holiday"
       },
       {
         "no": 3,
@@ -5817,7 +5806,10 @@ SHIFT_DATA["2026-11"] = {
       {
         "no": 2,
         "name": "細野　麻維",
-        "status": "public_holiday"
+        "status": "work",
+        "start": "07:00",
+        "end": "16:45",
+        "overtime": "01:00"
       },
       {
         "no": 3,
@@ -6223,8 +6215,8 @@ SHIFT_DATA["2026-11"] = {
         "no": 2,
         "name": "細野　麻維",
         "status": "work",
-        "start": "07:00",
-        "end": "16:45",
+        "start": "08:00",
+        "end": "17:45",
         "overtime": "01:00"
       },
       {
