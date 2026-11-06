@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>月のリズムと、私の1か月 | 愛泉の杜</title>
+<style>
+:root{--navy:#16223a;--navy2:#1d3557;--cream:#f7f2e7;--ink:#2b2b2b;--soft:#5b6270;--line:#e6dfcf;--gold:#f0d27a;
+  --r1:#2a8f8a;--r2:#d9653b;--r3:#4f9a3f;--sun:#c0392b;--sat:#2f6db5;
+  --blue:#d6e8fb;--red:#fbdde3;--green:#d9f0d6;--cyan:#d6e8fb}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--cream);color:var(--ink);font-family:"Noto Sans CJK JP","Hiragino Sans","Yu Gothic",sans-serif;-webkit-text-size-adjust:100%}
+header{background:linear-gradient(180deg,#0f1c33,#1d3557 75%,#2c4a6e);color:#fff;padding:18px 16px 16px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
+header .moon{position:absolute;right:28px;top:14px;width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 40% 38%,#fff7d0,#f0d27a 60%,#c9a24a);box-shadow:0 0 30px 8px rgba(246,214,120,.3)}
+header h1{font-size:26px;font-weight:900;color:#f5d98a;letter-spacing:.03em}
+header .sub{font-size:13px;color:#e8edf5;margin-top:4px;letter-spacing:.08em}
+.nav{display:flex;align-items:center;gap:10px;max-width:1180px;margin:14px auto 0;padding:0 16px}
+.nav button{flex:0 0 auto;min-width:44px;min-height:44px;border:1px solid var(--line);background:#fff;border-radius:22px;font-size:15px;cursor:pointer;padding:0 14px;color:var(--navy2)}
+.nav button:disabled{opacity:.35;cursor:default}
+.nav .range{flex:1;text-align:center;background:#fff;border:1px solid var(--line);border-radius:22px;padding:8px 10px;font-weight:700;font-size:16px}
+.nav .range small{display:block;font-weight:400;font-size:11.5px;color:var(--soft)}
+.calcnote{max-width:1148px;margin:8px auto 0;background:#eef2f8;border:1px solid #c9d4e6;color:#2c3e5c;border-radius:10px;padding:6px 12px;font-size:13px;line-height:1.6}
+@media (max-width:899px){.calcnote{margin:8px 16px 0}}
+main{max-width:1180px;margin:0 auto;padding:12px 16px 28px}
+/* PC：10日×3段 */
+.row{margin-top:10px}
+.bar{color:#fff;font-weight:700;font-size:15px;padding:4px 14px;border-radius:10px 10px 0 0}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;position:relative}
+.cell{background:#fff;border:1px solid var(--line);min-height:168px;padding:6px 2px 4px;display:flex;flex-direction:column;align-items:center;cursor:pointer;position:relative}
+.cell:hover{background:#fffdf6}
+.cell.sel{outline:3px solid #e2b54a;outline-offset:-3px}
+.cell.today{background:#fff8e6}
+.cell.today::after{content:"今日";position:absolute;top:4px;right:4px;font-size:10.5px;background:var(--sun);color:#fff;border-radius:6px;padding:0 5px}
+.cell .dt{font-size:16px;font-weight:700;margin-top:3px}
+.cell .dw{font-size:12px;color:var(--soft)}
+.sun{color:var(--sun)!important}.sat{color:var(--sat)!important}
+.cell .nm{font-size:13px;color:var(--navy2);margin-top:3px;text-align:center;line-height:1.3;word-break:keep-all;overflow-wrap:anywhere;padding:0 2px}
+.cell .nm small{display:block;font-size:11px;color:var(--soft);margin-top:1px}
+.cell .nn{font-size:11.5px;color:var(--soft)}
+.bands{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:3px;min-height:34px}
+.band{border-radius:17px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;color:var(--navy2);padding:4px 8px;text-align:center;line-height:1.2}
+.band small{font-weight:400;font-size:11px;color:#3b4252}
+.tag{border-radius:10px;font-size:12px;font-weight:700;text-align:center;padding:3px 2px;line-height:1.25}
+.tag small{display:block;font-weight:400;font-size:10.5px;color:#3b4252}
+.tag.new{background:#e5e1f5}.tag.full{background:#fde7c8}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;margin-top:10px;color:#333}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-1px;margin-right:4px}
+/* 選んだ日の詳細 */
+.detail{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-top:12px;font-size:14px;line-height:1.7}
+.detail b{color:var(--navy2)}
+/* 新月・満月カード */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.card{background:var(--navy);color:#e9edf4;border:1px solid #c9a24a;border-radius:16px;padding:16px 18px}
+.card .hd{display:flex;align-items:center;gap:12px}
+.card .when{color:var(--gold);font-size:14px}
+.card .ttl{font-size:21px;font-weight:700;color:#fff}
+.card .ttl span{font-size:13px;color:#cfd6e2;font-weight:400;margin-left:6px}
+.card .kw{color:#f2c96a;font-weight:700;margin:10px 0 6px;font-size:15px}
+.card p{font-size:14px;line-height:1.75}
+.card ul{margin:8px 0 0 1.1em;font-size:14px;line-height:1.8}
+.card .q{margin-top:10px;border:1px dashed #c9a24a;border-radius:10px;padding:8px 10px;color:#f2c96a;font-style:italic;text-align:center;font-size:14.5px}
+.card .none{color:#cfd6e2;font-size:14px;margin-top:8px}
+.card summary{list-style:none;cursor:pointer}
+.card summary::-webkit-details-marker{display:none}
+.card .more{font-size:12px;color:#cfd6e2;margin-top:6px}
+.sp-only{display:none}
+@media (max-width:899px){.sp-only{display:block}}
+.notes{font-size:11.5px;color:var(--soft);margin-top:14px;line-height:1.7}
+/* スマホ */
+.ov,.tabs,.list,.guide{display:none}
+.guide{font-size:13px;color:var(--soft);margin-top:8px;text-align:center}
+@media (max-width:899px){
+  header h1{font-size:21px}header .moon{width:42px;height:42px;right:18px}
+  .nav .range{font-size:14.5px}
+  .rows-pc,.legend-pc{display:none}
+  .ov{display:flex;gap:2px;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 6px;margin-top:10px}
+  .ov .grp{display:flex;gap:2px;flex:1;justify-content:space-around;border-bottom:3px solid}
+  .ov .grp{background:none;border-top:0;border-left:0;border-right:0;padding:0 0 2px;cursor:pointer;font:inherit;min-width:0;flex:1 1 0}
+  .ov span.dy svg{width:100%;max-width:9px;height:auto}
+  .ov span.dy{padding:2px 0;display:flex;flex-direction:column;align-items:center;flex:1;min-width:0}
+  .ov span.dy i{display:block;width:5px;height:5px;border-radius:50%;margin-top:2px}
+  .ov span.dy.today{outline:2px solid var(--sun);border-radius:4px}
+  .guide{display:block!important}
+  .tabs{display:flex;gap:6px;margin-top:10px}
+  .tabs button{flex:1;min-height:48px;border:1px solid var(--line);background:#fff;border-radius:12px 12px 0 0;font-size:13px;line-height:1.3;cursor:pointer;color:var(--ink)}
+  .tabs button b{display:block;font-size:14px}
+  .tabs button.on{color:#fff;border-color:transparent}
+  .list{display:block;background:#fff;border:1px solid var(--line);border-radius:0 0 12px 12px}
+  .item{border-bottom:1px solid var(--line)}
+  .item:last-child{border-bottom:0}
+  .item>button{width:100%;display:grid;grid-template-columns:40px 64px 1fr;align-items:center;gap:8px;padding:9px 10px;background:none;border:0;text-align:left;cursor:pointer;font:inherit;color:inherit;min-height:56px}
+  .item.today>button{background:#fff8e6}
+  .item .d{font-weight:700;font-size:16px;line-height:1.2}.item .d small{display:block;font-weight:400;font-size:12px;color:var(--soft)}
+  .item .n{font-size:14px;line-height:1.35;word-break:keep-all;overflow-wrap:anywhere}.item .n small{font-size:11.5px;color:var(--soft);margin-left:4px}
+  .item .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+  .chip{font-size:11.5px;border-radius:9px;padding:1px 8px;font-weight:700;color:var(--navy2)}
+  .item .tod{font-size:10.5px;background:var(--sun);color:#fff;border-radius:6px;padding:0 5px;margin-left:4px}
+  .item .ex{display:none;padding:0 12px 10px 58px;font-size:13.5px;line-height:1.7;color:#333}
+  .item.open .ex{display:block}
+  .detail{display:none}
+  .cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header><div class="moon"></div><h1>月のリズムと、私の1か月</h1><div class="sub">月の流れを眺めながら、自分らしい過ごし方を見つける</div></header>
+<div class="nav"><button id="prev" aria-label="前の周期">◀</button><div class="range" id="range"></div><button id="next" aria-label="次の周期">▶</button></div>
+<div class="calcnote" id="calcnote" hidden></div>
+<main>
+  <div class="rows-pc" id="rowsPc"></div>
+  <div class="legend legend-pc" id="legendPc"></div>
+  <div class="guide">新月・満月の特徴は、下のカードで確認できます</div>
+  <div class="ov" id="ov" aria-label="この周期30日の全体像"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="list" id="list"></div>
+  <div class="detail" id="detail"></div>
+  <div class="cards" id="cards"></div>
+  <div class="notes" id="notes"></div>
+</main>
+
+<!-- ① ハワイ暦：全月アプリ共通の周期データ（moon_techo と同一のブロックをそのまま埋め込み。手で編集しない） -->
+<script>
+/* ===== HAWAIIAN_CALENDAR_DATA BEGIN v1.1.0 ===== */
+// 古来ハワイ太陰暦 共通周期データ（愛泉の杜OS）収録範囲：1499-12-12〜2101-01-29（7435周期）
+// 計算済みの周期一覧を参照するだけのモジュール。暦の算出処理は含まない。生成元は非公開。手で編集しない（OS-DEC-017）。
+// 日付は各アプリ既存の Date.UTC(y,m-1,d) と同じミリ秒表現で扱う。
+var HawaiianCalendar = (function(){
+  'use strict';
+  var VERSION = '1.1.0', DAY = 86400000, N = 7435;
+  var FIRST_HILO = Date.UTC(1499, 11, 12);
+  var DATA = '1apqk27STupKXakt1apqVbVKW6krdaW2VJuqVdUqbaWu1JXskl2yVdWqapW2UleyS3ZJN2mrrFXaSm2pLtkl3aSt1JVaS7WltmSXdJN2UldqS7Wm2lJt0k3aSV2pLdWmalW1STdpJ3WltlSXalW1KlulrdSVupJdqlXVqmqVtlJX6kp2yS7pqmxV1kpbqS3ZJb2km7RV2kptpbZkl/SSbtJWakutpdpSW7JLuklbqSu1pVpVrck26SZtpa7UlmpVtapapZu0lbpSW6pLtapqla3SVupKXsku2apqVbVKW6krtSW7ZJu0ldZKa6Wu1Jbskl7SVdpKbaW2UluyS3pJN2krtaXaUm2qLukl3aSt1JXaUq2qVmWbdJO2UldqS7WqWlWt0lXaSl2pLdmqWlW1SldpK3Ult2SXbJW1KlulrdSV3KJd0lXaSmultlRXakt2US/pKm2l1lJrqi3ZJb2kq7SV2lKtqjZll3STbtJW6kqtqlZVq7JVukpbqSu1qVpVrcpW6Sptxa7olmxVtapapau0lbqiW7RTtkpbpa3UVuqKbtEu6iptpbVSW6oruUW7qCt1pbZSa6o11Rbtom7UldpSbapWVauyk7pRV2pLdalWVa2qVupKXakt2aXaVK2qVmUrdaW6ZJd0k7bKWmWt1JXakl3STdpJW6Wt0lZqS3VJN2kndaW2UluqLdUl3aKd1JXaUluqVVWbapN2UlfqSm2pNlWrqlXaSl2pK7Wl2lStqlZVK3WlrmSX7JKtqlZVq7SVupJdsku6SVtlrdJWakt1yS7pJm2lrtJWai21Jbukm7STulJbqi3VluqSbtJO6kptqTZVq6pNukk7qSt1pbZUq6pV1Sptpa7UlexSbapWVau0lbpSV7JLdklXZauyVdpKbcku2SXdpK3SVmortaW6pJd0k7ZSV2ot1Zbakl3STdpKXakt1apqTbZJN2kndaW2VKuqVdUq3aSd1JXaUl2qVdWqapW2UlfqSnbJVlWrqlXaSl2pLdkl26SrtFVaK3WltmSX9JKu0lZqK7WV2pJd0ku6SVupLbWWalNtyS7pJm2lrtSWalW1Ktukm7SVulJbqlXVqmqVrtJW6kptyS7VqmpVtkpbqSu5Jbtkq6xV1Sptpa7kluySbtJWWiutlbpSW7JLeklXaSu1ldpSbcku6SXdpK3UlmpVtam6pJt0k7ZSV2pNtapala3STdpKXakt1apqVbVKV2krdSW3ZKsE';
+  var HILO = [FIRST_HILO];
+  (function(){ var raw = atob(DATA), h = FIRST_HILO;
+    for (var i = 0; i < N; i++){ h += (29 + ((raw.charCodeAt(i >> 3) >> (i & 7)) & 1)) * DAY; HILO.push(h); } })();
+  var MIN_MS = HILO[0], MAX_MS = HILO[N] - DAY;
+  function ymd(ms){ var d = new Date(ms); return d.getUTCFullYear() + '-' + ('0'+(d.getUTCMonth()+1)).slice(-2) + '-' + ('0'+d.getUTCDate()).slice(-2); }
+  function parse(s){ return Date.parse(s + 'T00:00:00Z'); }
+  function inRange(ms){ return ms >= MIN_MS && ms <= MAX_MS; }
+  function make(i){ var hilo = HILO[i], muku = HILO[i+1] - DAY, nights = Math.round((muku - hilo) / DAY) + 1;
+    return { id: ymd(hilo), hiloMs: hilo, mukuMs: muku, nights: nights, hasMauli: nights === 30, mauliMs: nights === 30 ? muku - DAY : null }; }
+  function indexOf(ms){ var lo = 0, hi = N - 1; if (!inRange(ms)) return -1;
+    while (lo < hi){ var mid = (lo + hi + 1) >> 1; if (HILO[mid] <= ms) lo = mid; else hi = mid - 1; } return lo; }
+  // fromMs〜toMs に重なる周期の配列（時系列順）。label：Hiloの年月（同じ暦月の2周期目は 'b'）。検索には使わない。
+  function cycles(fromMs, toMs){
+    var out = [], i = indexOf(Math.max(fromMs, MIN_MS)); if (i < 0) return out;
+    for (; i < N && HILO[i] <= toMs; i++) out.push(make(i));
+    var seen = {}; out.forEach(function(c){ var m = c.id.slice(0, 7); c.label = seen[m] ? m + 'b' : m; seen[m] = true; });
+    return out;
+  }
+  function cycleAt(targetMs){
+    if (!inRange(targetMs)) return null;
+    var list = cycles(targetMs - 40*DAY, targetMs + 40*DAY);
+    for (var i = 0; i < list.length; i++) if (list[i].hiloMs <= targetMs && targetMs <= list[i].mukuMs) return list[i];
+    return null;
+  }
+  function adjacent(cycle, dir){ return cycle ? cycleAt(dir > 0 ? cycle.mukuMs + DAY : cycle.hiloMs - DAY) : null; }
+  // 夜番号：1〜28、Mauliありの周期は29（Mauli）、Mukuは30。Mauliなしの周期では29を飛ばす。
+  function nightNumber(cycle, targetMs){
+    if (!cycle || targetMs < cycle.hiloMs || targetMs > cycle.mukuMs) return null;
+    if (targetMs === cycle.mukuMs) return 30;
+    if (cycle.hasMauli && targetMs === cycle.mukuMs - DAY) return 29;
+    return Math.round((targetMs - cycle.hiloMs) / DAY) + 1;
+  }
+  function nightAt(targetMs){ return nightNumber(cycleAt(targetMs), targetMs); }
+  // 指定年にHiloがある周期（表示ラベル付き）
+  function cyclesOfYear(year){
+    var a = Date.UTC(year, 0, 1), b = Date.UTC(year + 1, 0, 1) - DAY;
+    return cycles(a - 40*DAY, b + 40*DAY).filter(function(c){ return c.hiloMs >= a && c.hiloMs <= b; });
+  }
+  return { VERSION: VERSION, DAY: DAY, MIN_MS: MIN_MS, MAX_MS: MAX_MS, inRange: inRange,
+           cycles: cycles, cycleAt: cycleAt, adjacent: adjacent, nightNumber: nightNumber,
+           nightAt: nightAt, cyclesOfYear: cyclesOfYear, ymd: ymd, parse: parse };
+})();
+/* ===== HAWAIIAN_CALENDAR_DATA END ===== */
+</script>
+<!-- ② 月夜名（夜番号→名前・かな。既存アプリと同じ対応） -->
+<script type="application/json" id="night-data">[{"n":1,"name":"Hilo","kana":"ヒロ","icon":"🌑"},{"n":2,"name":"Hoaka","kana":"ホアカ","icon":"🌒"},{"n":3,"name":"Kū-kahi","kana":"クーカヒ","icon":"🌒"},{"n":4,"name":"Kū-lua","kana":"クールア","icon":"🌒"},{"n":5,"name":"Kū-kolu","kana":"クーコル","icon":"🌓"},{"n":6,"name":"Kū-pau","kana":"クーパウ","icon":"🌓"},{"n":7,"name":"ʻOle-kū-kahi","kana":"オレ・クー・カヒ","icon":"🌔"},{"n":8,"name":"ʻOle-kū-lua","kana":"オレ・クー・ルア","icon":"🌔"},{"n":9,"name":"ʻOle-kū-kolu","kana":"オレ・クー・コル","icon":"🌔"},{"n":10,"name":"ʻOle-pau","kana":"オレ・パウ","icon":"🌔"},{"n":11,"name":"Huna","kana":"フナ","icon":"🌔"},{"n":12,"name":"Mōhalu","kana":"モハル","icon":"🌕"},{"n":13,"name":"Hua","kana":"フア","icon":"🌕"},{"n":14,"name":"Akua","kana":"アクア","icon":"🌕"},{"n":15,"name":"Hoku","kana":"ホク","icon":"🌕"},{"n":16,"name":"Māhealani","kana":"マヘアラニ","icon":"🌕"},{"n":17,"name":"Kulu","kana":"クル","icon":"🌖"},{"n":18,"name":"Lāʻau-kū-kahi","kana":"ラーアウ・クー・カヒ","icon":"🌖"},{"n":19,"name":"Lāʻau-kū-lua","kana":"ラーアウ・クー・ルア","icon":"🌗"},{"n":20,"name":"Lāʻau-pau","kana":"ラーアウ・パウ","icon":"🌗"},{"n":21,"name":"ʻOle-kū-kahi","kana":"オレ・クー・カヒ","icon":"🌗"},{"n":22,"name":"ʻOle-kū-lua","kana":"オレ・クー・ルア","icon":"🌗"},{"n":23,"name":"ʻOle-pau","kana":"オレ・パウ","icon":"🌘"},{"n":24,"name":"Kāloa-kū-kahi","kana":"カーロア・クー・カヒ","icon":"🌘"},{"n":25,"name":"Kāloa-kū-lua","kana":"カーロア・クー・ルア","icon":"🌘"},{"n":26,"name":"Kāloa-pau","kana":"カーロア・パウ","icon":"🌘"},{"n":27,"name":"Kāne","kana":"カーネ","icon":"🌘"},{"n":28,"name":"Lono","kana":"ロノ","icon":"🌑"},{"n":29,"name":"Mauli","kana":"マウリ","icon":"🌑"},{"n":30,"name":"Muku","kana":"ムク","icon":"🌑"}]</script>
+<!-- ③ 新月・満月：日付・時刻（国立天文台）と星座（トロピカル）を別項目で保持 -->
+<script type="application/json" id="moon-events">{"time_source": "国立天文台 暦要項（令和8年・令和9年）朔弦望", "sign_source": "月と暦のカレンダー Data Version 2027.1.3（トロピカル）", "range": ["2026-09-01", "2027-12-31"], "events": [{"date": "2026-09-11", "type": "new", "time_jst": "12:27", "sign": "乙女座"}, {"date": "2026-09-27", "type": "full", "time_jst": "01:49", "sign": "牡羊座"}, {"date": "2026-10-11", "type": "new", "time_jst": "00:50", "sign": "天秤座"}, {"date": "2026-10-26", "type": "full", "time_jst": "13:12", "sign": "牡牛座"}, {"date": "2026-11-09", "type": "new", "time_jst": "16:02", "sign": "蠍座"}, {"date": "2026-11-24", "type": "full", "time_jst": "23:54", "sign": "双子座"}, {"date": "2026-12-09", "type": "new", "time_jst": "09:52", "sign": "射手座"}, {"date": "2026-12-24", "type": "full", "time_jst": "10:28", "sign": "蟹座"}, {"date": "2027-01-08", "type": "new", "time_jst": "05:24", "sign": "山羊座"}, {"date": "2027-01-22", "type": "full", "time_jst": "21:17", "sign": "獅子座"}, {"date": "2027-02-07", "type": "new", "time_jst": "00:56", "sign": "水瓶座"}, {"date": "2027-02-21", "type": "full", "time_jst": "08:24", "sign": "乙女座"}, {"date": "2027-03-08", "type": "new", "time_jst": "18:29", "sign": "魚座"}, {"date": "2027-03-22", "type": "full", "time_jst": "19:44", "sign": "天秤座"}, {"date": "2027-04-07", "type": "new", "time_jst": "08:51", "sign": "牡羊座"}, {"date": "2027-04-21", "type": "full", "time_jst": "07:27", "sign": "蠍座"}, {"date": "2027-05-06", "type": "new", "time_jst": "19:59", "sign": "牡牛座"}, {"date": "2027-05-20", "type": "full", "time_jst": "19:59", "sign": "蠍座"}, {"date": "2027-06-05", "type": "new", "time_jst": "04:40", "sign": "双子座"}, {"date": "2027-06-19", "type": "full", "time_jst": "09:44", "sign": "射手座"}, {"date": "2027-07-04", "type": "new", "time_jst": "12:02", "sign": "蟹座"}, {"date": "2027-07-19", "type": "full", "time_jst": "00:45", "sign": "山羊座"}, {"date": "2027-08-02", "type": "new", "time_jst": "19:05", "sign": "獅子座"}, {"date": "2027-08-17", "type": "full", "time_jst": "16:29", "sign": "水瓶座"}, {"date": "2027-09-01", "type": "new", "time_jst": "02:41", "sign": "乙女座"}, {"date": "2027-09-16", "type": "full", "time_jst": "08:04", "sign": "魚座"}, {"date": "2027-09-30", "type": "new", "time_jst": "11:36", "sign": "天秤座"}, {"date": "2027-10-15", "type": "full", "time_jst": "22:47", "sign": "牡羊座"}, {"date": "2027-10-29", "type": "new", "time_jst": "22:37", "sign": "蠍座"}, {"date": "2027-11-14", "type": "full", "time_jst": "12:26", "sign": "牡牛座"}, {"date": "2027-11-28", "type": "new", "time_jst": "12:24", "sign": "射手座"}, {"date": "2027-12-14", "type": "full", "time_jst": "01:09", "sign": "双子座"}, {"date": "2027-12-28", "type": "new", "time_jst": "05:12", "sign": "山羊座"}]}</script>
+<!-- ④ 12星座×新月・満月の文章（初期版採用候補。正本化は最終承認後） -->
+<script type="application/json" id="sign-themes">{"status": "採用候補（PO・Soul承認の3点修正を反映。公開時の正本化は最終承認後）", "author": "Claude（りょうま）作成の文案。PO・Soulのレビュー前", "note": "占星術上の星座の象徴を、自己理解のヒントとして愛泉の杜の言葉で書いたもの。既存資料（TIME DIRECTION CAL 等）の文章は使っていない", "signs": [{"sign": "牡羊座", "new": {"keywords": ["はじまり", "勇気", "素直な気持ち"], "text": "「やってみたい」という素直な気持ちに目を向けやすいとき。大きな計画より、心が動いたことに小さく手をつけるきっかけに。", "actions": ["気になっていたことを5分だけ始めてみる", "朝いちばんに、今日やりたいことを一つ決める", "体を動かして気分を切り替える"], "question": "今の私が、素直にやってみたいことは？"}, "full": {"keywords": ["勢い", "ねぎらい", "ひと休み"], "text": "勢いで進めてきたことを振り返るとき。動けた自分を認めながら、少し力を抜いてもよいところに気づけるかもしれません。", "actions": ["最近始めたことを書き出してみる", "がんばった自分を、少しねぎらってみる", "急いでいたことを一つだけゆるめる"], "question": "走ってきた中で、どんな自分に気づいた？"}}, {"sign": "牡牛座", "new": {"keywords": ["心地よさ", "五感", "豊かさ"], "text": "自分にとっての「心地よい」を大切にしたいとき。五感を通して、日々の暮らしに何を育てたいかを見つめるきっかけに。", "actions": ["好きな香りや手ざわりのものを身近に置く", "ひと口ずつ味わって食事をする", "続けたい習慣を一つ選ぶ"], "question": "この1か月、私が育てたい心地よさは？"}, "full": {"keywords": ["満たされ感", "感謝", "持ちすぎの見直し"], "text": "すでに手にしているものの豊かさに気づくとき。満たされているものへの感謝とともに、持ちすぎているものにも目を向けられます。", "actions": ["今日うれしかったことを3つ書く", "しばらく使っていない物を一つ見直す", "身近なものや人に感謝を伝える"], "question": "すでに私を満たしてくれているものは？"}}, {"sign": "双子座", "new": {"keywords": ["好奇心", "言葉", "軽やかさ"], "text": "「知りたい」「話してみたい」という好奇心が芽生えやすいとき。軽やかな気持ちで、新しい言葉や出会いに心をひらくきっかけに。", "actions": ["気になる本や記事を一つ読んでみる", "いつもと違う道を歩いてみる", "しばらく話していない人に短いメッセージを送る"], "question": "今の私が、もっと知りたいことは？"}, "full": {"keywords": ["言葉", "気づき", "静けさ"], "text": "交わした言葉や受け取った情報を振り返るとき。心に残った一言から、自分の本当の気持ちに気づけることもあります。", "actions": ["心に残った言葉をメモしておく", "伝えたかったのに言えなかったことを書き出す", "画面から離れて静かな時間をとる"], "question": "最近心に残った言葉は、私に何を教えてくれた？"}}, {"sign": "蟹座", "new": {"keywords": ["安心", "居場所", "いたわり"], "text": "心が安らぐ場所や人を大切にしたいとき。自分や身近な人をいたわることから、新しい流れを始めるきっかけに。", "actions": ["部屋の一角を心地よく整える", "大切な人とゆっくり過ごす時間をつくる", "温かい飲み物でひと息つく"], "question": "私が安心できる居場所を、どう育てたい？"}, "full": {"keywords": ["ぬくもり", "感謝", "心のケア"], "text": "支えてくれた人や場所のぬくもりを振り返るとき。感謝の気持ちとともに、がんばってきた自分の心もいたわってみましょう。", "actions": ["身近な人に「ありがとう」を伝える", "思い出の写真を見返す", "疲れを感じたら早めに休む"], "question": "私を支えてくれていたものに、どんな感謝が浮かぶ？"}}, {"sign": "獅子座", "new": {"keywords": ["喜び", "表現", "自分らしさ"], "text": "自分の「好き」や「楽しい」を表現したくなるとき。人の評価より、心が喜ぶことを大切にする一歩を考えるきっかけに。", "actions": ["好きなことに使う時間を予定に入れる", "服や小物で自分らしさを楽しむ", "小さな作品や記録を形にしてみる"], "question": "私の心が喜ぶ表現は、どんなこと？"}, "full": {"keywords": ["輝き", "受けとめる", "分かち合い"], "text": "これまでの自分の歩みを認めるとき。できたことに光を当て、周りと喜びを分かち合うことで、自分の輝きに気づけるかもしれません。", "actions": ["最近できたことを書き出して眺める", "人のよいところを見つけて伝えてみる", "自分をほめる言葉を一つ選ぶ"], "question": "私らしさを感じられたのは、どんなとき？"}}, {"sign": "乙女座", "new": {"keywords": ["暮らしのリズム", "丁寧さ", "小さな工夫"], "text": "日々の暮らしや体のリズムを見直したいとき。完璧を目指すより、続けやすい小さな工夫から始めるきっかけに。", "actions": ["一日の流れを紙に書いてみる", "寝る時間や食事のリズムを一つ見直す", "机の上など、小さな場所を整える"], "question": "私の毎日を心地よくする、小さな工夫は？"}, "full": {"keywords": ["振り返り", "ねぎらい", "ゆるめる"], "text": "日々の積み重ねを丁寧に振り返るとき。うまくいったことをねぎらい、負担になっている習慣を見直すきっかけにもなります。", "actions": ["続けられた習慣に印をつける", "負担に感じていることを一つ書き出す", "体の声に耳を傾けて休む"], "question": "私の毎日の中で、もう少しゆるめてもいいことは？"}}, {"sign": "天秤座", "new": {"keywords": ["調和", "バランス", "関わり方"], "text": "人との関係や心のバランスを大切にしたいとき。自分と相手の両方を尊重できる関わり方を考えるきっかけに。", "actions": ["気になる人に穏やかな言葉をかける", "予定に自分のための余白をつくる", "身の回りに、美しいと感じるものを置く"], "question": "人とも自分とも心地よくいるために、何を大切にしたい？"}, "full": {"keywords": ["関わり", "自分の選択", "バランス"], "text": "まわりとの関わりを、少し離れたところから振り返るとき。合わせすぎていたことや、自分で選びたいことに気づけるかもしれません。", "actions": ["最近の人間関係を一つ振り返る", "無理に合わせていたことを書き出す", "自分の意見を一つ言葉にしてみる"], "question": "まわりとの関わりの中で、私が本当に選びたいことは？"}}, {"sign": "蠍座", "new": {"keywords": ["集中", "本当に大切なこと", "深いつながり"], "text": "ひとつのことにじっくり向き合いたいとき。広げるより深めることで、自分にとって本当に大切なものを見つめるきっかけに。", "actions": ["スマホを置いて、一つのことに集中する時間をとる", "信頼できる人とゆっくり話す", "心の奥にある願いを書き出す"], "question": "私が本当に深めたいことは何？"}, "full": {"keywords": ["本音", "解放", "再生"], "text": "心の奥にしまっていた気持ちに気づきやすいとき。抱えてきたものを静かに見つめ、必要ならそっと手放すきっかけにもなります。", "actions": ["言葉にできなかった気持ちを紙に書く", "役目を終えた物や考えを一つ手放す", "ゆっくりお風呂に入って心身をほどく"], "question": "私がそっと手放してもよいものは？"}}, {"sign": "射手座", "new": {"keywords": ["探求", "自由", "視野"], "text": "新しい世界や考え方に心がひらきやすいとき。知りたいことや行ってみたい場所に思いを向け、視野を広げる一歩を考えるきっかけに。", "actions": ["行ってみたい場所を調べてみる", "興味のある分野の入門書を手に取る", "いつもと違うジャンルの話を聞いてみる"], "question": "これから私が探求してみたい世界は？"}, "full": {"keywords": ["経験", "意味", "次の方向"], "text": "経験してきたことから何を受け取ったかを振り返るとき。出来事の意味を自分なりに見つめると、次に向かいたい方向が見えてくるかもしれません。", "actions": ["最近の経験を3行でまとめる", "出かけた場所や出来事を振り返る", "感謝したい出会いを書き出す"], "question": "この経験から、私は何を受け取った？"}}, {"sign": "山羊座", "new": {"keywords": ["積み重ね", "土台", "確かな一歩"], "text": "長い目で見た目標や、これから積み重ねたいことを考えたいとき。遠いゴールより、今日できる確かな一歩を決めるきっかけに。", "actions": ["1年後の自分を想像して書き出す", "目標を小さな段階に分けてみる", "毎日続けられることを一つ決める"], "question": "私が少しずつ積み重ねていきたいことは？"}, "full": {"keywords": ["達成", "責任", "ねぎらい"], "text": "これまで積み重ねてきたことを振り返るとき。成し遂げたことを認め、背負いすぎている責任があれば見直すきっかけにもなります。", "actions": ["達成できたことを書き出す", "抱えている役割を一覧にしてみる", "がんばった自分に小さなご褒美を用意する"], "question": "積み重ねてきた中で、私が誇りに思えることは？"}}, {"sign": "水瓶座", "new": {"keywords": ["自分らしさ", "仲間", "ひらめき"], "text": "いつもの枠から少し外れて、自分らしい発想を大切にしたいとき。ひらめきや仲間とのつながりを形にする一歩を考えるきっかけに。", "actions": ["思いついたアイデアをメモに残す", "興味の近い人の集まりをのぞいてみる", "いつもの習慣を一つ変えてみる"], "question": "私らしさを生かして、始めてみたいことは？"}, "full": {"keywords": ["個性", "つながり", "別の視点"], "text": "自分らしさや仲間とのつながりを振り返るとき。人と違うところも含めて、自分の視点を大事にできているかに気づけるかもしれません。", "actions": ["自分らしいと感じた瞬間を書き出す", "仲間に感謝のメッセージを送る", "当たり前にしていたことを別の角度から見てみる"], "question": "私らしくいられたのは、どんなとき？"}}, {"sign": "魚座", "new": {"keywords": ["やすらぎ", "想像", "感じる力"], "text": "感じる力や想像する力がひらきやすいとき。言葉にならない思いも大切にしながら、心が安らぐ時間を育てるきっかけに。", "actions": ["好きな音楽や絵にふれる時間をとる", "夢や思い浮かんだことを自由に書き出す", "静かに目を閉じて、呼吸に意識を向ける"], "question": "私の心が安らぐ時間を、どう育てたい？"}, "full": {"keywords": ["癒し", "受けとめる", "ゆるし"], "text": "心に積もった思いを優しく受けとめるとき。うまくいかなかったことも含めて、自分の気持ちを受けとめ、ねぎらうきっかけにもなります。", "actions": ["心が動く映画や本で気持ちを流す", "自分に「よくやったね」と声をかける", "水辺や自然の中で過ごす"], "question": "今の私が、優しく受けとめたい気持ちは？"}}]}</script>
+<!-- ⑤ 表示ロジック -->
+<script>
+'use strict';
+const HC = HawaiianCalendar, DAY = 86400000;
+const NIGHTS = JSON.parse(document.getElementById('night-data').textContent);
+const EV = JSON.parse(document.getElementById('moon-events').textContent);
+const TH = JSON.parse(document.getElementById('sign-themes').textContent);
+const THEME = Object.fromEntries(TH.signs.map(s => [s.sign, s]));
+const DOW = ['日','月','火','水','木','金','土'];
+// 活動期間（既存アプリの夜番号の対応と同じ。変更しない）
+const PERIODS = [
+  { key:'blue',  from:1,  to:3,  name:'新しい事を始める', sub:'', color:'#3b8ff0', bg:'var(--blue)' },
+  { key:'red',   from:7,  to:10, name:'休息期', sub:'小さなことでも良いので休息をとる', color:'#e8345a', bg:'var(--red)' },
+  { key:'green', from:18, to:20, name:'食物パワー・自然とつながる', sub:'', color:'#1f9a3c', bg:'var(--green)' },
+  { key:'cyan',  from:23, to:26, name:'浄化期', sub:'手放し・整える', color:'#3c8fe6', bg:'var(--cyan)' },
+];
+const periodOf = n => PERIODS.find(p => n >= p.from && n <= p.to) || null;
+const ymd = ms => HC.ymd(ms), md = ms => { const d = new Date(ms); return (d.getUTCMonth()+1) + '/' + d.getUTCDate(); };
+const dow = ms => new Date(ms).getUTCDay();
+// 長い夜名・かなは区切り（- ・）の後ろで折り返せるようにする
+const brk = (s, sep) => esc(s).split(sep).join(sep + '<wbr>');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// 月の形（各日正午JSTの輝面比。低精度の天文計算＝見た目の目安）
+function moonShape(ms){
+  const t = (ms + 3*3600000 - Date.UTC(2000,0,1,12)) / DAY / 36525, r = Math.PI/180;
+  const D = (297.8501921 + 445267.1114034*t) % 360, M = (357.5291092 + 35999.0502909*t) % 360, Mp = (134.9633964 + 477198.8675055*t) % 360;
+  const i = 180 - D - 6.289*Math.sin(Mp*r) + 2.100*Math.sin(M*r) - 1.274*Math.sin((2*D-Mp)*r) - 0.658*Math.sin(2*D*r) - 0.214*Math.sin(2*Mp*r) - 0.110*Math.sin(D*r);
+  return { frac: (1 + Math.cos(i*r)) / 2, waxing: ((D % 360) + 360) % 360 < 180 };
+}
+function moonSvg(ms, size, glow){
+  const { frac:f, waxing } = moonShape(ms), R = size/2 - 2, c = size/2, rx = Math.abs(1-2*f)*R, sw = f < .5 ? 0 : 1;
+  const id = 'g' + ms + size;
+  const lit = f > .01 ? `<path d="M${c},${c-R} A${R},${R} 0 0 1 ${c},${c+R} A${rx},${R} 0 0 ${sw} ${c},${c-R}Z" fill="url(#${id})" ${waxing ? '' : `transform="translate(${size},0) scale(-1,1)"`}/>` : '';
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><defs><radialGradient id="${id}" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#fff2b0"/><stop offset=".65" stop-color="#f3cf55"/><stop offset="1" stop-color="#d9a92c"/></radialGradient></defs>${glow ? `<circle cx="${c}" cy="${c}" r="${R+1}" fill="none" stroke="#f6d36b" stroke-width="2.5" opacity=".6"/>` : ''}<circle cx="${c}" cy="${c}" r="${R}" fill="#1d2433"/>${lit}</svg>`;
+}
+
+// 状態：表示する周期（?cycle=YYYY-MM-DD でその日を含む周期を開ける：共有用）・今日（日本時間）
+const qs = new URLSearchParams(location.search);
+const now = new Date(Date.now() + 9*3600000);
+const TODAY = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+let cyc = HC.cycleAt(qs.get('cycle') ? HC.parse(qs.get('cycle')) : TODAY);
+let tab = 0, sel = null;
+
+function daysOf(c){
+  const out = [];
+  for (let ms = c.hiloMs; ms <= c.mukuMs; ms += DAY){ const n = HC.nightNumber(c, ms); out.push({ ms, n, night: NIGHTS[n-1] }); }
+  return out;
+}
+// この周期に付く新月・満月：はじまりの新月＝Hilo以前で最も近い新月、満月＝周期内、終わりの新月＝周期内（Muku側）
+function eventsOf(c){
+  const list = EV.events.map(e => ({ ...e, ms: HC.parse(e.date) }));
+  const startNew = list.filter(e => e.type === 'new' && e.ms <= c.hiloMs && e.ms >= c.hiloMs - 3*DAY).pop() || null;
+  const full = list.find(e => e.type === 'full' && e.ms >= c.hiloMs && e.ms <= c.mukuMs) || null;
+  const endNew = list.find(e => e.type === 'new' && e.ms > c.hiloMs && e.ms <= c.mukuMs) || null;
+  const covered = c.hiloMs >= HC.parse(EV.range[0]) && c.mukuMs <= HC.parse(EV.range[1]);
+  return { startNew, full, endNew, covered };
+}
+const evOnDay = (E, ms) => [E.full, E.endNew].filter(e => e && e.ms === ms);
+const groups = days => [days.slice(0,10), days.slice(10,20), days.slice(20)];
+const fmtDate = ms => `${new Date(ms).getUTCFullYear()}年${new Date(ms).getUTCMonth()+1}月${new Date(ms).getUTCDate()}日`;
+const dowCls = ms => dow(ms) === 0 ? 'sun' : dow(ms) === 6 ? 'sat' : '';
+
+function render(){
+  const days = daysOf(cyc), E = eventsOf(cyc), G = groups(days);
+  const hasToday = TODAY >= cyc.hiloMs && TODAY <= cyc.mukuMs;
+  // 2028年以降の日付を含む周期：計算値であることを表示（共通周期データは変更しない）
+  const cn = document.getElementById('calcnote'), CALC_FROM = Date.UTC(2028, 0, 1);
+  cn.hidden = cyc.mukuMs < CALC_FROM;
+  cn.textContent = 'この周期には2028年以降の日付が含まれます。2028年以降のハワイ暦の日付（Hilo・Muku）は、愛泉の杜OSの共通周期データによる計算値で、正式な暦資料とはまだ照合していません。';
+  document.getElementById('range').innerHTML = `${md(cyc.hiloMs)}（${days[0].night.name}）〜 ${md(cyc.mukuMs)}（${days[days.length-1].night.name}）<small>${new Date(cyc.hiloMs).getUTCFullYear()}年｜古来ハワイ太陰暦 ${cyc.nights}夜の周期</small>`;
+  document.getElementById('prev').disabled = !HC.inRange(cyc.hiloMs - DAY);
+  document.getElementById('next').disabled = !HC.inRange(cyc.mukuMs + DAY);
+  // PC
+  const colors = ['var(--r1)','var(--r2)','var(--r3)'];
+  document.getElementById('rowsPc').innerHTML = G.map((g, gi) => {
+    let cells = '', bands = '';
+    g.forEach((d, i) => {
+      const e = evOnDay(E, d.ms)[0];
+      cells += `<div class="cell ${d.ms===TODAY?'today':''} ${sel===d.ms?'sel':''}" data-ms="${d.ms}" style="grid-column:${i+1}">
+        ${moonSvg(d.ms, 40, e && e.type==='full')}<div class="dt ${dowCls(d.ms)}">${md(d.ms)}</div><div class="dw ${dowCls(d.ms)}">（${DOW[dow(d.ms)]}）</div>
+        <div class="nn">第${d.n}夜</div><div class="nm">${brk(d.night.name, '-')}<small>${brk(d.night.kana, '・')}</small></div></div>`;
+    });
+    // 帯・札
+    let i = 0;
+    while (i < g.length){ const p = periodOf(g[i].n); let j = i; while (p && j+1 < g.length && periodOf(g[j+1].n) === p) j++;
+      if (p) bands += `<div class="band" style="grid-column:${i+1}/${j+2};background:${p.bg}"><span class="dot" style="background:${p.color}"></span>${p.name}${p.sub && j>i+1 ? `<small>（${p.sub}）</small>` : ''}</div>`;
+      else { const e = evOnDay(E, g[i].ms)[0]; if (e) bands += `<div class="tag ${e.type}" style="grid-column:${i+1}">${e.type==='full'?'満月':'新月'}<small>${e.time_jst}・${e.sign}</small></div>`; }
+      i = j + 1; }
+    return `<div class="row"><div class="bar" style="background:${colors[gi]}">${md(g[0].ms)} 〜 ${md(g[g.length-1].ms)}　第${g[0].n}〜${g[g.length-1].n}夜</div><div class="grid">${cells}</div><div class="bands">${bands}</div></div>`;
+  }).join('');
+  document.getElementById('legendPc').innerHTML = PERIODS.map(p => `<span><span class="dot" style="background:${p.color}"></span>${p.name}</span>`).join('') + '<span>日付をクリックすると、その日の詳細を表示します</span>';
+  // スマホ：30日の全体ナビ
+  document.getElementById('ov').innerHTML = G.map((g, gi) => `<button class="grp" data-tab="${gi}" style="border-color:${colors[gi]}" aria-label="${md(g[0].ms)}〜${md(g[g.length-1].ms)}を表示">${g.map(d => { const p = periodOf(d.n);
+    return `<span class="dy ${d.ms===TODAY?'today':''}">${moonSvg(d.ms, 9)}<i style="background:${p ? p.color : 'transparent'}"></i></span>`; }).join('')}</button>`).join('');
+  if (!tabInit){ tab = hasToday ? G.findIndex(g => g.some(d => d.ms === TODAY)) : 0; tabInit = true; }
+  document.getElementById('tabs').innerHTML = G.map((g, gi) => `<button class="${gi===tab?'on':''}" style="${gi===tab?`background:${colors[gi]}`:''}" data-tab="${gi}"><b>${md(g[0].ms)}〜${md(g[g.length-1].ms)}</b>第${g[0].n}〜${g[g.length-1].n}夜</button>`).join('');
+  document.getElementById('list').innerHTML = G[tab].map(d => { const p = periodOf(d.n), e = evOnDay(E, d.ms)[0];
+    return `<div class="item ${d.ms===TODAY?'today':''} ${sel===d.ms?'open':''}" data-ms="${d.ms}"><button aria-expanded="${sel===d.ms}">
+      ${moonSvg(d.ms, 34, e && e.type==='full')}<div class="d ${dowCls(d.ms)}">${md(d.ms)}<small>（${DOW[dow(d.ms)]}）</small></div>
+      <div><div class="n">第${d.n}夜 ${brk(d.night.name, '-')}<small>${brk(d.night.kana, '・')}</small>${d.ms===TODAY?'<span class="tod">今日</span>':''}</div>
+      <div class="chips">${p ? `<span class="chip" style="background:${p.bg}">${p.name}</span>` : ''}${e ? `<span class="chip" style="background:${e.type==='full'?'#fde7c8':'#e5e1f5'}">${e.type==='full'?'満月':'新月'} ${e.time_jst} ${e.sign}</span>` : ''}</div></div></button>
+      <div class="ex">${dayNote(d, E)}</div></div>`; }).join('');
+  // PC：選んだ日
+  const sd = days.find(d => d.ms === sel) || days.find(d => d.ms === TODAY) || days[0];
+  document.getElementById('detail').innerHTML = `<b>${fmtDate(sd.ms)}（${DOW[dow(sd.ms)]}）</b>　${dayText(sd, E)}`;
+  // カード
+  document.getElementById('cards').innerHTML = card('new', E.startNew, 'この周期のはじまりの新月', E.covered) + card('full', E.full, 'この周期の満月', E.covered);
+  document.getElementById('notes').innerHTML = `※ 新月・満月の時刻：${esc(EV.time_source)}（日本標準時）。星座：${esc(EV.sign_source)}。収録期間 ${EV.range[0]}〜${EV.range[1]}。<br>
+    ※ 月の形：各日の正午（日本時間）の輝いて見える割合を、天文計算の簡易式（Meeus『Astronomical Algorithms』）で描いた目安です。ハワイ暦の月夜（第n夜）とは別のものです。<br>
+    ※ ハワイ暦の日付・月夜名：愛泉の杜OSの共通周期データ（v${HC.VERSION}）。2028年以降の周期は計算値です。<br>
+    ※ 星座のテーマは、自己理解のヒントとして愛泉の杜がまとめたものです。行動や結果を決めるものではありません。`;
+  bind();
+}
+let tabInit = false;
+const IS_SP = matchMedia('(max-width:899px)').matches;
+const cardOpen = { new: !IS_SP, full: !IS_SP };
+function dayText(d, E){
+  const p = periodOf(d.n), e = evOnDay(E, d.ms)[0];
+  return `第${d.n}夜 ${esc(d.night.name)}（${esc(d.night.kana)}）` + (p ? `／${p.name}${p.sub ? `（${p.sub}）` : ''}` : '') + (e ? `／${e.type==='full'?'満月':'新月'} ${e.time_jst}〈${e.sign}〉` : '');
+}
+// スマホの行を開いたときの補足（行に出ている内容は繰り返さない）
+function dayNote(d, E){
+  const p = periodOf(d.n), e = evOnDay(E, d.ms)[0], t = e && THEME[e.sign] ? THEME[e.sign][e.type] : null, out = [];
+  if (p) out.push(`${p.name}（第${p.from}〜${p.to}夜）${p.sub ? '：' + p.sub : ''}`);
+  if (e) out.push(`${e.type==='full'?'満月':'新月'}〈${e.sign}〉${t ? '：' + t.keywords.join('・') : ''}${e.type==='full' ? '（下のカードで詳しく）' : ''}`);
+  if (!out.length) out.push('特別な期間ではない日です。月の形を眺めて、ひと息つくきっかけに。');
+  return out.map(esc).join('<br>');
+}
+function card(type, e, label, covered){
+  const t = e && THEME[e.sign] ? THEME[e.sign][type] : null;
+  const icon = moonSvg(e ? e.ms : 0, 46, type === 'full');
+  if (!e) return `<div class="card"><div class="ttl">${type==='new'?'新月':'満月'}</div><div class="none">${covered ? 'この周期の' + (type==='new'?'新月':'満月') + 'はありません。' : 'この周期の新月・満月データは、まだ収録されていません。'}</div></div>`;
+  const head = `<div class="hd">${type==='new' ? `<svg width="46" height="46"><circle cx="23" cy="23" r="21" fill="#1d2433" stroke="#556" /></svg>` : icon}<div><div class="when">${label}・${md(e.ms)}（${DOW[dow(e.ms)]}）${e.time_jst}</div><div class="ttl">${type==='new'?'新月':'満月'}<span>〈${e.sign}〉</span></div></div></div>`;
+  if (!t) return `<div class="card">${head}<div class="none">この星座の文章は未収録です。</div></div>`;
+  const body = `<p>${esc(t.text)}</p><ul>${t.actions.map(a => `<li>${esc(a)}</li>`).join('')}</ul><div class="q">${esc(t.question)}</div>`;
+  return `<details class="card" data-type="${type}" ${cardOpen[type] ? 'open' : ''}><summary>${head}<div class="kw">${t.keywords.map(esc).join('・')}</div><div class="more sp-only">タップで説明を開く／閉じる</div></summary>${body}</details>`;
+}
+function bind(){
+  document.querySelectorAll('.cell').forEach(el => el.onclick = () => { sel = +el.dataset.ms; render(); });
+  document.querySelectorAll('.item>button').forEach(el => el.onclick = () => { const ms = +el.parentNode.dataset.ms; sel = sel === ms ? null : ms; render(); });
+  document.querySelectorAll('details.card').forEach(el => el.ontoggle = () => { cardOpen[el.dataset.type] = el.open; });
+  document.querySelectorAll('#tabs button').forEach(el => el.onclick = () => { tab = +el.dataset.tab; render(); });
+  document.querySelectorAll('#ov .grp').forEach(el => el.onclick = () => { tab = +el.dataset.tab; render(); });
+}
+document.getElementById('prev').onclick = () => { cyc = HC.cycleAt(cyc.hiloMs - DAY); tab = 0; sel = null; render(); };
+document.getElementById('next').onclick = () => { cyc = HC.cycleAt(cyc.mukuMs + DAY); tab = 0; sel = null; render(); };
+render();
+</script>
+</body>
+</html>
