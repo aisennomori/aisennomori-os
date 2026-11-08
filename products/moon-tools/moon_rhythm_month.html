@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="ja">
 <!--- 月のリズムと、私の1か月 Version 1.0.1（2026-11-06 PO承認・公開候補）：月の絵を既存素材（画像/moon_01〜30.png）に差し替え・画面下の注記を整理。暦データ・24パターンの文章は Version 1.0 と同一--->
+<!-- Version 1.0.2 候補（2026-11-08）：周期の表示を1行に簡素化（スマホ＝月日、PC＝西暦年つき）・新月満月カードの月アイコンを透過の円形に（A案）。暦データ・計算・カレンダーの月の絵・文章は変更なし -->
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,8 +19,9 @@ header .sub{font-size:13px;color:#e8edf5;margin-top:4px;letter-spacing:.08em}
 .nav{display:flex;align-items:center;gap:10px;max-width:1180px;margin:14px auto 0;padding:0 16px}
 .nav button{flex:0 0 auto;min-width:44px;min-height:44px;border:1px solid var(--line);background:#fff;border-radius:22px;font-size:15px;cursor:pointer;padding:0 14px;color:var(--navy2)}
 .nav button:disabled{opacity:.35;cursor:default}
-.nav .range{flex:1;text-align:center;background:#fff;border:1px solid var(--line);border-radius:22px;padding:8px 10px;font-weight:700;font-size:16px}
-.nav .range small{display:block;font-weight:400;font-size:11.5px;color:var(--soft)}
+.nav .range{flex:1;min-width:0;min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:22px;padding:4px 10px;font-weight:700;font-size:16px}
+.nav .range .r-sp{display:none}
+@media (max-width:899px){.nav .range .r-pc{display:none}.nav .range .r-sp{display:inline}}
 .calcnote{max-width:1148px;margin:8px auto 0;background:#eef2f8;border:1px solid #c9d4e6;color:#2c3e5c;border-radius:10px;padding:6px 12px;font-size:13px;line-height:1.6}
 @media (max-width:899px){.calcnote{margin:8px 16px 0}}
 main{max-width:1180px;margin:0 auto;padding:12px 16px 28px}
@@ -53,6 +55,7 @@ main{max-width:1180px;margin:0 auto;padding:12px 16px 28px}
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
 .card{background:var(--navy);color:#e9edf4;border:1px solid #c9a24a;border-radius:16px;padding:16px 18px}
 .card .hd{display:flex;align-items:center;gap:12px}
+.card .hd .cmoon{display:block;flex:none;width:46px;height:46px}
 .card .when{color:var(--gold);font-size:14px}
 .card .ttl{font-size:21px;font-weight:700;color:#fff}
 .card .ttl span{font-size:13px;color:#cfd6e2;font-weight:400;margin-left:6px}
@@ -249,7 +252,9 @@ function render(){
   const cn = document.getElementById('calcnote'), CALC_FROM = Date.UTC(2028, 0, 1);
   cn.hidden = cyc.mukuMs < CALC_FROM;
   cn.textContent = 'この周期には2028年以降の日付が含まれます。2028年以降のハワイ暦の日付（Hilo・Muku）は、愛泉の杜OSの共通周期データによる計算値で、正式な暦資料とはまだ照合していません。';
-  document.getElementById('range').innerHTML = `${md(cyc.hiloMs)}（${days[0].night.name}）〜 ${md(cyc.mukuMs)}（${days[days.length-1].night.name}）<small>${new Date(cyc.hiloMs).getUTCFullYear()}年｜古来ハワイ太陰暦 ${cyc.nights}夜の周期</small>`;
+  // 周期の表示：スマホ（幅899px以下）は月日だけ、PCは開始日・終了日とも西暦年つき。年は周期の日付から取得（年をまたぐ周期にも対応）
+  const ymdS = ms => `${new Date(ms).getUTCFullYear()}/${md(ms)}`;
+  document.getElementById('range').innerHTML = `<span class="r-sp">${md(cyc.hiloMs)}〜${md(cyc.mukuMs)}</span><span class="r-pc">${ymdS(cyc.hiloMs)}〜${ymdS(cyc.mukuMs)}</span>`;
   document.getElementById('prev').disabled = !HC.inRange(cyc.hiloMs - DAY);
   document.getElementById('next').disabled = !HC.inRange(cyc.mukuMs + DAY);
   // PC
@@ -315,9 +320,15 @@ function dayNote(d, E){
   if (!out.length) out.push('特別な期間ではない日です。月の形を眺めて、ひと息つくきっかけに。');
   return out.map(esc).join('<br>');
 }
+// 新月・満月カードの月アイコン（A案）：透過の円形SVG。新月＝黒に近い円、満月＝月光色の円。どちらも細い金の縁取り・46px
+function cardMoon(type){
+  const fill = type === 'full' ? 'url(#cardFullGrad)' : '#11151f';
+  const defs = type === 'full' ? '<defs><radialGradient id="cardFullGrad" cx="42%" cy="40%" r="62%"><stop offset="0" stop-color="#fff6d8"/><stop offset="0.6" stop-color="#f8dc8c"/><stop offset="1" stop-color="#eec865"/></radialGradient></defs>' : '';
+  return `<svg class="cmoon" width="46" height="46" viewBox="0 0 46 46" aria-hidden="true" focusable="false">${defs}<circle cx="23" cy="23" r="21.75" fill="${fill}" stroke="#c9a24a" stroke-width="1.5"/></svg>`;
+}
 function card(type, e, label, covered){
   const t = e && THEME[e.sign] ? THEME[e.sign][type] : null;
-  const icon = e ? moonImg(HC.nightNumber(HC.cycleAt(e.ms), e.ms), 46, type === 'full') : '';
+  const icon = e ? cardMoon(type) : '';
   if (!e) return `<div class="card"><div class="ttl">${type==='new'?'新月':'満月'}</div><div class="none">${covered ? 'この周期の' + (type==='new'?'新月':'満月') + 'はありません。' : 'この周期の新月・満月データは、まだ収録されていません。'}</div></div>`;
   const head = `<div class="hd">${icon}<div><div class="when">${label}・${md(e.ms)}（${DOW[dow(e.ms)]}）${e.time_jst}</div><div class="ttl">${type==='new'?'新月':'満月'}<span>〈${e.sign}〉</span></div></div></div>`;
   if (!t) return `<div class="card">${head}<div class="none">この星座の文章は未収録です。</div></div>`;
