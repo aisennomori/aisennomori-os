@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:,">
-<title>使えるエネルギー 早見ページ</title>
+<title>愛泉の杜エネルギー一覧</title>
 <style>
 :root{
 --bg:#f7f3ea; --surface:#fffdf7; --surface2:#efe8d8; --ink:#2b2620; --muted:#6b6358; --line:#ddd3bd;
@@ -59,20 +59,24 @@ details.energy[open] summary.chev{transform:rotate(180deg)}
 footer{color:var(--muted);font-size:13px;margin-top:36px;text-align:center}
 .top-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
 .top-actions button{min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px;cursor:pointer}
+.top-actions a.navlink{min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px;text-decoration:none;display:inline-flex;align-items:center}
+.chant-intro{font-size:15px;margin:10px 0 4px}
+.chant-intro small{color:var(--muted)}
+h3.chant-g{font-family:var(--serif);font-size:17px;margin:22px 0 6px;color:var(--accent2)}
+.chant-sec{counter-reset:chant}
+ol.chant{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+ol.chant li{counter-increment:chant;padding:12px 16px 12px 52px;position:relative;border-bottom:1px solid var(--line);font-size:15px;line-height:1.8}
+ol.chant li:last-child{border-bottom:none}
+ol.chant li::before{content:counter(chant);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--chip);color:var(--accent);font-size:13px;font-weight:700;display:grid;place-items:center}
+ol.chant .cn{font-family:var(--serif);font-weight:700;font-size:16px}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
-<h1>使えるエネルギー 早見ページ</h1>
-<p class="sub">光一さんのアチューメント・マニュアル 全23件 ／ 名前をタップすると宣言文・手順がその場で開きます</p>
-<div class="premise">
-<p>🌿 <strong>この23件はすべて、アチューメント受領済みで流せるもの</strong>です。</p>
-<p>🤲 <strong>送る際は、相手の同意が基本</strong>です。マニュアル側にも、ヒーリング・伝授の前にその存在本人へ許可を確認する手順が共通して書かれています。</p>
-<p style="color:var(--muted);font-size:14px">共通の流れ： 毎日の自己ヒーリング → 十分に感じられるようになったら、その存在本人へ可否を確認 → 自信がなければ友人同士で練習を重ねる。</p>
-</div>
-<div class="top-actions"><button type="button" id="openAll">すべて開く</button><button type="button" id="closeAll">すべて閉じる</button></div>
+<h1>愛泉の杜エネルギー一覧</h1>
+<div class="top-actions"><button type="button" id="openAll">すべて開く</button><button type="button" id="closeAll">すべて閉じる</button><a class="navlink" href="#chant-h">唱え方リストへ</a></div>
 </header>
 
 <section aria-labelledby="purpose-h">
@@ -80,9 +84,60 @@ footer{color:var(--muted);font-size:13px;margin-top:36px;text-align:center}
 <div id="purposes"></div>
 </section>
 
+<section class="chant-sec" aria-labelledby="chant-h">
+<h2 class="sec" id="chant-h">唱え方リスト <span>真言のように連続して唱える順</span></h2>
+<p class="chant-intro">宣言の共通型（多くの件がこれを共有し、名だけ差し替える）：</p>
+<div class="decl">「偉大なる○○様に帰依します。お力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします。」
+※レムリア・西洋系は「私のハートに、あなたのエナジーを」「サポートをお願いします」の言い回し。</div>
+<p class="chant-intro"><small>並びは系統順（仏教系→神道系→福徳系→レムリア・西洋系→龍・統合系）。順番自体はマニュアル指定ではなく、唱える順は自由に組み替えてよい。印の形そのものは文章・写真で示されているものが多いため、ここでは「どの印か」までとし、形の確認は原典で。</small></p>
+
+<h3 class="chant-g">仏教系</h3>
+<ol class="chant">
+<li><span class="cn">大日如来</span>：般若心経（題目→本文2回→「羯諦羯諦…」から最後までもう1回）→ 金剛界の印を組み、金剛界マントラ「おん あびらうんけん ばさらだとばん」×7回 → 宣言（「ああ、偉大な大日如来様に帰依します」＋ハート／エナジー版）</li>
+<li><span class="cn">弥勒如来</span>：合掌して一礼 → 弥勒如来印を組み「オン マイタレイヤ ソワカー」×21回 → 合掌に戻し一礼 → 宣言</li>
+<li><span class="cn">薬師瑠璃光如来</span>：薬壺印を組み「オン コロコロ センダリ マトウギ ソワカ」×7回 → 「薬師瑠璃光如来様」×3回 → 宣言</li>
+<li><span class="cn">不動明王</span>：般若心経（大日如来と同じ唱え方）→ 手印を組み、心咒「のうまくさーまんだー ばーざらだん せんだーまーかろ しゃーだーそわたや うんたらたーかんまん」×7回 → 宣言（「ああ、偉大な不動明王様に帰依します」）</li>
+<li><span class="cn">毘沙門天</span>：印（2種のどちらでも可）を組み、光明真言「おんあぼきゃー べいろしゃのー まかぼだらー まにはんどば じんばら はらばりたや うん」×7回 → 毘沙門天真言「なうまくさんまんだー ぼだなん べいしらまんだや そわかー」×7回 → 宣言</li>
+<li><span class="cn">千手観世音菩薩</span>：合掌して一礼 → 専用手印（人差し指と薬指を交差させる印）を組み「オン バサラー タラマー キリーク」×21回 → 合掌に戻し一礼 → 宣言</li>
+<li><span class="cn">観世音菩薩</span>：印を組み、聖観音真言「オン アロリキャ ソワカ」×7回 → 宣言（導入が独特：「全ての世界の衆生に救いの手を差し伸べます、観世音菩薩様に帰依します…」）</li>
+</ol>
+
+<h3 class="chant-g">神道・日本の神々</h3>
+<ol class="chant">
+<li><span class="cn">天之御中主神</span>：二礼二拍手・合掌 → 神通秘詞を奏上 → 二礼二拍手一礼 → 「天之御中主神様」×3回＋宣言</li>
+<li><span class="cn">造化三神様</span>：六礼六拍手・合掌 → 大元造化三神報恩之祈詞を天に向かって奏上 → 三柱の名を呼び宣言。締め：「天御中主之大御神 咲きはへ／高皇産靈之大御神 咲きはへ／神皇産靈之大御神 咲きはへ」＋「神ながらたまちはえませ」×3 → 六礼六拍手三礼</li>
+<li><span class="cn">天照大御神</span>：手を洗い口を漱ぐ → 二礼二拍手 → 「あーめーのーおーきー つーちーのーおーきー あーめーのーひーれー つーちーのーひーれー」→ 十言の神咒「アーマーテーラースー オーオーミーカーミー」×10回 → 印（天乃咲手印／八咫鏡印のどちらか）を組んで宣言 → 二拍手一礼</li>
+<li><span class="cn">伊耶那岐命・伊耶那美命</span>：二礼二拍手・合掌 → 「伊耶那岐命様・伊耶那美命様」×3回＋宣言（参考として二柱それぞれの祝詞＝祓詞ほかが併記されている）</li>
+<li><span class="cn">宇迦之御霊神</span>：二礼・合掌 → 稲荷祝詞（本詞／略詞）を奏上 → 二礼二拍手一礼 → 「宇迦之御霊神様」×3回＋宣言</li>
+<li><span class="cn">木花咲耶姫命</span>：事前浄化（入浴・塩うがい・手洗い）→ 二礼二拍手 → 富士の浅間大神への祝詞を奏上 → 「木花咲耶姫命様（コノハナサクヤヒメノミコト様）」×3回＋宣言 → 二拍手一礼</li>
+<li><span class="cn">瀬織津姫</span>：事前浄化（入浴・塩うがい・手洗い）→ 二礼二拍手一礼 → 「瀬織津姫 饒速日尊（ニギハヤヒノミコト）」をマントラのように×3回＋宣言 → 終わりも二礼二拍手一礼</li>
+<li><span class="cn">菊理媛神命</span>：事前浄化（塩風呂・塩水うがい等）→ 二礼二拍手 → 龍神祝詞を奏上 → 二拍手一礼 → 「菊理媛神命様（くくりひめかみのみこと様）」×3回＋宣言</li>
+</ol>
+
+<h3 class="chant-g">福徳系</h3>
+<ol class="chant">
+<li><span class="cn">七福神</span>：手印なし・合掌のみ。合掌して一礼 → 七柱の真言を各×7回（毘沙門天「オン ベイシラマンダヤ ソワカ」／大黒天「オン マカキャラヤー ソワカ」／弁財天「オン ソラソバティエー ソワカ」／恵比寿天「オン インダラヤー ソワカ」／福禄寿「オン マカシリ ソワカ」／寿老人「オン バサラユセイ ソワカ」／布袋尊「オン マイタレイヤ ソワカ」）→ 一礼して宣言 → 締め「七福神集結 開運招福・無病息災・延命長寿 オン ロキャロキャ キャラヤー ソワカ」×7回</li>
+<li><span class="cn">大辯財天</span>：印相を組み「オン ソラソバティエイ ソワカ」×7回 → 宣言（「ああ、偉大なる大辯財天様に帰依します」※原典は「様様」の二重表記）</li>
+</ol>
+
+<h3 class="chant-g">レムリア・西洋系</h3>
+<ol class="chant">
+<li><span class="cn">マザー・メアリー</span>：宣言のみ。「マザー・メアリー様」×3回＋「私に力をお貸しください…」（イメージ：頭上から金色の光、ハートがピンクに輝く）※要約カード由来のため宣言は要点のみ</li>
+<li><span class="cn">イエスと二人のマリア</span>：宣言のみ。「イエスキリスト様・聖母マリア様・マグダラのマリア様。私に力をお貸しください…」</li>
+<li><span class="cn">サナトクマラ</span>：「マスター・サナトクマラ ホワイトブラザーフッド」×3回＋宣言</li>
+<li><span class="cn">尊天</span>：合掌して尊天真言「オン バサラー ダルマキリー ベイシラマナヤー ダルマハラー マソバミウン ソワカー」×7回 → 合掌を解いて宣言（宛名は「護法魔王尊様・千手観世音菩薩様・毘沙門天王様」の三者連名）</li>
+<li><span class="cn">レディー・レムリア</span>：宣言のみ。「レディー・レムリア様」×3回＋宣言</li>
+</ol>
+
+<h3 class="chant-g">龍・統合系</h3>
+<ol class="chant">
+<li><span class="cn">虹龍と鳳凰</span>：事前浄化（塩風呂・塩水うがい）→ 虹龍の手印を結び「オン メイキャシャ ニエイ ソワカ」×7回 → 鳳凰の手印を結び「オン ガルダヤ ソワカ」×7回 → 印を解き「虹龍様・鳳凰様」×3回＋宣言</li>
+</ol>
+</section>
+
 <main id="groups"></main>
 
-<footer>発行元： Office Lemuria Spiritual School® ／ 本ページはマニュアル記載の整理であり、効果の評価は含みません。</footer>
+<footer>愛泉の杜</footer>
 </div>
 
 <script>
