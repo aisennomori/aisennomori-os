@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>使えるエネルギー 早見ページ</title>
+<style>
+:root{
+--bg:#f7f3ea; --surface:#fffdf7; --surface2:#efe8d8; --ink:#2b2620; --muted:#6b6358; --line:#ddd3bd;
+--accent:#7a4a1f; --accent2:#2e4a3a; --gold:#b8862e; --chip:#efe6d2; --chip-on:#2e4a3a; --chip-on-ink:#fff;
+--decl-bg:#f3ecdb; --warn-bg:#fdf3e3;
+--serif:"Hiragino Mincho ProN","Yu Mincho",YuMincho,"Noto Serif JP",serif;
+--sans:"Hiragino Kaku Gothic ProN","Yu Gothic",YuGothic,"Noto Sans JP",system-ui,sans-serif;
+}
+@media(prefers-color-scheme:dark){
+:root{--bg:#171512;--surface:#221f1b;--surface2:#2b2722;--ink:#ece6d9;--muted:#b3a99a;--line:#3d372f;--accent:#e0b56a;--accent2:#8fc0a6;--gold:#d9a94a;--chip:#2e2a24;--chip-on:#3d6b52;--decl-bg:#2a251e;--warn-bg:#2e2718}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75}
+.wrap{max-width:820px;margin:0 auto;padding:20px 16px 64px}
+h1{font-family:var(--serif);font-size:28px;line-height:1.3;margin:8px 0 6px;font-weight:700;letter-spacing:.02em}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+.premise{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:22px}
+.premise p{margin:4px 0;font-size:15px}
+.premise strong{color:var(--accent)}
+h2.sec{font-family:var(--serif);font-size:20px;margin:30px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--gold);display:flex;justify-content:space-between;align-items:baseline}
+h2.sec span{font-size:13px;color:var(--muted);font-family:var(--sans);font-weight:400}
+.purpose-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 4px}
+@media(max-width:520px){.purpose-grid{grid-template-columns:1fr}}
+.pbtn{min-height:52px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-size:16px;font-family:var(--sans);color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pbtn small{color:var(--muted);font-size:13px;white-space:nowrap}
+.pbtn[aria-expanded="true"]{background:var(--chip-on);color:var(--chip-on-ink);border-color:var(--chip-on)}
+.pbtn[aria-expanded="true"] small{color:#d8e8de}
+.plist{display:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px;margin:0 0 10px}
+.plist.open{display:block}
+.plist a{display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:8px 10px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line);font-size:15px}
+.plist a:last-child{border-bottom:none}
+.plist a span{color:var(--accent);font-size:18px}
+details.energy{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+details.energy summary{min-height:56px;padding:14px 16px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:10px}
+details.energy summary::-webkit-details-marker{display:none}
+details.energy summary.nm{font-family:var(--serif);font-size:18px;font-weight:700;line-height:1.4}
+details.energy summary.tm{color:var(--muted);font-size:13px;display:block;font-family:var(--sans);font-weight:400}
+details.energy summary.chev{flex:none;width:28px;height:28px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-size:16px;color:var(--accent);transition:transform.2s}
+details.energy[open] summary.chev{transform:rotate(180deg)}
+.body{padding:2px 16px 18px;border-top:1px solid var(--line)}
+.body h3{font-size:13px;letter-spacing:.08em;color:var(--accent2);margin:16px 0 4px;font-weight:700}
+.body p{margin:4px 0;font-size:15px}
+.decl{background:var(--decl-bg);border-radius:8px;padding:12px 14px;font-size:15px;line-height:1.9;white-space:pre-wrap}
+.times{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.times span{background:var(--chip);border-radius:999px;padding:4px 10px;font-size:13px}
+.scope{display:flex;flex-wrap:wrap;gap:6px}
+.scope b{font-weight:600;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px}
+.scope b.no{opacity:.75}
+.note{background:var(--warn-bg);border-radius:8px;padding:10px 12px;font-size:14px}
+footer{color:var(--muted);font-size:13px;margin-top:36px;text-align:center}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.top-actions button{min-height:44px;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:14px;cursor:pointer}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>使えるエネルギー 早見ページ</h1>
+<p class="sub">光一さんのアチューメント・マニュアル 全23件 ／ 名前をタップすると宣言文・手順がその場で開きます</p>
+<div class="premise">
+<p>🌿 <strong>この23件はすべて、アチューメント受領済みで流せるもの</strong>です。</p>
+<p>🤲 <strong>送る際は、相手の同意が基本</strong>です。マニュアル側にも、ヒーリング・伝授の前にその存在本人へ許可を確認する手順が共通して書かれています。</p>
+<p style="color:var(--muted);font-size:14px">共通の流れ： 毎日の自己ヒーリング → 十分に感じられるようになったら、その存在本人へ可否を確認 → 自信がなければ友人同士で練習を重ねる。</p>
+</div>
+<div class="top-actions"><button type="button" id="openAll">すべて開く</button><button type="button" id="closeAll">すべて閉じる</button></div>
+</header>
+
+<section aria-labelledby="purpose-h">
+<h2 class="sec" id="purpose-h">目的から引く <span>タップで一覧 → 名前で該当カードへ</span></h2>
+<div id="purposes"></div>
+</section>
+
+<main id="groups"></main>
+
+<footer>発行元： Office Lemuria Spiritual School® ／ 本ページはマニュアル記載の整理であり、効果の評価は含みません。</footer>
+</div>
+
+<script>
+var PURPOSES=[
+{id:"purify",label:"浄化・祓い",items:["yakushi","fudo","amenominakanushi","zouka","amaterasu","izanagi","konohanasakuya","seoritsuhime","kikurihime","sanat","sonten"]},
+{id:"heal",label:"癒し・回復",items:["dainichi","miroku","yakushi","senju","kanzeon","shichifukujin","sonten","mother","lemuria","jesus"]},
+{id:"guard",label:"守護",items:["fudo","bishamonten","senju","amenominakanushi","zouka","amaterasu","seoritsuhime","sanat","jesus"]},
+{id:"fortune",label:"福徳・豊かさ",items:["bishamonten","senju","zouka","amaterasu","ukanomitama","shichifukujin","daibenzaiten","sonten"]},
+{id:"love",label:"愛・調和",items:["dainichi","miroku","senju","kanzeon","izanagi","ukanomitama","konohanasakuya","kikurihime","mother","lemuria","jesus","sanat","nijiryu"]},
+{id:"awaken",label:"覚醒・次元上昇",items:["dainichi","miroku","izanagi","seoritsuhime","kikurihime","sanat","lemuria","nijiryu"]}
+];
+var GROUPS=[
+{name:"仏教系",items:[
+{id:"dainichi",name:"大日如来",title:"宇宙真実儀 ―大いなる日輪―",desc:"太陽を司る毘盧舎那如来がさらに進化した仏とされ、密教では宇宙の真理そのもの、宇宙そのものを指すと説明される。金剛界（智慧）と胎蔵界（無限の慈悲）の2つの捉え方がある。「宇宙意識に目覚め、心と言葉と行動が一体となり、神我への変貌を遂げる」サポートとされる。",decl:"アチューメント前に般若心経を唱える（題目→本文2回→「羯諦羯諦…」から最後までもう1回）。金剛界の印を組み、金剛界マントラを7回唱える。\n金剛界マントラ：「おん あびらうんけん ばさらだとばん」\n胎蔵界マントラ：「のうまくさーまんだー ぼだなん あびらうんけん」\n「ああ、偉大な大日如来様に帰依します。お力をお貸しください。私のハートに、あなたのエナジーを注いで下さい…」\n「宇宙意識に目覚め、神我へと覚醒する事が出来ました。心・言葉・行動の本質にお導きを下さり、ありがとうございます」",steps:"金剛界マントラ×7回 → 宣言 → 約15分瞑想（感じたタイミングで終了可）。真言は「一切の病が癒え、無事に安産になり、一切の災いから救われる最強マントラ」とされ、日常では同封のカードを飾り、印を組み 7・21・108回唱えるとされる。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"本書に終了後の水分・休養の注意書きはない。日常の唱えでは同封カードを飾ることが指定されている（カードはPDF外の付属物）。"},
+{id:"miroku",name:"弥勒如来",title:"次元上昇救世主",desc:"釈迦入滅から56億7千万年後に弥勒菩薩から現れ、人々を救う仏と説明される。「ミロクがこの世に降り立つ時、世界に秩序と調和が訪れ、完全なる理想郷が出現する」とされる。テーマは愛と平和の大調和・ワンネスで、「全ての存在との大調和の一部として生きると決意した方の変貌」をサポートするとされる。",decl:"合掌して一礼 → 弥勒如来印を組み「オンマイタレイヤソワカー」を21回唱える → 合掌に戻し一礼\n「偉大なる弥勒如来様に帰依します。私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるようにご援助をお願い致します。」\n「全ての存在が自分であり、自分が全てのものであると気付く事ができました。愛と平和の大調和、ワンネスにお導き下さり、ありがとうございます。」",steps:"前動作は自己・ヒーリング・伝授すべて共通。身体全体が「レインボーゴールド」の神通力に包まれるイメージで瞑想する。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"終了後は天然水などの水分（カフェインは避ける）を多めに飲み、ゆっくり休む。運転中や注意力を要することの最中は受け取らない（受け手へも伝える）。そのまま寝てしまっても構わないと明記。"},
+{id:"yakushi",name:"薬師瑠璃光如来",title:"瑠璃光本願功徳 ―病根消滅瑠璃光―",desc:"東方浄瑠璃世界（瑠璃光浄土）の教主で「大医王仏」ともいわれ、病気を平癒し身心の健康を守る現世利益の仏。今回は『薬師瑠璃光如来本願功徳経』十二本願のうち、特に第六願（病気や身体的苦痛を取り除く）と第七願（病気や苦しみを取り除き、身心安楽にして無上菩提を証する）に基づく伝授と明記される。守護分野：邪気退散、あらゆる病根消滅、心身平穏、自己治癒力の向上、直感や閃き。",decl:"薬壺印を組みながら「オンコロコロ センダリマトウギ ソワカ」を7回奏上\n「薬師瑠璃光如来様」×3回 ＋「私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします」\n「自らの治癒能力に目覚め、病根消滅によって健康な肉体を手に入れることが出来ました。直感や創造力を開花し、邪気を祓い、持病完治と免疫力向上を施して下さりありがとうございます」",steps:"薬壺印＋真言×7回 → 宣言 → 身体全体が「瑠璃色の光」（ラピスラズリの深いブルー）で包まれるイメージで瞑想する。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"終了後は水分（カフェイン・アルコール回避）を多めに飲みゆっくり休む。運転中・注意力を要する最中は受け取らない。「（許可を頂いていないのに他者には禁止です）」と明記。そのまま寝てしまっても構わない。"},
+{id:"fudo",name:"不動明王",title:"煩悩消滅魂",desc:"インド神話のシヴァ神の別名とされ、梵名アチャラナータ（動かない守護者）。憤怒の形相は「煩悩や罪悪に苦しむ人々を怒りの力で救済するため」と説明され、「威厳のある父親のような存在」と書かれる。テーマはエゴ払拭と軸を定めること。",decl:"般若心経を読経する（「魔訶般若波羅蜜多心経」と唱え、「観自在…」から最後までを2回、最後に「羯諦羯諦…」から最後までをもう一度）。続いて心咒を7回唱える。真言は小咒・心咒・大咒の3種が掲載され、「邪気を祓い、間違いを正し、一切の災いから救われる最強マントラ」とされる。\n「ああ、偉大な不動明王様に帰依します。お力をお貸しください。私の心に、あなたの神通力を注いで下さい…」\n「エゴが払拭され、本来の自分に覚醒する事が出来ました。間違いを正し、しっかりとブレない軸へのお導きを下さり、ありがとうございます」",steps:"般若心経 → 心咒×7回 → 宣言 → 約15分瞑想（受け取り終わったと感じるタイミングで終了可）。日常では手印を組み、7・21・108回唱えるとされる。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15分"],heal:true,attune:true,note:"本書に終了後の水分・休養の注意書きはない。"},
+{id:"bishamonten",name:"毘沙門天",title:"陰滅来福",desc:"密教の天部十二天・四天王の一神で、別称「多聞天」。ヒンドゥー教のクーベラ（財宝福徳の神）に由来するとされ、「戦いの神」「国家鎮護の神」として信仰され、七福神の一人でもある。ご利益：商売繁盛、金運財運向上、武運長久・勝運・開運長久、厄除開運。",decl:"手指で印を組みながら（印は2種のうちどちらでも可）\n光明真言：「おんあぼきゃー べいろしゃのー…」×7回\n毘沙門天真言：「なうまくさんまんだー ぼだなん べいしらまんだやそわかー」×7回\n「偉大なる毘沙門天様に帰依します。お力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします。」\n「私の心はあなたの神通力によって満たされました…万徳を授かり、光の存在として生きる事にお導き下さり、ありがとうございます」（受け手の名前を入れる形式）",steps:"真言お唱え → 宣言 → 身体全体が毘沙門天の光の神通力で包まれるイメージで約15分瞑想（受け取り終わったと感じるタイミングで終了可）。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:"cond",attune:"cond",note:"他者ヒーリング・伝授は「許可が下りたら」が条件（II・III章の見出し自体がそうなっている）。本書に終了後の水分・休養の注意書きはない。"},
+{id:"senju",name:"千手観世音菩薩",title:"大慈悲救済 ―真の幸福への覚醒―",desc:"別名・千手千眼観自在菩薩。千の手と手のひらの千の眼で苦しむ衆生を見つけて手を差し伸べる大慈悲を表し、「大悲観音」「蓮華王」とも称される。守護分野：万物救済、心願成就、家内安全、病気平穏、開運・厄除け、子宝・安産・子育て、夫婦円満、究極豊穣。子年の守り本尊とされる。",decl:"合掌し一礼 → 千手観世音菩薩の手印（人差し指と薬指を交差し、残りの指は立てる印相）を組みながら真言を21回奏上 → 合掌に戻し一礼\n真言：「オンバサラー タラマーキリーク」×21回\n「偉大なる千手観世音菩薩様に帰依します。私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします。」\n「自らの愛が発動し、自然治癒力と慈悲の心が覚醒し、開運と厄除けの力を手に入れることが出来ました…」",steps:"手印＋真言×21回 → 宣言 → 身体全体が「シャンパンゴールドの光」で包まれるイメージで瞑想する。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"終了後は水分（カフェイン・アルコール回避）を多めに飲みゆっくり休む。運転中・注意力を要する最中は受け取らない。「（許可を頂いていないのに他者には禁止です）」と明記。そのまま寝てしまっても構わない。"},
+{id:"kanzeon",name:"観世音菩薩",title:"神通力伝授マニュアル（伝授教則本）",desc:"一般に「観音様」と呼ばれ、三十三の化身を持ち、「東洋の聖母マリア」として広く崇められていると説明される。元々は最高位の如来「正法明如来」だったが、衆生救済のため菩薩としてとどまったとされる。「全ての痛み・苦しみ・悩みから解放され、愛と癒しに満たされるよう援助する」とされ、今回は聖観音の真言を唱える。",decl:"手の印を組み、聖観音真言「オン アロリキャ ソワカ」を7回唱える\n「全ての世界の衆生に救いの手を差し伸べます、観世音菩薩様に帰依します。お力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします。」\n「全ての痛み・苦しみ・悩みから救われることが出来ました。とても大きな愛と、癒しと、お慈悲でお導きを下さり、ありがとうございます」",steps:"印＋真言×7回 → 宣言 → 身体中が「ロータスピンクの光」に包まれ、内側から愛に満ち溢れてくるイメージで約15分瞑想（受け取り終わったと思ったところで終了）。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"終了後は天然水などの水分（カフェインは避ける）を多目に飲みゆっくり休む。運転中・注意力を要する最中は受け取らない（伝授・ヒーリング共通の注意として独立した囲みで記載）。"}
+]},
+{name:"神道・日本の神々",items:[
+{id:"amenominakanushi",name:"天之御中主神",title:"創造神覚醒 ―神波動神通変化―",desc:"『古事記』で最初に登場する神、別天津神にして造化三神の一柱。神名は「天の真中を領する神」の意で、北極星・北斗七星が象徴。「妙見様」とも呼ばれる。守護分野：全ての星々の守護、八方塞がりや方位除け、不要な感情の払拭、方位方角に関わる災い避け、内側の清浄・心の清浄、万物からのサポート。",decl:"二礼・二拍手・通常の合掌 → 神通秘詞を奏上 → 二礼・二拍手・一礼 → 宣言\n題は「神通秘詞（じんつうひし）」。冒頭の句は「北極大和元気 神通変化（ほっきょくだいわげんき じんつうへんげ）」。中盤に「（願主姓名・自分の名前）の霊魂幽顕に出入して」と、唱える本人の名を入れる箇所がある。結びは「謹て神通を願ふ」。回数の指定はない。\n「天之御中主神様」×3回 ＋「私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします」",steps:"神通秘詞奏上 → 宣言 → 身体全体が「金色の光」で包まれるイメージで約15分瞑想。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"終了後は水分（カフェイン・アルコール回避）を多めに飲みゆっくり休む。運転中・注意力を要する最中は受け取らない。「（許可を頂いていないのに他者には出来ません）」と明記。そのまま寝てしまっても構わない。核の言葉（神通秘詞）は別添ファイルが正本。"},
+{id:"zouka",name:"造化三神様",title:"大根源波動 ―真世界創造―",desc:"日本神話で天地創造の際に最初に現れた三柱：天御中主之大御神（宇宙の中心・統治者）、高皇産靈之大御神（創造と繁栄）、神皇産靈之大御神（生命力と生成）。守護分野：産業振興、殖産興業、方位除け、物事の新たな生み出しと発展、強い開運力、病災を祓う力。",decl:"六礼・六拍手・通常の合掌 → 大元造化三神報恩之祈詞を天に向かって奏上 → 三柱の名を呼び宣言 → 締めは各神名＋「咲きはへ」／「神ながらたまちはえませ」×3 → 六礼・六拍手・三礼で閉じる\n題の脇に「此祝詞は無形の大霊に向ひて発聲すべきなり」との注記。造化三神の御恩への感謝と、現世にある限り御心の随に仕え奉る誓いの祈詞。文末の連唱が本体マニュアルの締めの唱え言葉と一致する。\n「私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします」",steps:"祈詞奏上 → 宣言 → 身体全体が「金銀銅の光」で包まれるイメージで約15分瞑想。所作（六礼・六拍手）は全23件で最も大掛かり。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"終了後は水分（カフェイン・アルコール回避）を多めに飲みゆっくり休む。運転中・注意力を要する最中は受け取らない。「（許可を頂いていないのに他者には出来ません）」と明記。そのまま寝てしまっても構わない。核の言葉（報恩之祈詞）は別添ファイルが正本。"},
+{id:"amaterasu",name:"天照大御神",title:"神通力伝授（伝授テキスト）",desc:"神々の中でもトップクラスに位置する太陽の女神で、三貴子の一柱。そのエネルギーは「眩い光により、ネガティブ感情や闇を全て光に変えて行くほどの強力なエネルギー」とされる。守護分野：霊的な成長・導き、霊的・エネルギー的なプロテクト、現実的な物事のサポート、太陽エネルギーの取込み。",decl:"①手を洗い口を漱ぐ ②二礼・二拍手 ③「あーめーのーおーきー つーちーのーおーきー あーめーのーひーれー つーちーのーひーれー」 ④「アーマーテーラースー オーオーミーカーミー」を10回、心を込めて真剣に唱える ⑤二拍手・一礼\n天乃咲手印／八咫鏡印（日拝印）のどちらでも可。手印を結んで十言の神咒を行う → 宣言\n「全てを愛と光に変え、あるがままの光の存在である自分に戻ることが出来ました。霊的成長、導き、防御、周波数上昇と行動への援助をありがとうございます」（瀬織津姫版と同一）",steps:"十言の神咒 → 宣言 → 身体全体が「陽の光」で包まれるイメージで約15分瞑想。章立ては I＝伝授によってつながる、II＝他者にヒーリング、III＝自分にヒーリング、と他と異なる。",times:["自己 約15分瞑想","他者ヒーリング 15分","自己ヒーリング 15分"],heal:true,attune:false,note:"他者への伝授（アチューメント）の独立した章はない。巻末でも確認対象は「ほかの人にヒーリングが出来るかどうか」。終了後の水分・休養の注意書きは本書には見当たらない。そのまま寝てしまっても構わないと明記。"},
+{id:"izanagi",name:"伊耶那岐命・伊耶那美命",title:"真・深・心・信 ―真世界回帰―",desc:"天地のはじまりに生まれ、国生みをした男神・女神の二柱。タイトル「真・深・心・信」は、本当の事に目を向ける／心の深いところの記憶を呼び覚ます／心の声に耳を傾ける／今ここに存在する自分を信じる、の4義。受け取る援助：内なる神の覚醒、傾聴力強化、閃きからの瞬発行動、エゴの払拭、自分を信じる事への援助。男性性・女性性の統合、真のパートナーシップがテーマ。",decl:"二礼・二拍手・合掌をしてから宣言する。終了時は感謝の言葉の後に一礼。\n「伊耶那岐命様・伊耶那美命様」×3回 ＋「私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします」\n各章に伊耶那岐命の祝詞（祓詞）と伊耶那美命の祝詞の全文が『参考』として併記されている。",steps:"二礼二拍手 → 宣言 → 身体全体が二柱の「金銀の光」で包まれるイメージで約15分瞑想（感じたタイミングで終了可）。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"全23件で最も条件が強い：他者への伝授の前には相手の霊性についても自己判断せず二柱に聞くこと。エゴの支配下での伝授・ヒーリングは「場合によって危険を伴う」と明記。自己ヒーリングも心の状態が平常な時に。終了後は水を多めに（500mlくらい）採り、アルコール・カフェインは避ける。運転中・集中作業時は控える。"},
+{id:"ukanomitama",name:"宇迦之御霊神",title:"豊穣循環神通力 ―未来向上願―",desc:"稲荷神社の主祭神で、狐の神ではなく食物神と説明される。「宇迦」は穀物・食物の意で稲の精霊を表す。総本山は伏見稲荷大社。守護分野：五穀豊穣、商売繁盛、産業振興、生活安泰、願望成就。「内側に眠っている無限の豊かさと愛の循環を覚醒させ、人生の隆盛・繁栄をもたらす為の神通力」とされる。",decl:"二礼・通常の合掌 → 稲荷祝詞を奏上 → 二礼・二拍手・一礼 → 宣言\n本詞と略詞の2版があり、どちらを奏上してもよい。本詞は家の産業を怠りなく営めること、家門が高く栄えること、夜の守り日の守りに守られ幸を得ることを願う内容。回数の指定はない。\n「宇迦之御霊神様」×3回 ＋「私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします」\n「内側に眠るすでにあった愛と豊かさの循環に目覚め…自分がすでに幸せで、全てが揃っていて、豊かさの循環の中にいた事に気付きを施して下さり、ありがとうございます」",steps:"祝詞奏上 → 宣言 → 身体全体が「ホワイトイエローの光」で包まれるイメージで約15分瞑想。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"終了後は水分（カフェイン・アルコール回避）を多めに飲みゆっくり休む。運転中・注意力を要する最中は受け取らない。「（許可を頂いていないのに他者には出来ません）」と明記。そのまま眠ってしまっても構わない。核の言葉（稲荷祝詞）は別添ファイルが正本。"},
+{id:"konohanasakuya",name:"木花咲耶姫命",title:"桜爛漫優神美（伝授教則本）",desc:"日本神話で最も美しいと誉れ高い女神で、桜の花の名の語源ともいわれ、「竹取物語」のかぐや姫のモデルとも伝わる。「自信を持ち、眠っている才能を開花させる為の、愛と情熱の力を援助する」とされ、テーマは自己愛・自己尊重・不安要素の払拭。",decl:"入浴かシャワーをし、塩でうがい、手洗いをする\n二礼・二拍手し、富士の浅間大神への祝詞（「かけまくも あやに かしこき ふじのあさまの おおかみのおおまえに…」）を奏上する（全文が本文に掲載）\n「木花咲耶姫命様（コノハナサクヤヒメノミコト様）」×3回 ＋「私にお力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるようにご援助をお願いします。」\n「自信が溢れ、眠っていた本来の自分が目覚めました。不安要素の払拭、自己愛、自己尊重を高めて下さり、ありがとうございます」→ 二拍手・一礼で閉じる",steps:"事前浄化 → 祝詞 → 宣言 → 身体全体が「桜色の光」で包まれるイメージで約15分瞑想（感じたタイミングで終了可）。ヒーリング・伝授とも約15〜20分と、自己より長い唯一の例。",times:["自己 約15分瞑想","他者ヒーリング 約15〜20分","他者伝授 約15〜20分"],heal:true,attune:true,note:"終了後の水分・休養の注意書きは本書には見当たらない。祝詞の宛先は木花咲耶姫ではなく「ふじのあさまのおおかみ（富士の浅間大神）」。"},
+{id:"seoritsuhime",name:"瀬織津姫",title:"神通力伝授（教則本）",desc:"祓いの神・水の神で、「水の神＝龍神。龍神の化身が瀬織津姫様」と説明される。天照大神が和魂であるのに対し、龍神は荒魂とされ、荒々しい作用でこの世を浄化させる性質があるが「荒魂も慈悲や愛情のひとつ」と書かれる。エナジーは「浄化のエネルギー」で、本来持って生まれた能力の封印解除、閉じ込めた感情や女性性・男性性の封印解除ができるとされる。カルマの払拭をサポートする。",decl:"入浴かシャワーをし、塩でうがい、手洗いをする\n二礼・二拍手・一礼をしてから宣言、終了時も二礼・二拍手・一礼\n「瀬織津姫 饒速日尊（ニギハヤヒノミコト）」をマントラのように3回唱え、「私にお力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします。」\n「全てを愛と光に変え、あるがままの光の存在である自分に戻ることが出来ました。霊的成長、導き、防御、周波数上昇と行動への援助をありがとうございます」（天照大御神版と同一）",steps:"連名×3回がマントラとして機能する（2人の名を唱えると縄文・レムリア・アトランティス・江戸のエネルギーが活性化し、エネルギーポータルが開くと説明される）。ホワイトシルバーと青白い光が第7チャクラから流れ、中心軸にゴールドの光の柱が立つイメージで瞑想する。",times:["自己 約15分瞑想","自己ヒーリング 約15分","他者ヒーリング 約15〜20分"],heal:true,attune:false,note:"他者への伝授の独立した章はない。巻末の確認対象は「ほかの人にヒーリングが出来るかどうか」で、ただし同段落に「聞こえて来たら伝授可能です」という一文も併記。終了後は天然水などの水分（カフェインは避ける）を多く飲み、ゆっくり休む。そのまま眠ってしまっても構わない。"},
+{id:"kikurihime",name:"菊理媛神命",title:"神通力伝授マニュアル",desc:"加賀国の白山や全国の白山神社に祀られる白山比咩神と同一神とされる。伊奘諾尊と伊弉冉尊を仲直りさせたことから、縁結びの神・大調和大神・統合の神とされ、ケガレを払う神格とも言われる。菊理媛神命は龍神でもあるため『龍神祝詞』を奏上する。受け取る神通力は「自己・陰陽・全存在との和合」。",decl:"塩風呂に入浴、または清明水を浴びてシャワーし塩水でうがいをする。難しい場合は手を洗い、水でうがいをする\n二礼・二拍手し、龍神祝詞を奏上 → 二拍手・一礼 → 宣言\n主格は「龍王」。龍王が十種の御寶を自らの姿と変じて天界・地界・人界を治めると述べられ、一切衆生の罪穢の衣を脱ぎ去らせ、萬物の病災を祓い清め、大願を成就させることを祈る祝詞。回数の指定はない。繋がる・ヒーリング・伝授の全章で奏上する。\n「菊理媛神命様（くくりひめかみのみこと様）」×3回 ＋「私にお力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします」\n「内側の自己の統合と、大宇宙との和合に至る述（すべ）を体現する事が出来ました。大いなる宇宙と繋がり、罪穢れの浄化と、真理に目覚めるお導きを下さりありがとうございます」",steps:"龍神祝詞 → 宣言 → 身体全体が「ホワイト・ゴールドの光」で包まれるイメージで約15分瞑想（感じたタイミングで終了可）。他者ヒーリングは「契約ではなく、あくまでも神通力で一時的に癒されるだけです」と注記。",times:["自己 約15分瞑想","他者ヒーリング 約15分","他者伝授 約15分"],heal:true,attune:"cond",note:"伝授の章の冒頭に「（伝授の許可を得てください）」と明記。終了後は水を多めに（500mlくらい）採り、アルコール・カフェインは避ける。運転中・集中作業時は控える。核の言葉（龍神祝詞）は別添ファイルが正本。"}
+]},
+{name:"福徳系",items:[
+{id:"shichifukujin",name:"七福神",title:"大豊神通力 ―開運招福・無病息災・延命長寿―",desc:"『仁王経』の「七難即滅 七福即生」に由来する福徳の神・七柱の総称。毘沙門天＝武勇・勝運、大黒天＝食物・財福、弁財天＝金運・芸能・学問、恵比寿天＝商売繁盛・豊漁、福禄寿＝幸福・財産・長寿、寿老人＝長寿、布袋尊＝愛敬・円満・福徳。伝授によって「開運招福・無病息災・延命長寿を覚醒させて無限の豊穣を手に入れる為の神通力」を受け取るとされる。",decl:"中国由来の神も含まれるため手印は組まず、通常の合掌のみで唱える。合掌し一礼 → 各柱の真言を各7回 → 一礼し宣言 → 締めの真言×7回\n毘沙門天「オン ベイシラマンダヤソワカ」／大黒天「オン マカキャラヤーソワカ」／弁財天「オン ソラソバティエーソワカ」／恵比寿天「オン インダラヤーソワカ」／福禄寿「オン マカシリソワカ」／寿老人「オン バサラユセイソワカ」／布袋尊「オン マイタレイヤソワカ」\n締め：「七福神集結 開運招福・無病息災・延命長寿 オン ロキャロキャ キャラヤーソワカ」×7回\n「偉大なる七福神様に帰依します。私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします。」",steps:"真言奏上 → 宣言 → 身体全体が「虹の七色の光」に包まれるイメージで約15分瞑想。真言は「音の波動」として心に響き、効果を高めるには最低5回唱えるのが良いとされる。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"終了後は水分（カフェイン・アルコール回避）を多めに飲みゆっくり休む。運転中・注意力を要する最中は受け取らない。「（許可を頂いていないのに他者には禁止です）」と明記。そのまま寝てしまっても構わない。"},
+{id:"daibenzaiten",name:"大辯財天",title:"神通力伝授 ―願望の実現―",desc:"仏教の守護神・天部の一人で、ヒンドゥー教の女神サラスヴァティーが取り込まれた呼び名と説明される。本来「弁才天」だが「才」が「財」に通じるため「弁財天」と表記されることが多く、財宝神の性格が付与された。日本では七福神の一員。「知性と閃きに目覚め、願望実現力を持った人間へと変貌を遂げる援助」をするとされる。",decl:"手の印相を組み、真言「オン ソラソバティエイ ソワカ」を7回唱える（ローマ字表記：Om sarasvatyai svaha）\n「ああ、偉大なる大辯財天様様に帰依します。お力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるようにご援助をお願いします。」（「様様」は原文ママ）\n「知性と閃きに目覚め、願望実現力を持つことが出来ました。無限の豊かさと願いの実現にお導きを下さり、ありがとうございます」",steps:"印相＋真言×7回 → 宣言 → 身体全体が「黄金色の光」で包まれるイメージで約15分瞑想（感じたタイミングで終了可）。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"終了後は水を多めに（500mlくらい）採り、アルコール・カフェインは避ける。受け取りは静かな場所で身体と場を浄化してからが望ましいが、軽い家事・作業中でも可能。運転中・集中作業時は控える。"}
+]},
+{name:"レムリア・西洋系",items:[
+{id:"mother",name:"マザー・メアリー",title:"Holy Mary's rays of love",desc:"聖母マリアの「神聖なる聖母の愛」の光につながるアチューメント。受けた人はマスターとして他者へアチューメントも可能で、自己ヒーリング、対面・遠隔ヒーリング可と明記される。",decl:"「マザー・メアリー様」×3回 ＋「私に力をお貸しください」から始まる宣言（金色の光・ピンクのハートのイメージとともに）",steps:"宣言のみの型（前動作なし）。イメージング：頭上から金色の光、ハートがピンクに輝き「私は愛。私は愛の体現者。」、光が部屋→地域→国→地球へ広がる。約15分瞑想し、感謝の言葉で終了する。他者ヒーリングでは「エナジーは想いによって流れます」。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"伝授後の心得：自己ヒーリングを毎日行い、十分に感じられるようになったら他者へ伝授してよいかマザー・メアリー様自身に確認する。自信がなければ友人同士で練習を重ねる。"},
+{id:"jesus",name:"イエスと二人のマリア",title:"Trinity Love ―愛の三位一体―",desc:"3者の愛のエナジーを束ねた「愛の三位一体」：イエス・キリスト＝「大いなる守護と赦しの愛」、聖母マリア＝「信頼と無償の愛」、マグダラのマリア＝「真実の愛」。エナジーの性質としてヒーリング、守護、インナーチャイルドを癒す、深い真実の愛が挙げられ、トラウマなどで深く傷ついた人にも向けられる。",decl:"「イエスキリスト様・聖母マリア様・マグダラのマリア様。私に力をお貸しください。私のハートに、あなたのエナジーを注いで下さい。そして、私にとって必要な事が起きるようにサポートをお願いします。」\n「私のハートは、あなた方三人のエナジーによって満たされました。内側から湧き出す、赦しの愛・無償の愛・真実の愛の世界を体現することが出来ました。心の底から、愛の世界を作り出す、偉大なお導きを下さり、有難うございます。」",steps:"真言・印・経典などの前動作はなく、宣言のみで始まる最もシンプルな型。宣言後、約15分瞑想（光の色の指定はなく、感じたタイミングで終了可）。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"本書に終了後の水分・休養の注意書きはない。他者への伝授は、十分に感じられるようになったら三人に確認することが条件。"},
+{id:"sanat",name:"サナトクマラ",title:"Rays of White Brotherhood ―白色同胞団の霊光―",desc:"アセンデッドマスターで、何万年も前に金星から地球へ降りてきた目的は地球のネガティブな闇エネルギーの浄化にあったと書かれる。地球のマスター達が集合する「白色同胞団（ホワイトブラザーフッド）」のリーダー。鞍馬山では「魔王尊」として祀られ、毘沙門天・千手観世音とともに三位一体で、3者を総称して「尊天」と呼ぶと説明される。",decl:"ヒーラーがサナトクマラ・シジル（護符）に両手をかざし目を瞑り、「マスター・サナトクマラ 私にあなたのエナジーを授けて下さい」と宣言し、満たされた感覚を得て感謝してから本編を開始する\n「マスター・サナトクマラ ホワイトブラザーフッド」と3回唱えたうえで、「私に力をお貸しください。私のハートに、あなたのエナジーを注いで下さい。そして、私にとって必要な事が起きるようにサポートをお願いします。」\n「内なる愛と光を解き放つ事が出来ました。愛と光と調和のワンネス世界にお導き下さりありがとうございます。」",steps:"身体全体がサナトクマラとシャンバラのホワイトブラザーフッドからの「ホワイトゴールド」のエナジーで包まれるイメージで15分瞑想（感じたタイミングで終了可）。シジルは額に入れて飾るか、他者伝授・ヒーリング時に持ち込むとされ、シジルによって「サナトクマラ・レイキが伝授される」と明記される。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"他者伝授・ヒーリングの際はシジル（護符）を持ち込み、開始前に護符へ両手をかざして宣言する手順が必須。本書に終了後の水分・休養の注意書きはない。"},
+{id:"sonten",name:"尊天",title:"神通力 運命根本大改 ―森羅万象靈氣―",desc:"鞍馬山（鞍馬寺・鞍馬弘教）のご本尊で、「この世に存在するすべてを生み出している宇宙エネルギー」と説明される。三身一体：毘沙門天王＝太陽の精霊・光の象徴、千手観世音菩薩＝月輪の精霊・愛の象徴、護法魔王尊＝大地（地球）の霊王・力の象徴。守護分野：金運改善、健康運改善、恋愛成就、仕事運改善、家庭運改善、運命改善。",decl:"通常の合掌を組み、尊天真言「オンバサラー ダルマキリー ベイシラマナヤー ダルマハラー マソバミウンソワカー」を7回唱える → 合掌を解き宣言\n宛名は「護法魔王尊様・千手観世音菩薩様・毘沙門天王様」の三者連名 ＋「私に力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように援助をお願いします」\n「自らが決めた世界を突き進む為の決意をしっかりと定めることが出来ました。水・陽・大地の氣による運命の大改善への援助をお施し下さりありがとうございます」",steps:"尊天真言×7回 → 宣言 → 身体全体が「虹色の光」で包まれるイメージで約15分瞑想。月からの水の氣、太陽からの陽の氣、地球からの大地の氣を受け取るとされる。",times:["自己 約15分瞑想","他者ヒーリング 15分","他者伝授 15分"],heal:true,attune:true,note:"終了後は水分（カフェイン・アルコール回避）を多めに飲みゆっくり休む。運転中・注意力を要する最中は受け取らない。「（許可を頂いていないのに他者には出来ません）」と明記。そのまま寝てしまっても構わない。"},
+{id:"lemuria",name:"レディー・レムリア",title:"Divine ray of lemuria",desc:"レムリアの高女神官とされる存在。レムリア大陸は「かつて愛の精神世界を実現していた古代の叡智の最高峰」とされ、高女神官は中央の愛の神殿で愛の女神に仕えた中心だったと説明される。その神光はハート・チャクラの解放とサイキック・アイ（サードアイ）の覚醒を促し、神聖な女性性が溢れると書かれる。テーマは女性性・女神性の解放と愛の循環。",decl:"「レディー・レムリア様」と3回唱えたうえで、「私に力をお貸しください。私のハートに、あなたのエナジーを注いで下さい。そして、私にとって必要な事が起きるようにサポートをお願いします。」\n「私のハートは、あなたのエナジーによって満たされました。あなたによって自らの女性性を前面に出し、女神性を解放することに目覚める事が出来ました。愛・豊かさ・美・優雅さ・喜びのミラクルな世界にお導き下さりありがとうございます。」",steps:"宣言のみの型。身体全体が「マゼンダ・シルバー」のエナジーで包まれるイメージで約15分瞑想（感じたタイミングで終了可）。",times:["自己 約15分瞑想","他者ヒーリング 約10分","他者伝授 約15〜20分"],heal:true,attune:true,note:"終了後は天然水などの水分（カフェイン・アルコールは避ける）を多めに飲みゆっくり休む。運転中や注意力を要することの最中は受け取らない。伝授は、レディー・レムリア様と会話しながら十分に感じられるようになったら本人に確認する。"}
+]},
+{name:"龍・統合系",items:[
+{id:"nijiryu",name:"虹龍と鳳凰",title:"Awakening integration",desc:"虹龍は「様々な色のドラゴン達が合体し虹色に輝く龍」で究極の男性性を、鳳凰は大きく広げた翼であらゆるものを包容する「優しさと癒しと愛」＝究極の女性性を導き出すとされ、両者の神光によって「自己の覚醒・統合」を促すと書かれる。受け取るエネルギー：「自身の統合と本来の自分の覚醒促進」。マニュアル上、虹龍は八大龍王、鳳凰は迦楼羅天と対応付けられている。",decl:"塩風呂に入浴、または清明水を浴びてシャワーし、塩水でうがいをする。難しい場合は手を洗い、水でうがいをする\n虹龍（八大龍王）の手印を結び「オンメイキャシャ 二エイソワカ」×7回、鳳凰（迦楼羅天）の手印を結び「オン ガルダヤ ソワカ」×7回\n印を解き、「虹龍様・鳳凰様」と3回唱え、「私にお力をお貸しください。私の心に、あなたの神通力を注いで下さい。そして、私にとって必要な事が起きるように、援助をお願いします。」\n「軸がしっかりと定まり、あるがままの自分を体現することが出来ました。自己の統合により、何事にも囚われない平常心にお導き下さり、ありがとうございます」",steps:"内側が虹龍の虹色の光と鳳凰のシャンパンゴールドの光が渦巻き満たされるイメージで約15分瞑想。章立ては I＝繋がる、II＝自分にヒーリング、III＝他者にヒーリング。II・IIIとも「（契約ではなく、あくまでもエナジーで一時的に癒されるだけです）」という注記がある。",times:["自己 約15分瞑想","自己ヒーリング 約15分","他者ヒーリング 約15分"],heal:true,attune:false,note:"他者への伝授の独立した章はない。巻末でも確認対象は「他の人にヒーリングが出来るかどうか」。終了後は天然水を多めに採る（カフェイン・アルコールはNG）、なるべく身体を休める。集中を要する事や自動車の運転中は行わない。"}
+]}
+];
+var byId={};
+GROUPS.forEach(function(g){g.items.forEach(function(it){byId[it.id]=it;});});
+function scopeHTML(it){
+var h='<div class="scope">';
+if(it.heal===true)h+='<b>他者ヒーリング：可</b>';
+else if(it.heal==="cond")h+='<b>他者ヒーリング：可（許可が下りたら）</b>';
+else h+='<b class="no">他者ヒーリング：—</b>';
+if(it.attune===true)h+='<b>他者伝授：可</b>';
+else if(it.attune==="cond")h+='<b>他者伝授：可（許可を得てから）</b>';
+else h+='<b class="no">他者伝授：独立章なし</b>';
+return h+'</div>';
+}
+var groupsEl=document.getElementById('groups');
+GROUPS.forEach(function(g){
+var sec=document.createElement('section');
+var h=document.createElement('h2');h.className='sec';h.innerHTML=g.name+' <span>'+g.items.length+'件</span>';sec.appendChild(h);
+g.items.forEach(function(it){
+var d=document.createElement('details');d.className='energy';d.id='e-'+it.id;
+d.innerHTML='<summary><span><span class="nm">'+it.name+'</span><span class="tm">'+it.title+'</span></span><span class="chev" aria-hidden="true">⌄</span></summary>'
++'<div class="body"><h3>どんな存在／エネルギーか</h3><p>'+it.desc+'</p>'
++'<h3>宣言文・唱える言葉（原文）</h3><div class="decl">'+it.decl+'</div>'
++'<h3>手順の要点</h3><p>'+it.steps+'</p><div class="times">'+it.times.map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>'
++'<h3>送れる範囲</h3>'+scopeHTML(it)
++'<h3>注意点</h3><p class="note">'+it.note+'</p></div>';
+sec.appendChild(d);
+});
+groupsEl.appendChild(sec);
+});
+var purEl=document.getElementById('purposes');
+PURPOSES.forEach(function(p){
+var btn=document.createElement('button');btn.type='button';btn.className='pbtn';btn.setAttribute('aria-expanded','false');
+btn.innerHTML='<span>'+p.label+'</span><small>'+p.items.length+'件 ⌄</small>';
+var list=document.createElement('div');list.className='plist';list.id='plist-'+p.id;
+p.items.forEach(function(id){
+var it=byId[id];if(!it)return;
+var a=document.createElement('a');a.href='#e-'+id;a.innerHTML=it.name+'<span aria-hidden="true">›</span>';
+a.addEventListener('click',function(ev){ev.preventDefault();openEnergy(id);});
+list.appendChild(a);
+});
+btn.addEventListener('click',function(){
+var open=list.classList.toggle('open');btn.setAttribute('aria-expanded',open?'true':'false');
+});
+var wrap=document.createElement('div');wrap.appendChild(btn);wrap.appendChild(list);purEl.appendChild(wrap);
+});
+function openEnergy(id){
+var d=document.getElementById('e-'+id);if(!d)return;
+d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.getElementById('openAll').addEventListener('click',function(){document.querySelectorAll('details.energy').forEach(function(d){d.open=true;});});
+document.getElementById('closeAll').addEventListener('click',function(){document.querySelectorAll('details.energy').forEach(function(d){d.open=false;});window.scrollTo({top:0,behavior:'smooth'});});
+if(location.hash&&location.hash.indexOf('#e-')===0){var t=document.querySelector(location.hash);if(t){t.open=true;}}
+</script>
+</body>
+</html>
