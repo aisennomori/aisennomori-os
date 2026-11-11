@@ -69,6 +69,9 @@ ol.chant li{counter-increment:chant;padding:12px 16px 12px 52px;position:relativ
 ol.chant li:last-child{border-bottom:none}
 ol.chant li::before{content:counter(chant);position:absolute;left:14px;top:12px;width:26px;height:26px;border-radius:50%;background:var(--chip);color:var(--accent);font-size:13px;font-weight:700;display:grid;place-items:center}
 ol.chant .cn{font-family:var(--serif);font-weight:700;font-size:16px}
+.fulltext{font-family:var(--serif);font-size:16px;line-height:2.05;white-space:pre-wrap;word-break:break-all;background:var(--decl-bg);border-radius:8px;padding:14px 16px}
+.body h4{font-size:14px;color:var(--accent2);margin:14px 0 4px;font-weight:700}
+a.tlink{color:var(--accent);text-decoration:underline;text-underline-offset:3px;font-weight:600}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 </style>
 </head>
@@ -76,7 +79,7 @@ ol.chant .cn{font-family:var(--serif);font-weight:700;font-size:16px}
 <div class="wrap">
 <header>
 <h1>愛泉の杜エネルギー一覧</h1>
-<div class="top-actions"><button type="button" id="openAll">すべて開く</button><button type="button" id="closeAll">すべて閉じる</button><a class="navlink" href="#chant-h">唱え方リストへ</a></div>
+<div class="top-actions"><button type="button" id="openAll">すべて開く</button><button type="button" id="closeAll">すべて閉じる</button><a class="navlink" href="#chant-h">唱え方リストへ</a><a class="navlink" href="#texts-h">祝詞・経文へ</a></div>
 </header>
 
 <section aria-labelledby="purpose-h">
@@ -93,10 +96,10 @@ ol.chant .cn{font-family:var(--serif);font-weight:700;font-size:16px}
 
 <h3 class="chant-g">仏教系</h3>
 <ol class="chant">
-<li><span class="cn">大日如来</span>：般若心経（題目→本文2回→「羯諦羯諦…」から最後までもう1回）→ 金剛界の印を組み、金剛界マントラ「おん あびらうんけん ばさらだとばん」×7回 → 宣言（「ああ、偉大な大日如来様に帰依します」＋ハート／エナジー版）</li>
+<li><span class="cn">大日如来</span>：<a class="tlink" href="#t-hannya">般若心経</a>（題目→本文2回→「羯諦羯諦…」から最後までもう1回）→ 金剛界の印を組み、金剛界マントラ「おん あびらうんけん ばさらだとばん」×7回 → 宣言（「ああ、偉大な大日如来様に帰依します」＋ハート／エナジー版）</li>
 <li><span class="cn">弥勒如来</span>：合掌して一礼 → 弥勒如来印を組み「オン マイタレイヤ ソワカー」×21回 → 合掌に戻し一礼 → 宣言</li>
 <li><span class="cn">薬師瑠璃光如来</span>：薬壺印を組み「オン コロコロ センダリ マトウギ ソワカ」×7回 → 「薬師瑠璃光如来様」×3回 → 宣言</li>
-<li><span class="cn">不動明王</span>：般若心経（大日如来と同じ唱え方）→ 手印を組み、心咒「のうまくさーまんだー ばーざらだん せんだーまーかろ しゃーだーそわたや うんたらたーかんまん」×7回 → 宣言（「ああ、偉大な不動明王様に帰依します」）</li>
+<li><span class="cn">不動明王</span>：<a class="tlink" href="#t-hannya">般若心経</a>（大日如来と同じ唱え方）→ 手印を組み、心咒「のうまくさーまんだー ばーざらだん せんだーまーかろ しゃーだーそわたや うんたらたーかんまん」×7回 → 宣言（「ああ、偉大な不動明王様に帰依します」）</li>
 <li><span class="cn">毘沙門天</span>：印（2種のどちらでも可）を組み、光明真言「おんあぼきゃー べいろしゃのー まかぼだらー まにはんどば じんばら はらばりたや うん」×7回 → 毘沙門天真言「なうまくさんまんだー ぼだなん べいしらまんだや そわかー」×7回 → 宣言</li>
 <li><span class="cn">千手観世音菩薩</span>：合掌して一礼 → 専用手印（人差し指と薬指を交差させる印）を組み「オン バサラー タラマー キリーク」×21回 → 合掌に戻し一礼 → 宣言</li>
 <li><span class="cn">観世音菩薩</span>：印を組み、聖観音真言「オン アロリキャ ソワカ」×7回 → 宣言（導入が独特：「全ての世界の衆生に救いの手を差し伸べます、観世音菩薩様に帰依します…」）</li>
@@ -104,14 +107,14 @@ ol.chant .cn{font-family:var(--serif);font-weight:700;font-size:16px}
 
 <h3 class="chant-g">神道・日本の神々</h3>
 <ol class="chant">
-<li><span class="cn">天之御中主神</span>：二礼二拍手・合掌 → 神通秘詞を奏上 → 二礼二拍手一礼 → 「天之御中主神様」×3回＋宣言</li>
-<li><span class="cn">造化三神様</span>：六礼六拍手・合掌 → 大元造化三神報恩之祈詞を天に向かって奏上 → 三柱の名を呼び宣言。締め：「天御中主之大御神 咲きはへ／高皇産靈之大御神 咲きはへ／神皇産靈之大御神 咲きはへ」＋「神ながらたまちはえませ」×3 → 六礼六拍手三礼</li>
+<li><span class="cn">天之御中主神</span>：二礼二拍手・合掌 → <a class="tlink" href="#t-shinshi">神通秘詞</a>を奏上 → 二礼二拍手一礼 → 「天之御中主神様」×3回＋宣言</li>
+<li><span class="cn">造化三神様</span>：六礼六拍手・合掌 → <a class="tlink" href="#t-zouka">大元造化三神報恩之祈詞</a>を天に向かって奏上 → 三柱の名を呼び宣言。締め：「天御中主之大御神 咲きはへ／高皇産靈之大御神 咲きはへ／神皇産靈之大御神 咲きはへ」＋「神ながらたまちはえませ」×3 → 六礼六拍手三礼</li>
 <li><span class="cn">天照大御神</span>：手を洗い口を漱ぐ → 二礼二拍手 → 「あーめーのーおーきー つーちーのーおーきー あーめーのーひーれー つーちーのーひーれー」→ 十言の神咒「アーマーテーラースー オーオーミーカーミー」×10回 → 印（天乃咲手印／八咫鏡印のどちらか）を組んで宣言 → 二拍手一礼</li>
-<li><span class="cn">伊耶那岐命・伊耶那美命</span>：二礼二拍手・合掌 → 「伊耶那岐命様・伊耶那美命様」×3回＋宣言（参考として二柱それぞれの祝詞＝祓詞ほかが併記されている）</li>
-<li><span class="cn">宇迦之御霊神</span>：二礼・合掌 → 稲荷祝詞（本詞／略詞）を奏上 → 二礼二拍手一礼 → 「宇迦之御霊神様」×3回＋宣言</li>
-<li><span class="cn">木花咲耶姫命</span>：事前浄化（入浴・塩うがい・手洗い）→ 二礼二拍手 → 富士の浅間大神への祝詞を奏上 → 「木花咲耶姫命様（コノハナサクヤヒメノミコト様）」×3回＋宣言 → 二拍手一礼</li>
+<li><span class="cn">伊耶那岐命・伊耶那美命</span>：二礼二拍手・合掌 → 「伊耶那岐命様・伊耶那美命様」×3回＋宣言（参考として二柱それぞれの<a class="tlink" href="#t-izanagi">祝詞</a>＝祓詞ほかが併記されている）</li>
+<li><span class="cn">宇迦之御霊神</span>：二礼・合掌 → <a class="tlink" href="#t-inari">稲荷祝詞</a>（本詞／略詞）を奏上 → 二礼二拍手一礼 → 「宇迦之御霊神様」×3回＋宣言</li>
+<li><span class="cn">木花咲耶姫命</span>：事前浄化（入浴・塩うがい・手洗い）→ 二礼二拍手 → <a class="tlink" href="#t-asama">富士の浅間大神への祝詞</a>を奏上 → 「木花咲耶姫命様（コノハナサクヤヒメノミコト様）」×3回＋宣言 → 二拍手一礼</li>
 <li><span class="cn">瀬織津姫</span>：事前浄化（入浴・塩うがい・手洗い）→ 二礼二拍手一礼 → 「瀬織津姫 饒速日尊（ニギハヤヒノミコト）」をマントラのように×3回＋宣言 → 終わりも二礼二拍手一礼</li>
-<li><span class="cn">菊理媛神命</span>：事前浄化（塩風呂・塩水うがい等）→ 二礼二拍手 → 龍神祝詞を奏上 → 二拍手一礼 → 「菊理媛神命様（くくりひめかみのみこと様）」×3回＋宣言</li>
+<li><span class="cn">菊理媛神命</span>：事前浄化（塩風呂・塩水うがい等）→ 二礼二拍手 → <a class="tlink" href="#t-ryujin">龍神祝詞</a>を奏上 → 二拍手一礼 → 「菊理媛神命様（くくりひめかみのみこと様）」×3回＋宣言</li>
 </ol>
 
 <h3 class="chant-g">福徳系</h3>
@@ -133,6 +136,169 @@ ol.chant .cn{font-family:var(--serif);font-weight:700;font-size:16px}
 <ol class="chant">
 <li><span class="cn">虹龍と鳳凰</span>：事前浄化（塩風呂・塩水うがい）→ 虹龍の手印を結び「オン メイキャシャ ニエイ ソワカ」×7回 → 鳳凰の手印を結び「オン ガルダヤ ソワカ」×7回 → 印を解き「虹龍様・鳳凰様」×3回＋宣言</li>
 </ol>
+</section>
+
+<section aria-labelledby="texts-h">
+<h2 class="sec" id="texts-h">祝詞・経文 <span>タップで全文が開きます</span></h2>
+
+<details class="energy" id="t-hannya">
+<summary><span><span class="nm">般若心経</span><span class="tm">大日如来・不動明王で唱える ／ 読み仮名（音読）テキスト</span></span><span class="chev" aria-hidden="true">⌄</span></summary>
+<div class="body">
+<h3>唱え方</h3>
+<p>題目→本文2回→「ぎゃーていぎゃーてい…」から最後までもう1回（大日如来・不動明王のマニュアル指定）。以下はgoh提供の読み仮名テキストをそのまま掲載。</p>
+<div class="fulltext">まーかーはんにゃーはーらー
+みったーしんぎょうー
+
+かんじーざいぼーさーぎょうじん
+はんにゃーはーらーみーたーじー
+しょうけんごーうんかいくうどう
+いっさいくーやくしゃーりーしー
+
+しきふういーくうくうふーいーしき
+しきそくぜーくうくうそくぜーしき
+
+じゅーそーぎょーしきやくぶーにょーぜー
+しゃーりーしーぜーしょうほうくうそう
+
+ふーしょうふーめつふーくーふーじょー
+ふーぞうふーげん
+
+ぜーこーくうちゅうむーしき
+むーじゅーそうぎょうしき
+むーげんにーびーぜっしんにー
+むーしきしょうこうみーそくほう
+
+むーげんかいないしーむーいーしきかい
+むーむーみょうやくむーむーみょうじん
+
+ないしーむーろーしー
+やくむーろーしーじん
+
+むーくーしゅうめつどう
+むーちーやくむーとく
+
+いーむーしょっとうこうぼーだいさったー
+えーはんにゃーはーらーみーたーこう
+
+しんむーけーげーむーけーげーこう
+むーうーくーふうおんりーいっさいてんどう
+むーそうくーきょうねーはん
+さんぜーしょうぶつえー
+はんにゃーはーらーみーたーこーとく
+
+あーのくたーらーさんみゃくさんぼーだい
+こーちーはんにゃーはーらーみーたー
+
+ぜーだいじんしゅーぜーだいみょうしゅー
+ぜーむーじょーしゅー
+ぜーむーとーどうしゅう
+のうじょういっさいくー
+しんじつふーこーこーせつ
+はんにゃーはーらーみーたーしゅう
+そくせつしゅーわつ
+
+ぎゃーていぎゃーていはーらーぎゃーてい
+はらそうぎゃーていぼーじーそわかー
+
+はんにゃーしんぎょーう</div>
+</div>
+</details>
+
+<details class="energy" id="t-ryujin">
+<summary><span><span class="nm">龍神祝詞</span><span class="tm">菊理媛神命で奏上 ／ 振り仮名付き</span></span><span class="chev" aria-hidden="true">⌄</span></summary>
+<div class="body">
+<div class="fulltext">高天原に坐し坐して天と地に御働きを現し給う（たかまがはらにましをしててんとちにみはたらきをあらわしたまう）
+龍王は大宇宙根元の御祖の御使いにして（りゅうおうはだいうちゅうこんげんのみおやのみつかいにして）
+一切を産み一切を育て萬物を御支配あらせ給う（いっさいをうみいっさいをそだてよろづのものをごしはいあらせたまう）
+玉神なれば一二三四五六七八九十の十種の（たまかみなればひふみよいむなやことのとくさの）
+御寶を己がすがたと變じ給いし自在自由に（みたからをおのれがすがたとへんじたまいしじざいじゆうに）
+天界地界人界を治め給う龍王神なるを尊み（てんかいちかいじんかいをおさめたまうりゅうおうじんなるをとうとみ）
+敬いて眞の六根一筋に御仕え申すことの由を（うやまいてまことのむねひとすじにみつかえもうすことのよしを）
+受引ひき給いて愚かなる心の数々を戒め給いて（うけひきたまいておろかなるこころのかずかずをいましめたまいて）
+一切衆生の罪穢の衣を脱ぎ去らしめ給いて（いっさいしゅじょうのつみけがれのこころもをぬぎさらしめたまいて）
+萬物の病災をも主所に祓い清め給い萬世界も（よろづのもののやまいわざわいをもたちどころにはらいきよめたまい よろづせかいも）
+御祖のもとに治めせしめ給へと祈願奉る（みおやのもとにおさめせしめたまへとこいねがいたてまつる）
+ことの由をきこしめして六根のうちに念じ申す（ことのよしをきこしめしてむねのうちにねんじもうす）
+大願を成就なさしめ給へと恐み恐み白す（たいがんをじょうじゅなさしめたまへとかしこみかしこみもうす）</div>
+</div>
+</details>
+
+<details class="energy" id="t-shinshi">
+<summary><span><span class="nm">神通秘詞</span><span class="tm">天之御中主神で奏上</span></span><span class="chev" aria-hidden="true">⌄</span></summary>
+<div class="body">
+<div class="fulltext">北極大和元気 神通変化（ほっきょくだいわげんき じんつうへんげ）
+紫微宮より天地の間を経過し萬物を慈育す（しびきゅうよりてんちのかんをけいかしばんぶつをじいくす）
+天に在りては日月明なり 地に在りては草木を生ず（てんにありてはにちげつめいなり ちにありてはそうもくをしょうず）
+人に在りては神識霊なり 之を見て見えず（ひとにありてはしんしきれいなり これをみてみえず）
+其声を聞て形見えず 萬物之に依て生ず（そのこえをききてかたちみえず ばんぶつこれによりしょうず）
+二氣之に依て廻る 人霊之を享て動く（にきこれによりまわる じんれいこれをうけてうごく）
+生々化々の姐 神人の主 之を仰げば愈々高く（せいせいかかくその しんじんのしゅ これをおおげばいよいよたかく）
+之を随て幽道を開き以て其の形を見む（これにしたがい ゆうどうをひらきもってそのかたちをみむ）
+（願主姓名・自分の名前）の霊魂幽顕に出入して（れいこんゆうけん しゅつにゅうして）
+天氣已に至て神霊泥丸に降り（てんきすでにいたり しんれいでいがんにくだり）
+神教忽ち得て 品を進め 寿を増し 体を保ん（しんきょうたちまちえて ほんをすす じゅをまし たいをたもたん）
+謹て神通を願ふ（つつしみ じんつう ねごふ）</div>
+</div>
+</details>
+
+<details class="energy" id="t-inari">
+<summary><span><span class="nm">稲荷祝詞</span><span class="tm">宇迦之御霊神で奏上 ／ 本詞・略詞</span></span><span class="chev" aria-hidden="true">⌄</span></summary>
+<div class="body">
+<h4>本詞</h4>
+<div class="fulltext">掛けまくも畏き稲荷大神の大前に畏み畏みも白さく（かけまくもかしこきいなりのおおかみのおおまえにかしこみかしこみももうさく）
+朝に夕に勤み務むる家の産業を譲ぶ事無く怠る事無く（あしたにゆうべにいそしみつとむるいえのちょうわいをゆるぶことなくおこたることなく）
+彌榮めに榮め賜ひ彌助けに助け賜ひて家門高く（いやさかめにさかめたまい いやたすけにたすけたまいて いえかどたかく）
+吹き興こさしめ賜ひ堅磐に常盤に命長く子孫の八十連屬に（ふきおこさしめたまい かきわにとこいわに いのちながく うみのこのやそつづきに）
+至るまで茂し八桑枝の如く立た榮へしめ賜ひ家にも身にも（いたるまでかや しげくたちさかへしめたまい いえにもみにも）
+枉神の枉事今有らざらしめず過ち犯す事の有らむをば（まがかみのまがこといまあらざらしめず あやまちおかすことのあらむをば）
+神直日大直日に見直し聞直し座して（かんなおびおおなおびにみなおしききなおしざして）
+夜の守り日の守りに守り幸へ賜へと（よのまもりひのまもりにまもりさきわえたまへと）
+畏み畏みも白す（かしこみかしこみももうす）</div>
+<h4>略詞</h4>
+<div class="fulltext">掛けまくも畏き稲荷大神の大前に畏み畏みも白さく
+大神の厚き弘き恩頼に依りて家門を起こさしめ賜ひ（おおかみのあつきひろきみたまのふゆによりて いえかどをおこさしめたまい）
+立て榮へしめ賜ひ夜の守り日の守りに守り幸へ賜へと
+畏み畏みも白す</div>
+</div>
+</details>
+
+<details class="energy" id="t-zouka">
+<summary><span><span class="nm">大元造化三神報恩之祈詞</span><span class="tm">造化三神様で天に向かって奏上</span></span><span class="chev" aria-hidden="true">⌄</span></summary>
+<div class="body">
+<p>※見出しに「此祝詞は無形の大霊に向ひて発聲すべきなり」との注記あり。</p>
+<div class="fulltext">掛巻（かけまく）も最も畏き天地の元津神天御中主之大御神（もっともかしこきてんちのもとつかみあめのみなかぬしのおおみかみ）高皇産霊之大御神（たかみむすびのおおみかみ）神皇産霊之大御神（かみむすびのおおみかみ）の奇（くす）しく妙（たえ）なる御恩頼（みたまのふゆ）に依て此現世（このうつしよ）に生出（おもいで）たる身にし有れば其（その）本津御恩に報い奉らむと爲て稱辭（たたえごと）を奉らくは彌高（いやたか）く底（そこひ）水（みなそこ）無き高天原（たかまのはら）の幽界（かくりよ）を主宰（しめしたま）ひ給ひ始めも無く終（おわり）も無く常磐（ときわ）に堅磐（かきわ）に鎮（しずま）り座坐（ましま）して眼（め）に不見元津氣（もとつき）は百餘八十の神氣を生じ（もあややそのかみけをなし）給ひ眠（ねむ）りに所見（みゆ）る物形（もののかたち）は日の御國（ひのみくに）月の御國星の御國（つきのみくにほしのみくに）亦是（またこれ）地球に在ては現しき蒼生（あおひとくさ）を始息（はじめいき）有も息（いきな）きも世に在どし在物（あるもの）の限（かぎ）りを産化（うみか）し出（いで）す宇宙斯（うす）波（なみ）伎（わざ）護り幸（さきわ）へ給へる御化功（みさとし）の大さ久き廣き厚（あつ）き大愛（おおみかみ）を崇（あが）めて此現世（このうつしよ）に在む限は大御神達（おおみかみたち）の本津御心（もとつこころ）の隨（まにま）に此心を盡（つく）して俺事（わがこと）無く此身を務（つと）めて怠（おこ）事なく敬（うやま）ひ畏（かしこ）みも仕奉（つかえまつ）る狀（さま）を平（たいら）けく安（やすら）けく聞食（きこしめ）して四方（よも）の國の青人草（あおひとくさ）を爲て天地の神理（かむわざ）に違は不今（いま）開（ひらき）世に後（おく）れ不今（いま）種々（くさぐさ）の禍（わざわい）無く恙（つつが）無く今在給（いまあるたま）ひ夜の守（まもり）日の守に護（まも）り恵（めぐ）み幸（さきわ）へ賜へと眞空遙（しんくうはるか）に拝み奉らくを白す</div>
+<h4>文末の連唱</h4>
+<div class="fulltext">天御中主之大御神 咲きはへ（あめのみなかぬしのおおみかみ さきはへ）
+高皇産霊之大御神 咲きはへ（たかみむすびのおおみかみ さきはへ）
+神皇産霊之大御神 咲きはへ（かみむすびのおおみかみ さきはへ）
+神ながら たまちはえませ
+神ながら たまちはえませ
+神ながら たまちはえませ</div>
+</div>
+</details>
+
+<details class="energy" id="t-asama">
+<summary><span><span class="nm">富士の浅間大神への祝詞</span><span class="tm">木花咲耶姫命で奏上</span></span><span class="chev" aria-hidden="true">⌄</span></summary>
+<div class="body">
+<div class="fulltext">かけまくも あやに かしこき ふじのあさまの おおかみの おおまえに
+かしこみ かしこみ も もうさく きよきこころの まことをさきとし
+かみよののりをあがめ まさにすなおのもともとに かえりよりし よこしまの
+すえののりを すてて いまかみの みちの たえなるわざを きがんたてまつり
+たたえごとをえ たてまつる このさまを たいらけく やすらけく きこしめして
+いまも ゆくさきも おおかみの ひろき あつき みたまのふゆを かがふらしめ
+よのまもり ひのまもりに まもり さきわえたまえと かしこみ かしこみ も まをす</div>
+</div>
+</details>
+
+<details class="energy" id="t-izanagi">
+<summary><span><span class="nm">伊耶那岐命・伊耶那美命の祝詞</span><span class="tm">二柱のマニュアルに『参考』として併記</span></span><span class="chev" aria-hidden="true">⌄</span></summary>
+<div class="body">
+<h4>伊耶那岐命の祝詞（祓詞）</h4>
+<div class="fulltext">かけまくも かしこき いざなぎの おほかみ つくしの ひむかの たちばなの をどの あはぎはらに みそぎはらへたまひし ときに なりませる はらへどの おほかみたち もろもろの まがこと つみけがれ あらむをば はらへたまひ きよめたまへと まをすことを きこしめせと かしこみかしこみも まをす</div>
+<h4>伊耶那美命の祝詞</h4>
+<div class="fulltext">かけまくも かしこき いざなみの おほかみの おおまえに かしこみかしこみも もうさく おほかみの たかき とほとき おおみいづを したいまつり おろがみまつる このさまを みそなはして いまも ゆくさきも おほかみの ひろき あつき みたまのふゆを かがふらしめ よのまもり ひのまもりに まもり さきわえたまへと かしこみかしこみも まをす</div>
+</div>
+</details>
 </section>
 
 <main id="groups"></main>
@@ -234,7 +400,8 @@ d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});
 }
 document.getElementById('openAll').addEventListener('click',function(){document.querySelectorAll('details.energy').forEach(function(d){d.open=true;});});
 document.getElementById('closeAll').addEventListener('click',function(){document.querySelectorAll('details.energy').forEach(function(d){d.open=false;});window.scrollTo({top:0,behavior:'smooth'});});
-if(location.hash&&location.hash.indexOf('#e-')===0){var t=document.querySelector(location.hash);if(t){t.open=true;}}
+document.querySelectorAll('a.tlink').forEach(function(a){a.addEventListener('click',function(ev){ev.preventDefault();var d=document.querySelector(a.getAttribute('href'));if(d){d.open=true;d.scrollIntoView({behavior:'smooth',block:'start'});}});});
+if(location.hash&&(location.hash.indexOf('#e-')===0||location.hash.indexOf('#t-')===0)){var t=document.querySelector(location.hash);if(t){t.open=true;}}
 </script>
 </body>
 </html>
