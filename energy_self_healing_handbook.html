@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>エネルギー自己治癒ハンドブック検索 V10</title>
+<style>
+:root{
+  --bg:#faf6ef; --bg2:#f3ecdd; --surface:#fffdf8; --surface2:#f7f1e3;
+  --ink:#2e2440; --ink2:#5d5470; --ink3:#8a7f9c;
+  --purple:#5b3a8e; --purple-deep:#3d2766; --purple-soft:#ece4f7; --purple-mid:#7a5bb0;
+  --gold:#b8912f; --gold-soft:#f3e8c8; --gold-line:#d9c37a;
+  --line:#e3d9c4; --line2:#d5c9e8;
+  --warn-bg:#fdf3e3; --warn-line:#d99a2b; --warn-ink:#6b4a0e;
+  --aff-bg:#f1eaf9;
+  --shadow:0 1px 3px rgba(61,39,102,.08),0 4px 14px rgba(61,39,102,.06);
+  --radius:14px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1d1730; --bg2:#171226; --surface:#2a2142; --surface2:#332a52;
+    --ink:#f0eafc; --ink2:#c9bfe0; --ink3:#9d90b8;
+    --purple:#c4aef0; --purple-deep:#e6dcfa; --purple-soft:#3a2d5e; --purple-mid:#a98ad9;
+    --gold:#e3c56e; --gold-soft:#3d3420; --gold-line:#8a7434;
+    --line:#453a66; --line2:#453a66;
+    --warn-bg:#3a2f16; --warn-line:#c9902e; --warn-ink:#f3d9a0;
+    --aff-bg:#372b58;
+    --shadow:0 1px 3px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{transition:none!important} }
+body{margin:0;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);color:var(--ink);
+  font-family:"Hiragino Mincho ProN","Hiragino Mincho Pro","Yu Mincho","YuMincho","Noto Serif JP",serif;
+  line-height:1.75;-webkit-font-smoothing:antialiased}
+.sans{font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic UI","Yu Gothic",sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px 48px}
+
+/* header */
+header{padding:12px 4px 0;text-align:center}
+header .orn{display:none}
+header h1{font-size:clamp(19px,4.6vw,27px);line-height:1.3;margin:0 0 3px;color:var(--purple-deep);font-weight:700;letter-spacing:.02em}
+header .sub{color:var(--ink2);font-size:14px;margin:0}
+header .source{color:var(--ink3);font-size:11.5px;margin:2px 0 0}
+.rule{display:flex;align-items:center;gap:12px;margin:7px auto 0;max-width:420px}
+.rule::before,.rule::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-line))}
+.rule::after{background:linear-gradient(90deg,var(--gold-line),transparent)}
+.rule span{color:var(--gold);font-size:13px}
+
+/* controls */
+.controls{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);padding:10px 0 10px;margin-top:4px}
+.searchbox{position:relative}
+.searchbox svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--ink3);pointer-events:none}
+#q{width:100%;min-height:52px;padding:12px 48px 12px 44px;border:1.5px solid var(--line2);border-radius:999px;background:var(--surface);color:var(--ink);font-size:16px;font-family:inherit;outline:none;box-shadow:var(--shadow)}
+#q:focus{border-color:var(--purple-mid)}
+#q::placeholder{color:var(--ink3)}
+#clearQ{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:40px;height:40px;border:none;border-radius:50%;background:transparent;color:var(--ink3);font-size:20px;cursor:pointer;display:none}
+.fgroup{margin-top:12px}
+.fgroup .flabel{font-size:12px;letter-spacing:.14em;color:var(--ink3);margin:0 2px 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:40px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line2);background:var(--surface);color:var(--ink2);font-size:13.5px;cursor:pointer;font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Yu Gothic",sans-serif;line-height:1.3}
+.chip[aria-pressed="true"]{background:var(--purple);border-color:var(--purple);color:#fff;font-weight:700}
+@media (prefers-color-scheme: dark){ .chip[aria-pressed="true"]{background:var(--purple-mid);border-color:var(--purple-mid);color:#1d1730} }
+.chip .cdot,.badge .cdot,.detail .cdot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:1px;border:1px solid rgba(0,0,0,.15)}
+.count{margin:14px 2px 0;font-size:13.5px;color:var(--ink2)}
+.count b{color:var(--purple);font-size:16px}
+#resetBtn{margin-left:10px;min-height:36px;padding:4px 12px;border-radius:999px;border:1px solid var(--line2);background:var(--surface);color:var(--purple);font-size:13px;cursor:pointer;display:none}
+
+/* groups */
+.cat-head{display:flex;align-items:baseline;gap:10px;margin:30px 2px 12px;border-bottom:2px solid var(--gold-line);padding-bottom:6px}
+.cat-head h2{font-size:19px;margin:0;color:var(--purple-deep)}
+.cat-head .n{font-size:12.5px;color:var(--ink3)}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.sheet summary{list-style:none;cursor:pointer;padding:16px 18px;min-height:56px;display:block}
+.sheet summary::-webkit-details-marker{display:none}
+.sheet summary:focus-visible{outline:2px solid var(--purple-mid);outline-offset:-2px}
+.s-top{display:flex;align-items:flex-start;gap:12px}
+.s-no{flex:none;width:38px;height:38px;border-radius:50%;background:var(--purple-soft);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;font-family:"Hiragino Kaku Gothic ProN",sans-serif;margin-top:2px}
+.s-main{flex:1;min-width:0}
+.s-name{font-size:17.5px;font-weight:700;line-height:1.5}
+.s-tag{color:var(--ink2);font-size:13.5px;line-height:1.6;margin-top:2px}
+.s-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.badge{font-size:11.5px;padding:2px 9px;border-radius:999px;background:var(--gold-soft);color:var(--ink2);font-family:"Hiragino Kaku Gothic ProN",sans-serif;line-height:1.6}
+.badge.chakra{background:var(--purple-soft);color:var(--purple)}
+.chev{flex:none;color:var(--ink3);font-size:15px;margin-top:8px;transition:transform .25s}
+.sheet[open ] .chev{transform:rotate(180deg)}
+.detail{border-top:1px dashed var(--line2);padding:6px 18px 20px}
+.detail h3{font-size:13px;letter-spacing:.12em;color:var(--purple);margin:20px 0 6px;font-family:"Hiragino Kaku Gothic ProN",sans-serif}
+.detail h3:first-child{margin-top:14px}
+.detail p{margin:0;font-size:15px}
+.items{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.items li{display:flex;gap:12px;background:var(--surface2);border-radius:10px;padding:12px 14px}
+.items .num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:700;font-family:"Hiragino Kaku Gothic ProN",sans-serif;margin-top:2px}
+@media (prefers-color-scheme: dark){ .items .num{color:#1d1730;background:var(--purple-mid)} }
+.items .iname{font-weight:700;font-size:15px}
+.items .itext{font-size:14px;color:var(--ink2);line-height:1.7}
+.doctor{background:var(--warn-bg);border:1.5px solid var(--warn-line);border-radius:10px;padding:12px 14px;margin-top:6px}
+.doctor p{color:var(--warn-ink);font-size:14.5px}
+.doctor .dh{font-weight:700;font-size:13px;letter-spacing:.08em;margin-bottom:4px;color:var(--warn-ink);font-family:"Hiragino Kaku Gothic ProN",sans-serif}
+.aff{background:var(--aff-bg);border-radius:10px;padding:14px 16px;text-align:center;margin-top:6px}
+.aff p{font-size:16px;font-weight:700;color:var(--purple-deep)}
+.aff .ah{font-size:11.5px;letter-spacing:.16em;color:var(--ink3);margin-bottom:4px;font-family:"Hiragino Kaku Gothic ProN",sans-serif}
+.pagenote{margin-top:16px;text-align:right;font-size:12.5px;color:var(--ink3)}
+.empty{display:none;text-align:center;padding:44px 16px;color:var(--ink2)}
+.empty .big{font-size:17px;font-weight:700;color:var(--purple-deep);margin-bottom:6px}
+footer{margin-top:44px;border-top:1px solid var(--gold-line);padding-top:18px;text-align:center}
+footer .disc{font-size:13px;color:var(--ink2);max-width:560px;margin:0 auto}
+footer .src{font-size:12.5px;color:var(--ink3);margin-top:10px}
+footer .orn{color:var(--gold);letter-spacing:.55em;text-indent:.55em;font-size:13px;margin-top:14px}
+mark{background:var(--gold-soft);color:inherit;border-radius:2px;padding:0 1px}
+
+/* Chakra multi-select: checked options use OR matching. */
+.chakra-checks{gap:8px}
+.chakra-option{display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:7px 12px;border:1.5px solid var(--line2);border-radius:12px;background:var(--surface);color:var(--ink2);font-size:13px;cursor:pointer;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}
+.chakra-option:has(input:checked){border-color:var(--purple-mid);background:var(--purple-soft);color:var(--purple);font-weight:700}
+.chakra-option input{width:17px;height:17px;accent-color:var(--purple);margin:0}
+.chakra-option:focus-within{outline:2px solid var(--purple-mid);outline-offset:2px}
+.chakra-option .cdot{display:inline-block;width:9px;height:9px;border-radius:50%;border:1px solid rgba(0,0,0,.15)}
+.supplement{margin:14px 0;padding:10px 12px;border:1px solid #d6d6d0;border-radius:9px}.supplement summary{cursor:pointer;font-weight:600}.supplement[open] summary{margin-bottom:10px}
+
+/* V9: quiet, refined, mobile-first reading design */
+:root{--bg:#f7f5f0;--bg2:#f1eee8;--surface:#fffefa;--surface2:#f7f5ef;--line:#e7e0d6;--line2:#ddd4e5;--shadow:0 3px 18px rgba(44,34,64,.055);--radius:18px}
+body{background:linear-gradient(145deg,var(--bg),var(--bg2));}
+.wrap{max-width:920px;padding:0 clamp(12px,3vw,28px) 64px}
+header{padding:18px 0 5px}
+header h1{font-size:clamp(19px,3.4vw,25px);letter-spacing:.025em}
+header .sub{font-size:12px}
+header .source{font-size:11px}
+.rule{max-width:260px}
+.controls{border-bottom:1px solid var(--line);padding:12px 0;background:color-mix(in srgb,var(--bg) 95%,transparent)}
+#q{min-height:48px;box-shadow:0 2px 12px rgba(44,34,64,.045)}
+.fgroup{margin-top:9px}.fgroup .flabel{margin-bottom:4px}
+.chips{gap:6px}.chip,.chakra-option{min-height:36px;padding:6px 11px;font-size:12.5px}
+.cat-head{margin-top:26px;border-bottom:1px solid var(--gold-line)}
+.cat-head h2{font-size:17px}
+.sheet{border-radius:18px;margin-bottom:10px;transition:box-shadow .2s,border-color .2s}
+.sheet[open]{border-color:var(--line2);box-shadow:0 8px 28px rgba(50,32,77,.09)}
+.sheet summary{padding:14px 17px}
+.s-name{font-size:17px}.s-tag{font-size:13px}
+.s-no{width:35px;height:35px;font-size:12px}
+.detail{padding:4px clamp(14px,3.5vw,25px) 20px;border-top:1px solid var(--line)}
+.content-section{padding:14px 0;border-bottom:1px solid var(--line)}
+.content-section h3{display:flex;align-items:baseline;gap:11px;margin:0 0 8px;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;font-size:11px;letter-spacing:.06em;color:var(--gold)}
+.content-section h3 span{font-size:14px;color:var(--purple-deep);font-weight:700;letter-spacing:.02em}
+.content-section p{font-size:14.5px;line-height:1.85}
+.chakra-panel{background:var(--purple-soft);border:1px solid var(--line2);border-radius:13px;padding:13px 15px;margin:12px 0 0}
+.chakra-panel h3{margin-bottom:5px}.chakra-panel p{font-weight:600;color:var(--purple-deep)}
+.ritual-panel{padding:15px 0}
+.ritual-panel p{border-left:3px solid var(--gold-line);padding:8px 0 8px 15px}
+.aff{margin:0;padding:19px 17px;border:1px solid var(--line2);border-radius:13px;background:linear-gradient(135deg,var(--aff-bg),var(--surface));}
+.aff p{font-size:17px;line-height:1.85;letter-spacing:.025em}
+.doctor{margin:0;padding:12px 14px;border-width:1px;border-radius:12px}
+.doctor p{font-size:13.5px;line-height:1.8}
+.supplement{margin:16px 0 0;padding:0;border:1px solid var(--line);border-radius:13px;background:var(--surface2)}
+.supplement summary{padding:13px 15px;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;font-size:13px;color:var(--ink2);list-style-position:inside}
+.supplement[open] summary{margin-bottom:0;border-bottom:1px solid var(--line)}
+.supplement .items{padding:13px}
+.items li{background:var(--surface);border:1px solid var(--line)}
+.pagenote{margin-top:12px}
+@media(max-width:560px){.controls{position:relative;backdrop-filter:none}.sheet summary{padding:13px 12px}.s-top{gap:9px}.detail{padding-bottom:16px}.content-section p{font-size:14px}.aff p{font-size:16px}}
+@media(prefers-color-scheme:dark){:root{--bg:#1d1730;--bg2:#171226;--surface:#2a2142;--surface2:#332a52;--line:#453a66;--line2:#51436c;--shadow:0 3px 18px rgba(0,0,0,.2)}.aff{background:var(--aff-bg)}}
+
+/* V10: botanical pearl palette and calmer reading rhythm */
+:root{
+ --bg:#f7f8f4;--bg2:#edf3ee;--surface:#fffefa;--surface2:#f4f7f2;
+ --ink:#273a36;--ink2:#53665f;--ink3:#697b73;
+ --purple:#376f66;--purple-deep:#244e49;--purple-mid:#4d887d;--purple-soft:#e4f0eb;
+ --gold:#9b7840;--gold-soft:#f5ecda;--gold-line:#d6bc8d;
+ --line:#dde6df;--line2:#c9ded5;--aff-bg:#eaf3ef;
+ --warn-bg:#fff7ed;--warn-line:#c48d54;--warn-ink:#73512d;
+ --shadow:0 4px 22px rgba(30,67,55,.055);
+}
+body{background:radial-gradient(ellipse at 80% 0%,#e9f3ed 0%,transparent 43%),linear-gradient(165deg,var(--bg),var(--bg2));}
+header h1{color:var(--purple-deep)}
+.rule span{color:var(--gold)}
+#q:focus-visible,.chip:focus-visible,#resetBtn:focus-visible,#clearQ:focus-visible{outline:3px solid var(--purple-mid);outline-offset:2px}
+.chip[aria-pressed="true"]{background:var(--purple);border-color:var(--purple);color:#fff}
+.sheet{border-color:var(--line)}
+.sheet[open]{border-color:var(--line2);box-shadow:0 8px 30px rgba(27,76,61,.09)}
+.s-no{background:var(--purple-soft);color:var(--purple-deep)}
+.cat-head{border-bottom-color:var(--gold-line)}
+.content-section h3{color:var(--gold)}
+.chakra-panel{background:linear-gradient(110deg,var(--purple-soft),var(--surface2));border-color:var(--line2)}
+.ritual-panel p{border-left-color:var(--gold-line)}
+.aff{background:linear-gradient(120deg,var(--aff-bg),var(--surface));border-color:var(--line2)}
+.aff p{color:var(--purple-deep)}
+.supplement{background:var(--surface2)}
+.chakra-option:has(input:checked){background:var(--purple-soft);border-color:var(--purple-mid);color:var(--purple-deep)}
+@media (prefers-color-scheme:dark){
+ :root{--bg:#172623;--bg2:#11201d;--surface:#22332e;--surface2:#2b4038;
+ --ink:#eef5ef;--ink2:#c5d7ce;--ink3:#a5bdb1;
+ --purple:#9ad8c4;--purple-deep:#d3f0e4;--purple-mid:#83c9b2;--purple-soft:#304c42;
+ --gold:#e5c68c;--gold-soft:#453c2b;--gold-line:#927a51;
+ --line:#3c554b;--line2:#4a6a5b;--aff-bg:#2e4b40;
+ --warn-bg:#3b3026;--warn-line:#bc8d59;--warn-ink:#f0d6b4;
+ --shadow:0 4px 22px rgba(0,0,0,.22)}
+ body{background:linear-gradient(165deg,var(--bg),var(--bg2))}
+ .chip[aria-pressed="true"]{background:var(--purple-mid);border-color:var(--purple-mid);color:#13241e}
+ .items .num{background:var(--purple-mid);color:#13241e}
+ .aff{background:linear-gradient(120deg,var(--aff-bg),var(--surface))}
+}
+
+/* V11: unified seven-section visual hierarchy; ritual and affirmation lead. */
+.detail>.content-section{position:relative;margin:10px 0 0;padding:15px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);}
+.detail>.content-section h3{margin:0 0 10px;align-items:center;gap:10px;line-height:1.55}
+.detail>.content-section h3 span{font-size:14px}
+.detail>.content-section h3::first-letter{color:var(--gold)}
+/* Understanding: quiet neutral cards. */
+.detail>.content-section:nth-of-type(1),.detail>.content-section:nth-of-type(2){background:var(--surface2);border-color:var(--line)}
+/* Chakra: distinctive but restrained, with original per-chakra dots intact. */
+.detail>.chakra-panel{background:linear-gradient(115deg,var(--purple-soft),var(--surface));border-color:var(--line2)}
+/* Ritual: primary actionable section. */
+.detail>.ritual-panel{background:linear-gradient(120deg,var(--surface),var(--gold-soft));border-color:var(--gold-line);box-shadow:0 3px 14px rgba(91,77,43,.055)}
+.detail>.ritual-panel h3 span{color:var(--purple-deep)}
+.detail>.ritual-panel p{margin:0;border-left:3px solid var(--gold);padding:7px 0 7px 14px;line-height:1.95}
+/* Affirmation: second focal section, with one clean integrated panel. */
+.detail>.content-section:has(>.aff){background:linear-gradient(120deg,var(--aff-bg),var(--surface));border-color:var(--line2);box-shadow:0 3px 14px rgba(34,89,66,.055)}
+.detail>.content-section:has(>.aff) .aff{border:0;background:transparent;padding:8px 6px 6px;margin:0}
+.detail>.content-section:has(>.aff) .aff p{font-size:clamp(16px,2.5vw,19px);line-height:1.9}
+/* Consultation: readable and clearly distinct without dominating the flow. */
+.detail>.content-section:has(>.doctor){background:var(--surface);border-color:var(--line)}
+.detail>.content-section:has(>.doctor) .doctor{background:var(--warn-bg);border-color:var(--warn-line);margin:0}
+/* Supplement remains optional and visually secondary. */
+.detail>.supplement{margin-top:12px;border-color:var(--line)}
+@media(max-width:560px){.detail>.content-section{padding:13px 12px;margin-top:9px}.detail>.ritual-panel p{padding-left:11px}.detail>.content-section:has(>.aff) .aff{padding:6px 2px}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="orn" aria-hidden="true">✦ ✦ ✦</div>
+  <h1>エネルギー自己治癒ハンドブック検索</h1>
+  <p class="sub">80のセルフケアシートを検索</p>
+  <p class="source">出典：『エネルギー自己治癒ハンドブック』</p>
+  <div class="rule" aria-hidden="true"><span>◆</span></div>
+</header>
+
+<div class="controls">
+  <div class="searchbox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="症状名・キーワードで検索（例：頭痛、眠れない、アメジスト）" aria-label="キーワード検索" autocomplete="off">
+    <button id="clearQ" aria-label="検索を消す">×</button>
+  </div>
+  <div class="fgroup">
+    <p class="flabel sans">カテゴリー</p>
+    <div class="chips" id="catChips" role="group" aria-label="カテゴリーで絞り込み"></div>
+  </div>
+  <div class="fgroup">
+    <p class="flabel sans">チャクラ</p>
+    <div class="chips" id="chakraChips" role="group" aria-label="チャクラで絞り込み"></div>
+  </div>
+  <p class="count sans"><span id="countText"></span><button id="resetBtn">絞り込みをリセット</button></p>
+</div>
+
+<main id="list"></main>
+<div class="empty" id="empty">
+  <p class="big">見つかりませんでした</p>
+  <p>キーワードや絞り込みを変えて、もう一度お試しください。</p>
+</div>
+
+<footer>
+  <p class="disc">補完的なウェルビーイングの実践です。医師の診察や治療の代わりにならず、治癒を約束するものではありません。</p>
+  <p class="src">出典：『エネルギー自己治癒ハンドブック』（イラストガイド）</p>
+  <div class="orn" aria-hidden="true">✦ ✦ ✦</div>
+</footer>
+</div>
+
+<script>
+var SHEETS = [{"no":1,"name":"頭痛","category":"身体の痛み","page":13,"tagline":"心が抱えきれないほどのものを背負ったとき。","items":[{"name":"アメジスト","text":"呼吸しながら、眉間にそっとのせます。"},{"name":"レモンバームティー","text":"神経の緊張をほぐす助けに。ぬるめを少しずつ飲みます。"},{"name":"冷たいタオル","text":"額にのせるか、温めて首の後ろに。楽なほうを選びます。"}],"signs":"額やこめかみ、首の後ろの圧迫感や重さ。肩のこわばりを伴うことがよくあります。","meaning":"伝統では、コントロールしすぎの表れとされています。すべてを頭で解決しようとして、立ち止まることを自分に許さないのです。","chakra":"第６チャクラ：思考、直感、そして休息","ritual":"【5分間】光がつらくなければ照明を落とし、楽な姿勢で休みます。アメジストは手元に置いても構いません。息を無理に深くせず、肩やあごの力が抜ける感覚を確かめます。","doctor":"突然激しく痛む、発熱・首のこわばり・意識の混乱を伴う、または頭を打ったあとに起きたとき。","affirmation":"今日解決しなくていいことは、手放します。"},{"no":2,"name":"片頭痛","category":"身体の痛み","page":14,"tagline":"休んでほしいという、体からの強い訴え。","items":[{"name":"レピドライト","text":"深い安らぎの石。水には決してつけません。"},{"name":"ジンジャーティー","text":"しょうがの薄切り2〜3枚をお湯に入れて5分。"},{"name":"アイマスク","text":"真っ暗にします。光は発作を悪化させやすいからです。"}],"signs":"ズキズキと脈打つ痛み。片側だけのことが多く、光や音がつらくなったり、吐き気がしたりします。","meaning":"自分への厳しさと関係があるとされます。限界を無視したペースで走り続け、体がブレーキをかけるまで止まれません。","chakra":"第７チャクラ：つながり、静けさ、生きる意味","ritual":"【5分間】光や音の刺激を減らし、楽な姿勢で休みます。レピドライトはそばに置いても構いません。飲み物は無理に用意せず、今は休むことを優先します。","doctor":"いつもと痛み方が違う、50歳以降に始まった、または脱力感、物が二重に見える、話しにくさがあるとき。","affirmation":"休むことも、私の大切な仕事です。"},{"no":3,"name":"首の痛み","category":"身体の痛み","page":15,"tagline":"口にしない思いも、肩にたまっていきます。","items":[{"name":"ソーダライト","text":"横になり、首の付け根に数分のせます。"},{"name":"カモミールティー","text":"緊張をゆるめ、寄り添うお茶。ぬるめをゆっくり。"},{"name":"湯たんぽ","text":"タオルで包み、首の後ろと肩にあてます。"}],"signs":"首の後ろや肩のこわばりで、頭を回しにくくなります。ストレスで強まりがちです。","meaning":"かたくなさと関係があるとされます。物事を一面からしか見ない、言いたいことをのみ込む、といった状態です。","chakra":"第５チャクラ：表現と、自分の言葉","ritual":"【5分間】首を無理に動かさず、楽な姿勢で座ります。心地よければ首の後ろをほんのり温め、ゆっくり呼吸します。今の自分に伝えたい言葉をひとつ心の中で選びます。","doctor":"打撲や事故のあとに起きた、発熱とこわばりを伴う、または腕のしびれや力の入りにくさがあるとき。","affirmation":"別の道を見ることも、本音を言うことも、自分に許します。"},{"no":4,"name":"背中の痛み","category":"身体の痛み","page":16,"tagline":"誰にも見えなくても、背負っている重荷。","items":[{"name":"スモーキークォーツ","text":"荷を下ろす助けに。寝るときはそばに置きます。"},{"name":"ゴールデンミルク","text":"ターメリック小さじ半分に、こしょうをひとつまみ。"},{"name":"マッサージボール","text":"背中と壁のあいだで、やさしく転がします。"}],"signs":"肩甲骨のあいだや背中に沿った張りや痛み。姿勢によって悪化します。","meaning":"伝統では、人の重荷まで背負うことと結びつけられています。すべて自分次第で、助けを求められないと感じているのです。","chakra":"第４チャクラ：与えることと、助けを受け取ること","ritual":"【5分間】背中に負担のない姿勢で休み、呼吸を整えます。今日、自分ひとりで背負わなくてもよいことをひとつ思い浮かべます。痛む場所を無理に押したり、ボールで刺激したりする必要はありません。","doctor":"発熱、脱力感、脚のしびれ、排尿のトラブルを伴うとき、または転んだあとに起きたとき。","affirmation":"すべてを背負わなくていい。助けを求め、受け取ります。"},{"no":5,"name":"腰痛","category":"身体の痛み","page":17,"tagline":"自分を支えるものが足りないと感じるとき。","items":[{"name":"レッドジャスパー","text":"体のそば、腰のあたりに置きます。"},{"name":"シナモンティー","text":"シナモンスティック半分をお湯に5分。体が温まります。"},{"name":"温熱パッド","text":"ほんのり温かくして腰に。熱くしすぎないように。"}],"signs":"腰まわりの痛み。かがんだり、重い物を持ち上げたり、長時間動かずにいたりすると、こわばります。","meaning":"生活の不安と関係があるとされます。お金や住まい、支えがなくなることへの恐れです。","chakra":"第１チャクラ：安心感、身体、グラウンディング","ritual":"【5分間】腰が楽になる姿勢で休みます。膝を立てる姿勢が心地よければ選び、無理に動かしません。レッドジャスパーはそばに置いても構いません。自然な呼吸で、今の身体をいたわります。","doctor":"痛みがしびれとともに脚へ広がる、力が入らない、尿が出にくい、または発熱を伴うとき。","affirmation":"大地が私を支え、私も自分を支えます。"},{"no":6,"name":"股関節の痛み","category":"身体の痛み","page":18,"tagline":"次の一歩を踏み出す怖さ。","items":[{"name":"カーネリアン","text":"股関節にあてて、やさしく円を描きながら。"},{"name":"ルイボスティー","text":"ノンカフェインで、やさしい温かさ。いつでもどうぞ。"},{"name":"ヨガマット","text":"床の上で、ゆっくり無理なく体を動かすために。"}],"signs":"股関節や脚の付け根の違和感。歩くとき、階段を上るとき、横向きで寝るときに気になります。","meaning":"伝統では、変化への抵抗の表れとされています。大切な決断に向けて踏み出すのが怖いのです。","chakra":"第２チャクラ：動き、楽しむこと、変化","ritual":"【5分間】股関節が楽になる姿勢で休みます。動かす場合は痛みのない範囲にとどめ、無理に膝を引き寄せません。今の自分にできる小さな一歩をひとつ考えます。","doctor":"転んだあとに起きた、脚に体重をかけられない、発熱がある、または患部が赤く熱をもっているとき。","affirmation":"自信をもって、私のペースで進みます。"},{"no":7,"name":"膝の痛み","category":"身体の痛み","page":19,"tagline":"少しだけ譲るのが難しいとき。","items":[{"name":"ヘマタイト","text":"膝のそばに。しっかりと立つ感覚を。水にはつけません。"},{"name":"しょうがとレモン","text":"しょうがの薄切りとレモンの輪切り1枚を、お湯で5分。"},{"name":"クッション","text":"横になり、膝の下にクッションを入れます。"}],"signs":"曲げるとき、階段を上るとき、しばらくじっとしたあと立ち上がるときの痛みやこわばり。","meaning":"プライドや融通のきかなさと関係があるとされます。譲る、謝る、考えを変えるといったことが難しくなります。","chakra":"第１チャクラ：安定と、歩む道への信頼","ritual":"【5分間】膝に負担のない姿勢で、クッションを使って休みます。ヘマタイトはそばに置いても構いません。ゆっくり呼吸しながら、今日は少し力を抜いてもよいことをひとつ考えます。","doctor":"膝に腫れ・赤み・熱感がある、引っかかって動かない、体重を支えられない、または打ったあとに痛むとき。","affirmation":"譲ることは、弱さではなく自由です。"},{"no":8,"name":"坐骨神経痛","category":"身体の痛み","page":20,"tagline":"脚の道すじをたどって下りていく緊張。","items":[{"name":"ガーネット","text":"活力と安定感を。目の前の床に置きます。"},{"name":"リンデンティー","text":"緊張をほぐす助けに。カップ1杯に小さじ1。"},{"name":"足湯","text":"ぬるま湯に粗塩をひとつかみ入れて10分。"}],"signs":"お尻から脚の裏側へ下りていく痛み。座るときや歩くときに出て、しびれを伴うこともあります。","meaning":"伝統では、将来やお金への心配と結びつけられています。この先への恐れを抱えたまま進んでいる状態です。","chakra":"第１チャクラ：安心感と、しっかりした足どり","ritual":"【5分間】座って足元を楽にし、ガーネットをそばに置きます。静かに呼吸しながら、気がかりなことをひとつ心の中で言葉にします。【別の時間に】足湯をするなら、無理のない温度で10分ほど。","doctor":"脚に力が入らない、デリケートゾーンがしびれる、排尿のコントロールが難しい、または動けないとき。","affirmation":"目の前に続く道を信じます。"},{"no":9,"name":"筋肉のしこり","category":"身体の痛み","page":21,"tagline":"体が抱え込むことを覚えてしまった緊張。","items":[{"name":"タイガーアイ","text":"マッサージ中は手に。こわばらない芯の強さを。"},{"name":"ラベンダーティー","text":"カップ1杯に花をひとつまみ。香りに心がほどけます。"},{"name":"アーモンドオイル","text":"気になる部分を、ゆっくりマッサージするために。"}],"signs":"筋肉にできる、かたく痛むしこり。とくに肩、首、背中に多く、動きを妨げます。","meaning":"いつも身構えていることと関係があるとされます。何かあったらと怖くて、コントロールを手放せないのです。","chakra":"第３チャクラ：意志とコントロール","ritual":"【5分間】楽な姿勢で、肩や手の力をゆるめます。痛みやしこりを無理に押さず、心地よい範囲で呼吸を整えます。今、手放せそうな力みがあれば、少しだけ緩めてみます。","doctor":"無理をしたあとに強い痛み、腫れ、あざが出たとき、または1週間たってもよくならないとき。","affirmation":"すべてを思いどおりにしなくてもいい。今は少し力を抜いてみます。"},{"no":10,"name":"腱炎","category":"身体の痛み","page":22,"tagline":"ひと息つく間もなく、同じ無理を繰り返すとき。","items":[{"name":"グリーンアベンチュリン","text":"その部分にのせて、穏やかさと再生を。"},{"name":"ターメリックとしょうが","text":"ターメリックひとつまみに、しょうがの薄切り2枚。"},{"name":"保冷剤","text":"タオルで包み、その部分に10分あてます。"}],"signs":"ひじ、手首、肩などの腱の痛み。同じ動きを繰り返すと強まります。","meaning":"伝統では、休みのない頑張りすぎの表れとされます。やりたいか、できるかも考えず、動き続けてしまうのです。","chakra":"第３チャクラ：行動するエネルギーと、その加減","ritual":"【5分間】手や腕を楽な姿勢で休ませ、グリーンアベンチュリンをそばに置きます。人に任せられる用事をひとつ考え、ゆっくり呼吸します。【別の時間に】冷却する場合は、保冷剤をタオルで包み、肌に直接当てないようにします。","doctor":"患部がひどく腫れている、赤い、熱をもっている、プツッという音がした、または手に力が入らないとき。","affirmation":"ほどよく動き、罪悪感なく休みます。"},{"affirmation":"自分を受け入れ、そっといたわります。","category":"肌と髪","chakra":"第２チャクラ：感情と、自分の身体とのつながり","doctor":"ニキビが大きく痛む、跡が残る、大人になって急にできた、または気持ちが沈むとき。","items":[{"name":"ローズクォーツ","text":"自分を愛する石。鏡を見るとき手に持ちます。"},{"name":"ミントティー","text":"すっきり爽やか。カップ1杯に小さじ1、5分。"},{"name":"手鏡","text":"あら探しではなく、やさしく自分を見つめるために。"}],"meaning":"自分を受け入れられないことと関係があるとされます。自分を好きになれない、期待に応えられていないと感じているのです。","name":"ニキビ","no":11,"page":23,"ritual":"【5分間】鏡を見るのが心地よければ、ローズクォーツを手元に置き、自分の好きなところをひとつ探します。見たくない日は鏡を使わず、肌を責めない時間として静かに過ごします。","signs":"顔や胸、背中にできる吹き出物、毛穴の黒ずみ、炎症。ホルモンの変化やストレスで増えがちです。","tagline":"言えない思いが、肌から出ようとしています。"},{"affirmation":"自分を大切にするために、心地よい距離を選んでいい。","category":"肌と髪","chakra":"第４チャクラ：人とのつながりと境界線","doctor":"水ぶくれがある、膿が出る、急に広がる、発熱がある、またはかゆみで眠れないとき。","items":[{"name":"ジェード","text":"穏やかさの石。呼吸しながら手に持ちます。"},{"name":"レモンバームティー","text":"気持ちを鎮める助けに。カップ1杯に小さじ1。"},{"name":"オーツ麦の小袋","text":"ぬるめのお風呂に入れて、肌をやわらかく。"}],"meaning":"伝統では、ため込んだいら立ちと結びつけられています。身近な何かや誰かが気に障るのに、口に出せずにいるのです。","name":"皮膚炎","no":12,"page":24,"ritual":"【5分間】刺激の少ない場所で楽に座り、肌をこすらず休ませます。ゆっくり呼吸しながら、今の自分に必要な心地よい距離をひとつ考えます。【別の時間に】入浴や保湿は肌の状態に合わせて行います。","signs":"赤み、乾燥、かゆみのある肌。皮がむけることもあり、せっけんや摩擦、ストレスで悪化します。","tagline":"外の世界との接点が、ヒリヒリするとき。"},{"affirmation":"めぐる私の体を、愛をこめていたわります。","category":"肌と髪","chakra":"第２チャクラ：流れ、心地よさ、身体","doctor":"その部分が赤く、熱をもって腫れて痛む、または発熱があるとき。皮膚の感染症なので、すぐに受診してください。","items":[{"name":"カーネリアン","text":"めぐるエネルギーと、動きのために。"},{"name":"レモンバーベナティー","text":"消化にやさしいお茶。カップ1杯に小さじ1。"},{"name":"やわらかいブラシ","text":"乾いた肌に、足元から上へブラッシング。"}],"meaning":"滞りと関係があるとされます。ため込んだ感情や、長いあいだ変わらないままの習慣のことです。","name":"セルライト","no":13,"page":25,"ritual":"【5分間】身体に負担のない姿勢で、心地よい範囲の軽い動きをします。好きな音楽を流しても構いません。最後に、今日の身体に感謝をひとつ伝えます。","signs":"太もも、腰まわり、お尻のでこぼこ肌。ごく一般的なもので病気ではなく、あなたの価値とも無関係です。","tagline":"オレンジの皮のような肌。滞りが、動きを求めています。"},{"affirmation":"与えるのと同じ愛で、自分を潤します。","category":"肌と髪","chakra":"第２チャクラ：水、心地よさ、やわらかさ","doctor":"ひび割れから血が出る、かゆみが強い、赤みが広がる、または強いのどの渇きと疲れを伴うとき。","items":[{"name":"ムーンストーン","text":"水、やわらかさ、自分へのいたわりのために。"},{"name":"ローズティー","text":"食用のバラの乾燥花びらを、カップ1杯に小さじ1。"},{"name":"水差し","text":"一日を通して水を飲みましょう。肌も水を求めています。"}],"meaning":"伝統では、心の栄養不足の表れとされています。人にたくさん与えて、自分には少ししか残していない状態です。","name":"肌の乾燥","no":14,"page":26,"ritual":"【5分間】肌の状態に合う保湿を、こすらず優しく行います。刺激を感じる場合は中止します。最後に、今日の身体に感謝できることをひとつ思い浮かべます。","signs":"つっぱる、ざらつく、皮がむける肌。とくに手、脚、顔に多く、冬に強まります。","tagline":"みんなに尽くして、自分を潤していないとき。"},{"affirmation":"過去の私も、今の私も大切にします。今日の光を自分のペースで受け取ります。","category":"肌と髪","chakra":"第３チャクラ：自分の光と自己肯定感","doctor":"シミやほくろの大きさ・色・形が変わる、輪郭がいびつ、かゆい、または出血するとき。","items":[{"name":"シトリン","text":"太陽の石。自信と、自分の光を。"},{"name":"ルイボスティー","text":"ノンカフェインでやさしい味。いつでもどうぞ。"},{"name":"つば広の帽子","text":"いちばんの原因は日差し。肌を守りましょう。"}],"meaning":"跡を残した古い心の傷と関係があるとされます。過ぎたことなのに、今も重くのしかかっている出来事です。","name":"シミ","no":15,"page":27,"ritual":"【5分間】窓辺など落ち着ける場所で、まぶしくない光を感じながら座ります。シトリンはそばに置いても構いません。過去のことを無理に手放そうとせず、今日の自分を大切にする言葉をひとつ選びます。","signs":"顔、手、デコルテに出る、周りより色の濃い部分。日差し、妊娠、ホルモンの変化でできやすくなります。","tagline":"手放せなかったものが残した跡。"},{"affirmation":"自分の時の流れを信じ、心配を手放します。","category":"肌と髪","chakra":"第７チャクラ：静けさと、時の流れへの信頼","doctor":"変化するシミ、傷つきやすいとても薄い肌、またはほかの新しい症状を伴うとき。","items":[{"name":"ローズクォーツのローラー","text":"冷やして、顔の中心から外側へ。"},{"name":"緑茶","text":"朝に1杯。夜は飲まないようにします。"},{"name":"シルクの枕カバー","text":"寝ている間の肌への摩擦を減らします。"}],"meaning":"伝統では、絶えない心配と結びつけられています。人生に対して、長いあいだ眉をひそめ続けてきたのです。","name":"早期のシワ","no":16,"page":28,"ritual":"【5分間】顔や額の力をそっと抜き、楽な姿勢で休みます。ローラーを使う場合は肌に刺激のない範囲で短時間だけ。使わなくても構いません。今の自分の表情を評価せずに眺めます。","signs":"思ったより早く現れる小じわ。とくに額、眉間、目のまわりに多く見られます。","tagline":"焦りや心配も、顔にあらわれます。"},{"affirmation":"余分なものは手放し、私を養うものを残します。","category":"肌と髪","chakra":"第３チャクラ：与えることと保つことのバランス","doctor":"急に脂っぽくなり、体毛の増加・抜け毛・生理不順を伴うとき、または深く痛む吹き出物があるとき。","items":[{"name":"フローライト","text":"秩序と明晰さを。お手入れ中は見える所に置きます。"},{"name":"冷やしたカモミール","text":"化粧水がわりに、コットンで洗顔後の肌へ。"},{"name":"綿のタオル","text":"清潔でやわらかい、顔専用のもの。軽く押さえて。"}],"meaning":"抱えすぎと関係があるとされます。荷が重すぎるのに、下ろす場所がないという感覚です。","name":"脂性肌","no":17,"page":29,"ritual":"【5分間】肌に合う方法で、こすらず優しく洗顔します。刺激を感じるものは使いません。フローライトはそばに置いても構いません。静かに呼吸し、今の自分に必要なケアをひとつ考えます。","signs":"額、鼻、あごのテカリや目立つ毛穴。吹き出物ができやすい傾向があります。","tagline":"行き場のない緊張を抱えているとき。"},{"affirmation":"不安がある日も、自分を急かさず、今の私をいたわります。","category":"肌と髪","chakra":"第７チャクラ：信頼と、大いなるものとのつながり","doctor":"束で抜ける、円形に抜ける、強い疲れや体重の変化がある、または3か月以上続くとき。","items":[{"name":"アメジスト","text":"横になり、頭のてっぺんに数分のせます。"},{"name":"ローズマリーティー","text":"朝に飲むほか、冷ましてヘアリンスにも。"},{"name":"木のくし","text":"根元から毛先へ、ゆっくりとかします。"}],"meaning":"伝統では、恐れとコントロールの表れとされています。張りつめたままの心と、人生の流れを信じきれない気持ちです。","name":"抜け毛","no":18,"page":30,"ritual":"【5分間】頭皮に負担をかけず、楽な姿勢で休みます。触れるなら指の腹でごく優しく。アメジストはそばに置いても構いません。自分を急かさず、今の気持ちを確かめます。","signs":"枕やくし、シャワーで、いつもより抜け毛が多い状態。強いストレスの数週間後に起こることもあります。","tagline":"緊張が、頭に重くのしかかるとき。"},{"affirmation":"小さなケアを重ねながら、今日の私を大切にします。","category":"肌と髪","chakra":"第１チャクラ：力、守り、支え","doctor":"色や形が変わる、はがれる、痛む、またはぶつけた覚えがないのに黒っぽい線が出たとき。","items":[{"name":"アゲート","text":"忍耐と、こつこつ続ける力の石。"},{"name":"カモミールティー","text":"穏やかに寄り添うお茶。カップ1杯に小さじ1。"},{"name":"オリーブオイル","text":"甘皮に数滴、1本ずつなじませます。"}],"meaning":"無防備な感覚と関係があるとされます。外の世界から自分を守るものが何もない、と感じている状態です。","name":"もろい爪","no":19,"page":31,"ritual":"【5分間】爪や指先を無理に押さず、心地よければ少量の保湿剤で優しくいたわります。オイルが合わない場合は使いません。今日、自分を支えてくれたものをひとつ思い出します。","signs":"割れる、層になってはがれる、伸びが遅い爪。水仕事や洗剤、栄養不足が原因のこともあります。","tagline":"今はなかなか見つけられない強さ。"},{"affirmation":"人生にも自分にも、気長に向き合います。","category":"肌と髪","chakra":"第４チャクラ：忍耐と心の平和","doctor":"全身がかゆい、2週間以上続く、眠れないほどかゆい、または肌の黄ばみや体重減少を伴うとき。","items":[{"name":"アマゾナイト","text":"落ち着きの石。呼吸しながら手に持ちます。"},{"name":"リンデンティー","text":"気持ちを鎮める助けに。カップ1杯に小さじ1。"},{"name":"冷たいタオル","text":"かく代わりに、ぬらしたタオルをひんやりとあてます。"}],"meaning":"伝統では、もどかしさと結びつけられています。かなわない願いや、正体のわからないいら立ちを抱えている状態です。","name":"原因不明のかゆみ","no":20,"page":32,"ritual":"【5分間】かゆい部分をこすらず、楽な姿勢で休みます。冷たいタオルが心地よければ短時間当てます。アマゾナイトはそばに置いても構いません。原因を無理に探さず、今の不快さをそのまま認めます。","signs":"ブツブツや目立つ斑点がないのに、肌がかゆい状態。夜や、気持ちが高ぶったときに強まりがちです。","tagline":"出口を探している、心のざわつき。"},{"affirmation":"受け入れにくいことがあってもいい。私は自分の気持ちを大切にします。","category":"消化","chakra":"第３チャクラ：食べ物と人生の消化","doctor":"痛みが強いか長引く、血を吐く、便が黒い、熱がある、お腹が硬いとき。","items":[{"name":"シトリン","text":"みぞおちの上に、数分間置きます。"},{"name":"カモミールティー","text":"定番の一杯。カップに小さじ1、5分蒸らします。"},{"name":"湯たんぽ","text":"布で包んで、お腹の上にのせます。"}],"meaning":"受け入れられずにいるものと結びつくとされます。まだのみ込めない状況や知らせ、言葉のことです。","name":"胃の痛み","no":21,"page":33,"ritual":"【5分間】お腹を圧迫しない楽な姿勢で休みます。温める場合は心地よい温度にとどめ、無理に深呼吸しません。今、抱えていることをひとつ心の中で言葉にしても構いません。","signs":"みぞおちのあたりの不快感、焼けるような感じや重さ。緊張や胃に重い食事で強まることがあります。","tagline":"まだ消化しきれていないこと。"},{"affirmation":"今、できる範囲で力を抜き、自分の身体に優しくします。","category":"消化","chakra":"第２チャクラ：お腹で感じる感情","doctor":"便に血が混じる、意図せず体重が減る、熱がある、症状で夜中に目が覚める、50歳を過ぎてから始まったとき。","items":[{"name":"オレンジカルサイト","text":"お腹にぬくもりと安らぎを。水には浸けないで。"},{"name":"ミントティー","text":"ガスをやわらげます。胸やけがあれば控えて。"},{"name":"ノート","text":"食べたものと、その日の気分を書き留めます。"}],"meaning":"伝統では、絶えず警戒している状態と捉えます。いつも「何か悪いことが起きる」と身構えている神経系です。","name":"過敏性腸症候群","no":22,"page":34,"ritual":"【5分間】お腹を圧迫しない姿勢で、両手をそっと添えるか、楽に置きます。カルサイトはそばに置いても構いません。呼吸を無理に数えず、今日の気持ちを短く書くか、静かに休みます。","signs":"お腹の痛みや張りに、便通のリズムの変化が伴います。ストレスで悪化しやすいのが特徴です。","tagline":"感じたことすべてに反応してしまう腸。"},{"affirmation":"感じていることを、穏やかにはっきり伝えます。","category":"消化","chakra":"第３チャクラと第５チャクラ：感じることと、言葉にすること","doctor":"のみ込みにくい、血を吐く、便が黒い、体重が減る、体を動かすと胸が痛むとき。","items":[{"name":"アクアマリン","text":"穏やかさの石。胸の上に置きます。"},{"name":"カモミールティー","text":"熱すぎない、ぬるめで。ここではミントはなし。"},{"name":"傾斜クッション","text":"頭側を高くして、胸やけせずに眠ります。"}],"meaning":"抑え込んだ怒りや恐れと結びつくとされます。内側で燃えているのに、口に出せずにいる状況です。","name":"胸やけ","no":23,"page":35,"ritual":"【5分間】食後は横にならず、楽に座って呼吸を整えます。アクアマリンをそばに置いても構いません。今の気持ちをひとこと心の中で確かめます。【日常の習慣】食後すぐに横になることは避けます。","signs":"胃から胸やのどへこみ上げる、焼けるような感じ。横になったときや食べすぎたあとに強まります。","tagline":"こみ上げるのに、のみ込めないもの。"},{"affirmation":"信頼して古いものを手放し、新しいものを迎えます。","category":"消化","chakra":"第１チャクラ：信頼して手放すこと","doctor":"出血、強い痛み、嘔吐、体重減少があるとき、または新しく始まった変化が3週間以上続くとき。","items":[{"name":"レッドジャスパー","text":"動きとグラウンディング。儀式中は手に持って。"},{"name":"フェンネルティー","text":"つぶした種を小さじ半分。"},{"name":"コップ1杯の白湯","text":"起きてすぐの空腹時に。動き出しを助けます。"}],"meaning":"伝統では「ため込むこと」と結びつけます。失うのが怖くて、考えや物、人にしがみつくことです。","name":"便秘","no":24,"page":36,"ritual":"【5分間】楽な姿勢で呼吸を整え、水分をとれる場合は少しずつ飲みます。お腹が痛むときはマッサージをせず、身体の感覚を確かめます。【日常の習慣】水分や食事のリズムを無理のない範囲で整えます。","signs":"排便が週3回未満で、いきむ必要があったり、出きらない感じが残ったりします。","tagline":"手放すのが難しいとき。"},{"affirmation":"私は余白をつくります。全部抱えなくていい。","category":"消化","chakra":"第３チャクラ：受け止めて、変えていく力","doctor":"張りが続いて強まるとき、または強い痛み、嘔吐、出血、発熱、意図しない体重減少を伴うとき。","items":[{"name":"タイガーアイ","text":"お腹の上に置き、整理と消化を助けます。"},{"name":"ミントとフェンネル","text":"ガスや重さに。胸やけがあればミントは抜いて。"},{"name":"スニーカー","text":"食べ終えたら、ゆっくり10分歩きます。"}],"meaning":"抱えすぎと結びつくとされます。用事や心配ごと、感情を、消化する時間もないままため込むことです。","name":"お腹の張り","no":25,"page":37,"ritual":"【5分間】楽な姿勢でゆっくり呼吸し、お腹に負担のない範囲で手を添えます。今日の予定に少し余白をつくれるか考えます。【別の時間に】食後の散歩は体調に合わせて行います。","signs":"お腹がふくらんで張り、ガスや重さを感じます。一日のうちにだんだん強まりがちです。","tagline":"消化しきれないほど、ため込んでいるとき。"},{"affirmation":"私に合うものを選び、ほかは手放します。","category":"消化","chakra":"第３チャクラ：受け入れるものと、受け入れないもの","doctor":"嘔吐が止まらない、血が混じる、強い痛みや脱水がある、または妊娠の可能性があるとき。","items":[{"name":"クリアクォーツ","text":"明晰さの石。手に持ち、深くゆっくり呼吸を。"},{"name":"ジンジャーティー","text":"薄切り2〜3枚で5分。少しずつ飲みます。"},{"name":"レモン","text":"香りがむかつきを和らげます。ゆっくり吸って。"}],"meaning":"伝統では拒絶のサインと捉えます。受け入れたくない考えや状況、人がいるということです。","name":"頻繁な吐き気","no":26,"page":38,"ritual":"【5分間】換気のよい場所で、座るなど楽な姿勢を取ります。香りがつらければ使わず、自然な呼吸で休みます。飲めそうなら水分を少しずつ。無理に食べたり飲んだりしなくて構いません。","signs":"吐き気が来たり引いたりします。めまいを伴うことも。強いにおいや乗り物、緊張で起こりがちです。","tagline":"受けつけない何かが、暮らしにある。"},{"affirmation":"本音を、やさしく伝えます。","category":"消化","chakra":"第５チャクラ：はっきりとした、やさしい言葉","doctor":"歯ぐきから血が出る、奥歯が痛む、長引く口内炎がある、胃の焼ける感じとともに口に嫌な味がするとき。","items":[{"name":"ブルーアゲート","text":"やさしい言葉の石。のどに当てます。"},{"name":"ミントティー","text":"食後に冷やして。胸やけがあればミントは控えて。"},{"name":"舌ブラシ","text":"朝、奥から手前へ、やさしく。"}],"meaning":"しまい込んだ言葉と結びつくとされます。健やかに外へ出せず、たまっていく怒りや恨みです。","name":"口臭","no":27,"page":39,"ritual":"【5分間】口の中が気になるときは、無理のない範囲で水分をとり、普段どおりの口腔ケアを行います。アゲートは手に持っても構いません。言葉にしたい気持ちがあれば、心の中でそっと確かめます。","signs":"息の不快なにおいが続きます。口の乾きや歯ぐき、消化が関係していることもあります。","tagline":"言えないまま残った言葉。"},{"affirmation":"受け取り、消化する時間を自分にあげます。","category":"消化","chakra":"第３チャクラ：エネルギーと意志の中心","doctor":"強い痛み、出血、嘔吐、体重減少、のみ込みにくさがあるとき、または新しい症状がおさまらないとき。","items":[{"name":"シトリン","text":"ソーラープレクサスの石。日中は身につけて。"},{"name":"カモミールとフェンネル","text":"ブレンドを1杯に小さじ1、ふたをして。"},{"name":"小皿","text":"画面を見ずに、よくかんでゆっくり食べます。"}],"meaning":"伝統では、コントロールと焦りに結びつけます。何もかも早く、自分の思いどおりに進めたい気持ちです。","name":"消化の不調","no":28,"page":40,"ritual":"【5分間】食事の前に楽に座り、ゆっくり3回呼吸します。食べる時間を急がず、ひと口ずつ味わいます。【日常の習慣】無理のない範囲で、食事のペースを整えます。","signs":"胃の重さ、ガス、胸やけ、消化の遅れを繰り返します。特に急ぐときやストレス、胃に重い食事のあとに。","tagline":"力の中心が、整いと静けさを求めている。"},{"affirmation":"急がなくてもいい。今できることをひとつ選びます。","category":"消化","chakra":"第３チャクラ：変化を生む火","doctor":"嘔吐、体重減少、強い痛みがある、すぐお腹がいっぱいになる、のみ込みにくいとき。","items":[{"name":"パイライト","text":"動き出すエネルギーに。濡らさないで。"},{"name":"しょうがとシナモン","text":"しょうが2切れと、シナモンスティック半分。"},{"name":"砂時計","text":"夕食から寝るまで、2時間あけます。"}],"meaning":"勢いのなさと結びつくとされます。決断を先延ばしにし、人生がスローモーションのように進む感覚です。","name":"胃もたれ","no":29,"page":41,"ritual":"【5分間】座った姿勢で呼吸を整え、パイライトをそばに置きます。今日できそうなことをひとつだけ選びます。【別の時間に】食後の散歩は体調に合わせて行います。","signs":"食べたものが何時間も胃にとどまる感じ。食後に重さと眠気が出ます。","tagline":"暮らしのすべてが、思うより重く進んでいくとき。"},{"affirmation":"緊張している私も、そのままでいい。一歩ずつ進んでいきます。","category":"消化","chakra":"第３チャクラ：自分への信頼","doctor":"食べることも眠ることもできない、ほぼ毎日起こる、パニック発作や体重減少があるとき。","items":[{"name":"レピドライト","text":"穏やかさの石。手に持ち、水には浸けずに。"},{"name":"レモンバームティー","text":"緊張した胃を落ち着かせます。小さじ1。"},{"name":"やわらかいブランケット","text":"お腹を包んで。ぬくもりが安心をくれます。"}],"meaning":"伝統では「力不足かも」という恐れと捉えます。失敗しそうなことを、すべて先回りして考えるのです。","name":"緊張による胃の不調","no":30,"page":42,"ritual":"【5分間】お腹を圧迫しない楽な姿勢で、片手をそっと添えます。レピドライトはそばに置いても構いません。呼吸は苦しくない速さで。『緊張していてもいい』と自分に語りかけます。","signs":"試験や気の重い話し合いの前、心配ごとがあるときに、胃が締めつけられたり、ざわざわ、キリキリしたりします。","tagline":"喜びからではない、お腹のそわそわ。"},{"no":31,"name":"不眠","category":"睡眠","page":43,"tagline":"頭が、その日を手放せずにいるとき。","items":[{"name":"アメジスト","text":"枕の下か、ベッドサイドに。"},{"name":"リンデンティー","text":"寝る1時間前に、1杯につき小さじ1。"},{"name":"ラベンダーのサシェ","text":"枕元に。香りが眠りへと誘います。"}],"signs":"なかなか寝つけず、夜中や早朝に目が覚め、朝起きても元気が出ません。","meaning":"信頼できないことと結びつくとされます。手綱をゆるめたら何かが崩れる、という感覚です。","chakra":"第７チャクラ：ゆだねることと信頼","ritual":"【5分間】寝床で楽な姿勢を取り、呼吸を無理なくゆっくり整えます。今日の出来事をいったん脇に置き、身体を休めます。【事前準備】就寝前は画面や照明の刺激を減らす時間をつくります。","doctor":"1か月以上続く、日中に支障が出る、呼吸が止まる大きないびきがある、深い悲しみがあるとき。","affirmation":"この一日を手放します。安心して休んでいい。"},{"no":32,"name":"繰り返す悪夢","category":"睡眠","page":44,"tagline":"昼に消化できなかったものが、夜に戻る。","items":[{"name":"ブラックトルマリン","text":"守りの石。ベッドサイドのテーブルに。"},{"name":"カモミールティー","text":"ぬるめを、寝る1時間前に。"},{"name":"ノート","text":"起きたら夢を書き、結末を書き換えます。"}],"signs":"不安な夢を繰り返し見て、胸がドキドキして目が覚めます。","meaning":"伝統では、聴いてもらえなかった感情と捉えます。昼のうちに向き合ってほしい恐れや悲しみです。","chakra":"第６チャクラ：夢と直感","ritual":"【5分間】安心できる場所で、思い出せる範囲だけ夢を書き留めます。望むなら、穏やかな結末を短く書き添えます。つらくなる場合は途中でやめて構いません。【別の時間に】寝る前に読み返すかどうかは自分で選びます。","doctor":"ほぼ毎晩見る、トラウマとなる出来事のあとから続いている、休めずに不安が残るとき。","affirmation":"つらい夢を見た日も、自分を責めずに休んでいい。"},{"no":33,"name":"夢遊病","category":"睡眠","page":45,"tagline":"心は遠くにあるまま、身体だけが動き出す。","items":[{"name":"ヘマタイト","text":"グラウンディング。足元に置き、水は避けます。"},{"name":"リンデンティー","text":"ぬるめを、寝る1時間前に。"},{"name":"時計","text":"寝る時間も起きる時間も、いつも同じに。"}],"signs":"眠ったまま起き上がる、歩く、何かをするなどして、記憶に残りません。子どもや睡眠不足のときに多く見られます。","meaning":"身体と心のずれと結びつくとされます。昼に見つからない何かを、自分の一部が探しているのです。","chakra":"第１チャクラ：グラウンディングと、身体にいる感覚","ritual":"【5分間】寝る前に部屋の足元を確認し、つまずきやすいものを片づけます。ヘマタイトを手に持つ場合は、寝床に持ち込まず片づけます。最後は楽な姿勢で静かに休みます。","doctor":"けがや外に出てしまう危険がある、大人になってから始まった、頻度がとても高い、ほかの症状を伴うとき。","affirmation":"私の身体と心は、ともに休みます。"},{"no":34,"name":"夜中に目が覚める","category":"睡眠","page":46,"tagline":"午前3時にスイッチが入ってしまう頭。","items":[{"name":"セレスタイト","text":"休息の石。ベッドサイドに置きます。"},{"name":"レモンバームティー","text":"ぬるめを、寝る1時間前に。"},{"name":"ソルトランプ","text":"起きたときは、暖色の小さな明かりだけに。"}],"signs":"夜中に一度または何度も目が覚め、考えがぐるぐるして、なかなか寝直せません。","meaning":"伝統では、片づいていない用事と結びつけます。身体が休みを求めていても、頭が働き続けているのです。","chakra":"第６チャクラ：休息を必要としている思考","ritual":"【5分間】夜中に目が覚めたら、時計を何度も確認せず、楽な姿勢で休みます。気になることがあれば短くメモしても構いません。眠ろうと無理をせず、今は休息の時間だと確かめます。","doctor":"息苦しさ、大きないびき、強いのどの渇き、寝汗、動悸で目が覚めるとき、または深い悲しみがあるとき。","affirmation":"やり残したことは、明日まで待ってくれます。"},{"no":35,"name":"寝床で考えが止まらない","category":"睡眠","page":47,"tagline":"明かりを消すと、頭の中に明かりがつくとき。","items":[{"name":"ソーダライト","text":"頭を静めます。両手で包むように持って。"},{"name":"ラベンダーティー","text":"1杯に花をひとつまみ、ふたをして5分。"},{"name":"白い紙","text":"頭を空っぽに。浮かぶことを全部書き出します。"}],"signs":"横になったとたん、考えが止まらなくなります。やることリスト、会話、心配ごと。","meaning":"感じる余白もなく一日中動くことと結びつくとされます。消化しきれなかったものが、立ち止まると現れます。","chakra":"第６チャクラ：思考とその休息","ritual":"【5分間】気になることを紙に短く書き出します。全部書き切る必要はありません。ソーダライトはそばに置いても構いません。最後は紙を伏せ、呼吸を整えて『続きは明日でいい』と自分に伝えます。","doctor":"ほぼ毎晩起こる、強い不安や動悸、パニックを伴う、日中にも影響が出るとき。","affirmation":"私は頭を休めます。続きはまた明日。"},{"no":36,"name":"眠りが浅い","category":"睡眠","page":48,"tagline":"警戒を解くことを、自分に許せずにいる部分。","items":[{"name":"セレナイト","text":"場を清めます。ベッドサイドに。水は使いません。"},{"name":"リンデンとラベンダー","text":"ブレンドを1杯に小さじ1、ふたをして。"},{"name":"枕","text":"心地よく、首にちょうどいい高さのものを。"}],"signs":"眠ってはいても、少しの物音や動きで目が覚め、深く休めた感じがしません。","meaning":"伝統では過剰な警戒と捉えます。誰かに必要とされたときに備え、いつも気を張っている状態です。","chakra":"第７チャクラ：ゆだねることと深い休息","ritual":"【5分間】照明や室温を心地よく整え、楽な姿勢で休みます。セレナイトはそばに置いても構いません。足先から順に身体の感覚を確かめ、力を抜けるところだけそっと緩めます。","doctor":"呼吸が止まるいびきがある、日中に寝てしまう、脚のむずむずがある、1か月以上続くとき。","affirmation":"眠れない夜も、自分を責めなくていい。"},{"no":37,"name":"寝起きのだるさ","category":"睡眠","page":49,"tagline":"睡眠時間は足りているのに、身体が充電されていない。","items":[{"name":"カーネリアン","text":"活力の石。起きたら手に持ちます。"},{"name":"ローズマリーティー","text":"朝に飲み、夜は避けます。1杯に小さじ1。"},{"name":"ヨガマット","text":"起きたら3分間のストレッチを。"}],"signs":"十分に眠ったはずなのに、起きても元気が出ず、休めた気がしません。","meaning":"たまった疲れと結びつくとされます。補える以上のものを求められる暮らしです。","chakra":"第１チャクラ：身体のエネルギーと活力","ritual":"【5分間】起き上がれる状態ならカーテンを開け、自然の光を感じます。カーネリアンはそばに置いても構いません。軽く身体を伸ばすか、つらい日は座って休み、今日のペースを決めます。","doctor":"何週間も続く、日中に寝てしまう、呼吸が止まるいびき、深い悲しみ、顔色の悪さ、体重減少があるとき。","affirmation":"目覚めが重い日もある。今日の私に合うペースで始めます。"},{"no":38,"name":"日中の眠気","category":"睡眠","page":50,"tagline":"予定が許さない休みを、身体が求めているとき。","items":[{"name":"シトリン","text":"太陽のエネルギー。机の上の見える場所に。"},{"name":"ミントティー","text":"すっきり頭をクリアに。胸やけがあれば控えて。"},{"name":"砂時計","text":"1時間ごとに5分、身体を動かす休憩を。"}],"signs":"活動する時間帯にあくびが出て、まぶたが重く、眠くなります。特に食後に起こりがちです。","meaning":"伝統では意欲の低下と結びつけます。わくわくしないことばかりしていると、エネルギーが消えていくのです。","chakra":"第３チャクラ：意欲と行動力","ritual":"【5分間】無理のない範囲で姿勢を変え、軽く伸びをします。歩ける状態なら少し歩き、今日楽しみにできることをひとつ考えます。強い眠気があるときは無理に活動せず休みます。","doctor":"運転中など危険な場面で眠ってしまう、呼吸が止まるいびきがある、強い疲れや悲しみがあるとき。","affirmation":"疲れを感じたら、立ち止まっていい。私のペースを大切にします。"},{"no":39,"name":"睡眠リズムの乱れ","category":"睡眠","page":51,"tagline":"身体が安心するには、リズムが必要です。","items":[{"name":"ムーンストーン","text":"リズムと周期の石。ベッドサイドに。"},{"name":"カモミールティー","text":"ぬるめを、毎晩同じ時間に。"},{"name":"目覚まし時計","text":"起きる時間は、日曜日も同じに。"}],"signs":"寝る時間も起きる時間も日によってばらばら。平日は睡眠不足で、週末に寝だめをします。","meaning":"根を張れていないことと結びつくとされます。決まった休みがなく、自分の休息以外はすべて急ぎの暮らしです。","chakra":"第１チャクラ：安心をくれる生活のリズム","ritual":"【5分間】ムーンストーンをそばに置き、ゆっくり呼吸しながら、明日の起床時刻を確認します。【日常の習慣】起床時刻をできるだけ一定にし、就寝前は照明を落として過ごします。","doctor":"夜勤で休めない、または不眠、危険なほどの眠気、消えない悲しみがあるとき。","affirmation":"リズムが乱れる日もある。少しずつ整えていけばいい。"},{"no":40,"name":"夜のむずむず脚","category":"睡眠","page":52,"tagline":"行き場を見つけられずにいるエネルギー。","items":[{"name":"オニキス","text":"グラウンディング。足元に置いて。"},{"name":"リンデンティー","text":"ぬるめを、寝る1時間前に。"},{"name":"アーモンドオイル","text":"足先からひざへ、下から上にマッサージ。"}],"signs":"じっとしていると脚を動かしたくなり、むずむずや不快感が出ます。動かすと楽になります。","meaning":"伝統では、何かを変えたい気持ちの表れと捉えます。前に進みたい自分に、許可を出せずにいるのです。","chakra":"第１チャクラ：意味のある動き","ritual":"【5分間】楽な姿勢で足を休ませ、オニキスをそばに置いて呼吸します。脚に触れる場合は、心地よい範囲で軽くさすります。【別の時間に】歩く場合は無理のない範囲で。","doctor":"ほぼ毎晩起こる、眠れなくなる、妊娠中である、疲れや顔色の悪さ、鉄分不足があるとき。","affirmation":"落ち着かない夜も、自分に優しく休む時間をつくります。"},{"no":41,"name":"副鼻腔炎","category":"呼吸とのど","page":53,"tagline":"誰かにのしかかられているような、顔の圧迫感。","items":[{"name":"アクアマリン","text":"額にのせて、ゆったりとした呼吸を。"},{"name":"ユーカリの葉","text":"蒸気用のみで、飲用不可。子どもには使いません。"},{"name":"お湯を張ったボウル","text":"手のひら1つ分あけ、タオルをかぶって5分。"}],"signs":"額や頬、目のまわりの圧迫感や痛み。鼻づまりや、粘り気のある鼻水を伴います。","meaning":"身近な人に踏み込まれ、いら立たされ、自分の空間がないと感じることと関係があるとされます。","chakra":"第６チャクラ：明晰さと自分の空間","ritual":"【5分間】座って楽な姿勢を取り、アクアマリンをそばに置きます。無理に鼻から吸おうとせず、呼吸しやすい方法で静かに休みます。熱い蒸気を顔に近づける方法は避けます。","doctor":"高熱がある、目のまわりが腫れる、痛みがとても強い、10日以上続く、または一度よくなってから悪化したとき。","affirmation":"自分の空間をもっていい。私は自由に呼吸します。"},{"no":42,"name":"鼻づまり","category":"呼吸とのど","page":54,"tagline":"ひと息つきたいのに、自分に許していないとき。","items":[{"name":"クリアクォーツ","text":"明晰さの石。呼吸しながら手に。"},{"name":"ミントティー","text":"すっきり爽やかに。胸やけがあれば控えて。"},{"name":"加湿器","text":"潤った空気が、夜の呼吸を助けます。"}],"signs":"鼻が詰まり、息がしにくく眠りにくい状態。鼻水の有無を問わず、かぜ、アレルギー、空気の乾燥で起こります。","meaning":"伝統では、余裕のなさと結びつけられています。休みが必要なのに、認めも求めもしない状態です。","chakra":"第６チャクラ：空気、空間、明晰さ","ritual":"【5分間】楽な姿勢で休み、呼吸しやすい方法でゆっくり息をします。クォーツはそばに置いても構いません。熱い湯気を無理に吸い込む必要はありません。","doctor":"10日以上続く、高熱がある、鼻血をくり返す、顔が痛む、またはいつも片側だけが詰まるとき。","affirmation":"必要なひと息を、自分にあげます。"},{"no":43,"name":"しつこい咳","category":"呼吸とのど","page":55,"tagline":"何かにいら立っていて、それを周りに気づいてほしいとき。","items":[{"name":"ラピスラズリ","text":"のどにのせて表現の助けに。水にはつけません。"},{"name":"タイムとはちみつ","text":"はちみつは1歳未満には絶対に与えません。"},{"name":"マフラー","text":"気温の変わり目には、首を温かく包みます。"}],"signs":"何週間も続く、乾いた咳や痰のからむ咳。夜や長く話したときに強まることもあります。","meaning":"周りへのいら立ちや、外に出たがっている言葉と関係があるとされます。","chakra":"第５チャクラ：ため込まずに表現すること","ritual":"【5分間】のどを刺激しないよう、楽な姿勢で休みます。飲める場合は飲み物を少しずつ。咳が出るときは無理に声を出さず、今の気持ちを心の中で確かめます。","doctor":"3週間以上続く、または血が混じる、熱がある、息苦しい、胸が痛む、体重が減るとき。","affirmation":"声にできない気持ちも、大切にしていい。"},{"no":44,"name":"声のかすれ","category":"呼吸とのど","page":56,"tagline":"聞いてもらえないことに疲れた声。","items":[{"name":"ブルーアゲート","text":"声の石。のどの上に置きます。"},{"name":"セージティーのうがい","text":"ぬるめをうがい専用に。飲み込みません。"},{"name":"はちみつレモン","text":"ぬるま湯に溶かし、少しずつ。はちみつは1歳から。"}],"signs":"声がかすれる、弱くなる、途切れる状態。話しすぎや大声、かぜ、空気の乾燥で起こります。","meaning":"伝統では、聞いてもらえないまま話すことや、大切なことを黙っていることと結びつけられています。","chakra":"第５チャクラ：自分の声","ritual":"【5分間】声を出さずに楽な姿勢で休み、アゲートをそばに置きます。のどの緊張を意識しながら、静かに呼吸します。【別の時間に】声を休める時間を十分に確保します。","doctor":"2〜3週間以上続く、たばこを吸う、飲み込みにくい・息がしにくい、または首にしこりがあるとき。","affirmation":"私は自分の声を大切にします。"},{"no":45,"name":"耳鳴り","category":"呼吸とのど","page":57,"tagline":"自分の内側で起きていることを、聞きたくないとき。","items":[{"name":"ラブラドライト","text":"エネルギーを守る石。静かに手に持ちます。"},{"name":"レモンバームティー","text":"神経を落ち着かせる助けに。カップに小さじ1。"},{"name":"シンギングボウル","text":"耳鳴りを打ち消さず、やさしく寄り添う音。"}],"signs":"外の音がないのに、片耳や両耳でキーン、ジー、ピーと鳴る状態。静かなときほど気になります。","meaning":"聞こうとしないことと関係があるとされます。内なる声にも、人が伝えようとしていることにも。","chakra":"第５チャクラ：人の話と自分の声を聴くこと","ritual":"【5分間】心地よい音量の環境音があれば静かに聴きます。音がつらいときは使わず、楽な姿勢で休みます。ラブラドライトを手に持っても構いません。","doctor":"片耳だけで鳴る、脈打つように鳴る、急に始まった、または聞こえにくさやめまいを伴うとき。","affirmation":"心静かに、内なる声を聴きます。"},{"no":46,"name":"季節性アレルギー","category":"呼吸とのど","page":58,"tagline":"周りのものに反応してしまうとき。","items":[{"name":"グリーンアベンチュリン","text":"周りとのバランスに。ポケットに入れて。"},{"name":"ルイボスティー","text":"やさしい味でノンカフェイン。1日1〜2杯。"},{"name":"サングラス","text":"外出時に、花粉から目を守ります。"}],"signs":"くしゃみ、鼻や目のかゆみ、透明な鼻水。毎年決まった時期に、花粉とともに起こります。","meaning":"伝統では、過敏さの表れとされています。外の世界を脅威のように感じ、いつも身構えて生きている状態です。","chakra":"第４チャクラ：心を開き、周りを信頼すること","ritual":"【5分間】外から帰った後などに、負担のない範囲で顔を洗い、必要なら着替えます。アベンチュリンはそばに置いても構いません。飲み物を楽しみながら、呼吸を整えて休みます。","doctor":"息苦しい、呼吸のときにゼーゼーと音がする、唇や顔が腫れる、またはいつもの対処でよくならないとき。","affirmation":"私は周りと調和し、穏やかです。"},{"no":47,"name":"胸の締めつけ","category":"呼吸とのど","page":59,"tagline":"つらい思いが、胸の上に居座るとき。","items":[{"name":"ローズクォーツ","text":"胸の上に置き、両手をそっと重ねます。"},{"name":"リンデンとレモンバーム","text":"神経を落ち着かせる助けに。カップに小さじ1。"},{"name":"キャンドル","text":"ゆっくり呼吸しながら、炎を見つめます。"}],"signs":"胸の重さやつかえ、圧迫感。不安や緊張、悲しみとともに現れることが多いものです。","meaning":"しまい込んだ感情と関係があるとされます。悲しみや恐れ、十分に感じることを自分に許していない思いです。","chakra":"第４チャクラ：感じて、流れにまかせること","ritual":"【5分間】医師から緊急の対応が不要と説明されている場合に限り、楽な姿勢で静かに休みます。呼吸を無理に長くせず、落ち着ける環境を選びます。新しい胸の締めつけや強い症状がある場合は儀式より医療的な対応を優先します。","doctor":"痛みが腕・首・あごに広がる、息苦しい、または冷や汗が出るときは、今すぐ救急車（119番）を呼んでください。","affirmation":"今の身体のサインを大切にし、必要な助けを求めていい。"},{"no":48,"name":"歯ぎしり","category":"呼吸とのど","page":60,"tagline":"歯を食いしばってこらえている怒り。","items":[{"name":"アマゾナイト","text":"緊張をやわらげる石。ベッドサイドに。"},{"name":"カモミールティー","text":"ぬるめを、寝る1時間前に。"},{"name":"温かい湿布","text":"寝る前に5分、あごにあてます。"}],"signs":"特に夜、歯を食いしばったり、ギリギリとこすり合わせたりします。あごの疲れや頭痛、歯のすり減りを伴います。","meaning":"伝統では、抑えた怒りと結びつけられています。昼間に表せなかった緊張を、夜にかみしめているのです。","chakra":"第５チャクラ：かみしめるより、言葉にすること","ritual":"【5分間】あごを無理に動かさず、楽な姿勢で力を抜きます。心地よければ、あごの周りをほんのり温めながら静かに呼吸します。","doctor":"痛みが強い、あごが引っかかる・カクカク鳴る、または歯がすり減ったり欠けたりしているときは、歯科へ。","affirmation":"緊張をゆるめ、必要なことを言葉にします。"},{"no":49,"name":"のどのイガイガ","category":"呼吸とのど","page":61,"tagline":"イガイガする言葉を、のみ込むとき。","items":[{"name":"アクアマリン","text":"のどの石。話すときに手に持ちます。"},{"name":"しょうがとはちみつ","text":"ぬるめを少しずつ。はちみつは1歳を過ぎてから。"},{"name":"保温ボトル","text":"一日を通して、温かい飲み物をとります。"}],"signs":"のどのかゆみ、ヒリヒリ、イガイガで、飲み込むとつらくなります。かぜ、空気の乾燥、話しすぎで起こります。","meaning":"思いをのみ込むことと関係があるとされます。争いを避けるために、胸にしまっておく言葉です。","chakra":"第５チャクラ：心を解き放つ表現","ritual":"【5分間】のどを刺激しないよう、楽な姿勢で休みます。飲める場合はぬるめの飲み物を少しずつ。アクアマリンはそばに置いても構いません。声を出さず、伝えたい気持ちを心の中で確かめます。","doctor":"高熱がある、のどに白い斑点がある、飲み込みにくい・口を開けにくい、または1週間以上続くとき。","affirmation":"私の気持ちは、私の言葉で、少しずつ伝えていい。"},{"no":50,"name":"かぜをひきやすい","category":"呼吸とのど","page":62,"tagline":"自分に与えていない休みを、体が求めているとき。","items":[{"name":"ガーネット","text":"活力の石。休んでいるあいだ手に持ちます。"},{"name":"しょうがとレモン","text":"しょうがの薄切りとレモンの輪切り1枚を、お湯で5分。"},{"name":"ウールの靴下","text":"足を温かくして、しっかり休みます。"}],"signs":"1年に何度もかぜをひき、鼻水やのどの痛み、だるさがなかなか抜けません。","meaning":"伝統では、強制的な休止と捉えられています。頭が止まれないとき、体がブレーキをかけるのです。","chakra":"第４チャクラ：人を思うように自分を大切にすること","ritual":"【5分間】温かくして座るか横になり、ガーネットをそばに置きます。無理なく呼吸し、今日は休むことを自分に許します。【日常の調整】予定を減らし、十分な休息をとります。","doctor":"高熱や3日以上続く熱がある、息苦しい、耳や胸が痛む、またはとても頻繁に体調をくずすとき。","affirmation":"体に求められる前に、自分から休みます。"},{"affirmation":"周期を大切にし、自分にやさしくします。","category":"月経周期とホルモン","chakra":"第２チャクラ：周期、お腹、創造性","doctor":"痛みで日常生活が送れない、出血がとても多い、性交時に痛む、または年々悪化しているとき。","items":[{"name":"ムーンストーン","text":"周期の石。お腹の上にのせます。"},{"name":"ジンジャーティー","text":"薄切り2〜3枚で5分。ぬるめを少しずつ。"},{"name":"湯たんぽ","text":"布で包んで、下腹部にのせます。"}],"meaning":"自分の周期を尊重しないことと関係があるとされます。月のどの日も、同じ成果を自分に求めるのです。","name":"生理痛","no":51,"page":63,"ritual":"【5分間】お腹が楽になる姿勢で休み、心地よければ下腹部をほんのり温めます。ムーンストーンはそばに置いても構いません。無理に深呼吸せず、今日はペースを落としてよいと自分に伝えます。","signs":"生理の前や生理中に起こる、下腹部のさしこむような痛み。腰や脚の痛みを伴うこともあります。","tagline":"がまんではなく、耳を傾けてほしいと訴える周期。"},{"affirmation":"私のリズムを聴き、大切にします。","category":"月経周期とホルモン","chakra":"第２チャクラ：リズムと周期","doctor":"3か月以上来ない、生理以外のときや性交後に出血する、または妊娠の可能性があるとき。","items":[{"name":"ロードクロサイト","text":"体へのいたわりを。お腹の上にのせます。"},{"name":"ローズティー","text":"乾燥した花びらをカップに小さじ1、5分蒸らします。"},{"name":"ノート","text":"周期ごとに、日付・気分・エネルギーを記録。"}],"meaning":"伝統では、リズムの乱れと結びつけられています。自分のではなく、人のリズムに合わせて生きている状態です。","name":"月経不順","no":52,"page":64,"ritual":"【5分間】周期や体調について、書ける範囲で短く記録します。ムーンストーンなど好きな石をそばに置いても構いません。月の満ち欠けに合わせる必要はなく、今の身体のリズムをそのまま受け止めます。","signs":"生理が早まる、遅れる、または来ない状態。ストレスや体重の変化、人生の節目によることもあります。","tagline":"内なるリズムが乱れたとき。"},{"affirmation":"知恵と自由とともに、この時期を抱きしめます。","category":"月経周期とホルモン","chakra":"第７チャクラ：知恵と新しいステージ","doctor":"生理が止まって1年たってから出血した、ほてりで日常生活が送れない、または深い悲しみや骨の痛みがあるとき。","items":[{"name":"アメジスト","text":"静けさと知恵の石。ベッドサイドに。"},{"name":"レモンバームティー","text":"夜にぬるめを。休息に寄り添います。"},{"name":"扇子","text":"ほてったときに、落ち着いたまま涼しい風を。"}],"meaning":"老いや、役に立たなくなることへの恐れと関係があるとされます。同時に、賢者の席につくようにという招きでもあります。","name":"更年期","no":53,"page":65,"ritual":"【5分間】楽な姿勢で休み、今までの経験から得たことをひとつ思い出します。アメジストは手に持っても構いません。飲み物は好みと体調に合わせて選び、無理に準備しなくても大丈夫です。","signs":"生理が終わりを迎える時期。45〜55歳ごろで、ほてりや睡眠・気分・肌の変化を伴います。","tagline":"終わりではなく、知恵のステージへの入り口。"},{"affirmation":"私の声にも、私の思いにも、大切な居場所があります。","category":"月経周期とホルモン","chakra":"第５チャクラ：あなたの声と、あなたの番","doctor":"体調に変化があるとき。薬を自己判断でやめたり量を変えたりは、決してしないでください。動悸や極度の疲れがあるときも。","items":[{"name":"ソーダライト","text":"のどの上に置き、自分らしい表現の助けに。"},{"name":"ルイボスティー","text":"朝の薬とは時間をあけて飲みます。"},{"name":"キャンドル","text":"毎日の静かなひとときを照らす灯り。"}],"meaning":"伝統では、自分を後回しにすることと結びつけられています。話すのも選ぶのも輝くのも、自分の番は来ないと感じるのです。","name":"甲状腺機能低下症","no":54,"page":66,"ritual":"【5分間】楽な姿勢で、のどの力を抜いて休みます。ソーダライトをそばに置き、今の自分が伝えたい言葉をひとつ心の中で選びます。声を出す必要はありません。","signs":"甲状腺の働きがゆっくりになり、疲れやすさ、寒がり、肌の乾燥、体重の増加、気分の落ち込みがみられます。診断は医師が行います。","tagline":"自分の声とリズムが、居場所を求めているとき。"},{"affirmation":"自分に耳を傾け、必要なものを与えます。","category":"月経周期とホルモン","chakra":"第２チャクラ：感情と周期","doctor":"症状のせいで仕事や人づきあいができない、または深い悲しみや、自分を傷つけたい気持ちがあるとき。","items":[{"name":"ムーンストーン","text":"心の落ち着きに。その時期は持ち歩きます。"},{"name":"カモミールティー","text":"その時期に、ぬるめを1〜2杯。"},{"name":"手帳","text":"その日に印をつけ、予定を減らします。"}],"meaning":"ひと月分たまった感情と関係があるとされます。黙っていたことが、その時期に出口を見つけるのです。","name":"PMS（月経前症候群）","no":55,"page":67,"ritual":"【5分間】ムーンストーンを手に、今の気分や身体の状態を短く書き留めます。今月、自分に必要な休息をひとつ考えます。【日常の調整】可能なら予定を減らして休息を増やします。","signs":"生理前の数日に起こる、イライラ、落ち込み、むくみ、食欲の高まり、胸の痛み。","tagline":"すべてがいつもより重く感じる日々。"},{"affirmation":"感じたことを外に出し、落ち着きを取り戻します。","category":"月経周期とホルモン","chakra":"第３チャクラ：火とそのバランス","doctor":"動悸、体重減少、発熱を伴うとき、または更年期以外で寝汗が出るとき。","items":[{"name":"アクアマリン","text":"水と涼しさの石。ほてりのあいだ、手に持ちます。"},{"name":"冷たいミントティー","text":"冷やして少しずつ。胸やけがあれば控えて。"},{"name":"冷たいタオル","text":"ほてりが始まったら、すぐ首の後ろに。"}],"meaning":"伝統では、抑えた怒りや欲求の表れとされています。表現を求めて、こみ上げてくる感情です。","name":"ホットフラッシュ","no":56,"page":68,"ritual":"【5分間】ほてりを感じたら、涼しい場所で楽な姿勢を取ります。心地よければ首元を冷たいタオルで冷やします。アクアマリンはそばに置いても構いません。呼吸を無理に長くせず、落ち着くまで休みます。","signs":"顔や胸が急にカッと熱くなり、汗や赤みを伴います。更年期によくみられます。","tagline":"こみ上げて、外へ出たがる火。"},{"affirmation":"私も、自分をいたわっていい。","category":"月経周期とホルモン","chakra":"第４チャクラ：人に注ぐ愛を、自分にも","doctor":"しこりがある、皮膚や乳頭に変化がある、分泌物が出る、または痛みが周期と関係なく起こるとき。","items":[{"name":"ローズクォーツ","text":"いたわるように胸の上に。"},{"name":"レモンバームティー","text":"心を静め、寄り添うお茶。カップに小さじ1。"},{"name":"温かい湿布","text":"胸の上に数分間、やさしくあてます。"}],"meaning":"人に尽くしすぎることと関係があるとされます。際限なく与え、自分のケアを後回しにすることです。","name":"胸の張り","no":57,"notes":"ritual内の「今日自分のためだけににすることを」は原文の表記のまま転記した（「だけににする」は原文の癖・誤植の可能性あり）。","page":69,"ritual":"【5分間】胸を圧迫しない楽な姿勢で休みます。温める場合は心地よい範囲で。ローズクォーツはそばに置いても構いません。今日、自分のためにできることをひとつ考えます。","signs":"胸が敏感になる、張る、痛む状態。特に生理前に起こります。","tagline":"みんなの世話をして、自分を忘れているとき。"},{"affirmation":"楽しむこと、体を感じることを自分に許します。","category":"月経周期とホルモン","chakra":"第２チャクラ：心地よさ、欲求、創造性","doctor":"性交時に痛む、深い悲しみやホルモンの変化がある、または新しい薬を飲み始めてから起きたとき。","items":[{"name":"カーネリアン","text":"セイクラルの石。活力と楽しむ心を。"},{"name":"シナモンティー","text":"スティック半分をお湯に。ぬくもりと香りを。"},{"name":"キャンドル","text":"自分だけのひとときに、温かな灯りを。"}],"meaning":"伝統では、喜びから切り離されることと結びつけられています。義務のために生き、楽しむことも自分のものだと忘れている状態です。","name":"性欲の低下","no":58,"page":70,"ritual":"【5分間】自分だけの落ち着ける時間をつくり、心地よい音や香りなどをひとつ選びます。刺激が苦手なら何も使わなくて構いません。カーネリアンはそばに置き、今の自分が心地よいと感じることを探します。","signs":"以前より親密なふれあいを求めなくなる状態。疲れやストレス、ホルモンの変化、薬が関係していることもあります。","tagline":"喜びが、やることリストの最後に回ったとき。"},{"affirmation":"感情は移り変わり、私はそれに寄り添います。","category":"月経周期とホルモン","chakra":"第２チャクラ：感情の流れ","doctor":"仕事や人間関係に影響が出ている、または深い悲しみ、激しい怒りの爆発、自分を傷つけたい気持ちがあるとき。","items":[{"name":"レピドライト","text":"心のバランスに。持ち歩きます。水にはつけません。"},{"name":"リンデンティー","text":"神経を落ち着かせる助けに。カップに小さじ1。"},{"name":"ノート","text":"毎日の気分を記録。パターンが見えてきます。"}],"meaning":"周期にあらがうことと関係があるとされます。変わるのが本来の姿なのに、いつも同じでいようとするのです。","name":"周期による気分の波","no":59,"page":71,"ritual":"【5分間】レピドライトを手に、今日の気分をひとことで書き留めます。今の自分に求めることをひとつ減らしてみます。【日常の記録】気分の変化を継続して記録します。","signs":"周期の特定の日に、喜びから怒りや悲しみへと気分が移りやすくなります。","tagline":"満ち引きする感情にも、知恵が宿っています。"},{"affirmation":"休むことも、私の周期の一部です。","category":"月経周期とホルモン","chakra":"第１チャクラ：身体のエネルギーと血","doctor":"出血が多いか血のかたまりが出る、または顔色が悪い、めまい、息切れがあるとき。鉄分不足かもしれません。","items":[{"name":"ガーネット","text":"血と活力の石。"},{"name":"しょうがとシナモン","text":"しょうがの薄切り2枚と、シナモンスティック半分。"},{"name":"ブランケット","text":"その時期は、いつもより休んでいい。"}],"meaning":"伝統では、静かにこもる時期への呼びかけと捉えます。することを減らし、ただ在ることを求める日々です。","name":"生理中のだるさ","no":60,"page":72,"ritual":"【5分間】ブランケットなどで心地よく整え、楽な姿勢で休みます。ガーネットはそばに置いても構いません。眠れなくても構いません。今日は休むことを自分に許す時間にします。","signs":"生理中の気力不足、眠気、脱力感。出血が多いことが原因の場合もあります。","tagline":"その時期、体はいつもより働きます。休ませてあげて。"},{"affirmation":"今の身体を責めずに、私に合う選択を少しずつ重ねます。","category":"エネルギーと活力","chakra":"第３チャクラ：自己肯定感と自分の力","doctor":"体重の計画は、必ず専門家と立てます。この実践は寄り添うもので、体重を減らすものではありません。","items":[{"name":"シトリン","text":"自信と意志の石。キッチンの見える場所に。"},{"name":"緑茶","text":"朝に1〜2杯、砂糖なしで。"},{"name":"水のボトル","text":"いつも持ち歩きます。渇きを空腹と感じることも。"}],"meaning":"伝統では、守られたいという思いと結びつけます。痛みや怖さを遠ざける盾としての体です。","name":"肥満","no":61,"page":73,"ritual":"【5分間】食事や身体への評価をいったん脇に置き、呼吸を整えます。今の自分にとって心地よいケアをひとつ考えます。シトリンをそばに置いても構いません。","signs":"健康や心身の調子に影響するほどの体重過多。原因はさまざまで、専門家とともに向き合うものです。","tagline":"責めるのではなく、いたわりながら体を大切に。"},{"affirmation":"充電する時間を、自分に許します。","category":"エネルギーと活力","chakra":"第１チャクラ：生命エネルギーと支え","doctor":"2週間以上続く、または発熱、体重減少、顔色の悪さ、息切れ、出血、深い悲しみがあるとき。","items":[{"name":"レッドジャスパー","text":"体のエネルギーの石。手に握ります。"},{"name":"ローズマリーティー","text":"朝に。カップに小さじ1、5分蒸らします。"},{"name":"手帳","text":"今週、急ぎでないことに線を引きます。"}],"meaning":"受け取る以上に与えていることと結びつくとされます。みんなを支え、自分を満たす場所がない状態です。","name":"極度の疲労","no":62,"page":74,"ritual":"【5分間】安全で楽な姿勢で休み、今日の予定から急がなくてよいことをひとつ選びます。レッドジャスパーはそばに置いても構いません。立つことや深呼吸を無理にせず、今は身体を休めます。","signs":"眠っても抜けない深い疲れ。毎日のことをこなすのが難しくなります。","tagline":"休んでも、元気が戻らないとき。"},{"affirmation":"無理なことには、無理と言っていい。私の境界線を大切にします。","category":"エネルギーと活力","chakra":"第４チャクラ：大切なものを守ること、まずは自分から","doctor":"とても頻繁に体調を崩す、感染症が重いか長引く、または発熱、発汗、体重減少があるとき。","items":[{"name":"ブラックトルマリン","text":"守りと境界線の石。持ち歩きます。"},{"name":"しょうが・レモン・はちみつ","text":"ぬるめで。はちみつは1歳未満には与えません。"},{"name":"色とりどりの果物","text":"いろいろな果物と野菜を毎日。"}],"meaning":"伝統では、境界線のなさと捉えます。自分のエネルギーを守らず、何でも誰でも受け入れてしまうのです。","name":"免疫力の低下","no":63,"page":75,"ritual":"【5分間】温かい飲み物など、負担のない方法でひと息つきます。ブラックトルマリンはそばに置いても構いません。今週、断ってもよいことをひとつ思い浮かべ、無理をしない選択を自分に許します。","signs":"よく体調を崩す、なかなか回復しない、何でもうつってしまう気がする。","tagline":"自分で境界線を引かないと、体が引こうとします。"},{"affirmation":"今は立ち止まってもいい。自分のペースを大切にします。","category":"エネルギーと活力","chakra":"第１チャクラ：足元、安定、方向","doctor":"激しい頭痛、物が二重に見える、話しにくさ、脱力感、失神を伴うとき。すぐ救急（119）に連絡してください。","items":[{"name":"ヘマタイト","text":"グラウンディングの石。床に足をつけて手に。"},{"name":"ジンジャーティー","text":"吐き気に寄り添う一杯。少しずつ飲みます。"},{"name":"椅子","text":"転ばないよう、始まったらすぐ座ります。"}],"meaning":"方向を見失うことと結びつくとされます。多くの変化が一度に訪れ、頼れる場所がないと感じる状態です。","name":"めまい","no":64,"page":76,"ritual":"【5分間】安全な場所で座るか横になり、無理に動かず休みます。呼吸は自然なままで構いません。立ち上がることを儀式の目標にしません。","signs":"周りが回る感覚やふらつき。姿勢を変えたときや緊張したときに起こり、吐き気を伴うこともあります。","tagline":"足元がぐらつくように感じるとき。"},{"affirmation":"感じることを流れにまかせ、何もため込みません。","category":"エネルギーと活力","chakra":"第２チャクラ：水、流れ、感情","doctor":"片脚だけがむくむ、痛みや皮膚の赤み・熱感、息切れがある、またはむくみが急に増すとき。","items":[{"name":"アクアマリン","text":"水の石。ポケットに入れて持ち歩きます。"},{"name":"フェンネルティー","text":"つぶした種を小さじ半分。"},{"name":"クッション","text":"一日の終わりに、脚を10分高く上げます。"}],"meaning":"伝統では、感情をため込むことと結びつけます。流すのを自分に許さない涙や怒りです。","name":"むくみ","no":65,"page":77,"ritual":"【5分間】楽な姿勢で脚を休ませ、アクアマリンをそばに置きます。呼吸を整えながら、今日という日をそっと送り出します。【別の時間に】脚を高くして休む場合は、無理のない姿勢で行います。","signs":"足首、脚、手、まぶたのむくみと重だるさ。特に一日の終わりに目立ちます。","tagline":"内側でとどこおるものも、重さになります。"},{"affirmation":"疲れを感じる私にも、休む時間が必要です。","category":"エネルギーと活力","chakra":"第３チャクラ：エネルギーとその休息","doctor":"消耗が何週間も続く、悲しみ、不眠、動悸、体重減少がある、または働けなくなったとき。","items":[{"name":"スモーキークォーツ","text":"たまった緊張を手放すために。"},{"name":"ルイボスティー","text":"ノンカフェイン。午後のひと息に。"},{"name":"シンギングボウル","text":"1分間の音で、警戒モードを断ち切ります。"}],"meaning":"非常事態の中で暮らすことと結びつくとされます。回復する間もなく、たえず高い要求に応え続ける状態です。","name":"副腎疲労","no":66,"page":78,"ritual":"【5分間】スモーキークォーツを手に、静かな場所で楽な姿勢を取ります。無理のない範囲で吐く息を少し長くし、身体の力を抜きます。【日常の習慣】短い休憩をこまめに取ります。","signs":"慢性的なストレスによる消耗の通称です。医学的な診断名ではありません。疲れは医師に相談を。","tagline":"いつも警戒モードで動き続けているとき。"},{"affirmation":"私のエネルギーは私が守ります。","category":"エネルギーと活力","chakra":"第３チャクラ：あなたの力とあなたの盾","doctor":"疲れや不調がいつも続くようになった、または悲しみ、不安、恐れが消えないとき。","items":[{"name":"ブラックトルマリン","text":"守りの石。ポケットに入れます。"},{"name":"ローズマリーティー","text":"朝に。自分のエネルギーで一日を始めます。"},{"name":"粗塩","text":"器に盛って玄関に置き、毎週取り替えます。"}],"meaning":"伝統では、境界線がもろい状態と捉えます。他人のエネルギーを吸い込み、その視線に揺さぶられてしまうのです。","name":"嫉妬とエネルギーの消耗","no":67,"page":79,"ritual":"【5分間】落ち着ける場所で手を洗うなど、気持ちの切り替えになる行動をひとつ選びます。ブラックトルマリンはそばに置いても構いません。光に包まれるイメージが心地よければ思い描き、自分の境界線を確かめます。","signs":"特定の人と過ごしたあとや、特定の場所に行ったあとに現れる疲れ、頭痛、イライラ。","tagline":"特定の人と会ったあと、力が抜けてしまうとき。"},{"affirmation":"一度に全部できなくてもいい。今はひとつに向き合います。","category":"エネルギーと活力","chakra":"第６チャクラ：明晰さと集中","doctor":"もの忘れを周りの人が心配している、または混乱、激しい頭痛、深い悲しみがあるとき。","items":[{"name":"フローライト","text":"集中の石。机の上に置きます。"},{"name":"ローズマリーとミント","text":"それぞれ小さじ半分ずつ、昼前に。"},{"name":"砂時計","text":"25分ずつ区切り、終わるたびにひと休み。"}],"meaning":"散漫さと結びつくとされます。何でも一度にやろうとし、ひとつに絞ることを自分に許さない状態です。","name":"集中力の低下","no":68,"page":80,"ritual":"【5分間】机の上から気になるものをひとつだけ片づけます。フローライトをそばに置いても構いません。小さな作業をひとつ選び、途中で疲れたら休みます。","signs":"注意が続かない、もの忘れ、考えが散らばる感覚。特に疲れているときに目立ちます。","tagline":"考えがあちこちに飛んでしまうとき。"},{"affirmation":"さまざまな形で自分を甘やかします。","category":"エネルギーと活力","chakra":"第２チャクラ：楽しみと甘やかさ","doctor":"強いのどの渇き、頻尿、体重減少、極度の疲れを伴うとき。糖尿病でないか確認が必要です。","items":[{"name":"ローズクォーツ","text":"心にやさしい甘さを。手に握ります。"},{"name":"シナモンティー","text":"スティック半分。砂糖なしで自然な甘さ。"},{"name":"果物","text":"欲しくなったときに備え、果物をひとつ手元に。"}],"meaning":"伝統では、日々に足りない甘やかさと結びつけます。自分で自分を甘やかさない分、外に求めるのです。","name":"甘いものがやめられない","no":69,"page":81,"ritual":"【5分間】ローズクォーツをそばに置き、飲み物を楽しみながら、今の自分が本当に求めているものを考えます。食べたい気持ちを責めず、選択を急がなくても大丈夫です。","signs":"甘いものへの強い欲求。特に午後や夜、疲れやストレスがあるときに起こります。","tagline":"足りない甘やかさを、食べ物に求めてしまうとき。"},{"affirmation":"重だるい日は無理をしなくていい。自分の身体をいたわります。","category":"エネルギーと活力","chakra":"第１チャクラ：軽やかで、しっかりした足どり","doctor":"片脚が腫れる、痛む、赤くなる、熱をもつ、息切れがある、または血管が浮き出て痛むとき。","items":[{"name":"オブシディアン","text":"重荷を下ろす助けに。儀式のときはそばに。"},{"name":"リンデンティー","text":"一日の終わりに、ぬるめで。"},{"name":"ヨガマット","text":"一日の終わりに、脚を壁に上げて5分。"}],"meaning":"荷を背負ったままの歩みと結びつくとされます。過去の重さを下ろさずに進み続けるのです。","name":"脚の重だるさ","no":70,"page":82,"ritual":"【5分間】脚が楽になる姿勢で休みます。壁に脚を上げることは必須ではありません。オブシディアンをそばに置き、今の身体の感覚を確かめながら静かに呼吸します。","signs":"一日の終わりの、脚の疲れや重さ、しびれ。暑いときや長く立ったあとに強まります。","tagline":"抱えたものが重く、前に進みにくいとき。"},{"no":71,"name":"不安","category":"感情とスピリチュアリティ","page":83,"tagline":"まだ起きていない未来に、心が住んでいるとき。","items":[{"name":"レピドライト","text":"安らぎの石。手に持ち、水にはつけません。"},{"name":"リンデンとレモンバーム","text":"合わせて1杯に小さじ。ふたをして蒸らします。"},{"name":"キャンドル","text":"呼吸しながら炎を見つめ、「今」に戻ります。"}],"signs":"絶え間ない心配、胃が締めつけられる感じ、動悸、緊張、リラックスしにくさ。","meaning":"伝統では、人生を信頼できない状態と捉えます。今の恐れを感じないように、未来をコントロールしようとするのです。","chakra":"第３チャクラ：信頼と心の静けさ","ritual":"【5分間】周囲を見渡し、見えるものや聞こえる音など、今ここで気づける感覚をひとつずつ確かめます。レピドライトはそばに置いても構いません。感覚を数え切る必要はなく、つらければ途中でやめて構いません。","doctor":"生活に支障がある、パニック発作がある、眠れない、自分を傷つけたい気持ちがあるとき。助けを求めてください。","affirmation":"不安があっても、今ここにいる自分を感じていい。"},{"no":72,"name":"自己肯定感の低さ","category":"感情とスピリチュアリティ","page":84,"tagline":"誰よりも厳しい目で自分を見るとき。","items":[{"name":"シトリン","text":"自分の輝きの石。ポケットか机の上に。"},{"name":"ローズティー","text":"乾燥した花びらで。自分への5分のごほうび。"},{"name":"手鏡","text":"自分の目を見て、やさしいひと言を。"}],"signs":"自分の価値を疑う、人と比べる、何をしても足りないと感じる、ほめ言葉を受け取りにくい。","meaning":"信じ込んできた古いメッセージと結びつくとされます。「十分じゃない」と今も告げる、過去の声です。","chakra":"第３チャクラ：自分の力と価値","ritual":"【5分間】昨日できたことをひとつ思い出します。思い浮かばない日は、今日ここまで過ごした自分を認めるだけでも構いません。鏡を見るかどうかは自由に選びます。","doctor":"人との関わりを避ける、自分を大切にしなくなる、または深い悲しみを伴うとき。心理の専門家が寄り添ってくれます。","affirmation":"私は、ありのままで十分です。"},{"no":73,"name":"悲しみと喪失の悲嘆","category":"感情とスピリチュアリティ","page":85,"tagline":"行き場を探し続けている愛。","items":[{"name":"ローズクォーツ","text":"胸の上にのせ、両手を重ねます。"},{"name":"レモンバームティー","text":"悲しみに寄り添う一杯。ぬるめを急がずに。"},{"name":"手紙","text":"失った人へ、言えなかったことを書きます。"}],"signs":"喪失のあとの深い悲しみ。涙、疲れ、食欲のなさ、胸の締めつけを伴うことがあります。","meaning":"伝統では、行き先を見つけられない愛と捉えます。絆は続いていて、痛みはそれを伝えるかたちなのです。","chakra":"第４チャクラ：感じて、大切にして、変えていくこと","ritual":"【5分間】落ち着ける場所で、思い出したいことをひとつ心に浮かべます。望むなら短い手紙を書きます。涙が出ても、何も浮かばなくても構いません。声に出して読む必要はありません。","doctor":"何か月も悲しみが和らがない、毎日を送れない、自分を傷つけたい気持ちがあるとき。今日、助けを求めてください。","affirmation":"愛したものを胸に、進むことを許します。"},{"no":74,"name":"見捨てられる不安","category":"感情とスピリチュアリティ","page":86,"tagline":"素顔を見せたら、去られそうで怖いとき。","items":[{"name":"レッドジャスパー","text":"安心と根づく力。両手で包んで持ちます。"},{"name":"リンデンティー","text":"気持ちを落ち着ける一杯。カップに小さじ1。"},{"name":"ブランケット","text":"くるまると、体が安心することを覚えていきます。"}],"signs":"つながりへの不安、たえず確かめずにいられない気持ち、距離や沈黙への苦しさ。","meaning":"幼いころの傷と結びつくとされます。ひとりになるのが怖かった自分の一部が、今も外に安心を探しているのです。","chakra":"第１チャクラ：内側の安心感","ritual":"【5分間】心地よければブランケットを使い、片手を胸かお腹にそっと添えます。レッドジャスパーは手に持っても構いません。「不安な私も、そのままでいい」と心の中で語りかけます。","doctor":"不安に押しつぶされそう、人間関係や仕事に影響が出る、またはパニック発作があるとき。心理の専門家に相談を。","affirmation":"不安な私も、そのままでいい。私は私の味方です。"},{"no":75,"name":"過度な罪悪感","category":"感情とスピリチュアリティ","page":87,"tagline":"もう償った過ちを、まだ背負っているとき。","items":[{"name":"ロードナイト","text":"許しの石。胸の上に置きます。"},{"name":"カモミールティー","text":"ぬるめで、この時間のおともに。"},{"name":"水を入れたボウル","text":"手をぬらし、背負わなくていいものを手放します。"}],"signs":"何でも自分の責任だと思う、何かにつけて謝る、楽しむと自分にはその資格がないと感じてしまう。","meaning":"伝統では、自分への厳しさと結びつけます。返し終えた借りを、内なる裁判官が今も取り立てるのです。","chakra":"第４チャクラ：許すこと、自分のことも","ritual":"【5分間】自分を責めている気持ちがあれば、書ける範囲で短く言葉にします。ロードナイトはそばに置いても構いません。「今の私にも、いたわりが必要」と静かに確かめます。書くのがつらい日は休むだけでも構いません。","doctor":"罪悪感で日常が送れない、または深い悲しみや自分を傷つけたい気持ちを伴うとき。専門家の助けを求めてください。","affirmation":"あのときの私を責め続けなくていい。今の私にも優しさを向けます。"},{"no":76,"name":"完璧主義","category":"感情とスピリチュアリティ","page":88,"tagline":"何をしても、十分だと思えないとき。","items":[{"name":"タイガーアイ","text":"しなやかな自信の石。机の上に。"},{"name":"ラベンダーティー","text":"カップに花をひとつまみ。緊張をゆるめます。"},{"name":"砂時計","text":"時間を決め、そこで終わりにします。"}],"signs":"自分への要求がとても高い、間違いを恐れる、何度も見直す、完璧にできないならと先延ばしにする。","meaning":"受け入れられない恐れと結びつくとされます。一度も失敗しなければ愛される、と信じているのです。","chakra":"第３チャクラ：自分を責めない意志","ritual":"【5分間】取り組めそうな小さな作業をひとつ選び、時間を決めて始めます。タイガーアイはそばに置いても構いません。時間が来たら、できたところまでを認めます。完璧に終える必要はありません。","doctor":"不安が絶えない、何も終えられない、眠れない、または深い悲しみがあるとき。助けを求めてください。","affirmation":"完璧でなくても、ここまで進めた自分を認めます。"},{"no":77,"name":"先延ばし","category":"感情とスピリチュアリティ","page":89,"tagline":"先延ばしは怠けではなく、多くの場合は恐れです。","items":[{"name":"カーネリアン","text":"始める勢いの石。手に持ちます。"},{"name":"ローズマリーティー","text":"朝に。すっきり始めるために。"},{"name":"紙と鉛筆","text":"笑ってしまうほど小さな、最初の一歩を書きます。"}],"signs":"あとで困るとわかっていても大事なことを後回しにし、進まないことに罪悪感を覚える。","meaning":"伝統では、失敗や批判への恐れと捉えます。始めなければ、誰にも評価されずにすむのです。","chakra":"第２チャクラ：創造の衝動","ritual":"【5分間】やりたいことの最小の一歩を紙に書き、できそうならその一歩だけ試します。カーネリアンはそばに置いても構いません。始められない日も責めず、準備できたことを認めます。","doctor":"仕事や勉強ができない、強い不安や悲しみを伴う、または注意欠如かもしれないと思うとき。","affirmation":"小さな一歩からでいい。始める時を自分で選びます。"},{"no":78,"name":"孤独","category":"感情とスピリチュアリティ","page":90,"tagline":"人といても、遠くにいるように感じる。","items":[{"name":"ローズクォーツ","text":"胸の上に。まずは自分自身に寄り添って。"},{"name":"ローズティー","text":"大切な人をもてなすように、自分にいれます。"},{"name":"鉢植え","text":"生きものの世話も、心の支えに。"}],"signs":"孤立している、誰にもわかってもらえないという感覚。疲れや悲しみ、意欲のなさを伴うこともあります。","meaning":"自分自身と離れていることと結びつくとされます。自分に寄り添えないと、外にも空しさを感じるのです。","chakra":"第４チャクラ：つながり、まずは自分から","ritual":"【5分間】自分のために温かい飲み物を用意するなど、心地よい時間をつくります。つながりたい人が浮かべば、送らなくてもよいメッセージを書いてみます。","doctor":"悲しみが和らがない、自分をいたわれない、自分を傷つけたい気持ちがあるとき。今日、助けを求めてください。","affirmation":"まず私が私に寄り添い、人にも心を開きます。"},{"no":79,"name":"自己妨害","category":"感情とスピリチュアリティ","page":91,"tagline":"あと一歩なのに、心にブレーキがかかるとき。","items":[{"name":"オブシディアン","text":"隠れているものを映す石。正直な目で見つめます。"},{"name":"ジンジャーティー","text":"薄切り2〜3枚を5分。勢いとぬくもりを。"},{"name":"ノート","text":"ブレーキがかかったら記録を。パターンが見えます。"}],"signs":"何かを達成する直前でやめる、大事なことを後回しにする、自分によくないとわかっているものを選ぶ。","meaning":"伝統では、資格がないという思い込みと結びつけます。成功したあとのことを、心の一部が恐れているのです。","chakra":"第１チャクラ：成長するための安心感","ritual":"【5分間】『うまくいったら怖いのは……』の続きを、書ける範囲でひとつだけ書きます。答えが出なくても構いません。今の気持ちを責めずに眺めます。","doctor":"何事も同じパターンをくり返す、または不安、飲酒や薬物の問題、深い悲しみを伴うとき。心理の専門家が力になってくれます。","affirmation":"私はよいものに値します。受け取っていい。"},{"no":80,"name":"インポスター症候群","category":"感情とスピリチュアリティ","page":92,"tagline":"いつ見抜かれてもおかしくない、と感じるとき。","items":[{"name":"ラブラドライト","text":"自分の光に気づくために。"},{"name":"レモンバーベナティー","text":"やさしい香りの一杯。カップに小さじ1。"},{"name":"できたことの瓶","text":"できたことを小さな紙に書いてためます。"}],"signs":"成果は自分にふさわしくない、運がよかっただけ、もうすぐ「実はわかっていない」と見抜かれる、と感じる。","meaning":"自分の立ち位置になじめないことと結びつくとされます。自己イメージが追いつかないほど速く成長してきたのです。","chakra":"第５チャクラ：自分が知っていることから話すこと","ritual":"【5分間】今日できたことをひとつ、小さな紙に書きます。ラブラドライトをそばに置き、その事実を自分の言葉で認めます。【日常の習慣】紙を瓶にため、気持ちが揺らぐ日に読み返します。","doctor":"身動きが取れなくなる、不安が絶えない、または仕事で成長できなくなっているとき。支えを求めてください。","affirmation":"ここまで歩んできた私の努力を、私自身が認めていい。"}];
+var CATS = ["身体の痛み","肌と髪","消化","睡眠","呼吸とのど","月経周期とホルモン","エネルギーと活力","感情とスピリチュアリティ"];
+var CHAKRAS = [
+  {key:"第１チャクラ",label:"第１チャクラ",color:"#c0392b"},
+  {key:"第２チャクラ",label:"第２チャクラ",color:"#e07b24"},
+  {key:"第３チャクラ",label:"第３チャクラ",color:"#d4a017"},
+  {key:"第４チャクラ",label:"第４チャクラ",color:"#3d9970"},
+  {key:"第５チャクラ",label:"第５チャクラ",color:"#2f7fc4"},
+  {key:"第６チャクラ",label:"第６チャクラ",color:"#4b4fa0"},
+  {key:"第７チャクラ",label:"第７チャクラ",color:"#7d4fa6"}
+];
+var state = { q:"", cat:"", chakras:[] };
+
+function chakraKeys(chakraStr){
+  var keys=[];
+  CHAKRAS.forEach(function(c){ if(chakraStr.indexOf(c.key)===0 || chakraStr.indexOf("と"+c.key)>-1){ keys.push(c.key); } });
+  return keys;
+}
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function matches(s){
+  if(state.cat && s.category!==state.cat) return false;
+  if(state.chakras.length && !state.chakras.some(function(key){ return chakraKeys(s.chakra).indexOf(key)>=0; })) return false;
+  if(state.q){
+    var q=state.q.toLowerCase();
+    var hay=[s.name,s.tagline,s.signs,s.meaning,s.chakra,s.category].join(" ");
+    s.items.forEach(function(it){ hay+=" "+it.name+" "+it.text; });
+    var terms=q.split(/[\s　]+/).filter(Boolean);
+    for(var i=0;i<terms.length;i++){ if(hay.toLowerCase().indexOf(terms[i])<0) return false; }
+  }
+  return true;
+}
+function chakraColor(key){
+  var found="";
+  CHAKRAS.forEach(function(c){ if(c.key===key) found=c.color; });
+  return found;
+}
+function chakraHeadHTML(head){
+  return head.split("と").map(function(part){
+    var key=part.trim();
+    var color=chakraColor(key);
+    return (color?'<span class="cdot" style="background:'+color+'"></span>':"")+esc(key);
+  }).join("と");
+}
+function chakraBadgeHTML(chakraStr){
+  return chakraHeadHTML(chakraStr.split("：")[0]);
+}
+function chakraFullHTML(chakraStr){
+  var parts=chakraStr.split("：");
+  var head=chakraHeadHTML(parts[0]);
+  return parts.length>1 ? head+"："+esc(parts.slice(1).join("：")) : head;
+}
+function detailHTML(s){
+  var items=s.items.map(function(it,i){
+    return '<li><span class="num">'+(i+1)+'</span><span><span class="iname">'+esc(it.name)+'</span><br><span class="itext">'+esc(it.text)+'</span></span></li>';
+  }).join("");
+  return '<div class="detail">'
+    +'<section class="content-section"><h3>01 <span>からだのサイン</span></h3><p>'+esc(s.signs)+'</p></section>'
+    +'<section class="content-section"><h3>02 <span>心と身体への気づき（伝統的な解釈）</span></h3><p>'+esc(s.meaning)+'</p></section>'
+    +'<section class="content-section chakra-panel"><h3>03 <span>関連チャクラ</span></h3><p>'+chakraFullHTML(s.chakra)+'</p></section>'
+    +'<section class="content-section ritual-panel"><h3>04 <span>5分間の儀式</span></h3><p>'+esc(s.ritual)+'</p></section>'
+    +'<section class="content-section"><h3>05 <span>アファメーション</span></h3><div class="aff"><p>'+esc(s.affirmation)+'</p></div></section>'
+    +'<section class="content-section"><h3>06 <span>こんなときは医師に相談を</span></h3><div class="doctor"><p>'+esc(s.doctor)+'</p></div></section>'
+    +'<details class="supplement"><summary>07　おすすめアイテムを見る（任意）</summary><ol class="items">'+items+'</ol></details>'
+    +'<p class="pagenote sans">本の'+s.page+'ページ</p>'
+    +'</div>';
+}
+var expandedSheetNos = {};
+function render(){
+  var list=document.getElementById("list");
+  // Expanded sheet IDs persist even when a filter temporarily hides them.
+  var filtered=SHEETS.filter(matches);
+  var html="";
+  CATS.forEach(function(cat){
+    var group=filtered.filter(function(s){return s.category===cat;});
+    if(!group.length) return;
+    html+='<section><div class="cat-head"><h2>'+esc(cat)+'</h2><span class="n sans">'+group.length+'件</span></div>';
+    group.forEach(function(s){
+      html+='<details class="sheet" data-no="'+s.no+'">'
+        +'<summary><span class="s-top"><span class="s-no">'+s.no+'</span>'
+        +'<span class="s-main"><span class="s-name">'+esc(s.name)+'</span>'
+        +'<span class="s-tag" style="display:block">'+esc(s.tagline)+'</span>'
+        +'<span class="s-meta"><span class="badge chakra">'+chakraBadgeHTML(s.chakra)+'</span><span class="badge">本の'+s.page+'ページ</span></span></span>'
+        +'<span class="chev" aria-hidden="true">▽</span></span></summary>'
+        +detailHTML(s)
+        +'</details>';
+    });
+    html+='</section>';
+  });
+  list.innerHTML=html;
+  list.querySelectorAll("details.sheet").forEach(function(el){
+    if(expandedSheetNos[el.getAttribute("data-no")]) el.open=true;
+  });
+  list.querySelectorAll("details.sheet").forEach(function(el){
+    el.addEventListener("toggle", function(){
+      if(el.open) expandedSheetNos[el.getAttribute("data-no")]=true;
+      else delete expandedSheetNos[el.getAttribute("data-no")];
+    });
+  });
+  document.getElementById("empty").style.display = filtered.length? "none":"block";
+  document.getElementById("countText").innerHTML = "全80シート中 <b>"+filtered.length+"</b> 件";
+  var active = state.q||state.cat||state.chakras.length;
+  document.getElementById("resetBtn").style.display = active? "inline-block":"none";
+  document.getElementById("clearQ").style.display = state.q? "block":"none";
+}
+function buildChips(){
+  var cc=document.getElementById("catChips");
+  var all=[{v:"",label:"すべて"}].concat(CATS.map(function(c){return{v:c,label:c};}));
+  cc.innerHTML=all.map(function(o){return '<button class="chip" data-v="'+esc(o.v)+'" aria-pressed="'+(state.cat===o.v)+'">'+esc(o.label)+'</button>';}).join("");
+  cc.querySelectorAll(".chip").forEach(function(b){ b.addEventListener("click",function(){ state.cat=b.getAttribute("data-v"); syncChips(); render(); }); });
+  var kc=document.getElementById("chakraChips");
+  kc.classList.add("chakra-checks");
+  kc.innerHTML=CHAKRAS.map(function(c){
+    return '<label class="chakra-option"><input type="checkbox" value="'+esc(c.key)+'"'+(state.chakras.indexOf(c.key)>=0?' checked':'')+'><span class="cdot" style="background:'+c.color+'"></span><span>'+esc(c.label)+'</span></label>';
+  }).join("");
+  kc.querySelectorAll('input[type="checkbox"]').forEach(function(cb){
+    cb.addEventListener("change",function(){
+      state.chakras=Array.from(kc.querySelectorAll('input:checked'),function(el){return el.value;});
+      render();
+    });
+  });
+}
+function syncChips(){
+  document.querySelectorAll("#catChips .chip").forEach(function(b){ b.setAttribute("aria-pressed", b.getAttribute("data-v")===state.cat ? "true":"false"); });
+  document.querySelectorAll("#chakraChips input[type=checkbox]").forEach(function(cb){ cb.checked=state.chakras.indexOf(cb.value)>=0; });
+}
+var qEl=document.getElementById("q");
+qEl.addEventListener("input",function(){ state.q=qEl.value.trim(); render(); });
+document.getElementById("clearQ").addEventListener("click",function(){ qEl.value=""; state.q=""; render(); qEl.focus(); });
+document.getElementById("resetBtn").addEventListener("click",function(){ state={q:"",cat:"",chakras:[]}; qEl.value=""; syncChips(); render(); });
+buildChips();
+render();
+</script>
+</body>
+</html>
